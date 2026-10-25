@@ -1,6 +1,6 @@
 {
   "name": "muzebos",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "MuzeBOS — local-first business workspace with approval-bound invoicing and evidence",
   "scripts": {
@@ -17,7 +17,8 @@
     "lab-sync": "tsx scripts/lab-sync.ts",
     "lab-agent": "tsx scripts/lab-agent.ts",
     "lab-e2e": "tsx scripts/lab-e2e-dry.ts",
-    "test:browser": "node scripts/muzebos-browser.mjs"
+    "test:browser": "node scripts/muzebos-browser.mjs",
+    "test:mission-browser": "node scripts/muzebos-mission-browser.mjs"
   },
   "dependencies": {
     "@miosa/sdk": "^3.2.5",

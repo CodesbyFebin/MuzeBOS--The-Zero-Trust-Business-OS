@@ -53,3 +53,24 @@ this endpoint. No action sends a WhatsApp message or charges a bank account.
 
 Errors use `{ "error": "..." }` and appropriate 400, 401, 403, 404, 409, 413 or
 500 status. Retried successful command keys do not create duplicate records.
+
+## Mission Control and reminders
+
+GET /api/mission-control returns timestamped business counters, real relation
+graph nodes/edges, tasks, reminders, activity and observed connector status.
+The response reports unavailable or excluded sources explicitly.
+
+POST /api/business additionally accepts:
+
+```json
+{"action":"reminder","data":{"title":"Follow up","dueAt":"2026-10-26T10:00:00Z"}}
+```
+
+`dueAt` is optional or null. Completion is an idempotent-keyed command:
+
+```json
+{"action":"completeReminder","id":"<reminder UUID>"}
+```
+
+Both commands require the same authentication, Origin, body size and
+idempotency checks as commerce commands. They append audit evidence.

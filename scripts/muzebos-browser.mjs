@@ -9,7 +9,7 @@ page.on('pageerror',e=>errors.push(e.message));
 const suffix=Date.now().toString();
 const clickTab=async name=>page.getByRole('navigation',{name:'Business views'}).getByRole('button',{name,exact:true}).click();
 try {
- await page.goto(base,{waitUntil:'networkidle'});
+ await page.goto(base+'/business',{waitUntil:'networkidle'});
  await page.getByRole('heading',{name:'Business intelligence'}).waitFor();
  await page.getByText('Opening your local workspace…').waitFor({state:'hidden'});
  await clickTab('customers');

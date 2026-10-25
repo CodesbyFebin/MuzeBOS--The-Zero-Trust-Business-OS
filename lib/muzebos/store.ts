@@ -11,6 +11,7 @@ const customerSchema = z.object({ name: text, email: z.union([z.string().email()
 const productSchema = z.object({ name: text, sku: text, price: money, taxBps: z.number().int().min(0).max(10_000), stock: z.number().int().min(0).max(1_000_000) }).strict();
 const draftSchema = z.object({ customerId: z.string().uuid(), lines: z.array(z.object({ productId: z.string().uuid(), quantity: z.number().int().min(1).max(10_000) }).strict()).min(1).max(100) }).strict();
 const merchantSchema=z.object({name:text,address:z.string().trim().max(1000),taxId:z.string().trim().max(40),upi:z.union([z.string().regex(/^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$/),z.literal('')])}).strict();
+export type Reminder={id:string;title:string;dueAt:string|null;status:'open'|'done';createdAt:string;completedAt:string|null};
 export type Merchant=z.infer<typeof merchantSchema>;
 export type Customer = { id: string; name: string; email: string };
 export type Product = { id: string; name: string; sku: string; price: number; taxBps: number; stock: number };
@@ -41,6 +42,8 @@ export class BusinessStore {
       CREATE TABLE IF NOT EXISTS mb_movements(id TEXT PRIMARY KEY, productId TEXT NOT NULL REFERENCES mb_products(id), orderId TEXT NOT NULL REFERENCES mb_orders(id), quantity INTEGER NOT NULL, createdAt TEXT NOT NULL, UNIQUE(productId,orderId));
       CREATE TABLE IF NOT EXISTS mb_audit(seq INTEGER PRIMARY KEY AUTOINCREMENT, action TEXT NOT NULL, target TEXT NOT NULL, detail TEXT NOT NULL, createdAt TEXT NOT NULL, previousHash TEXT NOT NULL, hash TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS mb_commands(key TEXT PRIMARY KEY, requestHash TEXT NOT NULL, result TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS mb_reminders(id TEXT PRIMARY KEY,title TEXT NOT NULL,dueAt TEXT,status TEXT NOT NULL CHECK(status IN ('open','done')),createdAt TEXT NOT NULL,completedAt TEXT);
+      INSERT OR IGNORE INTO mb_migrations VALUES(2, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
       CREATE TABLE IF NOT EXISTS mb_settings(key TEXT PRIMARY KEY, value TEXT NOT NULL);
       INSERT OR IGNORE INTO mb_migrations VALUES(1, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
     `);
@@ -65,6 +68,16 @@ export class BusinessStore {
       previous = hash;
     }
     return true;
+  }
+  reminders(): Reminder[] { return this.db.prepare('SELECT * FROM mb_reminders ORDER BY createdAt DESC,rowid DESC').all() as Reminder[]; }
+  reminder(input:unknown) {
+    const parsed=z.object({title:z.string().trim().min(1).max(200),dueAt:z.string().datetime({offset:true}).nullable().default(null)}).strict().parse(input);
+    const record:Reminder={id:randomUUID(),...parsed,status:'open',createdAt:now(),completedAt:null};
+    return this.atomic(()=>{this.db.prepare('INSERT INTO mb_reminders VALUES(@id,@title,@dueAt,@status,@createdAt,@completedAt)').run(record);this.audit('reminder.created',record.id,record.title);return record;});
+  }
+  completeReminder(id:string) {
+    z.string().uuid().parse(id);
+    return this.atomic(()=>{const result=this.db.prepare("UPDATE mb_reminders SET status='done',completedAt=? WHERE id=? AND status='open'").run(now(),id);if(result.changes!==1)throw new BusinessError('Open reminder not found',409);this.audit('reminder.completed',id,'Operator marked reminder done');return {id};});
   }
   merchant(): Merchant {
     const row=this.db.prepare("SELECT value FROM mb_settings WHERE key='merchant'").get() as {value:string}|undefined;

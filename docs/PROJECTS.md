@@ -25,3 +25,13 @@ Updated: 2026-10-25
 - [x] Keep payment settlement honest and provider connections explicit.
 - [x] Add domain and boundary tests.
 - [ ] Complete external and production gates listed above.
+
+## Founder navigation and Mission Control
+
+| Area | State |
+| --- | --- |
+| 18 sidebar destinations, five pinned utilities | Implemented |
+| 200 categorized tools plus five utility hubs | Organized; individual capability status remains explicit |
+| Real Mission Control, graph, polling and stale-state display | Verified locally; see MUZEBOS-MISSION-VERIFICATION.md |
+| Persistent reminders with due dates and completion | Implemented |
+| GitBook invitation | No invitation accepted or documentation published |

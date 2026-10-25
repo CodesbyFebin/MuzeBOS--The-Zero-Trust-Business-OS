@@ -23,6 +23,7 @@ type RouteEntry = {
 // a real 200 (not a 400/404 for a missing arg). Live-connector routes
 // (connections, social/sync) must still answer 200 with honest state.
 const ROUTES: RouteEntry[] = [
+  { route: 'mission-control', load: () => import('@/app/api/mission-control/route'), url: 'http://localhost/api/mission-control' },
   { route: 'business', load: () => import('@/app/api/business/route'), url: 'http://localhost/api/business' },
   { route: 'agents', load: () => import('@/app/api/agents/route'), url: 'http://localhost/api/agents' },
   // FounderOS merge (fo/data): every new GET answers 200 on a blank install, spending nothing.

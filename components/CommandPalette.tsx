@@ -6,6 +6,8 @@ import { filterCommands, type Command } from '@/lib/palette';
 // Digit shortcuts (1–9) jump to views — derived from the sidebar's visible order
 // so they stay in lockstep with the nav.
 import { digitViewsFor } from '@/lib/nav';
+import { workspaceDigitViews } from '@/lib/muzebos/navigation';
+import { BRAND } from '@/lib/brand';
 import { GEmpty, GList, GRow, GSearch, GTag } from '@/components/g';
 import type { UiStyle } from '@/lib/appearance';
 import { useUiStyle } from '@/lib/use-ui-style';
@@ -43,7 +45,7 @@ export function CommandPalette({ commands, ui = 'classic', off = [] }: { command
         if (e.defaultPrevented) return;
         close();
       } else if (!open && /^[1-9]$/.test(e.key) && !e.metaKey && !e.ctrlKey && !e.altKey && !isTyping()) {
-        const href = digitViewsFor(off)[Number(e.key) - 1];
+        const href = (BRAND.id === 'muzebos' ? workspaceDigitViews() : digitViewsFor(off))[Number(e.key) - 1];
         if (href) router.push(href);
       }
     }

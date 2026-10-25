@@ -13,7 +13,7 @@ function minor(raw:string) {
   if(!/^\d+(\.\d{1,2})?$/.test(raw)) throw new Error('Enter a price with at most two decimal places');
   const [whole,fraction='']=raw.split('.');return Number(whole)*100+Number(fraction.padEnd(2,'0'));
 }
-export function BusinessConsole() {
+export function BusinessConsole({initialView='overview'}:{initialView?:string}={}) {
   const [data,setData]=useState<Snapshot|null>(null);
   const [tab,setTab]=useState<Tab>('overview');
   const [error,setError]=useState('');const [notice,setNotice]=useState('');
@@ -24,9 +24,9 @@ export function BusinessConsole() {
     if(!res.ok) throw new Error(body.error||'Unable to load business records');setData(body);
   }
   useEffect(()=>{
-    const t=new URLSearchParams(window.location.search).get('view');if(tabs.includes(t as Tab)) setTab(t as Tab);
+    const t=initialView;if(tabs.includes(t as Tab)) setTab(t as Tab);
     refresh().catch(e=>setError(e.message));
-  },[]);
+  },[initialView]);
   async function act(command:unknown,message:string) {
     setBusy(true);setError('');setNotice('');
     try {

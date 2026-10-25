@@ -1,3 +1,5 @@
+import { SIDEBAR_ENTRIES } from '@/lib/muzebos/navigation';
+import { BRAND } from '@/lib/brand';
 import { NAV_EXTRA, NAV_ITEMS, groupOf } from '@/lib/nav';
 
 /** Window events a palette command can fire instead of navigating. */
@@ -42,7 +44,8 @@ export function filterCommands(commands: Command[], query: string): Command[] {
  *  every sidebar item plus the palette-only NAV_EXTRA views. The group title
  *  joins the keywords, so typing "system" or "growth" lists that group. */
 export function viewCommands(): Command[] {
-  return [...NAV_ITEMS, ...NAV_EXTRA].map((item) => {
+  const workspace = BRAND.id === 'muzebos' ? SIDEBAR_ENTRIES.filter(e=>e.href!=='/'&&e.id!=='workflows').map(e=>({href:e.href,label:e.label,keywords:`${e.cadence} workspace ${e.id}`})) : [];
+  return [...NAV_ITEMS, ...NAV_EXTRA, ...workspace].map((item) => {
     const group = groupOf(item.href)?.title;
     const slug = item.label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     return {

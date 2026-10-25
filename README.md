@@ -6,9 +6,19 @@ A self-hostable business workspace built from FounderOS. MuzeBOS adds a real,
 local SQLite commerce desk to the inherited business and AI department screens,
 with a dark operational interface inspired by the supplied reference.
 
-**Version 0.1.0: single-operator local preview.** The name describes the design
+**Version 0.1.1: single-operator local preview.** The name describes the design
 goal; this release is not a claim of independently certified zero-trust security
 or production readiness.
+
+## Daily founder workspace
+
+The sidebar has 18 destinations, with daily categories first and five utilities
+pinned below. All 205 requested pillars are organized inside category hubs with
+Available, Existing, or Planned labels. The home page is Mission Control: it
+shows real approvals, pending invoice requests, stockouts, tasks, persistent
+reminders, actual relationships, audit events and connector status. Updates poll
+every 20 seconds while visible; errors retain the last timestamped snapshot.
+See [navigation and status details](docs/MUZEBOS-NAVIGATION.md).
 
 ## What works locally
 

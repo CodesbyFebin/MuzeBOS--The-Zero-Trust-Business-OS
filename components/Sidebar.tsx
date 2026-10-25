@@ -21,6 +21,7 @@
  * `ui` comes from the root layout and then follows html[data-ui] live.
  */
 import Link from 'next/link';
+import { WorkspaceNavigation } from '@/components/muzebos/WorkspaceNavigation';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -398,7 +399,7 @@ export function Sidebar({ brand, ui = 'classic', off = [] }: { brand: BrandMark;
             </Link>
           </div>
         )}
-        <nav ref={navRef} className="os-nav" aria-label="Views">
+        {brand.name === 'MuzeBOS' ? <WorkspaceNavigation /> : <nav ref={navRef} className="os-nav" aria-label="Views">
           <div ref={listRef} className="os-nav-list">
             {visibleGroups(off).map((group) => (
               <div key={group.id} role="group" aria-label={group.label} className="os-nav-group">
@@ -457,7 +458,7 @@ export function Sidebar({ brand, ui = 'classic', off = [] }: { brand: BrandMark;
               </div>
             ))}
           </div>
-        </nav>
+        </nav>}
         {legacy && <LegacySideFoot />}
 
         {/* edge toggle (FR-7): rail ↔ last labelled width, same recipe as the Wizard dock's edge arrows */}
