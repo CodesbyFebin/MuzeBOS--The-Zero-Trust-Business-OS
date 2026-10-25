@@ -6,7 +6,7 @@ import { filterCommands, type Command } from '@/lib/palette';
 // Digit shortcuts (1–9) jump to views — derived from the sidebar's visible order
 // so they stay in lockstep with the nav.
 import { digitViewsFor } from '@/lib/nav';
-import { workspaceDigitViews } from '@/lib/muzebos/navigation';
+import { workspaceDigitViews } from '@/lib/muzebos/registry';
 import { BRAND } from '@/lib/brand';
 import { GEmpty, GList, GRow, GSearch, GTag } from '@/components/g';
 import type { UiStyle } from '@/lib/appearance';

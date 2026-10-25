@@ -1,3 +1,6 @@
+// Menus whose short path (/orders, /money …) has no page of its own.
+export const MUZEBOS_SHORT_PATHS = ['orders', 'money', 'talk', 'stock', 'growth', 'operations', 'builder', 'foundation', 'system', 'evidence', 'settings', 'upgrade', 'support', 'developer', 'account'];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Isolate the build output dir via env so a production build can run on its
@@ -20,6 +23,13 @@ const nextConfig = {
       // FounderOS kept lead magnets under /content/lead-magnets; GladOS has no
       // /content page (archived 2026-09-17), so the old path 308s (SPEC O2).
       { source: '/content/lead-magnets', destination: '/lead-magnets', permanent: true },
+      // MuzeBOS short paths -> canonical registry routes (lib/muzebos/registry.ts;
+      // tests/muzebos-registry.test.ts keeps this list in sync). 307 so the
+      // short paths stay free for later use.
+      ...MUZEBOS_SHORT_PATHS.map((id) => ({ source: `/${id}`, destination: `/workspace/${id}`, permanent: false })),
+      { source: '/help', destination: '/workspace/support', permanent: false },
+      { source: '/api-docs', destination: '/workspace/developer', permanent: false },
+      { source: '/billing', destination: '/workspace/upgrade', permanent: false },
     ];
   },
   // Pre-rename URLs, served by the renamed targets (S02 FR-5, FR-14). The

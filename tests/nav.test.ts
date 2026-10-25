@@ -176,7 +176,9 @@ describe('command palette mirrors the nav (S12 FR-3, C34)', () => {
     expect(top('drift')).toBe('/drift');
     expect(top('compute')).toBe('/compute');
     expect(top('brain files')).toBe('/database');
-    expect(top('database')).toBe('/database');
+    // MuzeBOS registry page "Database Migration Ledger" (label-prefix match) now
+    // outranks the keyword match; the Brain Files view stays findable.
+    expect(filterCommands(cmds, 'database').map((c) => c.href)).toContain('/database');
     expect(top('ad engine')).toBe('/creative-engine');
     expect(top('org chart')).toBe('/org');
     expect(top('reference')).toBe('/blueprint');
