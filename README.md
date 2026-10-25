@@ -125,3 +125,14 @@ Derived from the supplied FounderOS (on GladOS) source. The original MIT license
 and copyright remain in [LICENSE](LICENSE). Internal directory names, historical
 design documents, environment keys, and compatibility code retain upstream
 names intentionally. New MuzeBOS work: CodesbyFebin, 2026.
+
+## Reviewed upstream integrations
+
+The source catalog covers 29 pinned repositories, with licenses and integration
+status kept separate from deployment claims. New local sections include resource
+bookings, an attributed AI employee/founder prompt library, and a limited
+browser-local permission review using AgentShield's MIT normalizer.
+
+See [integration review](docs/MUZEBOS-UPSTREAM-INTEGRATIONS.md) and
+[third-party notices](THIRD_PARTY_NOTICES.md). No external applications or
+autonomous employee schedules are launched by these sections.

@@ -12,6 +12,7 @@ const productSchema = z.object({ name: text, sku: text, price: money, taxBps: z.
 const draftSchema = z.object({ customerId: z.string().uuid(), lines: z.array(z.object({ productId: z.string().uuid(), quantity: z.number().int().min(1).max(10_000) }).strict()).min(1).max(100) }).strict();
 const merchantSchema=z.object({name:text,address:z.string().trim().max(1000),taxId:z.string().trim().max(40),upi:z.union([z.string().regex(/^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$/),z.literal('')])}).strict();
 export type Reminder={id:string;title:string;dueAt:string|null;status:'open'|'done';createdAt:string;completedAt:string|null};
+export type Booking={id:string;customerId:string;resource:string;startsAt:string;endsAt:string;status:'confirmed'|'cancelled';createdAt:string};
 export type Merchant=z.infer<typeof merchantSchema>;
 export type Customer = { id: string; name: string; email: string };
 export type Product = { id: string; name: string; sku: string; price: number; taxBps: number; stock: number };
@@ -42,6 +43,9 @@ export class BusinessStore {
       CREATE TABLE IF NOT EXISTS mb_movements(id TEXT PRIMARY KEY, productId TEXT NOT NULL REFERENCES mb_products(id), orderId TEXT NOT NULL REFERENCES mb_orders(id), quantity INTEGER NOT NULL, createdAt TEXT NOT NULL, UNIQUE(productId,orderId));
       CREATE TABLE IF NOT EXISTS mb_audit(seq INTEGER PRIMARY KEY AUTOINCREMENT, action TEXT NOT NULL, target TEXT NOT NULL, detail TEXT NOT NULL, createdAt TEXT NOT NULL, previousHash TEXT NOT NULL, hash TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS mb_commands(key TEXT PRIMARY KEY, requestHash TEXT NOT NULL, result TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS mb_bookings(id TEXT PRIMARY KEY,customerId TEXT NOT NULL REFERENCES mb_customers(id),resource TEXT NOT NULL,startsAt TEXT NOT NULL,endsAt TEXT NOT NULL,status TEXT NOT NULL CHECK(status IN ('confirmed','cancelled')),createdAt TEXT NOT NULL);
+      CREATE INDEX IF NOT EXISTS mb_bookings_resource_time ON mb_bookings(resource,startsAt,endsAt);
+      INSERT OR IGNORE INTO mb_migrations VALUES(3, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
       CREATE TABLE IF NOT EXISTS mb_reminders(id TEXT PRIMARY KEY,title TEXT NOT NULL,dueAt TEXT,status TEXT NOT NULL CHECK(status IN ('open','done')),createdAt TEXT NOT NULL,completedAt TEXT);
       INSERT OR IGNORE INTO mb_migrations VALUES(2, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
       CREATE TABLE IF NOT EXISTS mb_settings(key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -78,6 +82,23 @@ export class BusinessStore {
   completeReminder(id:string) {
     z.string().uuid().parse(id);
     return this.atomic(()=>{const result=this.db.prepare("UPDATE mb_reminders SET status='done',completedAt=? WHERE id=? AND status='open'").run(now(),id);if(result.changes!==1)throw new BusinessError('Open reminder not found',409);this.audit('reminder.completed',id,'Operator marked reminder done');return {id};});
+  }
+  bookings(): Booking[] { return this.db.prepare('SELECT * FROM mb_bookings ORDER BY startsAt').all() as Booking[]; }
+  booking(input:unknown) {
+    const parsed=z.object({customerId:z.string().uuid(),resource:z.string().trim().min(1).max(120).transform(s=>s.toLowerCase()),startsAt:z.string().datetime({offset:true}),endsAt:z.string().datetime({offset:true})}).strict().parse(input);
+    const startsAt=new Date(parsed.startsAt).toISOString(),endsAt=new Date(parsed.endsAt).toISOString();
+    if(startsAt>=endsAt)throw new BusinessError('Booking end must be after start');
+    return this.atomic(()=>{
+      if(!this.db.prepare('SELECT id FROM mb_customers WHERE id=?').get(parsed.customerId))throw new BusinessError('Customer not found',404);
+      if(this.db.prepare("SELECT id FROM mb_bookings WHERE resource=? AND status='confirmed' AND startsAt<? AND endsAt>?").get(parsed.resource,endsAt,startsAt))throw new BusinessError('Resource already booked for this time',409);
+      const record:Booking={id:randomUUID(),...parsed,startsAt,endsAt,status:'confirmed',createdAt:now()};
+      this.db.prepare('INSERT INTO mb_bookings VALUES(@id,@customerId,@resource,@startsAt,@endsAt,@status,@createdAt)').run(record);
+      this.audit('booking.created',record.id,'Resource time reserved');return record;
+    });
+  }
+  cancelBooking(id:string) {
+    z.string().uuid().parse(id);
+    return this.atomic(()=>{const result=this.db.prepare("UPDATE mb_bookings SET status='cancelled' WHERE id=? AND status='confirmed'").run(id);if(result.changes!==1)throw new BusinessError('Confirmed booking not found',409);this.audit('booking.cancelled',id,'Reservation released');return {id};});
   }
   merchant(): Merchant {
     const row=this.db.prepare("SELECT value FROM mb_settings WHERE key='merchant'").get() as {value:string}|undefined;

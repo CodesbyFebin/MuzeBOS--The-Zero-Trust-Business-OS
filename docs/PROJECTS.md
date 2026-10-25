@@ -35,3 +35,20 @@ Updated: 2026-10-25
 | Real Mission Control, graph, polling and stale-state display | Verified locally; see MUZEBOS-MISSION-VERIFICATION.md |
 | Persistent reminders with due dates and completion | Implemented |
 | GitBook invitation | No invitation accepted or documentation published |
+
+## Reviewed upstream consolidation — 2026-10-25
+
+| Area | State |
+| --- | --- |
+| 29 shallow sparse clones, source revision and license catalog | Reviewed; all clones succeeded |
+| Four explicitly MIT-scoped imports | AgentShield parser, employee role/routine texts, founder skills, onboarding templates |
+| AI employee reference library and human review reminders | Verified locally; see MUZEBOS-INTEGRATION-VERIFICATION.md |
+| Browser-local limited agent permission review | Verified locally; see MUZEBOS-INTEGRATION-VERIFICATION.md |
+| SQLite resource reservations, overlap prevention and cancellation | Verified locally; see MUZEBOS-INTEGRATION-VERIFICATION.md |
+| Optional ERP/BI/server applications | Catalogued candidates; not deployed or connected |
+| Hypastack, Wave setup guide, HustleGPT | No implementation copied; license restrictions or missing grant |
+
+- [x] Clone and pin all requested source repositories outside the application.
+- [x] Retain attribution and identify excluded/review-only material.
+- [x] Qualify new sections locally.
+- [ ] Publish integration update, verify GitHub CI and merge.

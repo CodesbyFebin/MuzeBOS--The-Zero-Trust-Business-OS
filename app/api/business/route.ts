@@ -5,6 +5,8 @@ import { businessAccess } from '@/lib/muzebos/http';
 export const dynamic='force-dynamic';
 export const runtime='nodejs';
 const command=z.discriminatedUnion('action',[
+  z.object({action:z.literal('booking'),data:z.unknown()}),
+  z.object({action:z.literal('cancelBooking'),id:z.string().uuid()}),
   z.object({action:z.literal('reminder'),data:z.unknown()}),
   z.object({action:z.literal('completeReminder'),id:z.string().uuid()}),
   z.object({action:z.literal('configure'),data:z.unknown()}),
@@ -39,6 +41,8 @@ export async function POST(req: Request) {
     const store=businessStore();
     const result=store.command(key,c,()=>{
       switch(c.action) {
+        case 'booking':return store.booking(c.data);
+        case 'cancelBooking':return store.cancelBooking(c.id);
         case 'reminder':return store.reminder(c.data);
         case 'completeReminder':return store.completeReminder(c.id);
         case 'configure':return store.configure(c.data);

@@ -74,3 +74,15 @@ POST /api/business additionally accepts:
 
 Both commands require the same authentication, Origin, body size and
 idempotency checks as commerce commands. They append audit evidence.
+
+## Resource bookings
+
+`GET /api/bookings` returns local reservations and customer selections, under the
+same operator access gate and no-store policy. `POST /api/business` additionally
+accepts `booking` with `{customerId, resource, startsAt, endsAt}` and
+`cancelBooking` with `{id}`. Existing same-origin, UUID idempotency and body-size
+requirements apply. Resource names are trimmed/lowercased. Datetimes are
+normalized to UTC. Intervals are half-open: adjacent bookings are allowed.
+Overlap checks and writes run in the same SQLite immediate transaction.
+Cancellation is auditable and releases the interval. Public self-service,
+calendar-provider synchronization and notification delivery are not implemented.

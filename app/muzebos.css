@@ -137,3 +137,15 @@ html[data-sidebar='rail'] .mb-side-link { justify-content:center;padding:9px 6px
 .mb-mission-graph svg { width:100%;min-height:240px; }
 .mb-attention { max-height:465px;overflow:auto; }
 @media(max-width:1000px) { .mb-mission-hero { grid-template-columns:1fr; } }
+
+/* Source integrations use existing theme tokens and retain the 18-entry sidebar. */
+.mb-source-form { display: grid; gap: 1rem; margin-block: 1rem; }
+.mb-source-form label { display: grid; gap: .4rem; }
+.mb-source-form textarea, .mb-source-form input, .mb-source-form select { width: 100%; padding: .65rem; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: .35rem; }
+.mb-source-form textarea { font-family: monospace; resize: vertical; }
+.mb-source-shortcuts { display:flex; flex-wrap:wrap; gap:1rem; margin-block:1rem; }
+.mb-booking-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-block:.8rem; border-bottom:1px solid var(--border); }
+.mb-booking-row p { margin-block:.3rem; }
+.mb-library-item { display:grid; width:100%; text-align:left; padding:.65rem; gap:.3rem; border-bottom:1px solid var(--border); overflow-wrap:anywhere; }
+.mb-source-hash { font-family:monospace; overflow-wrap:anywhere; font-size:.75rem; }
+@media(max-width:600px) { .mb-booking-row { align-items:flex-start; flex-direction:column; } }

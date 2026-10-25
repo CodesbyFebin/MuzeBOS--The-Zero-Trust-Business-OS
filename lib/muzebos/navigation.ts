@@ -16,6 +16,7 @@ export const WORKSPACE_CATEGORIES:WorkspaceCategory[]=[
 export type WorkspaceTool={id:number;category:string;name:string;status:'available'|'existing'|'planned';href?:string;scope:string};
 const targets:Record<number,{href:string;status:'available'|'existing';scope:string}>={
  1:{href:'/business?view=orders',status:'available',scope:'Local invoice drafts, review, rejection and issuance; not the entire proposed order lifecycle.'},
+ 3:{href:'/workspace/orders/bookings',status:'available',scope:'Local resource reservations with transactional overlap rejection and audited cancellation. No public portal or reminders.'},
  4:{href:'/business?view=customers',status:'available',scope:'Create and list local customer records.'},
  5:{href:'/funnel',status:'existing',scope:'Inherited funnel workspace; connected data depends on configuration.'},
  21:{href:'/business?view=invoices',status:'available',scope:'Hash-bound issuance, immutable snapshots and printable basic invoices.'},
@@ -36,7 +37,7 @@ const targets:Record<number,{href:string;status:'available'|'existing';scope:str
  123:{href:'/setup',status:'existing',scope:'Application appearance settings; not a storefront theme builder.'},
  141:{href:'/wizard',status:'existing',scope:'Inherited assistant; provider setup and tool permissions apply.'},
  143:{href:'/business?view=evidence',status:'available',scope:'Commerce hashes and audit events; no passkey assertion or hardware signature yet.'},
- 144:{href:'/skills',status:'existing',scope:'Inherited skill library; not a new prompt evaluation system.'},
+ 144:{href:'/workspace/brain/employees',status:'available',scope:'Attributed role, routine and founder/onboarding reference documents. No autonomous execution.'},
  146:{href:'/integrations',status:'existing',scope:'Existing connector directory; do not assume executable MCP access.'},
  147:{href:'/business?view=overview',status:'available',scope:'Graph derived from local customers, products and orders; Faiss is planned.'},
  149:{href:'/business?view=orders',status:'available',scope:'Server-side schema, stock, expiry and payload-hash validation.'},
@@ -69,6 +70,7 @@ export const PINNED_ENTRIES:MainEntry[]=PINNED_UTILITIES.map(p=>({id:p.key,label
 export const SIDEBAR_ENTRIES=[...MAIN_ENTRIES,...PINNED_ENTRIES];
 export function workspaceActive(pathname:string):string|null {
  const path=pathname.split(/[?#]/)[0].replace(/\/$/,'')||'/';
+ const nested=SIDEBAR_ENTRIES.find(e=>e.href!=='/'&&path.startsWith(e.href+'/'));if(nested)return nested.id;
  const exact=SIDEBAR_ENTRIES.find(e=>e.href===path);if(exact)return exact.id;
  const aliases=SIDEBAR_ENTRIES.flatMap(e=>(e.aliases||[]).map(a=>({id:e.id,a}))).sort((a,b)=>b.a.length-a.a.length);
  return aliases.find(({a})=>path===a||path.startsWith(a+'/'))?.id||null;
