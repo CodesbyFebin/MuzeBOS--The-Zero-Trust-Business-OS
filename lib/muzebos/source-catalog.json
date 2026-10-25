@@ -1,0 +1,764 @@
+[
+  {
+    "repo": "zentyal/zentyal",
+    "url": "https://github.com/zentyal/zentyal",
+    "sha": "08030fe9a04454037078c5f72d8277ff9d5e8a28",
+    "branch": "master",
+    "section": "system",
+    "mode": "companion",
+    "license": "GPL-2.0",
+    "archived": false,
+    "use": "Small-business network/server administration",
+    "remaining": "Separate Linux host and authenticated adapter; no service deployed.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "COPYING",
+        "sha256": "32b1062f7da84967e7019d01ab805935caa7ab7321a7ced0e30ebe75e5df1670"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "86ca4aad630f385775690673d55e5a489fefe6175863abb2e0ad142e24036e6d"
+      }
+    ]
+  },
+  {
+    "repo": "qingchencloud/clawpanel",
+    "url": "https://github.com/qingchencloud/clawpanel",
+    "sha": "51aeb748022fe16b4c12c2227973c9e7c019db23",
+    "branch": "main",
+    "section": "brain",
+    "mode": "review",
+    "license": "AGPL-3.0 + additional terms",
+    "archived": false,
+    "use": "Desktop agent control-panel reference",
+    "remaining": "AGPL with additional terms and separate Tauri runtime; no source copied.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "2a3e36900721705de46e8fdbf536824f82979c3e1c2e883e26effeb7616592ce"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "571286256b47c0c0df37c611a73be939b82d1064696e8f7f0935c9abd6adc5ec"
+      },
+      {
+        "path": "README.es.md",
+        "sha256": "60b5fc9c971ab0407c27715cba80792111e4ff6078704ca2a83ad2131d0f6e1e"
+      },
+      {
+        "path": "README.zh-TW.md",
+        "sha256": "62376aa426ace5ebf227e5dfefd70226c73f26be526f48ca70b3070587bc37bd"
+      },
+      {
+        "path": "README.fr.md",
+        "sha256": "6a3dc721b809b2c4626ed70215e6b52dbdb33f49bc20802ccc5ef0bcda0d2b8c"
+      },
+      {
+        "path": "README.ko.md",
+        "sha256": "749f0af20cde96d227e6b296683e9094d6341789130e04751be1813ed1d1ba74"
+      },
+      {
+        "path": "README.de.md",
+        "sha256": "23c87552d0894d66209ff64717b3ee5f59f9d6ad3cbe8e1dc7a5306b9b333b3b"
+      },
+      {
+        "path": "README.en.md",
+        "sha256": "e8a459cdca5b297989ce5e974d23093cc84925dc105dcdb763a3c0b7899f6603"
+      },
+      {
+        "path": "README.pt.md",
+        "sha256": "df5df2deff48374f53c112ec05874ad237facb783a50e1586c67490e2be9be68"
+      },
+      {
+        "path": "README.vi.md",
+        "sha256": "ccb94838e3280d46df35e69853f0d691bbf1d51e048a58c4e832814117d7bfd6"
+      },
+      {
+        "path": "README.ru.md",
+        "sha256": "23ab29e13e365ace1739fc1374c7e5bd66bf48401b05a260e74e623eb6a7aced"
+      },
+      {
+        "path": "README.ja.md",
+        "sha256": "de372a545a1090a8c3644a5ced5a3eda763d764bfebdab3bfc904c339e817d39"
+      }
+    ]
+  },
+  {
+    "repo": "markfulton/ai-employees",
+    "url": "https://github.com/markfulton/ai-employees",
+    "sha": "020feb3d74d96c13243db53403a71c9705c231b3",
+    "branch": "main",
+    "section": "brain",
+    "mode": "imported",
+    "license": "MIT",
+    "archived": false,
+    "use": "Eight role definitions and 60 routine documents",
+    "remaining": "Read-only library and manual review queue only; no agent execution or schedule installed.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "40aa2b652aacd220fe0a43bea5269ad88ed13678426337d903d0a7214c9e96d6"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "6bd37732f1988e09411952e8a111517183bede16343303e4348c19dd8dfa5dfa"
+      }
+    ]
+  },
+  {
+    "repo": "affaan-m/agentshield",
+    "url": "https://github.com/affaan-m/agentshield",
+    "sha": "b0891303bdcd6037376a94263d45cfd2ff3dfb98",
+    "branch": "main",
+    "section": "brain",
+    "mode": "imported",
+    "license": "MIT",
+    "archived": false,
+    "use": "Pure permission parser and normalizer",
+    "remaining": "Limited local checks only; full scanner and runtime enforcement not integrated.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "c7b4cd9db1818a97fbc3ca0ee5a00a2ecaf7ae01c193a6875fd23a6627b43395"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "7c6d30830c1e1088b2ad94bde586d4038f659a7fa104bb923ee82d232964c237"
+      }
+    ]
+  },
+  {
+    "repo": "lsfusion-solutions/mycompany",
+    "url": "https://github.com/lsfusion-solutions/mycompany",
+    "sha": "c06696110e378bc850c92e0fbbc8f1eafbf86697",
+    "branch": "master",
+    "section": "operations",
+    "mode": "companion",
+    "license": "Apache-2.0",
+    "archived": false,
+    "use": "ERP, manufacturing and HR service candidate",
+    "remaining": "lsFusion runtime and business-data mapping need a separate adapter.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "c01c44277d056abb3b172cffe4da2b84eb117874632e7af56f64ae53b2422fe5"
+      }
+    ]
+  },
+  {
+    "repo": "papa-torb/adtruth",
+    "url": "https://github.com/papa-torb/adtruth",
+    "sha": "5683e7039542e9029b4ea833e701cb250442e5ff",
+    "branch": "main",
+    "section": "growth",
+    "mode": "companion",
+    "license": "MIT",
+    "archived": false,
+    "use": "Advertising fraud analysis candidate",
+    "remaining": "Requires reviewed event inputs and independent evaluation; no fraud predictions run.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "50a6aa7a42aae3a0f2741cef3e2be9b5e93229c33ca49e704b44a75786ae0e03"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "dde2251294b13a4aee8c098520988999f3e5b74eb2128c6c25a6e55e47ff85e7"
+      }
+    ]
+  },
+  {
+    "repo": "dragotin/kraft",
+    "url": "https://github.com/dragotin/kraft",
+    "sha": "95ad3706bba3a40c0a3494400c382dc6c2287194",
+    "branch": "master",
+    "section": "money",
+    "mode": "companion",
+    "license": "GPL-2.0",
+    "archived": false,
+    "use": "Desktop quotation and invoice workflows",
+    "remaining": "C++/Qt desktop application; no code merged into local commerce.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "COPYING",
+        "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "319f05e27b2547bb3d714b4165ed919293db682f8da68f45fb8bb13b4013aa30"
+      }
+    ]
+  },
+  {
+    "repo": "5dive-ai/5dive",
+    "url": "https://github.com/5dive-ai/5dive",
+    "sha": "4d9e1d2a391d2efa32d5f22ce7decdbaee5cb1ee",
+    "branch": "main",
+    "section": "brain",
+    "mode": "companion",
+    "license": "MIT",
+    "archived": false,
+    "use": "Self-hosted agent-team operations",
+    "remaining": "Separate runtime and credential boundaries require execution qualification.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "4ce1731fac8e17774b2490e4fcfe715a50b2fb9f8c84ed16cc0f9c5ced3b0118"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "4689aea1a1afc44e34db4877a10a0dd09c60dfaefe358883876da5763e8e024a"
+      },
+      {
+        "path": "README.zh-CN.md",
+        "sha256": "b00abfd00bf3db6aa34551280fe20449b96d7d7418777ae30d7c3cc23c6b59a5"
+      }
+    ]
+  },
+  {
+    "repo": "mert28kar-stack/Wave-Bookkeeping-Setup-Guide",
+    "url": "https://github.com/mert28kar-stack/Wave-Bookkeeping-Setup-Guide",
+    "sha": "aa9a2b1b532069ae16b8f435f0a7180f71e17cfd",
+    "branch": "main",
+    "section": "money",
+    "mode": "excluded",
+    "license": "Unresolved; no root license",
+    "archived": false,
+    "use": "Bookkeeping download/setup guide",
+    "remaining": "No root license grant found. Download-oriented guide is not an accounting engine; no linked installers fetched.",
+    "clone": "shallow sparse",
+    "licenseFiles": [],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "9c4ba8a6b8eb327c23d26bd50f890672f57dc24e32f578122b4d9b40a1730b0c"
+      }
+    ]
+  },
+  {
+    "repo": "SGrappelli/pronto",
+    "url": "https://github.com/SGrappelli/pronto",
+    "sha": "e89c5920ef9212acf5a5d217df437f3b991e8f4c",
+    "branch": "main",
+    "section": "orders",
+    "mode": "reference",
+    "license": "MIT",
+    "archived": false,
+    "use": "Booking, CRM and retail workflow reference",
+    "remaining": "Native SQLite reservations implemented independently; Next.js 16/Supabase stack not transplanted.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "7651f06d600499d65048ee3bdcb10ee6e313055dd69988b07d069851885181d2"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "6e25d09d15859b6b03baa52655aaf005cf53bb4ca29367aeebf03f340ce47a4a"
+      }
+    ]
+  },
+  {
+    "repo": "seldonframe/seldonframe",
+    "url": "https://github.com/seldonframe/seldonframe",
+    "sha": "3f386a221849843a1a535f442e210bf9d293fff9",
+    "branch": "main",
+    "section": "growth",
+    "mode": "companion",
+    "license": "AGPL-3.0",
+    "archived": false,
+    "use": "Front-office website, intake and booking service",
+    "remaining": "AGPL service remains separate; no source copied or deployment run.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "9a32109537554d51dd83792f3e9d6999376e0974d1d309cb1f922acad3946d1c"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "ae5e3763c507740ab7822ae46de54b70468a29027b5c3fba34f4386c9a5edade"
+      }
+    ]
+  },
+  {
+    "repo": "MicroPyramid/opensource-startup-crm",
+    "url": "https://github.com/MicroPyramid/opensource-startup-crm",
+    "sha": "b51c85dabbf68dd6b37f4ddd412dc8982f75e459",
+    "branch": "master",
+    "section": "orders",
+    "mode": "reference",
+    "license": "MIT",
+    "archived": true,
+    "use": "CRM pipeline reference",
+    "remaining": "Archived upstream; dependency/security review required before any import.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "d483565f95bf11868e09e0e63a8ee3db071ee228fcd7bdd2e7ae06ddd3dc66ec"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "69302b6db6113de8435c46c64be971d661bda07b36e8db0fa0e5557e5fb6ad46"
+      }
+    ]
+  },
+  {
+    "repo": "phpledger/phpledger",
+    "url": "https://github.com/phpledger/phpledger",
+    "sha": "e83a494e8e4e0da3237b04d2c535a47f9753edc2",
+    "branch": "master",
+    "section": "money",
+    "mode": "companion",
+    "license": "AGPL-3.0",
+    "archived": false,
+    "use": "Double-entry accounting and bank reconciliation",
+    "remaining": "AGPL PHP/MySQL service; maintenance notice and adapter qualification remain.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "d8a6cc31abc16b6748c7a21f21611f5a1ec33f67d22ca23d7da1c19b95496bee"
+      },
+      {
+        "path": "LICENSE-SCOPE.md",
+        "sha256": "cf48c4b5a3af9697dbe9844dec045814b9f57e0dca4f3a18f6ef9106c1ee0537"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "1e6a78e8c993cac675d366461c31b70e39000b91e2155041f7f6ff4cde0ada8f"
+      }
+    ]
+  },
+  {
+    "repo": "orekoapp/oreko",
+    "url": "https://github.com/orekoapp/oreko",
+    "sha": "32e3278ada2e2bc4afb8e68f2cc8ad186c74bead",
+    "branch": "main",
+    "section": "money",
+    "mode": "companion",
+    "license": "AGPL-3.0",
+    "archived": false,
+    "use": "Visual quote and invoice editing",
+    "remaining": "AGPL service; no source copied or data synchronization implemented.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "3bcd363af7c265626f9570f47dec870941194e2ce130ef36517b7e456e7bf2ec"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "b7ee494310c2ce0a2c2caf230b006e173bb794370d18ac4d8c8decbdc6f3fc2f"
+      }
+    ]
+  },
+  {
+    "repo": "ilyautov/small-business-ru",
+    "url": "https://github.com/ilyautov/small-business-ru",
+    "sha": "43ad4add8a4d242332d1e6753339771bbeb26401",
+    "branch": "main",
+    "section": "foundation",
+    "mode": "reference",
+    "license": "Apache-2.0",
+    "archived": false,
+    "use": "Jurisdiction-specific deterministic business calculators",
+    "remaining": "Russian tax assumptions cannot be presented as Indian GST or global tax rules.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "b05976217449b938090f698152ca85065c7ec4537ac3cf5a456b62ba9400b5b2"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "b9fef89eff37e553f510fbd8cd2398adf99d697989df6d56c4fd4fb9d37f6424"
+      },
+      {
+        "path": "README.en.md",
+        "sha256": "c1f2db130fd1b76306fc8b774c47ace6350da950f6bb15920671269844289a2c"
+      }
+    ]
+  },
+  {
+    "repo": "NowSquare/VoxelBooking",
+    "url": "https://github.com/NowSquare/VoxelBooking",
+    "sha": "cbf54db39db583d401f60f9a5dbbaefb46ddc143",
+    "branch": "main",
+    "section": "orders",
+    "mode": "companion",
+    "license": "AGPL-3.0",
+    "archived": false,
+    "use": "Resource/capacity appointment service",
+    "remaining": "AGPL PHP/MySQL application; separate adapter remains planned.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "5151f888e6e993a1a44aef0eb92314e836dfadcc98c23e8a8df2d562ed234e0b"
+      }
+    ]
+  },
+  {
+    "repo": "oyekamal/maps2whatsapp",
+    "url": "https://github.com/oyekamal/maps2whatsapp",
+    "sha": "a2d6ea69c11bfb45028b0cf35bdd12982d539add",
+    "branch": "master",
+    "section": "growth",
+    "mode": "review",
+    "license": "MIT",
+    "archived": false,
+    "use": "Local lead-research workflow reference",
+    "remaining": "No scraping or outreach enabled; consent, source terms and send approvals need review.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "4ac50c27a9af2529b4bc5be35534efed8db8fd84f60792db4437b6f16a5b03ab"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "8b68340b9b6f39c945c35bc61e02dbb178e2d5aed441bd09d55b51e062566e86"
+      }
+    ]
+  },
+  {
+    "repo": "True-Good-Craft/TGC-BUS-Core",
+    "url": "https://github.com/True-Good-Craft/TGC-BUS-Core",
+    "sha": "0a4676863033a0856659118c9953a3ceb8ad2192",
+    "branch": "main",
+    "section": "stock",
+    "mode": "review",
+    "license": "Unresolved; no root license",
+    "archived": false,
+    "use": "Shop-floor production tracking reference",
+    "remaining": "No root license file found; package-level permissions require review before copying.",
+    "clone": "shallow sparse",
+    "licenseFiles": [],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "e84d3e6868cd90c7960d0ef01637283821000738c02b9c30bc45c854a791023d"
+      }
+    ]
+  },
+  {
+    "repo": "adris-misra/multi-agentic-framework",
+    "url": "https://github.com/adris-misra/multi-agentic-framework",
+    "sha": "5cc9dd3c3abd9d41c36517173d67e1bb8d804a64",
+    "branch": "main",
+    "section": "brain",
+    "mode": "reference",
+    "license": "MIT",
+    "archived": false,
+    "use": "Manufacturing agent architecture reference",
+    "remaining": "Architecture reference is not a deployed industrial control or compliance system.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "ab71291695802c2702e4754f8fb646bbcf50940c6fc4f613fb5e395081a5248c"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "1ea5de49194cb79dc1b581364fee4ed07a96010a85ea5e522c50bddd80c371b9"
+      }
+    ]
+  },
+  {
+    "repo": "failcoach/ai-agent-onboarding",
+    "url": "https://github.com/failcoach/ai-agent-onboarding",
+    "sha": "c1abb54c157c1d1453582477c4fbfde5915088f2",
+    "branch": "main",
+    "section": "brain",
+    "mode": "imported",
+    "license": "MIT",
+    "archived": false,
+    "use": "Five agent onboarding templates",
+    "remaining": "Imported as inert reference text; operator queues manual review only.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "2ff8b44df46be419c4e70b4b6c17c92a0dd7362e508b5edf2e702e4795315bab"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "e0014dbad6e2181c396d3d1d2dfc72f3c0c5a5c871c7cf6398f7c3a6aa493265"
+      }
+    ]
+  },
+  {
+    "repo": "cube-js/cube",
+    "url": "https://github.com/cube-js/cube",
+    "sha": "091be1334e859cb95bc71247956a9c86095aa621",
+    "branch": "master",
+    "section": "growth",
+    "mode": "companion",
+    "license": "Apache-2.0 / MIT by component",
+    "archived": false,
+    "use": "Semantic analytics layer",
+    "remaining": "Root declares Apache-2.0 default with MIT packages; service, data model and auth not connected.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "fae0bbc037781c1d4697b700106f50a0a13910778ef8279a657bd61dcaeb5a5f"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "501931b17fc2324f42577bbb7e391dd815f54b59698751abd4d53cbfe7e8fd94"
+      }
+    ]
+  },
+  {
+    "repo": "thenaturalist/awesome-business-intelligence",
+    "url": "https://github.com/thenaturalist/awesome-business-intelligence",
+    "sha": "ff35bce37c85279098d69c89c12a98bccaffc416",
+    "branch": "master",
+    "section": "growth",
+    "mode": "reference",
+    "license": "MIT",
+    "archived": false,
+    "use": "BI discovery directory",
+    "remaining": "Curated links are not an executable analytics engine.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "d8acbfe7e87e93ef9aa6739fb6d125fbbab1f90bc0b03aaea33217bbef81101b"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "e6ac9f3062e234819f64ee5307734ba20c3b236dc45a46726e8ae7767897d141"
+      }
+    ]
+  },
+  {
+    "repo": "jortilles/EDA",
+    "url": "https://github.com/jortilles/EDA",
+    "sha": "a559eea0cfdecd8f448e20f467a73754e0f96b9f",
+    "branch": "master",
+    "section": "growth",
+    "mode": "companion",
+    "license": "AGPL-3.0",
+    "archived": false,
+    "use": "BI dashboard service",
+    "remaining": "AGPL service remains separate; no dashboards or database credentials connected.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE.txt",
+        "sha256": "e9df4c4e4e64b8168a71c3c67668dcffabbe8fca11d4ac4a7d5482562cd1679c"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "c95b5bf4a00dd0867d2ca4619bd04b6f4fd0221d95d4a644a35de7cd0d2b51c0"
+      }
+    ]
+  },
+  {
+    "repo": "hossainchisty/FreshGerium-ERP-Platform",
+    "url": "https://github.com/hossainchisty/FreshGerium-ERP-Platform",
+    "sha": "bbabea1e7d4c2940c3cc8c4d0fe09f8c5ca4d213",
+    "branch": "master",
+    "section": "operations",
+    "mode": "companion",
+    "license": "GPL-3.0 (root text)",
+    "archived": false,
+    "use": "ERP workflow reference",
+    "remaining": "Root GPL-3.0 text; separate service and dependency qualification required.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE.md",
+        "sha256": "64d0103da138529b03d41490635375079dfbe761d7ca1cf0f8b00c9838248613"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "21c7d97c908f6e2cbc94e68ca446712064fa8b909fcd99f32f241ac546dfe922"
+      }
+    ]
+  },
+  {
+    "repo": "odoo/odoo",
+    "url": "https://github.com/odoo/odoo",
+    "sha": "0af7f93d7b4e81895545bd1ed3db85099e7fa32b",
+    "branch": "20.0",
+    "section": "operations",
+    "mode": "companion",
+    "license": "LGPL-3.0 (component exceptions)",
+    "archived": false,
+    "use": "ERP module and external service candidate",
+    "remaining": "Root LGPL-3.0 with component exceptions; no Odoo server or modules deployed.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "abc09dad5f84a76e1b0279237053cae16c03228ab27d8d467677054c2bd17eeb"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "964c3dc18f056f667fd488efde0d25847aca0f7a8c99feca06d6dd6ef9657659"
+      }
+    ]
+  },
+  {
+    "repo": "jtmuller5/The-HustleGPT-Challenge",
+    "url": "https://github.com/jtmuller5/The-HustleGPT-Challenge",
+    "sha": "6d1f632f9458b209bf29bcc632fca8a49981dce1",
+    "branch": "main",
+    "section": "brain",
+    "mode": "excluded",
+    "license": "Unresolved; no root license",
+    "archived": false,
+    "use": "Founder experiment collection",
+    "remaining": "No root license grant found; not a runtime or verified business decision engine.",
+    "clone": "shallow sparse",
+    "licenseFiles": [],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "2487be5a51f6b9b261e063a26cdb36d4d211a45063d2083a9c646f3e6f8cb1b6"
+      }
+    ]
+  },
+  {
+    "repo": "Jakeschincariol/founder-skill",
+    "url": "https://github.com/Jakeschincariol/founder-skill",
+    "sha": "fd9385b0cfe1b96bebce3898fbd506d73eff5a9d",
+    "branch": "main",
+    "section": "brain",
+    "mode": "imported",
+    "license": "MIT",
+    "archived": false,
+    "use": "Eleven founder skill documents",
+    "remaining": "Text library only; Python calculators and simulated consumer panels are not executed.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "4c74c3540bded1d0b1acf8e83c8b75e836ac834ad3c4d6fa50878cf8ac0f5f54"
+      }
+    ]
+  },
+  {
+    "repo": "vishnuraghavb/EnBizCard",
+    "url": "https://github.com/vishnuraghavb/EnBizCard",
+    "sha": "03e85c8c9be7f87987c3bfab124140af81ee468f",
+    "branch": "master",
+    "section": "foundation",
+    "mode": "companion",
+    "license": "AGPL-3.0",
+    "archived": false,
+    "use": "Digital business-card generator",
+    "remaining": "AGPL application; no source copied or publishing adapter connected.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "3bea6b40795603182eefe67533ad839795be26e2025fc538ff822e2395737493"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "16bca50a4cfdc79eda3c4c46c2a476362f1e7c72126b07a685be5b7fc3e95e2a"
+      }
+    ]
+  },
+  {
+    "repo": "hypaware/Hypastack",
+    "url": "https://github.com/hypaware/Hypastack",
+    "sha": "4347a8353d131116ea9f81d9d2339672c08b10db",
+    "branch": "main",
+    "section": "system",
+    "mode": "excluded",
+    "license": "Reference-only; reuse prohibited",
+    "archived": false,
+    "use": "Reference-only licensed source",
+    "remaining": "License explicitly disallows product reuse and production hosting. No source copied or used to design integration.",
+    "clone": "shallow sparse",
+    "licenseFiles": [
+      {
+        "path": "LICENSE",
+        "sha256": "07475f34891e6ce1cea7eb02f615c54ab11d05e2c0ffc4bc2671b77014de5008"
+      }
+    ],
+    "readmeFiles": [
+      {
+        "path": "README.md",
+        "sha256": "0a654410cf2c1af343d12045c1bc098a8c339b60b44bfcb419a933be67c1d10c"
+      }
+    ]
+  }
+]

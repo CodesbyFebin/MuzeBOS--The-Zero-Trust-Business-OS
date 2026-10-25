@@ -1,0 +1,3 @@
+
+# Preserve upstream reference text byte-for-byte, including trailing blank lines.
+vendor/reference-documents/*.txt whitespace=-blank-at-eof

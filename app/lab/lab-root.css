@@ -1,0 +1,17 @@
+/*
+ * Content Lab v2 root placement (lane U1). The /lab layout renders the one `.lab[data-lab-root]` wrapper;
+ * like the frames route (`.lab[data-lab-frame]`) it bleeds to the content column's edges so the Aurora
+ * meets the sidebar and the top bar, the reference layout. The margins undo the shell main's padding
+ * (app/layout.tsx: px-8 pt-7 pb-16, wide px-10, ultra px-12). Tokens and component CSS stay in globals.
+ */
+.lab[data-lab-root]:not([data-lab-frame]) { margin: -28px -32px -64px; }
+@media (min-width: 1800px) { .lab[data-lab-root]:not([data-lab-frame]) { margin-inline: -40px; } }
+@media (min-width: 2200px) { .lab[data-lab-root]:not([data-lab-frame]) { margin-inline: -48px; } }
+
+/* The Sheet's inner-tab slot (02 13, 01 13.5) had no rule: a row under the header, scrolling sideways on a phone. */
+.lab2-sheet-tabs { display: flex; padding: 0 24px 16px; overflow-x: auto; scrollbar-width: none; }
+.lab2-sheet-tabs::-webkit-scrollbar { display: none; }
+@media (max-width: 600px) { .lab2-sheet-tabs { padding: 0 16px 12px; } }
+
+/* The Sheet header's tool slot (Copy link, close) never wraps under a long caption. */
+.lab2-sheet-tools { display: inline-flex; flex: none; align-items: center; gap: 8px; }

@@ -1,0 +1,490 @@
+{
+  "roles": [
+    {
+      "id": "ad-manager-employee",
+      "name": "Ad Manager Employee",
+      "role": "Paid acquisition",
+      "version": "1.9.0",
+      "source": "markfulton/ai-employees",
+      "routines": [
+        {
+          "id": "ads-account-intake",
+          "days": "first-weekday",
+          "sha256": "70ecbd1c5cba00fa2597ac7206b2771243a6fa0cf96088bd1feb0c1299359bb7"
+        },
+        {
+          "id": "ads-account-read",
+          "days": "mon-fri",
+          "sha256": "4e72e8f3928382c5babf62f036b59dc98420637c58c441d85ec8b7b9826235db"
+        },
+        {
+          "id": "ads-build-desk",
+          "days": "mon-fri",
+          "sha256": "0e9466cb27ea10dc8087672be7f286bfa40f9861c4d873b0d2c0a57347ac7ec2"
+        },
+        {
+          "id": "ads-change-list",
+          "days": "fri",
+          "sha256": "1ffbe8c579d4c9d20df8d54ac4c766a2760a42cc5a0e5b4efb389a4ceb54c744"
+        },
+        {
+          "id": "ads-creative-retro",
+          "days": "last-weekday",
+          "sha256": "5dc2ad5886e07a6ecb384ef9c4e0c5240c3298e3700621978c07e4d49fe35d6b"
+        },
+        {
+          "id": "ads-creative-studio",
+          "days": "mon-fri",
+          "sha256": "7afd643a0a6464513b5a8bf27ab711afc58a223da497b5c3312556d88412ce44"
+        },
+        {
+          "id": "ads-desk-standup",
+          "days": "mon-fri",
+          "sha256": "b884b0d7e89dccacc805a1527480943fe1adf6dbe5369c8f19b189124ed65825"
+        }
+      ]
+    },
+    {
+      "id": "chief-of-staff",
+      "name": "Chief of Staff",
+      "role": "Oversight and strategy",
+      "version": "1.9.0",
+      "source": "markfulton/ai-employees",
+      "routines": [
+        {
+          "id": "cos-charter-and-fleet-audit",
+          "days": "first-weekday",
+          "sha256": "d6ab386d3f1cb76e5ec9c4295b0d55b20d60f05e0c25ed2f3498aa532c207aa9"
+        },
+        {
+          "id": "cos-decision-brief",
+          "days": "fri",
+          "sha256": "0fce72f8a7148f2f4c85699c773064e5203bca4421bd62e733ec70ebf572a32b"
+        },
+        {
+          "id": "cos-decision-review",
+          "days": "last-weekday",
+          "sha256": "817dfc496bda49fa3d0224db08a838a76ec6b3def60a67ab0a9afef64a4fe5d6"
+        },
+        {
+          "id": "cos-fault-dossier",
+          "days": "mon-fri",
+          "sha256": "b1c9e6ccf438844993c6998072270225a35c528b68cacdc83390f2b71bb95910"
+        },
+        {
+          "id": "cos-fleet-reconcile",
+          "days": "mon-fri",
+          "sha256": "cc48e6ef421c0f320544c867a35ae774249288b81036321ff57e07286fc38d6b"
+        },
+        {
+          "id": "cos-market-sweep",
+          "days": "wed",
+          "sha256": "e957c6e9e22d42cb2b565fcea161dec5df2cd7b81e7ddaa4cd963166f84d6b90"
+        },
+        {
+          "id": "cos-metrics-review",
+          "days": "thu",
+          "sha256": "9f54e42586ff19b319430b4e872d7cf27c3fc4d5a904938429636f637f76c27f"
+        }
+      ]
+    },
+    {
+      "id": "customer-satisfaction-employee",
+      "name": "Customer Satisfaction Employee",
+      "role": "Support and retention",
+      "version": "1.9.0",
+      "source": "markfulton/ai-employees",
+      "routines": [
+        {
+          "id": "csat-churn-watch",
+          "days": "mon-fri",
+          "sha256": "d10e3dccbf7a6413cadc02e8feb46efdabde83795e07b0d1e388a2801c141138"
+        },
+        {
+          "id": "csat-deflection-desk",
+          "days": "wed",
+          "sha256": "8060a11ad07fcb44f6c9c6eb3b18e35c90a7671f212329f2951fe9983fd5d906"
+        },
+        {
+          "id": "csat-desk-intake",
+          "days": "first-weekday",
+          "sha256": "819d99f8468f3d198999db4cb7d387920af77c35959e3225010fad699d95e591"
+        },
+        {
+          "id": "csat-desk-standup",
+          "days": "mon-fri",
+          "sha256": "fe35a720c647ede98d4f3a4b0b7accc4e698a43d74b2c88947e2608f060328f5"
+        },
+        {
+          "id": "csat-inbox-sweep",
+          "days": "mon-fri",
+          "sha256": "bf55dc66c18ab24265267e4cd4f4018927af0d3db747bd97a812c3a3da8aeaf9"
+        },
+        {
+          "id": "csat-reply-desk",
+          "days": "mon-fri",
+          "sha256": "1a7bed405e8c57a3ba3ac47b94db1928ec709e46c998955eb8d7e1e5373cf48d"
+        },
+        {
+          "id": "csat-satisfaction-report",
+          "days": "fri",
+          "sha256": "22e84f6ad86200a8594fae2711558f1e1d24a438276cbdf6fa8a79171c0238b5"
+        },
+        {
+          "id": "csat-taxonomy-refresh",
+          "days": "last-weekday",
+          "sha256": "0a2974026f4a8c67f105f8dbad0721872b338eee3943a61b649657e386586ba1"
+        }
+      ]
+    },
+    {
+      "id": "gtm-engineer",
+      "name": "GTM Engineer",
+      "role": "Go to market and launch",
+      "version": "1.9.0",
+      "source": "markfulton/ai-employees",
+      "routines": [
+        {
+          "id": "gtm-board-standup",
+          "days": "mon-fri",
+          "sha256": "8c9673350a8eb995e1c077967d72daaaea895416a797f7e2888cc39c30ecf603"
+        },
+        {
+          "id": "gtm-icp-refresh",
+          "days": "last-weekday",
+          "sha256": "ba69001d716025c888263a29035135acdecb7d21b74298ddc2aaaf349da2cab9"
+        },
+        {
+          "id": "gtm-intake-and-dashboard",
+          "days": "first-weekday",
+          "sha256": "133f4ed3511d7709277d1dc745d7fbce30ee7ad1780e01524551961f1a9e0bc9"
+        },
+        {
+          "id": "gtm-launch-step-runner",
+          "days": "mon-fri",
+          "sha256": "98a35a2ee94ec764d63d01ac269875e32790c6f1afe325477b4a1a739321a79a"
+        },
+        {
+          "id": "gtm-outreach-queue",
+          "days": "mon-fri",
+          "sha256": "abcffc79de251f1e3ff59b665ae53aa7b6a27013feb7f8cc16c6770dc205d390"
+        },
+        {
+          "id": "gtm-paid-and-tracking-guard",
+          "days": "mon",
+          "sha256": "06f2604a3160df453b47080a65c77e7b83bd051a80b06d3104182e7dcdccfa58"
+        },
+        {
+          "id": "gtm-scoreboard",
+          "days": "fri",
+          "sha256": "b607ba80e4fc31008349902fc939f0a6f3cbd995b9c3a52ff57f03b5bd6baa11"
+        },
+        {
+          "id": "gtm-signal-sweep",
+          "days": "mon-fri",
+          "sha256": "2bb3fc55e570b188adb0698a96209a2aeda29155f75add2502b51fd42f37fe04"
+        }
+      ]
+    },
+    {
+      "id": "sales-employee",
+      "name": "Sales Employee",
+      "role": "Pipeline and outreach",
+      "version": "1.9.0",
+      "source": "markfulton/ai-employees",
+      "routines": [
+        {
+          "id": "sales-desk-setup",
+          "days": "first-weekday",
+          "sha256": "34b5004aa76db99fad58d7c959d2e20ee1ffd3c80a80a7ebb2851df5d3493116"
+        },
+        {
+          "id": "sales-desk-standup",
+          "days": "mon-fri",
+          "sha256": "bae459e61881f828c9280cf21e35be6cc19e0ea0eb8e718d440414d71a2c1bac"
+        },
+        {
+          "id": "sales-first-touch-drafts",
+          "days": "mon-fri",
+          "sha256": "3cff442619058d2dabefaa954405c98a40c3720eaabd38a7bf92689e56f37c41"
+        },
+        {
+          "id": "sales-followup-sweep",
+          "days": "mon-fri",
+          "sha256": "e51d2c367e3390b0c217bf58b22efc7eede52851168ed7b11db87c75fccede4d"
+        },
+        {
+          "id": "sales-pipeline-review",
+          "days": "fri",
+          "sha256": "6e2cdffdc1047ad4e534e277855453db4b69589ab9e6d9fda8e868eb11623ddc"
+        },
+        {
+          "id": "sales-prospect-sweep",
+          "days": "mon-fri",
+          "sha256": "4d884308c3a4feca1c58cc4551708d43f4b69d36cd6061cb2eff3790da1c3dd9"
+        },
+        {
+          "id": "sales-qualification-refresh",
+          "days": "last-weekday",
+          "sha256": "da833a9d9330ab79f194e3c3b4bdbdd22c9d9729f32f2f55d45db8a17351c3c5"
+        }
+      ]
+    },
+    {
+      "id": "seo-employee",
+      "name": "SEO/AEO Employee",
+      "role": "Search, content and answer visibility",
+      "version": "1.10.0",
+      "source": "markfulton/ai-employees",
+      "routines": [
+        {
+          "id": "seo-calendar-refill",
+          "days": "wed",
+          "sha256": "a95fc4665f260c2813a5780a9201a9a43e06fc585cbc22c05a8bb3498b3637d5"
+        },
+        {
+          "id": "seo-draft-run",
+          "days": "mon-fri",
+          "sha256": "24363a8cff114f80ea7949361f699f6c3279d262df778c72bd289b05009b21ae"
+        },
+        {
+          "id": "seo-index-sweep",
+          "days": "tue",
+          "sha256": "29b1794f3b3aaf4be955a4795ad4fcd3711d96aee7098ace3f66d36bcc12af45"
+        },
+        {
+          "id": "seo-intake-and-map",
+          "days": "first-weekday",
+          "sha256": "7b778bdb886f39aac09ba493ca1e70844669dad1d11440d4b1ca399611fd0d9f"
+        },
+        {
+          "id": "seo-publish-run",
+          "days": "mon-fri",
+          "sha256": "7122b6ff8799c3d7fa4cf83d1b6c3cebcaf08bc646b2cd7ff05a9d532ac01c5a"
+        },
+        {
+          "id": "seo-rank-review",
+          "days": "fri",
+          "sha256": "51ffdad04719978424cb2413620a6ced3121b6e460dabb3e1a1c59fb65cabdcb"
+        },
+        {
+          "id": "seo-standup",
+          "days": "mon-fri",
+          "sha256": "ee563f7fa845a39654137cf1db5dc994c86b58283f9180d3f7daecc207a8abef"
+        },
+        {
+          "id": "seo-answer-visibility",
+          "days": "thu",
+          "sha256": "5ebb37d0fdfae17494c8c25ad2e2352bf2216dc9c197b8fd8a607b55fa8ee543"
+        }
+      ]
+    },
+    {
+      "id": "social-media-employee",
+      "name": "Social Media Employee",
+      "role": "Audience and distribution",
+      "version": "1.9.0",
+      "source": "markfulton/ai-employees",
+      "routines": [
+        {
+          "id": "soc-calendar-standup",
+          "days": "mon-fri",
+          "sha256": "ba45a55683c79ba98af2e3997630bfc28faaee9dee9aaf22303afea25748ca0b"
+        },
+        {
+          "id": "soc-draft-queue",
+          "days": "mon-fri",
+          "sha256": "a942c7ad1a5422d73d3c9164f9b91cef2dec9033f0b91108d8063e42ad330fdd"
+        },
+        {
+          "id": "soc-engagement-sweep",
+          "days": "mon-fri",
+          "sha256": "660104c7761be94081966e5d3342e4da4a4156bd3616cd6a6a8242db2dce2876"
+        },
+        {
+          "id": "soc-intake-and-voice",
+          "days": "first-weekday",
+          "sha256": "b26248c0ffdc973f0e1fad159d1a4b74138cf225ef28cc8c7a000534188db980"
+        },
+        {
+          "id": "soc-material-sweep",
+          "days": "mon-fri",
+          "sha256": "fac28accf1d24d20efc2f9248227622ef0e116c554c75c2c98ae50331c9a96b9"
+        },
+        {
+          "id": "soc-performance-review",
+          "days": "fri",
+          "sha256": "242195bde4e2f12192dc8136c37e14a8e3baa4f33275297f6f7ba5ed87fd96ca"
+        },
+        {
+          "id": "soc-publish-run",
+          "days": "mon-fri",
+          "sha256": "6f78feb1bdf45408c0855b5453f8255421cec372c3fe41852a8ceea062a86fcb"
+        }
+      ]
+    },
+    {
+      "id": "web-dev-employee",
+      "name": "Web Dev Employee",
+      "role": "Engineering and maintenance",
+      "version": "1.9.0",
+      "source": "markfulton/ai-employees",
+      "routines": [
+        {
+          "id": "web-dependency-run",
+          "days": "wed",
+          "sha256": "49f332fa71e81d2a191a15c2786aba233630d3bf2a512191ad3e66b20a7ebb03"
+        },
+        {
+          "id": "web-fix-runner",
+          "days": "mon-fri",
+          "sha256": "e5d4ae1e0804602d84814ee8a199bd027e8a36725a9c18c7e0f30f94bf71af30"
+        },
+        {
+          "id": "web-guardrail-review",
+          "days": "last-weekday",
+          "sha256": "a2ebe5886f6a451e3d2e2c980c119c6a30d1eaa1ad0a5078098902b2068d1bf4"
+        },
+        {
+          "id": "web-inventory-refresh",
+          "days": "first-weekday",
+          "sha256": "3511869f00194e42a46c6a275a6fa6c44937c75acfd902921ae7b516f659ee08"
+        },
+        {
+          "id": "web-platform-guard",
+          "days": "mon",
+          "sha256": "10b6742392953ba8ae41818d3dddb74ababd72cba84bbad0cbe22bbb36575a9f"
+        },
+        {
+          "id": "web-site-sweep",
+          "days": "mon-fri",
+          "sha256": "7604545f95cc8afd49bd5c0b6861e5d78f45b35eaa0222a64525aa17741fff18"
+        },
+        {
+          "id": "web-standup",
+          "days": "mon-fri",
+          "sha256": "ec0da84d5f0dd6f7885b241c4c31e774aa499228874697988343ed99bc47702d"
+        },
+        {
+          "id": "web-weekly-report",
+          "days": "fri",
+          "sha256": "02b1da1b4db77ba5bb903a582b9df447d3e3f090a044e2c7763f16bf9b4475a0"
+        }
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "id": "founder-skill-founder-board",
+      "name": "Founder Board",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-board/SKILL.md",
+      "sha256": "4e9868404b98ced245322d6c5d05ac6a3672960ecc0453338edc0d674b419a52"
+    },
+    {
+      "id": "founder-skill-founder-brand",
+      "name": "Founder Brand",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-brand/SKILL.md",
+      "sha256": "406520c627dec8bb43914a94ac7303ceb8d3ee8b0e998a33b1378161b0068335"
+    },
+    {
+      "id": "founder-skill-founder-cfo",
+      "name": "Founder Cfo",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-cfo/SKILL.md",
+      "sha256": "38cc75b484758bff0fb333f7703d0658a0969349d10bd664539f7a06e96917ce"
+    },
+    {
+      "id": "founder-skill-founder-competitors",
+      "name": "Founder Competitors",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-competitors/SKILL.md",
+      "sha256": "cdc71a965b2e66622a11516e58b8b55fc7cf13c9b0c38fc95d2667772a6accec"
+    },
+    {
+      "id": "founder-skill-founder-consumer",
+      "name": "Founder Consumer",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-consumer/SKILL.md",
+      "sha256": "2f13355139a47ba1079dd7b4a16f719a4dbbf684813bb8193e33bdf85b75e1d0"
+    },
+    {
+      "id": "founder-skill-founder-launch",
+      "name": "Founder Launch",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-launch/SKILL.md",
+      "sha256": "fa44e8ff5eb16a74f22cc58febb19ab0e5c962beab7bb138024eaa48a262b2b6"
+    },
+    {
+      "id": "founder-skill-founder-marketing",
+      "name": "Founder Marketing",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-marketing/SKILL.md",
+      "sha256": "eb9d725dce17558fbd67d0a1a91a0e0560472fd4a2c43dba629401a02701931e"
+    },
+    {
+      "id": "founder-skill-founder-offer",
+      "name": "Founder Offer",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-offer/SKILL.md",
+      "sha256": "55630bf289684ba7ba27e62dfbff177c230bddab1a4d68412d6a1ae899a0b222"
+    },
+    {
+      "id": "founder-skill-founder-ops",
+      "name": "Founder Ops",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-ops/SKILL.md",
+      "sha256": "687a444046d60d35ac84414997623ce98a3e60d79404fd6d8e1e38ac3ae3db7b"
+    },
+    {
+      "id": "founder-skill-founder-plan",
+      "name": "Founder Plan",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-plan/SKILL.md",
+      "sha256": "a1f31d0b0d3186f3628416639d9d3d7e4ba95b39fd956d667eaf7a3d5336abab"
+    },
+    {
+      "id": "founder-skill-founder-pricing",
+      "name": "Founder Pricing",
+      "source": "Jakeschincariol/founder-skill",
+      "path": "skills/founder-pricing/SKILL.md",
+      "sha256": "d3ed84d9141c4117820bd372a44148d9e483259a7cbe24b5849d026d333bd59b"
+    },
+    {
+      "id": "ai-agent-onboarding-agent-brief",
+      "name": "Agent Brief",
+      "source": "failcoach/ai-agent-onboarding",
+      "path": "templates/agent-brief.md",
+      "sha256": "b22ac9d65a04c16e70241d1b1aecc9e59749e8ababf88fcaa239f435d5f58a89"
+    },
+    {
+      "id": "ai-agent-onboarding-feedback-template",
+      "name": "Feedback Template",
+      "source": "failcoach/ai-agent-onboarding",
+      "path": "templates/feedback-template.md",
+      "sha256": "39b29460a8ea41bdfffcbdd05a7fedacfb4a829d6aa388e4e32cdb37f3c73b8b"
+    },
+    {
+      "id": "ai-agent-onboarding-first-week-plan",
+      "name": "First Week Plan",
+      "source": "failcoach/ai-agent-onboarding",
+      "path": "templates/first-week-plan.md",
+      "sha256": "ca3922cace5d5c238bcdd66c9f1b8f202d6bffbb65f66f1245a5ec963e2242c4"
+    },
+    {
+      "id": "ai-agent-onboarding-memory-structure",
+      "name": "Memory Structure",
+      "source": "failcoach/ai-agent-onboarding",
+      "path": "templates/memory-structure.md",
+      "sha256": "992f4e5de5eddf9c09eeeb56341dd560273dc44ae18105ea1dc1e4eb274314d4"
+    },
+    {
+      "id": "ai-agent-onboarding-session-documentation",
+      "name": "Session Documentation",
+      "source": "failcoach/ai-agent-onboarding",
+      "path": "templates/session-documentation.md",
+      "sha256": "7aafc097ecde3335818e68a3f72e368203e09f59c60618b94dc0cd0732ad7960"
+    }
+  ]
+}
