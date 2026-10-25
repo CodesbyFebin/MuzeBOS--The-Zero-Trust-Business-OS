@@ -149,3 +149,9 @@ html[data-sidebar='rail'] .mb-side-link { justify-content:center;padding:9px 6px
 .mb-library-item { display:grid; width:100%; text-align:left; padding:.65rem; gap:.3rem; border-bottom:1px solid var(--border); overflow-wrap:anywhere; }
 .mb-source-hash { font-family:monospace; overflow-wrap:anywhere; font-size:.75rem; }
 @media(max-width:600px) { .mb-booking-row { align-items:flex-start; flex-direction:column; } }
+
+.mb-inference-tabs, .mb-inference-fields { display:flex; flex-wrap:wrap; gap:.65rem; margin-block:1rem; }
+.mb-inference .mb-inference-consent { display:flex; align-items:center; gap:.5rem; }
+.mb-inference-consent input { width:auto; }
+.mb-inference pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:24rem; overflow:auto; }
+.mb-inference .mb-source-shortcuts { padding:0; }

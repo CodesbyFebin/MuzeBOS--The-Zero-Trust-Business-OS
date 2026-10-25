@@ -1,0 +1,13 @@
+node_modules
+.next*
+.git
+.env
+.env.local
+.env.inference
+.env.*.local
+data
+demo-data
+*.db
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
