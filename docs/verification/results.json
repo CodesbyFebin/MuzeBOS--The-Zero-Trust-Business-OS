@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-25",
+  "implementation_commit": "6a69c593414112820bc55c4f124af39aec3dc939",
+  "source_tree": "9f2a7b2bba7625083d9d976da8f5d51ba3113c2f",
+  "runtime": "Node.js 22.23.4",
+  "framework": "Next.js 14.2.35",
+  "typecheck": "PASS",
+  "build": "PASS",
+  "automated_suite": {"files_passed": 358, "tests_passed": 4782, "tests_skipped": 8, "tests_failed": 0},
+  "commerce_tests": {"passed": 20, "failed": 0},
+  "browser": {"result": "PASS", "desktop": true, "mobile_width": 390, "runtime_errors": 0},
+  "live_meta": "BLOCKED",
+  "provider_settlement": "BLOCKED",
+  "independent_security_review": "NOT RUN",
+  "production_ready": false
+}
