@@ -70,3 +70,9 @@ rail has been deployed or connected. No independent security review, compliance
 certification, PostgreSQL migration or tenant-isolation qualification is claimed.
 See THIRD_PARTY_NOTICES.md for the four scoped MIT imports and the source catalog
 for the projects that remain external or excluded.
+
+## GitHub status
+
+The integration update is published in [PR #1](https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/1).
+Use its commit checks and merge state for the current GitHub result; the table
+above records executed local qualification rather than predicting CI outcomes.
