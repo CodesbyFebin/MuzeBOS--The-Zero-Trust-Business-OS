@@ -214,3 +214,8 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
   html:has(.mb-shell-nav) main { padding-left:14px!important;padding-right:14px!important; }
 }
 @media (prefers-reduced-motion: reduce) { html:has(.mb-shell-nav) .os-sidebar { transition:none; } }
+.mb-inference-tabs, .mb-inference-fields { display:flex; flex-wrap:wrap; gap:.65rem; margin-block:1rem; }
+.mb-inference .mb-inference-consent { display:flex; align-items:center; gap:.5rem; }
+.mb-inference-consent input { width:auto; }
+.mb-inference pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:24rem; overflow:auto; }
+.mb-inference .mb-source-shortcuts { padding:0; }

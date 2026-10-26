@@ -1,0 +1,48 @@
+# Prepared self-host packaging; validate on your Docker host before deployment.
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.inference
+    image: muzebos-inference:local
+    env_file: .env.inference
+    environment:
+      GLADOS_HOST: 0.0.0.0
+      GLADOS_DB: /app/data/workspace.db
+      MUZEBOS_DB: /app/data/business.db
+      GLADOS_ENV_LOCAL: /app/data/operator.env
+    # The application refuses remote binding until an operator password is set.
+    ports: ["127.0.0.1:3000:3000"]
+    volumes: ["business-data:/app/data"]
+    restart: unless-stopped
+    init: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 3g
+    cpus: 2
+  worker:
+    image: muzebos-inference:local
+    depends_on: [app]
+    env_file: .env.inference
+    environment:
+      GLADOS_DB: /app/data/workspace.db
+      MUZEBOS_DB: /app/data/business.db
+      GLADOS_ENV_LOCAL: /app/data/operator.env
+    command: ["npm", "run", "inference:worker"]
+    volumes: ["business-data:/app/data"]
+    restart: unless-stopped
+    stop_grace_period: 75s
+    init: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    cpus: 1
+  ollama:
+    image: ollama/ollama:latest
+    profiles: [local-model]
+    volumes: ["model-data:/root/.ollama"]
+    restart: unless-stopped
+    # Deliberately no public Ollama port; app/worker reach its internal hostname.
+volumes:
+  business-data:
+  model-data:

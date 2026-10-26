@@ -15,7 +15,8 @@ import {
   triageOf,
 } from '@/lib/inbox';
 
-const NOW = new Date('2026-09-16T15:00:00.000Z');
+// Fixed local afternoon: these assertions exercise local calendar-day buckets.
+const NOW = new Date(2026, 8, 16, 15, 0, 0, 0);
 const ago = (mins: number) => new Date(NOW.getTime() - mins * 60_000).toISOString();
 const ahead = (mins: number) => new Date(NOW.getTime() + mins * 60_000).toISOString();
 
@@ -127,6 +128,8 @@ describe('inbox: one list for every channel', () => {
     expect(dateBucket(ago(4 * 1440), NOW)).toBe('week');
     expect(dateBucket(ago(20 * 1440), NOW)).toBe('older');
     expect(BUCKET_LABEL.next).toBe('Up next');
+    const midnight = new Date(2026, 8, 17, 0, 5);
+    expect(dateBucket(new Date(midnight.getTime() - 14 * 60000).toISOString(), midnight)).toBe('yesterday');
   });
 
   test('filters narrow by source, queue, range and free text', () => {

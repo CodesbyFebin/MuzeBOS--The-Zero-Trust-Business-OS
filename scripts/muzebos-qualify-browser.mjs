@@ -30,6 +30,7 @@ try {
   await import('./muzebos-browser.mjs');
   await import('./muzebos-mission-browser.mjs');
   await import('./muzebos-integrations-browser.mjs');
+  await import('./muzebos-inference-browser.mjs');
   completed = true;
 } catch (error) { console.error(log); throw error; }
 finally {

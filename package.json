@@ -20,10 +20,14 @@
     "test:browser": "node scripts/muzebos-browser.mjs",
     "test:mission-browser": "node scripts/muzebos-mission-browser.mjs",
     "test:integrations-browser": "node scripts/muzebos-integrations-browser.mjs",
-    "test:qualify-browser": "node scripts/muzebos-qualify-browser.mjs"
+    "test:qualify-browser": "node scripts/muzebos-qualify-browser.mjs",
+    "inference:worker": "tsx scripts/inference-worker.ts",
+    "inference:once": "tsx scripts/inference-worker.ts --once",
+    "inference:bootstrap": "tsx scripts/inference-bootstrap.ts"
   },
   "dependencies": {
     "@miosa/sdk": "^3.2.5",
+    "@mlc-ai/web-llm": "^0.2.86",
     "@notionhq/client": "^5.22.0",
     "@slack/web-api": "^7.16.0",
     "@types/d3-force": "^3.0.10",

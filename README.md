@@ -136,3 +136,14 @@ browser-local permission review using AgentShield's MIT normalizer.
 See [integration review](docs/MUZEBOS-UPSTREAM-INTEGRATIONS.md) and
 [third-party notices](THIRD_PARTY_NOTICES.md). No external applications or
 autonomous employee schedules are launched by these sections.
+
+## Inference and bounded agents
+
+Open Brain → Inference & agent workspace for persistent tasks, deterministic
+small/medium/large routing, exact-task Jev approval, worker leases, delegation
+and draft outputs. WebLLM runs in an explicitly loaded browser worker; the
+separate Node worker supports configured Ollama, Meta Wonder and OpenRouter
+text endpoints. Muse Code/Wonder Full, OpenClaw execution and zkVM proving stay
+blocked until their external isolation/verification bridges are qualified.
+
+See [inference setup and boundaries](docs/MUZEBOS-INFERENCE.md).

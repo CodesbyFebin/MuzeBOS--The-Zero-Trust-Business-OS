@@ -27,3 +27,9 @@ outside the MuzeBOS repository and are not redistributed as an undifferentiated
 MIT bundle. Copyleft projects are not incompatible by definition: their source
 and obligations need a deliberate integration/distribution design. No such
 source merge was performed here.
+
+The inference workspace additionally depends on the packaged
+`@mlc-ai/web-llm` library (MLC, Apache License 2.0); its license remains in the
+installed package. Llama model weights are a separate, explicit device download
+under their upstream model terms. No Muse Code, Wonder Full or OpenClaw source
+or model weights are bundled or represented as running in this release.
