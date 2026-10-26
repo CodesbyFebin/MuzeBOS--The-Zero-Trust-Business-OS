@@ -63,6 +63,12 @@ const DEDICATED_ROUTES: Record<number, string> = {
   3: '/workspace/orders/bookings',
   144: '/workspace/brain/employees',
   181: '/workspace/system/sources',
+  186: '/workspace/system/webhooks',
+};
+
+/** Pillars verified since the navigation catalogue was written: the status and scope the tests back. */
+const VERIFIED: Record<number, { status: FeatureStatus; summary: string }> = {
+  186: { status: 'available', summary: 'Signature-verified Meta webhook receiver (WhatsApp, Instagram, Messenger) and its delivery log. Stores events; does not process or reply.' },
 };
 
 const PROVIDER = /whatsapp|instagram|messenger|facebook|upi gateway|upi autopay|ach|wire|pos hardware|sms|push notif|pixel|voice|kyc|aml|hardware key|passkey|cdn|container|failover|service mesh|edge cache|object storage|shelf scanner|call log/i;
@@ -81,8 +87,9 @@ const CATEGORY_DEPENDENCY: Record<string, string> = {
 };
 
 function toFeature(t: WorkspaceTool, clusterId: string): FeatureDefinition {
-  const blocked = t.status === 'planned' && PROVIDER.test(t.name);
-  const status: FeatureStatus = blocked ? 'blocked' : t.status;
+  const verified = VERIFIED[t.id];
+  const blocked = !verified && t.status === 'planned' && PROVIDER.test(t.name);
+  const status: FeatureStatus = verified?.status ?? (blocked ? 'blocked' : t.status);
   const dependencies = status === 'available' || status === 'existing' ? [] : blocked
     ? ['External provider account and credentials', 'Verified adapter with failure/unavailable states', CATEGORY_DEPENDENCY[t.category]]
     : [CATEGORY_DEPENDENCY[t.category], 'Schema migration, validation and tests'];
@@ -93,9 +100,9 @@ function toFeature(t: WorkspaceTool, clusterId: string): FeatureDefinition {
     clusterId,
     label: t.name,
     route: DEDICATED_ROUTES[t.id] ?? `/workspace/${t.category}/${slug(t.name)}`,
-    target: t.href,
+    target: verified ? undefined : t.href,
     status,
-    summary: status === 'blocked' ? 'Requires an external provider integration that is not built or verified. No executable implementation is claimed.' : t.scope,
+    summary: verified ? verified.summary : status === 'blocked' ? 'Requires an external provider integration that is not built or verified. No executable implementation is claimed.' : t.scope,
     dependencies,
   };
 }
@@ -134,8 +141,15 @@ function utilityMenu(key: string): Omit<MenuDefinition, 'number'> {
     route: `/workspace/${key}/${slug(l.label)}`, target: l.href, status: 'existing', dependencies: [],
     summary: `Opens the existing screen at ${l.href}.`,
   }));
+  if (key === 'developer') pages.push(META_WEBHOOK_STATUS);
   return { id: key, label: key === 'upgrade' ? 'Upgrade' : u.label, route: `/workspace/${key}`, icon: u.icon, section: 'pinned', summary: u.summary, aliases: LEGACY_ALIASES[key] ?? [], clusters: [{ id: cid, label: 'Current destinations', pages }] };
 }
+
+const META_WEBHOOK_STATUS: FeatureDefinition = {
+  id: 'developer.meta-webhooks', menuId: 'developer', clusterId: 'developer.overview', label: 'Meta webhook status',
+  route: '/workspace/developer/meta-webhooks', status: 'available', dependencies: [],
+  summary: 'Whether META_APP_SECRET and META_VERIFY_TOKEN are set (never their values), the endpoint paths, and recent deliveries.',
+};
 
 const missionPage: FeatureDefinition = { id: 'mission.overview', menuId: 'mission', clusterId: 'mission.today', label: 'Mission Control', route: '/', status: 'available', dependencies: [], summary: 'Derived pending approvals, unpaid requests, out-of-stock alerts and persisted reminders.' };
 const workflowsPage: FeatureDefinition = { id: 'workflows.canvas', menuId: 'workflows', clusterId: 'workflows.build', label: 'Workflow Canvas', route: '/workflows', status: 'existing', dependencies: [], summary: 'Inherited workflow editor. Execution evidence for MuzeBOS commands is planned (slice 7).' };
