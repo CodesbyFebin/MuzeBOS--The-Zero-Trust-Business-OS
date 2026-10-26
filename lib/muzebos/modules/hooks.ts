@@ -3,6 +3,7 @@ import { formatMoney, type ModuleRecord } from './types';
 import { productById, records, today } from './engine';
 import { MONEY_HOOKS } from './hooks-money';
 import { OPS_HOOKS } from './hooks-ops';
+import { GROWTH_HOOKS } from './hooks-growth';
 
 export type Hooks = {
   /** Field combinations that must be unique within the module, e.g. ['code'] or ['productId+serial']. */
@@ -163,4 +164,4 @@ const BASE_HOOKS: Record<string, Hooks> = {
     stats: (_s, recs) => [{ label: 'Units written off', value: String(recs.filter((r) => r.status === 'posted' && r.data.reason !== 'count_found').reduce((a, r) => a + n(r.data.quantity), 0)) }],
   },
 };
-export const HOOKS: Record<string, Hooks> = { ...BASE_HOOKS, ...MONEY_HOOKS, ...OPS_HOOKS };
+export const HOOKS: Record<string, Hooks> = { ...BASE_HOOKS, ...MONEY_HOOKS, ...OPS_HOOKS, ...GROWTH_HOOKS };

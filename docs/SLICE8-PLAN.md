@@ -79,6 +79,8 @@ Legend for "needs":
 | 93 | growth | UTM Tracker | DB only |
 | 99 | growth | Growth Experiments | DB only |
 
+Status: done - all six available (tests/muzebos-modules-e.test.ts, Playwright batch e + coupon redeem flow on desktop and mobile). Templates and canned replies only store text; nothing is sent from these pages.
+
 ## Batch (d) Settings, Account, Support, Upgrade, Developer
 
 These menus are pinned utilities that already link to existing screens (setup, login, usage, roadmap, integrations, blueprint). They contain no planned pillars. Slice 8 adds a Developer API reference generated from the real `app/api` route files; no plans, prices or tiers are invented. (done: /workspace/developer/api-reference, tests/muzebos-api-reference.test.ts keeps it in sync)
