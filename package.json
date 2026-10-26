@@ -26,7 +26,8 @@
     "test:slice4-browser": "node scripts/muzebos-slice4-browser.mjs",
     "test:slice5-browser": "node scripts/muzebos-slice5-browser.mjs",
     "test:slice7-browser": "node scripts/muzebos-slice7-browser.mjs",
-    "test:slice9-browser": "node scripts/muzebos-slice9-browser.mjs"
+    "test:slice9-browser": "node scripts/muzebos-slice9-browser.mjs",
+    "test:slice8-browser": "node scripts/muzebos-modules-browser.mjs"
   },
   "dependencies": {
     "@miosa/sdk": "^3.2.5",

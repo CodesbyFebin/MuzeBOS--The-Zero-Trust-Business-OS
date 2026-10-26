@@ -12,6 +12,7 @@
  *  - blocked:   cannot be built until an external provider, credential or
  *               platform capability exists; dependencies are listed.
  */
+import { MODULES } from './modules';
 import type { LucideIcon } from 'lucide-react';
 import { Home, Workflow, ShieldCheck } from 'lucide-react';
 import { WORKSPACE_CATEGORIES, WORKSPACE_TOOLS, PINNED_UTILITIES, type WorkspaceTool } from '@/lib/muzebos/navigation';
@@ -73,7 +74,7 @@ const VERIFIED: Record<number, { status: FeatureStatus; summary: string }> = {
   186: { status: 'available', summary: 'Signature-verified Meta webhook receiver (WhatsApp, Instagram, Messenger) and its delivery log. Stores events; does not process or reply.' },
 };
 
-const PROVIDER = /whatsapp|instagram|messenger|facebook|upi gateway|upi autopay|ach|wire|pos hardware|sms|push notif|pixel|voice|kyc|aml|hardware key|passkey|cdn|container|failover|service mesh|edge cache|object storage|shelf scanner|call log/i;
+const PROVIDER = /whatsapp|instagram|messenger|facebook|upi gateway|upi autopay|\bach\b|\bwire\b|pos hardware|sms|push notif|pixel|\bvoice|invoice send|kyc|\baml\b|hardware key|passkey|cdn|container|failover|service mesh|edge cache|object storage|shelf scanner|call log/i;
 
 const CATEGORY_DEPENDENCY: Record<string, string> = {
   orders: 'Slice 3: orders, inventory and invoice integrity',
@@ -88,8 +89,13 @@ const CATEGORY_DEPENDENCY: Record<string, string> = {
   system: 'Slice 7: workflow execution and evidence',
 };
 
+/** Pillars implemented as declarative modules (lib/muzebos/modules), each covered by tests/muzebos-modules*.test.ts. */
+const MODULE_VERIFIED: Record<number, { status: FeatureStatus; summary: string }> = Object.fromEntries(
+  MODULES.filter((m) => m.pillar).map((m) => [m.pillar as number, { status: 'available' as FeatureStatus, summary: m.summary }]),
+);
+
 function toFeature(t: WorkspaceTool, clusterId: string): FeatureDefinition {
-  const verified = VERIFIED[t.id];
+  const verified = VERIFIED[t.id] ?? MODULE_VERIFIED[t.id];
   const blocked = !verified && t.status === 'planned' && PROVIDER.test(t.name);
   const status: FeatureStatus = verified?.status ?? (blocked ? 'blocked' : t.status);
   const dependencies = status === 'available' || status === 'existing' ? [] : blocked

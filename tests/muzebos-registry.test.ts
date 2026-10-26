@@ -61,7 +61,7 @@ describe('MuzeBOS feature registry', () => {
       else { expect(f.dependencies).toEqual([]); expect(f.target ?? (appRoute(f.route) ? f.route : undefined), f.id).toBeTruthy(); }
     }
     expect(featureByRoute('/workspace/talk/whatsapp-hub')?.status).toBe('blocked');
-    expect(featureByRoute('/workspace/stock/barcode-and-qr-generator')?.status).toBe('planned');
+    expect(featureByRoute('/workspace/builder/hydration-optimizer')?.status).toBe('planned');
   });
   it('maps legacy routes onto their menus', () => {
     expect(resolveMenu('/funnel')?.id).toBe('orders');
@@ -108,7 +108,10 @@ describe('Registry-driven shell', () => {
   it('canonical page routes redirect working pages and stub the rest without controls', () => {
     expect(() => FeaturePage({ params: { section: 'money', page: 'invoice-maker' } })).toThrow('REDIRECT /business?view=invoices');
     expect(() => FeaturePage({ params: { section: 'money', page: 'nope' } })).toThrow('NEXT_NOT_FOUND');
-    const planned = pageForSegments('stock', 'barcode-and-qr-generator')!;
+    const mod = renderToStaticMarkup(FeaturePage({ params: { section: 'stock', page: 'barcode-and-qr-generator' } }) as never);
+    expect(mod).toContain('data-feature="stock.barcode-and-qr-generator"');
+    expect(mod).toContain('Loading Barcode');
+    const planned = pageForSegments('builder', 'hydration-optimizer')!;
     const html = renderToStaticMarkup(createElement(FeatureStub, { feature: planned }));
     expect(html).toContain('Planned');
     expect(html).toContain('Dependencies');

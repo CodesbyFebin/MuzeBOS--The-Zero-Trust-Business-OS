@@ -104,10 +104,42 @@ export class BusinessStore {
       CREATE INDEX IF NOT EXISTS mb_workflow_events_run ON mb_workflow_events(runId, seq);
       INSERT OR IGNORE INTO mb_migrations VALUES(9, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
     `);
+    // v10: declarative workspace modules (lib/muzebos/modules) and the per-location stock movement ledger.
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS mb_module_records(id TEXT PRIMARY KEY, module TEXT NOT NULL, status TEXT NOT NULL, data TEXT NOT NULL, version INTEGER NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
+      CREATE INDEX IF NOT EXISTS mb_module_records_module ON mb_module_records(module, updatedAt);
+      CREATE TABLE IF NOT EXISTS mb_stock_moves(seq INTEGER PRIMARY KEY AUTOINCREMENT, productId TEXT NOT NULL REFERENCES mb_products(id), locationId TEXT, quantity INTEGER NOT NULL CHECK(quantity<>0), reason TEXT NOT NULL, ref TEXT NOT NULL, affectsTotal INTEGER NOT NULL CHECK(affectsTotal IN (0,1)), createdAt TEXT NOT NULL);
+      CREATE INDEX IF NOT EXISTS mb_stock_moves_product ON mb_stock_moves(productId, locationId);
+      INSERT OR IGNORE INTO mb_migrations VALUES(10, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
+    `);
   }
   /** Engine hooks: run work in one IMMEDIATE transaction / append a hash-chained evidence event. */
   transact<T>(work: () => T): T { return this.atomic(work); }
   appendEvidence(action: string, target: string, detail: string) { this.audit(action, target, detail); }
+  /** Records a stock movement. affectsTotal=false moves stock between locations without changing the product total. */
+  moveStock(input: { productId: string; locationId: string | null; quantity: number; reason: string; ref: string; affectsTotal: boolean }) {
+    return this.atomic(() => {
+      const p = this.db.prepare('SELECT * FROM mb_products WHERE id=?').get(input.productId) as Product | undefined;
+      if (!p) throw new BusinessError('Product not found', 404);
+      if (!Number.isSafeInteger(input.quantity) || input.quantity === 0) throw new BusinessError('Movement quantity must be a non-zero integer');
+      if (input.affectsTotal) {
+        if (p.stock + input.quantity < 0) throw new BusinessError(`Insufficient stock: ${p.name} has ${p.stock}`, 409);
+        this.db.prepare('UPDATE mb_products SET stock=stock+? WHERE id=?').run(input.quantity, p.id);
+      }
+      if (input.locationId && input.quantity < 0) {
+        const at = this.locationOnHand(p.id, input.locationId);
+        if (at + input.quantity < 0) throw new BusinessError(`Insufficient stock at location: ${p.name} has ${at}`, 409);
+      }
+      this.db.prepare('INSERT INTO mb_stock_moves(productId,locationId,quantity,reason,ref,affectsTotal,createdAt) VALUES(?,?,?,?,?,?,?)').run(p.id, input.locationId, input.quantity, input.reason, input.ref, input.affectsTotal ? 1 : 0, now());
+      this.audit('stock.moved', p.id, `${input.reason} ${input.quantity > 0 ? '+' : ''}${input.quantity}${input.locationId ? ` @${input.locationId}` : ''} ref ${input.ref}`);
+    });
+  }
+  locationOnHand(productId: string, locationId: string): number {
+    return (this.db.prepare('SELECT COALESCE(SUM(quantity),0) q FROM mb_stock_moves WHERE productId=? AND locationId=?').get(productId, locationId) as { q: number }).q;
+  }
+  stockMoves(limit = 500): { seq: number; productId: string; locationId: string | null; quantity: number; reason: string; ref: string; affectsTotal: number; createdAt: string }[] {
+    return this.db.prepare('SELECT * FROM mb_stock_moves ORDER BY seq DESC LIMIT ?').all(limit) as never;
+  }
   close() { this.db.close(); }
   /** Persist one signature-verified webhook delivery. Each event key is recorded once per
    *  source, so a retried batch only adds the events not seen before. Written (and audited)
