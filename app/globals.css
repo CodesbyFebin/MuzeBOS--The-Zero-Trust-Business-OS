@@ -17666,3 +17666,4 @@ textarea.lab2c-input { height: auto; min-height: 96px; padding: 10px 12px; line-
 .kg-modules-label { flex: 1; font-size: var(--g-fs-body); }
 .kg-modules > [role='alert'], .kg-modules > .g-error-line { grid-column: 1 / -1; }
 
+.mb-mission-widgets{display:grid;gap:16px}

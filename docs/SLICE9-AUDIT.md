@@ -33,3 +33,16 @@ public/, source files, DB file size). Read-only; no shell, no rebuild, no purge.
 encrypted at rest, single SQLite connection, no replication, source-derived pages show zero without sources.
 
 Counts after 9c: available 154, existing 23, needs-credentials 43, planned 0, blocked 0.
+
+## 9d: Mission Control layouts and the no-stub guarantee
+- Widget layout (order and visibility of the 7 widgets) is stored in `mb_settings` under the key `mission.layout`. It is changed through `POST /api/mission-control/layout`, which requires an Idempotency-Key and validates on the server (unknown, repeated or empty layouts get a 422). Every save or reset writes an `mb_audit` entry.
+- The UI has a "Customize layout" panel with add, remove, move up/down and restore default.
+- `tests/muzebos-mission-9d.test.ts` checks:
+  - layout persistence across a restart, evidence and validation;
+  - that every widget and the Connected Business graph change in response to records written to the store;
+  - that none of the 220 registry routes renders FeatureStub. Dedicated pages are checked statically; the rest go through the dynamic page.
+- `scripts/muzebos-crawl-routes.mjs` crawls all 220 routes on desktop and mobile against a fresh DB. Each route must return 200 with no `.mb-stub`. It also runs the layout flow in the browser.
+- Limitations:
+  - The layout is for one workspace (there are no per-user layouts).
+  - Widgets have a fixed set of 7 and cannot be resized.
+  - The crawl only checks the 200 status and the absence of a stub; it does not test each page's behaviour.

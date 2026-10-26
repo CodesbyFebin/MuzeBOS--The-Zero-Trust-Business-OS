@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 197,
+ "count": 198,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1888,6 +1888,19 @@
    "idempotencyKey": false,
    "originCheck": true,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/mission-control/layout",
+   "file": "app/api/mission-control/layout/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Saved Mission Control widget layout (order and visibility).",
+   "idempotencyKey": true,
+   "originCheck": true,
+   "schemaValidated": true,
    "access": "session"
   },
   {
