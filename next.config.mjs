@@ -1,6 +1,12 @@
 // Menus whose short path (/orders, /money …) has no page of its own.
 export const MUZEBOS_SHORT_PATHS = ['orders', 'money', 'talk', 'stock', 'growth', 'operations', 'builder', 'foundation', 'system', 'evidence', 'settings', 'upgrade', 'support', 'developer', 'account'];
 
+export const MUZEBOS_LEGACY_WORKSPACE = [
+  ['/workspace/customers', '/workspace/orders/crm-profiles'],
+  ['/workspace/inventory', '/workspace/stock/product-catalog-graph'],
+  ['/workspace/tasks', '/workspace/operations/tasks-and-goals'],
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Isolate the build output dir via env so a production build can run on its
@@ -30,6 +36,8 @@ const nextConfig = {
       { source: '/help', destination: '/workspace/support', permanent: false },
       { source: '/api-docs', destination: '/workspace/developer', permanent: false },
       { source: '/billing', destination: '/workspace/upgrade', permanent: false },
+      // Old flat workspace paths -> their registry pages (tests/muzebos-registry.test.ts).
+      ...MUZEBOS_LEGACY_WORKSPACE.map(([from, to]) => ({ source: from, destination: to, permanent: false })),
     ];
   },
   // Pre-rename URLs, served by the renamed targets (S02 FR-5, FR-14). The
@@ -44,6 +52,8 @@ const nextConfig = {
       { source: '/content-media/ad-engine/:path*', destination: '/content-media/creative-engine/:path*' },
     ];
   },
+  // This is the private business workspace. Public project docs are built separately in site/.
+  async headers() { return [{ source: '/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' }] }]; },
   experimental: {
     outputFileTracingIncludes: { "/api/employee-library": ["./vendor/reference-documents/*.txt"] },
     serverComponentsExternalPackages: ['better-sqlite3', 'node-ical', 'nodemailer'],
