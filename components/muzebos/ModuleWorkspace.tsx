@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import type { FeatureDefinition } from '@/lib/muzebos/registry';
 import { moduleById, formatMoney, type FieldDef, type ModuleRecord, type ModuleView } from '@/lib/muzebos/modules';
 import { StatusBadge } from '@/components/muzebos/StatusBadge';
+import { ProviderPanel } from '@/components/muzebos/ProviderPanel';
 
 type Draft = Record<string, unknown>;
 const STALE_MS = 5 * 60_000;
@@ -132,6 +133,7 @@ export function ModuleWorkspace({ feature }: { feature: FeatureDefinition }) {
                 </div></td></tr>)}</tbody></table></div>}
         </section>
       </>}
+    {def.provider && <ProviderPanel moduleId={def.id} />}
     <section className="mb-panel"><h2>Limits</h2><ul className="mb-help-list">{def.limits.map((l) => <li key={l}>{l}</li>)}</ul><p className="mb-muted">Every change is written to the hash-chained evidence log.</p></section>
     <Link className="mb-link" href={`/workspace/${feature.menuId}`}><ArrowLeft size={13} /> Back</Link>
   </div>;

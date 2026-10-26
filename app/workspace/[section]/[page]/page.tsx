@@ -8,7 +8,7 @@ export const dynamic='force-dynamic';
 export default function FeaturePage({params}:{params:{section:string;page:string}}) {
  const feature=pageForSegments(params.section,params.page);
  if(!feature)notFound();
- if(feature.status==='available'&&moduleById(feature.id))return <ModuleWorkspace feature={feature}/>;
+ if((feature.status==='available'||feature.status==='needs-credentials')&&moduleById(feature.id))return <ModuleWorkspace feature={feature}/>;
  if(feature.target&&(feature.status==='available'||feature.status==='existing'))redirect(feature.target);
  return <FeatureStub feature={feature}/>;
 }

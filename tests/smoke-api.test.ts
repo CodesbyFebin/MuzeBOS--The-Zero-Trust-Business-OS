@@ -129,6 +129,7 @@ const ROUTES: RouteEntry[] = [
   { route: 'metrics', load: () => import('@/app/api/metrics/route'), url: 'http://localhost/api/metrics' },
   { route: 'roadmap', load: () => import('@/app/api/roadmap/route'), url: 'http://localhost/api/roadmap' },
   { route: 'social', load: () => import('@/app/api/social/route'), url: 'http://localhost/api/social' },
+  { route: 'providers/[module]', load: () => import('@/app/api/providers/[module]/route'), url: 'http://localhost/api/providers/talk.whatsapp-hub', params: { module: 'talk.whatsapp-hub' } },
   { route: 'modules/[module]', load: () => import('@/app/api/modules/[module]/route'), url: 'http://localhost/api/modules/stock.low-stock-alert', params: { module: 'stock.low-stock-alert' } },
   { route: 'social/[platform]', load: () => import('@/app/api/social/[platform]/route'), url: 'http://localhost/api/social/instagram', params: { platform: 'instagram' } },
   { route: 'social/history', load: () => import('@/app/api/social/history/route'), url: 'http://localhost/api/social/history?limit=6' },

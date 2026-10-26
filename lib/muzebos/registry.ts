@@ -17,9 +17,10 @@ import type { LucideIcon } from 'lucide-react';
 import { Home, Workflow, ShieldCheck } from 'lucide-react';
 import { WORKSPACE_CATEGORIES, WORKSPACE_TOOLS, PINNED_UTILITIES, type WorkspaceTool } from '@/lib/muzebos/navigation';
 
-export type FeatureStatus = 'available' | 'existing' | 'planned' | 'blocked';
-export const FEATURE_STATUSES: FeatureStatus[] = ['available', 'existing', 'planned', 'blocked'];
-export const STATUS_LABEL: Record<FeatureStatus, string> = { available: 'Available', existing: 'Existing screen', planned: 'Planned', blocked: 'Blocked' };
+/** needs-credentials: local records work (tested); the provider action needs credentials and an adapter. */
+export type FeatureStatus = 'available' | 'existing' | 'needs-credentials' | 'planned' | 'blocked';
+export const FEATURE_STATUSES: FeatureStatus[] = ['available', 'existing', 'needs-credentials', 'planned', 'blocked'];
+export const STATUS_LABEL: Record<FeatureStatus, string> = { available: 'Available', existing: 'Existing screen', 'needs-credentials': 'Needs credentials', planned: 'Planned', blocked: 'Blocked' };
 
 export type FeatureDefinition = {
   id: string;            // stable key, e.g. "orders.orders-pipeline"
@@ -91,14 +92,14 @@ const CATEGORY_DEPENDENCY: Record<string, string> = {
 
 /** Pillars implemented as declarative modules (lib/muzebos/modules), each covered by tests/muzebos-modules*.test.ts. */
 const MODULE_VERIFIED: Record<number, { status: FeatureStatus; summary: string }> = Object.fromEntries(
-  MODULES.filter((m) => m.pillar).map((m) => [m.pillar as number, { status: 'available' as FeatureStatus, summary: m.summary }]),
+  MODULES.filter((m) => m.pillar).map((m) => [m.pillar as number, { status: (m.provider ? 'needs-credentials' : 'available') as FeatureStatus, summary: m.summary }]),
 );
 
 function toFeature(t: WorkspaceTool, clusterId: string): FeatureDefinition {
   const verified = VERIFIED[t.id] ?? MODULE_VERIFIED[t.id];
   const blocked = !verified && t.status === 'planned' && PROVIDER.test(t.name);
   const status: FeatureStatus = verified?.status ?? (blocked ? 'blocked' : t.status);
-  const dependencies = status === 'available' || status === 'existing' ? [] : blocked
+  const dependencies = status === 'needs-credentials' ? ['External provider account and credentials', 'Provider dispatch adapter (not built; items stay queued)'] : status === 'available' || status === 'existing' ? [] : blocked
     ? ['External provider account and credentials', 'Verified adapter with failure/unavailable states', CATEGORY_DEPENDENCY[t.category]]
     : [CATEGORY_DEPENDENCY[t.category], 'Schema migration, validation and tests'];
   return {
@@ -241,7 +242,7 @@ export function breadcrumbs(pathname: string): Crumb[] {
 export function pageForSegments(menu: string, page: string) { return featureByRoute(`/workspace/${menu}/${page}`); }
 
 export function statusCounts(features: FeatureDefinition[] = ALL_FEATURES): Record<FeatureStatus, number> {
-  const out = { available: 0, existing: 0, planned: 0, blocked: 0 };
+  const out: Record<FeatureStatus, number> = { available: 0, existing: 0, 'needs-credentials': 0, planned: 0, blocked: 0 };
   for (const f of features) out[f.status]++;
   return out;
 }

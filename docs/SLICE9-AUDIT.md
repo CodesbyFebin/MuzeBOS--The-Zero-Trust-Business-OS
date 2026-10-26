@@ -12,3 +12,15 @@ Blocked on a provider: 32, 33, 34, 39, 41, 42, 43, 50, 51, 63, 89, 90, 94, 126, 
 
 ## Group 3: infrastructure measured from this process, DB and filesystem (slice 9c): 20 pages
 114, 130, 131, 133, 134, 138, 148, 175, 177, 182, 183, 184, 185, 187, 189, 192, 195, 196, 197, 200.
+
+## 9b — provider pages (43)
+New status `needs-credentials`: local records are real (module engine, full CRUD, evidence), the provider action is not.
+Each page has an approval-bound outbox (draft → queued → cancelled). Approval binds a sha256 of the payload; the item
+stays "queued, provider not connected". No sent/delivered/paid state exists (tested). Provider config is stored in
+`mb_provider_config` as env-var references (must start `MUZEBOS_` or be the provider default); values are never stored
+or returned. Test connection makes a real request when every reference resolves (Meta Graph `/me`, Razorpay
+`/v1/payments`, Cloudflare token verify, OpenRouter `/key`, SMTP 220 banner, generic HTTPS GET) and otherwise reports
+"Not configured". WebAuthn/service-mesh pages report "no live test".
+
+Counts after 9b: available 134, existing 23, needs-credentials 43, planned 19, blocked 1 (the 20 infra pages remain for 9c).
+Limits: no dispatch adapters; HTTP/SMTP tests prove reachability/auth only.

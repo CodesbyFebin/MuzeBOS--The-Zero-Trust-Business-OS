@@ -21,6 +21,8 @@ export type ModuleDef = {
   transitions: Record<string, TransitionDef>;
   /** Fields shown as columns in the list (defaults to the first three). */
   columns?: string[];
+  /** Provider-dependent page: local records work; the provider action needs credentials (status needs-credentials). */
+  provider?: ProviderSpec;
   /** Honest limits shown on the page. */
   limits: string[];
 };
@@ -28,3 +30,7 @@ export type ModuleRecord = { id: string; module: string; status: string; data: R
 export type RefOption = { id: string; label: string };
 export type ModuleView = { def: ModuleDef; records: ModuleRecord[]; refs: Record<string, RefOption[]>; stats: { label: string; value: string }[]; loadedAt: string };
 export const formatMoney = (paise: number) => `INR ${(paise / 100).toFixed(2)}`;
+export type TesterKind = 'meta-graph' | 'razorpay' | 'cloudflare' | 'openrouter' | 'smtp' | 'http' | 'none';
+export type ProviderSpec = { name: string; tester: TesterKind; secrets: { key: string; label: string; ref: string }[]; note?: string };
+/** Reported for a queued outbox item: never "sent". */
+export const QUEUED_LABEL = 'queued, provider not connected';

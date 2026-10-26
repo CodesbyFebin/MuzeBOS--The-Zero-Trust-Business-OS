@@ -4,6 +4,7 @@ import { MONEY_MODULES } from './catalog-money';
 import { OPS_FOUNDATION_MODULES } from './catalog-ops-foundation';
 import { TALK_GROWTH_MODULES } from './catalog-talk-growth';
 import { DB_MODULES } from './catalog-db';
+import { PROVIDER_MODULES } from './catalog-providers';
 export * from './types';
-export const MODULES: ModuleDef[] = [...ORDERS_STOCK_MODULES, ...MONEY_MODULES, ...OPS_FOUNDATION_MODULES, ...TALK_GROWTH_MODULES, ...DB_MODULES];
+export const MODULES: ModuleDef[] = [...ORDERS_STOCK_MODULES, ...MONEY_MODULES, ...OPS_FOUNDATION_MODULES, ...TALK_GROWTH_MODULES, ...DB_MODULES, ...PROVIDER_MODULES];
 export const moduleById = (id: string) => MODULES.find((m) => m.id === id);
