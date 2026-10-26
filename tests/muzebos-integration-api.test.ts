@@ -8,6 +8,7 @@ vi.mock('@/lib/auth', () => ({ readAuthState: () => ({ configured: access.config
 import { GET as bookings } from '@/app/api/bookings/route';
 import { GET as library } from '@/app/api/employee-library/route';
 import { POST } from '@/app/api/business/route';
+import { GET as inferenceGet, POST as inferencePost } from '@/app/api/inference/route';
 import { businessStore } from '@/lib/muzebos/store';
 const dir = mkdtempSync(path.join(tmpdir(), 'mb-integration-api-'));
 const req = (route: string) => new Request(`http://localhost${route}`);
@@ -46,4 +47,24 @@ describe('New integration API boundaries', () => {
     expect((await POST(post({ action: 'cancelBooking', id: booking.id }))).status).toBe(200);
     expect(businessStore().verifyAudit()).toBe(true);
   });
+  it('gates inference access and exact-task approval without leaking leases', async () => {
+    access.valid = false;
+    expect((await inferenceGet(req('/api/inference'))).status).toBe(401);
+    access.valid = true;
+    const make = (payload: unknown, key = randomUUID()) => new Request('http://localhost/api/inference', { method:'POST', headers:{origin:'http://localhost','content-type':'application/json','idempotency-key':key}, body:JSON.stringify(payload) });
+    const payload = { action:'create', data:{title:'API draft',prompt:'Draft a greeting',kind:'draft'} };
+    const key = randomUUID();
+    const first = await inferencePost(make(payload,key)); expect(first.status).toBe(200);
+    const task = (await first.json()).result;
+    expect((await (await inferencePost(make(payload,key))).json()).result.id).toBe(task.id);
+    expect((await inferencePost(make({action:'approve',id:task.id,hash:'0'.repeat(64)}))).status).toBe(409);
+    expect((await inferencePost(make({action:'approve',id:task.id,hash:task.hash}))).status).toBe(200);
+    const lease = (await (await inferencePost(make({action:'claimBrowser',workerId:'api-browser'}))).json()).result;
+    const state = await inferenceGet(req('/api/inference')); expect(state.headers.get('cache-control')).toBe('no-store');
+    expect(JSON.stringify(await state.json())).not.toContain(lease.token);
+    expect((await inferencePost(make({action:'completeBrowser',id:task.id,token:lease.token,output:'API fixture draft'}))).status).toBe(200);
+    expect((await inferencePost(make({action:'completeBrowser',id:task.id,token:lease.token,output:'Duplicate'}))).status).toBe(409);
+    expect(businessStore().verifyAudit()).toBe(true);
+  });
+
 });

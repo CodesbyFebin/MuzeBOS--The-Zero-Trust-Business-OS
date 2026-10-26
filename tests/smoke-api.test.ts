@@ -23,6 +23,7 @@ type RouteEntry = {
 // a real 200 (not a 400/404 for a missing arg). Live-connector routes
 // (connections, social/sync) must still answer 200 with honest state.
 const ROUTES: RouteEntry[] = [
+  { route: 'inference', load: () => import('@/app/api/inference/route'), url: 'http://localhost/api/inference' },
   { route: 'bookings', load: () => import('@/app/api/bookings/route'), url: 'http://localhost/api/bookings' },
   { route: 'employee-library', load: () => import('@/app/api/employee-library/route'), url: 'http://localhost/api/employee-library' },
   { route: 'mission-control', load: () => import('@/app/api/mission-control/route'), url: 'http://localhost/api/mission-control' },

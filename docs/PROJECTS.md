@@ -1,6 +1,6 @@
 # Project board
 
-Updated: 2026-10-25
+Updated: 2026-10-26
 
 ## MuzeBOS commerce and reference UI
 
@@ -54,3 +54,21 @@ Updated: 2026-10-25
 - [x] Publish qualified integration source to GitHub.
 
 GitHub CI and merge state are tracked live in [PR #1](https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/1). External service deployment remains outside this qualification.
+
+## Inference workspace — 2026-10-26
+
+| Area | State |
+| --- | --- |
+| Persistent inference queue, routing and exact-task Jev gate | Verified locally; see MUZEBOS-INFERENCE-VERIFICATION.md |
+| Leased browser/server workers, cancellation and bounded delegation | Implemented; domain and process tests pass |
+| WebLLM Web Worker and mobile control UI | Browser control checks passed; physical GPU inference unverified |
+| Ollama, Meta Wonder and OpenRouter text protocols | Implemented; fixture-tested, live endpoints/credentials not configured |
+| Muse Code/Wonder Full and OpenClaw execution | Blocked pending qualified isolated runtime and per-tool bridge |
+| zkVM proof generation/verification | Not configured; no proof claims |
+| Docker Compose and hidden-password bootstrap | Prepared; Docker unavailable for runtime qualification |
+
+- [x] Keep the existing repository and 18-destination navigation.
+- [x] Add durable draft execution and finite policy limits.
+- [x] Complete local build/browser qualification and prepare the reviewable inference change.
+
+Inference publication and CI are tracked on `feat/inference-swarm` and the repository pull-request list. External execution/deployment gates remain blocked as listed above.

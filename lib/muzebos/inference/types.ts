@@ -1,0 +1,9 @@
+export type Tier = 'small' | 'medium' | 'large';
+export type Lane = 'auto' | 'browser' | 'ollama' | 'meta' | 'openrouter' | 'openclaw' | 'muse-code';
+export type TaskKind = 'draft' | 'analysis' | 'plan' | 'code';
+export type InferencePayload = { title: string; prompt: string; agent: string; policyVersion: 1; kind: TaskKind; tier: Tier; provider: Exclude<Lane, 'auto'>; model: string; maxTokens: number; paidConsent: boolean; configHash: string; parentId: string | null; depth: number; rootId: string };
+export type InferenceTask = { id: string; payload: InferencePayload; hash: string; state: 'awaiting_approval' | 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'; approvedHash: string | null; approvalExpires: string | null; attempts: number; output: string | null; outputHash: string | null; error: string | null; usage: { promptTokens?: number; completionTokens?: number } | null; createdAt: string; startedAt: string | null; completedAt: string | null; workerId: string | null; leaseUntil: string | null };
+export type Lease = { task: InferenceTask; token: string };
+export type Route = { provider: Exclude<Lane, 'auto'>; model: string; endpoint: string | null; configured: boolean; reason: string; paid: boolean; configHash: string };
+export const BROWSER_CONTEXT = 8192;
+export const BROWSER_MODEL = 'Llama-3.2-1B-Instruct-q4f16_1-MLC';
