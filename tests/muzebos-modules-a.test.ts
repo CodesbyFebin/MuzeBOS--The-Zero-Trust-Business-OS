@@ -36,7 +36,7 @@ describe('registry wiring', () => {
     for (const m of MODULES) {
       expect(m.limits.length).toBeGreaterThan(0);
       expect(m.states).toContain(m.initial);
-      for (const t of Object.values(m.transitions)) { expect(m.states).toContain(t.to); for (const f of t.from) expect(m.states).toContain(f); }
+      for (const t of Object.values(m.transitions)) { expect([...m.states, 'same']).toContain(t.to); for (const f of t.from) expect(m.states).toContain(f); }
     }
   });
 });

@@ -138,7 +138,7 @@ export function perform(store: BusinessStore, moduleId: string, raw: unknown): M
       const patch = hooks?.transition?.(store, cur, act.transition, input) ?? {};
       // Inputs named after a system field are recorded on the record (e.g. a root cause or payment reference).
       const recorded = Object.fromEntries(Object.entries(input).filter(([k]) => def.fields.some((f) => f.system && f.name === k)));
-      status = patch.status ?? t.to; data = { ...cur.data, ...recorded, ...patch.data };
+      status = patch.status ?? (t.to === 'same' ? cur.status : t.to); data = { ...cur.data, ...recorded, ...patch.data };
       detail = `${act.transition}: ${cur.status} -> ${status}`;
     }
     const version = cur.version + 1;
