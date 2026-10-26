@@ -13,6 +13,7 @@
  *               platform capability exists; dependencies are listed.
  */
 import { MODULES } from './modules';
+import { INFRA_PAGES } from './infra-pages';
 import type { LucideIcon } from 'lucide-react';
 import { Home, Workflow, ShieldCheck } from 'lucide-react';
 import { WORKSPACE_CATEGORIES, WORKSPACE_TOOLS, PINNED_UTILITIES, type WorkspaceTool } from '@/lib/muzebos/navigation';
@@ -96,7 +97,7 @@ const MODULE_VERIFIED: Record<number, { status: FeatureStatus; summary: string }
 );
 
 function toFeature(t: WorkspaceTool, clusterId: string): FeatureDefinition {
-  const verified = VERIFIED[t.id] ?? MODULE_VERIFIED[t.id];
+  const verified = VERIFIED[t.id] ?? MODULE_VERIFIED[t.id] ?? (INFRA_PAGES[t.id] ? { status: 'available' as FeatureStatus, summary: 'Live read-only measurements from this process, the SQLite database and the filesystem, with stated limits.' } : undefined);
   const blocked = !verified && t.status === 'planned' && PROVIDER.test(t.name);
   const status: FeatureStatus = verified?.status ?? (blocked ? 'blocked' : t.status);
   const dependencies = status === 'needs-credentials' ? ['External provider account and credentials', 'Provider dispatch adapter (not built; items stay queued)'] : status === 'available' || status === 'existing' ? [] : blocked

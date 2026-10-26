@@ -62,7 +62,8 @@ describe('MuzeBOS feature registry', () => {
       else { expect(f.dependencies).toEqual([]); expect(f.target ?? (appRoute(f.route) ? f.route : undefined), f.id).toBeTruthy(); }
     }
     expect(featureByRoute('/workspace/talk/whatsapp-hub')?.status).toBe('needs-credentials');
-    expect(featureByRoute('/workspace/builder/hydration-optimizer')?.status).toBe('planned');
+    expect(featureByRoute('/workspace/builder/hydration-optimizer')?.status).toBe('available');
+    expect(ALL_FEATURES.filter((f) => f.status === 'planned' || f.status === 'blocked')).toEqual([]);
   });
   it('maps legacy routes onto their menus', () => {
     expect(resolveMenu('/funnel')?.id).toBe('orders');
@@ -112,7 +113,7 @@ describe('Registry-driven shell', () => {
     const mod = renderToStaticMarkup(FeaturePage({ params: { section: 'stock', page: 'barcode-and-qr-generator' } }) as never);
     expect(mod).toContain('data-feature="stock.barcode-and-qr-generator"');
     expect(mod).toContain('Loading Barcode');
-    const planned = pageForSegments('builder', 'hydration-optimizer')!;
+    const planned = { ...pageForSegments('builder', 'hydration-optimizer')!, status: 'planned' as const, dependencies: ['Schema migration'], target: undefined };
     const html = renderToStaticMarkup(createElement(FeatureStub, { feature: planned }));
     expect(html).toContain('Planned');
     expect(html).toContain('Dependencies');

@@ -24,3 +24,12 @@ or returned. Test connection makes a real request when every reference resolves 
 
 Counts after 9b: available 134, existing 23, needs-credentials 43, planned 19, blocked 1 (the 20 infra pages remain for 9c).
 Limits: no dispatch adapters; HTTP/SMTP tests prove reachability/auth only.
+
+## 9c — infra pages (20)
+`InfraWorkspace` server-renders measurements taken at request time (`lib/muzebos/infra.ts`, also `GET /api/infra/:id`):
+process (memoryUsage, cpuUsage, uptime, loadavg, cgroup memory.max), SQLite (PRAGMAs, mb_migrations, mb_audit with
+hash-chain verification, workflow runs/steps, mb_commands, webhook deliveries) and filesystem (.next BUILD_ID/static,
+public/, source files, DB file size). Read-only; no shell, no rebuild, no purge. Stated as limits: no rate limiter, DB not
+encrypted at rest, single SQLite connection, no replication, source-derived pages show zero without sources.
+
+Counts after 9c: available 154, existing 23, needs-credentials 43, planned 0, blocked 0.
