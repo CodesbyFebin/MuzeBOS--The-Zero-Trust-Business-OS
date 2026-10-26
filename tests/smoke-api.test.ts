@@ -182,6 +182,8 @@ describe('platform smoke — every GET API route answers 200 with JSON', () => {
       'lab/oauth/[provider]/callback',
       // serves the contact sheet image (raw bytes, 404 without a sheet); covered in tests/lab-gen-frames.test.ts
       'lab/frames',
+      // Meta subscription challenge: text/plain, 503/403 without a token; covered in tests/muzebos-webhooks.test.ts
+      'webhooks/[source]',
     ]);
     const discovered = discoverGetRoutes(path.join(process.cwd(), 'app', 'api')).filter((r) => !IGNORE.has(r)).sort();
     const covered = ROUTES.map((r) => r.route).sort();

@@ -21,6 +21,8 @@ export type InvoicePayload = { merchant: Merchant; customer: Customer; lines: Li
 export type Order = { id: string; status: string; payload: InvoicePayload; hash: string; expiresAt: string; createdAt: string };
 export type Invoice = { id: string; number: string; orderId: string; payload: InvoicePayload; createdAt: string; payment: 'pending' | 'manually_reconciled'; reference: string | null };
 export type Audit = { seq: number; action: string; target: string; detail: string; createdAt: string; previousHash: string; hash: string };
+export type WebhookReceipt = { id: string; eventCount: number; newEvents: number };
+export type WebhookDelivery = { id: string; source: string; bodyHash: string; eventCount: number; newEvents: number; receivedAt: string };
 export class BusinessError extends Error { constructor(message: string, public status = 400) { super(message); } }
 export const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const now = () => new Date().toISOString();
@@ -49,10 +51,33 @@ export class BusinessStore {
       CREATE TABLE IF NOT EXISTS mb_reminders(id TEXT PRIMARY KEY,title TEXT NOT NULL,dueAt TEXT,status TEXT NOT NULL CHECK(status IN ('open','done')),createdAt TEXT NOT NULL,completedAt TEXT);
       INSERT OR IGNORE INTO mb_migrations VALUES(2, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
       CREATE TABLE IF NOT EXISTS mb_settings(key TEXT PRIMARY KEY, value TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS mb_webhook_deliveries(id TEXT PRIMARY KEY, source TEXT NOT NULL, bodyHash TEXT NOT NULL, payload TEXT NOT NULL, eventCount INTEGER NOT NULL, newEvents INTEGER NOT NULL, receivedAt TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS mb_webhook_events(source TEXT NOT NULL, eventKey TEXT NOT NULL, deliveryId TEXT NOT NULL REFERENCES mb_webhook_deliveries(id), receivedAt TEXT NOT NULL, PRIMARY KEY(source, eventKey));
+      CREATE INDEX IF NOT EXISTS mb_webhook_deliveries_time ON mb_webhook_deliveries(receivedAt);
+      INSERT OR IGNORE INTO mb_migrations VALUES(4, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
       INSERT OR IGNORE INTO mb_migrations VALUES(1, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
     `);
   }
   close() { this.db.close(); }
+  /** Persist one signature-verified webhook delivery. Each event key is recorded once per
+   *  source, so a retried batch only adds the events not seen before. Written (and audited)
+   *  in one transaction before the route answers 200. */
+  recordWebhook(input: { source: string; payload: string; bodyHash: string; eventKeys: string[] }): WebhookReceipt {
+    return this.atomic(() => {
+      const id = randomUUID(); const receivedAt = now();
+      const keys = [...new Set(input.eventKeys)];
+      const fresh = keys.filter((k) => !this.db.prepare('SELECT 1 FROM mb_webhook_events WHERE source=? AND eventKey=?').get(input.source, k));
+      this.db.prepare('INSERT INTO mb_webhook_deliveries VALUES(?,?,?,?,?,?,?)').run(id, input.source, input.bodyHash, input.payload, keys.length, fresh.length, receivedAt);
+      const ins = this.db.prepare('INSERT INTO mb_webhook_events VALUES(?,?,?,?)');
+      for (const k of fresh) ins.run(input.source, k, id, receivedAt);
+      this.audit('webhook.received', `${input.source}:${id}`, `signature verified; ${fresh.length}/${keys.length} new events stored, not processed`);
+      return { id, eventCount: keys.length, newEvents: fresh.length };
+    });
+  }
+  webhookDeliveries(limit = 100): WebhookDelivery[] {
+    return this.db.prepare('SELECT id,source,bodyHash,eventCount,newEvents,receivedAt FROM mb_webhook_deliveries ORDER BY receivedAt DESC, rowid DESC LIMIT ?').all(limit) as WebhookDelivery[];
+  }
+  webhookEventKeys(source: string): string[] { return (this.db.prepare('SELECT eventKey FROM mb_webhook_events WHERE source=? ORDER BY eventKey').all(source) as { eventKey: string }[]).map((r) => r.eventKey); }
   private audit(action: string, target: string, detail: string) {
     const last = this.db.prepare('SELECT hash FROM mb_audit ORDER BY seq DESC LIMIT 1').get() as { hash: string } | undefined;
     const event = { action, target, detail, createdAt: now(), previousHash: last?.hash ?? 'GENESIS' };

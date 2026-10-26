@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
-import nextConfig, { MUZEBOS_SHORT_PATHS } from '../next.config.mjs';
+import nextConfig, { MUZEBOS_SHORT_PATHS, MUZEBOS_LEGACY_WORKSPACE } from '../next.config.mjs';
 import { MENUS, PINNED_MENUS, SCROLL_MENUS, ALL_FEATURES, FEATURE_STATUSES, resolveMenu, breadcrumbs, pageForSegments, featureByRoute, workspaceDigitViews } from '@/lib/muzebos/registry';
 import { registryCommands } from '@/lib/palette';
 let mockPath = '/workspace/brain';
@@ -88,6 +88,11 @@ describe('MuzeBOS feature registry', () => {
       expect(MENUS.some((m) => m.route === `/workspace/${id}`)).toBe(true);
       expect(existsSync(path.join('app', id))).toBe(false);
       expect(rules).toContainEqual({ source: `/${id}`, destination: `/workspace/${id}`, permanent: false });
+    }
+    for (const [from, to] of MUZEBOS_LEGACY_WORKSPACE) {
+      expect(featureByRoute(to), to).toBeDefined();
+      expect(MENUS.some((m) => m.route === from)).toBe(false);
+      expect(rules).toContainEqual({ source: from, destination: to, permanent: false });
     }
   });
 });
