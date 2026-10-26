@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 195,
+ "count": 196,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1902,6 +1902,19 @@
    "originCheck": false,
    "schemaValidated": true,
    "access": "token"
+  },
+  {
+   "path": "/api/providers/{module}",
+   "file": "app/api/providers/[module]/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Provider configuration: env-var references and whether each is set. Values are never returned.",
+   "idempotencyKey": true,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
   },
   {
    "path": "/api/roadmap",

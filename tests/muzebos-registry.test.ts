@@ -58,9 +58,10 @@ describe('MuzeBOS feature registry', () => {
     for (const f of ALL_FEATURES) {
       expect(FEATURE_STATUSES).toContain(f.status);
       if (f.status === 'planned' || f.status === 'blocked') { expect(f.dependencies.length, f.id).toBeGreaterThan(0); expect(f.target, f.id).toBeUndefined(); }
+      else if (f.status === 'needs-credentials') { expect(f.dependencies.length, f.id).toBeGreaterThan(0); expect(f.target, f.id).toBeUndefined(); }
       else { expect(f.dependencies).toEqual([]); expect(f.target ?? (appRoute(f.route) ? f.route : undefined), f.id).toBeTruthy(); }
     }
-    expect(featureByRoute('/workspace/talk/whatsapp-hub')?.status).toBe('blocked');
+    expect(featureByRoute('/workspace/talk/whatsapp-hub')?.status).toBe('needs-credentials');
     expect(featureByRoute('/workspace/builder/hydration-optimizer')?.status).toBe('planned');
   });
   it('maps legacy routes onto their menus', () => {
@@ -80,7 +81,7 @@ describe('MuzeBOS feature registry', () => {
     const cmds = registryCommands();
     expect(new Set(cmds.map((c) => c.id)).size).toBe(cmds.length);
     expect(cmds.filter((c) => c.hint === 'menu')).toHaveLength(18);
-    expect(cmds.find((c) => c.href === '/workspace/talk/whatsapp-hub')?.hint).toBe('blocked');
+    expect(cmds.find((c) => c.href === '/workspace/talk/whatsapp-hub')?.hint).toBe('needs credentials');
   });
   it('short-path redirects point at canonical menu routes', async () => {
     const rules = await nextConfig.redirects!();

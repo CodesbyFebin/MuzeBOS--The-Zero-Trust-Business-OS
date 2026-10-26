@@ -185,6 +185,7 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-status-existing { color:var(--mb-blue);border-color:color-mix(in srgb,var(--mb-blue) 40%,transparent); }
 .mb-status-planned { color:var(--mb-amber);border-color:color-mix(in srgb,var(--mb-amber) 40%,transparent); }
 .mb-status-blocked { color:var(--mb-danger);border-color:color-mix(in srgb,var(--mb-danger) 40%,transparent); }
+.mb-status-needs-credentials { color:var(--mb-amber);border-color:color-mix(in srgb,var(--mb-amber) 40%,transparent); } .mb-status-dot.mb-status-needs-credentials { background:var(--mb-amber); }
 .mb-status-dot.mb-status-available { background:var(--mb-success); } .mb-status-dot.mb-status-existing { background:var(--mb-blue); }
 .mb-status-dot.mb-status-planned { background:var(--mb-amber); } .mb-status-dot.mb-status-blocked { background:var(--mb-danger); }
 .mb-status-summary { display:flex;flex-wrap:wrap;gap:14px;margin:0 0 18px;color:var(--mb-muted);font-size:11px; }
