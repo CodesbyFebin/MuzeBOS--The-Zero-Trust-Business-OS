@@ -45,6 +45,7 @@ const PAGES: PageEntry[] = [
   { file: 'workspace/orders/bookings/page.tsx', load: () => import('@/app/workspace/orders/bookings/page') },
   { file: 'workspace/brain/employees/page.tsx', load: () => import('@/app/workspace/brain/employees/page') },
   { file: 'workspace/brain/security/page.tsx', load: () => import('@/app/workspace/brain/security/page') },
+  { file: 'workspace/brain/templates/page.tsx', load: () => import('@/app/workspace/brain/templates/page') },
   { file: 'workspace/system/sources/page.tsx', load: () => import('@/app/workspace/system/sources/page') },
   { file: 'page.tsx', load: () => import('@/app/page') },
   { file: 'workspace/[section]/page.tsx', load: () => import('@/app/workspace/[section]/page'), props: {params:{section:'orders'}} },

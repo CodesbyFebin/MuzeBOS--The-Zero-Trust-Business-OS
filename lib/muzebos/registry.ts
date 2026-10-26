@@ -122,6 +122,12 @@ const BRAIN_EXTRA: FeatureDefinition = {
   summary: 'Review attributed agent sources and their requested permissions. Nothing executes from this screen.',
 };
 
+const BRAIN_TEMPLATES: FeatureDefinition = {
+  id: 'brain.founder-templates', menuId: 'brain', clusterId: 'brain.assistants-and-employees', label: 'Founder Templates',
+  route: '/workspace/brain/templates', status: 'available', dependencies: [],
+  summary: '12 founder templates with persisted favorites and role preference. Use template creates a local draft only; nothing runs or is sent.',
+};
+
 const LEGACY_ALIASES: Record<string, string[]> = {
   orders: ['/business', '/funnel', '/clients', '/brand-deals'],
   money: ['/finances', '/trading'],
@@ -162,7 +168,7 @@ const cat = (id: string) => WORKSPACE_CATEGORIES.find((c) => c.id === id)!;
 const MENU_LABELS: Record<string, string> = { orders: 'Orders', money: 'Money', talk: 'Talk', stock: 'Stock', growth: 'Growth', operations: 'Operations', builder: 'Builder', brain: 'Brain', foundation: 'Foundation', system: 'System' };
 const categoryMenu = (id: string, section: MenuSection): Omit<MenuDefinition, 'number'> => {
   const clusters = categoryClusters(id);
-  if (id === 'brain') clusters[2].pages.push(BRAIN_EXTRA);
+  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES); clusters[2].pages.push(BRAIN_EXTRA); }
   return { id, label: MENU_LABELS[id], route: `/workspace/${id}`, icon: cat(id).icon, section, summary: cat(id).summary, aliases: LEGACY_ALIASES[id] ?? [], clusters };
 };
 
