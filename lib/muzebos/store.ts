@@ -27,6 +27,15 @@ export type WebhookReceipt = { id: string; eventCount: number; newEvents: number
 export type WebhookDelivery = { id: string; source: string; bodyHash: string; eventCount: number; newEvents: number; receivedAt: string };
 export class BusinessError extends Error { constructor(message: string, public status = 400) { super(message); } }
 export const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+/** Canonical JSON: object keys sorted recursively, no whitespace. Independent of key insertion order. */
+export function canonicalJson(value: unknown): string {
+  if (value === null || typeof value !== 'object') { if (typeof value === 'number' && !Number.isFinite(value)) throw new BusinessError('Non-finite number in payload'); return JSON.stringify(value); }
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  return `{${Object.keys(value).sort().filter((k) => (value as Record<string, unknown>)[k] !== undefined).map((k) => `${JSON.stringify(k)}:${canonicalJson((value as Record<string, unknown>)[k])}`).join(',')}}`;
+}
+export const payloadHash = (payload: unknown) => createHash('sha256').update(canonicalJson(payload)).digest('hex');
+export type Approval = { orderId: string; payloadHash: string; approvedAt: string; consumedAt: string | null; invoiceId: string | null };
+const minorUnits = (p: InvoicePayload) => [p.subtotal, p.tax, p.total, ...p.lines.flatMap((l) => [l.quantity, l.unitPrice, l.subtotal, l.tax, l.total, l.taxBps])].every(Number.isSafeInteger);
 const now = () => new Date().toISOString();
 
 /** Single-operator, single workspace extension. No claimed multi-tenant boundary. */
@@ -65,6 +74,11 @@ export class BusinessStore {
       if (!cols.includes('linkKind')) this.db.exec('ALTER TABLE mb_reminders ADD COLUMN linkKind TEXT; ALTER TABLE mb_reminders ADD COLUMN linkId TEXT;');
       this.db.prepare("INSERT INTO mb_migrations VALUES(5, strftime('%Y-%m-%dT%H:%M:%fZ','now'))").run();
     });
+    // v6: an approval is a separate record bound to the canonical payload hash it approved.
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS mb_approvals(orderId TEXT PRIMARY KEY REFERENCES mb_orders(id), payloadHash TEXT NOT NULL, approvedAt TEXT NOT NULL, consumedAt TEXT, invoiceId TEXT REFERENCES mb_invoices(id));
+      INSERT OR IGNORE INTO mb_migrations VALUES(6, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
+    `);
   }
   close() { this.db.close(); }
   /** Persist one signature-verified webhook delivery. Each event key is recorded once per
@@ -180,29 +194,68 @@ export class BusinessStore {
       });
       const payload: InvoicePayload = { merchant:this.merchant(), customer, lines, currency:'INR', subtotal:lines.reduce((s,l)=>s+l.subtotal,0), tax:lines.reduce((s,l)=>s+l.tax,0), total:lines.reduce((s,l)=>s+l.total,0) };
       if (!Number.isSafeInteger(payload.total) || payload.total > 100_000_000_000) throw new BusinessError('Order amount exceeds supported limit');
-      const order: Order = { id:randomUUID(), status:'awaiting_review',payload,hash:digest(payload),expiresAt:new Date(Date.now()+30*60_000).toISOString(),createdAt:now() };
+      const order: Order = { id:randomUUID(), status:'awaiting_review',payload,hash:payloadHash(payload),expiresAt:new Date(Date.now()+30*60_000).toISOString(),createdAt:now() };
       this.db.prepare('INSERT INTO mb_orders VALUES(@id,@customerId,@status,@payload,@hash,@expiresAt,@createdAt)').run({...order,customerId:customer.id,payload:JSON.stringify(payload)});
       this.audit('approval.requested',order.id,`Invoice draft ${order.hash}; expires ${order.expiresAt}`);
       return order;
     });
   }
-  issue(id: string, expectedHash: string) {
+  approval(orderId: string): Approval | undefined { return this.db.prepare('SELECT * FROM mb_approvals WHERE orderId=?').get(orderId) as Approval | undefined; }
+  private loadOrder(id: string) {
+    const row = this.db.prepare('SELECT id,status,payload,hash,expiresAt,createdAt FROM mb_orders WHERE id=?').get(id) as (Omit<Order,'payload'> & { payload: string }) | undefined;
+    if (!row) throw new BusinessError('Order not found', 404);
+    return { ...row, payload: JSON.parse(row.payload) as InvoicePayload };
+  }
+  /** Hash the payload as stored now. Orders drafted before v6 used key-order JSON; accept that form only for them. */
+  private currentHashMatches(order: Order, hash: string) { return payloadHash(order.payload) === hash || digest(order.payload) === hash; }
+  /** Operator approval of one exact payload. Re-approving the same hash is a no-op; a different hash is refused. */
+  approve(id: string, expectedHash: string): Approval {
+    z.string().uuid().parse(id); z.string().regex(/^[0-9a-f]{64}$/).parse(expectedHash);
     return this.atomic(() => {
-      const order = this.orders().find(o=>o.id===id);
-      if (!order) throw new BusinessError('Order not found',404);
-      if (order.status !== 'awaiting_review') throw new BusinessError('Approval already consumed',409);
-      if (order.expiresAt <= now()) throw new BusinessError('Approval expired; create a fresh draft',409);
-      if (order.hash !== expectedHash || digest(order.payload) !== expectedHash) throw new BusinessError('Reviewed invoice payload changed',409);
-      for (const line of order.payload.lines) {
+      const order = this.loadOrder(id);
+      if (order.status !== 'awaiting_review') throw new BusinessError('Approval already consumed', 409);
+      if (order.expiresAt <= now()) throw new BusinessError('Approval expired; create a fresh draft', 409);
+      if (order.hash !== expectedHash || !this.currentHashMatches(order, expectedHash)) throw new BusinessError('Reviewed invoice payload changed', 409);
+      const prior = this.approval(id);
+      if (prior) { if (prior.payloadHash !== expectedHash) throw new BusinessError('Order already approved for a different payload', 409); return prior; }
+      const approval: Approval = { orderId: id, payloadHash: expectedHash, approvedAt: now(), consumedAt: null, invoiceId: null };
+      this.db.prepare('INSERT INTO mb_approvals VALUES(@orderId,@payloadHash,@approvedAt,@consumedAt,@invoiceId)').run(approval);
+      this.audit('approval.granted', id, `Operator approved payload ${expectedHash}`);
+      return approval;
+    });
+  }
+  /**
+   * Atomic issuance. All eight steps run inside one IMMEDIATE transaction, so a failure at
+   * any step leaves no invoice, no stock movement and no consumed approval:
+   * 1 load the order  2 check it is still awaiting review  3 check expiry
+   * 4 bind: the approval (recorded now if the operator approves-and-issues in one step)
+   *   must carry the same hash as the canonical hash of the payload stored right now
+   * 5 integer minor units only  6 re-check and decrement stock conditionally per line
+   * 7 allocate the invoice number, write the invoice, consume the approval
+   * 8 record hash-chained evidence. Idempotent replay is provided by command().
+   */
+  issue(id: string, expectedHash: string) {
+    z.string().uuid().parse(id); z.string().regex(/^[0-9a-f]{64}$/).parse(expectedHash);
+    return this.atomic(() => {
+      const order = this.loadOrder(id);                                                        // 1
+      if (order.status !== 'awaiting_review') throw new BusinessError('Approval already consumed',409); // 2
+      if (order.expiresAt <= now()) throw new BusinessError('Approval expired; create a fresh draft',409); // 3
+      const approval = this.approval(id) ?? this.approve(id, expectedHash);                     // 4
+      if (approval.consumedAt) throw new BusinessError('Approval already consumed',409);
+      if (approval.payloadHash !== expectedHash || order.hash !== expectedHash || !this.currentHashMatches(order, approval.payloadHash))
+        throw new BusinessError('Invoice payload changed after approval',409);
+      if (!minorUnits(order.payload)) throw new BusinessError('Amounts must be integer minor units',409); // 5
+      for (const line of order.payload.lines) {                                                // 6
         const result = this.db.prepare('UPDATE mb_products SET stock=stock-? WHERE id=? AND stock>=?').run(line.quantity,line.productId,line.quantity);
         if (result.changes !== 1) throw new BusinessError(`Stock changed: ${line.name}. No invoice issued.`,409);
         this.db.prepare('INSERT INTO mb_movements VALUES(?,?,?,?,?)').run(randomUUID(),line.productId,id,-line.quantity,now());
       }
-      const count = (this.db.prepare('SELECT COUNT(*) AS n FROM mb_invoices').get() as {n:number}).n;
+      const count = (this.db.prepare('SELECT COUNT(*) AS n FROM mb_invoices').get() as {n:number}).n; // 7
       const invoice: Invoice = {id:randomUUID(),number:`MB-${String(count+1).padStart(6,'0')}`,orderId:id,payload:order.payload,createdAt:now(),payment:'pending',reference:null};
       this.db.prepare('INSERT INTO mb_invoices VALUES(@id,@number,@orderId,@payload,@createdAt,@payment,@reference)').run({...invoice,payload:JSON.stringify(invoice.payload)});
-      this.db.prepare("UPDATE mb_orders SET status='issued' WHERE id=?").run(id);
-      this.audit('invoice.issued',invoice.id,`Operator approved ${expectedHash}; ${invoice.number}; INR minor units ${invoice.payload.total}; stock deducted atomically`);
+      this.db.prepare("UPDATE mb_orders SET status='issued' WHERE id=? AND status='awaiting_review'").run(id);
+      this.db.prepare('UPDATE mb_approvals SET consumedAt=?,invoiceId=? WHERE orderId=? AND consumedAt IS NULL').run(now(),invoice.id,id);
+      this.audit('invoice.issued',invoice.id,`Operator approved ${expectedHash}; ${invoice.number}; INR minor units ${invoice.payload.total}; stock deducted atomically`); // 8
       return invoice;
     });
   }

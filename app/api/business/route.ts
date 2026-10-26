@@ -15,6 +15,7 @@ const command=z.discriminatedUnion('action',[
   z.object({action:z.literal('product'),data:z.unknown()}),
   z.object({action:z.literal('draft'),data:z.unknown()}),
   z.object({action:z.literal('issue'),id:z.string().uuid(),hash:z.string().regex(/^[0-9a-f]{64}$/)}),
+  z.object({action:z.literal('approve'),id:z.string().uuid(),hash:z.string().regex(/^[0-9a-f]{64}$/)}),
   z.object({action:z.literal('reject'),id:z.string().uuid()}),
   z.object({action:z.literal('reconcile'),id:z.string().uuid(),reference:z.string().trim().min(1).max(160)}),
 ]);
@@ -52,6 +53,7 @@ export async function POST(req: Request) {
         case 'product':return store.product(c.data);
         case 'draft':return store.draft(c.data);
         case 'issue':return store.issue(c.id,c.hash);
+        case 'approve':return store.approve(c.id,c.hash);
         case 'reject':return store.reject(c.id);
         case 'reconcile':return store.reconcile(c.id,c.reference);
       }
