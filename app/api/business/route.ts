@@ -9,6 +9,7 @@ const command=z.discriminatedUnion('action',[
   z.object({action:z.literal('cancelBooking'),id:z.string().uuid()}),
   z.object({action:z.literal('reminder'),data:z.unknown()}),
   z.object({action:z.literal('completeReminder'),id:z.string().uuid()}),
+  z.object({action:z.literal('reopenReminder'),id:z.string().uuid()}),
   z.object({action:z.literal('configure'),data:z.unknown()}),
   z.object({action:z.literal('customer'),data:z.unknown()}),
   z.object({action:z.literal('product'),data:z.unknown()}),
@@ -45,6 +46,7 @@ export async function POST(req: Request) {
         case 'cancelBooking':return store.cancelBooking(c.id);
         case 'reminder':return store.reminder(c.data);
         case 'completeReminder':return store.completeReminder(c.id);
+        case 'reopenReminder':return store.reopenReminder(c.id);
         case 'configure':return store.configure(c.data);
         case 'customer':return store.customer(c.data);
         case 'product':return store.product(c.data);

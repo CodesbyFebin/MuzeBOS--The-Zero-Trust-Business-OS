@@ -11,7 +11,9 @@ const customerSchema = z.object({ name: text, email: z.union([z.string().email()
 const productSchema = z.object({ name: text, sku: text, price: money, taxBps: z.number().int().min(0).max(10_000), stock: z.number().int().min(0).max(1_000_000) }).strict();
 const draftSchema = z.object({ customerId: z.string().uuid(), lines: z.array(z.object({ productId: z.string().uuid(), quantity: z.number().int().min(1).max(10_000) }).strict()).min(1).max(100) }).strict();
 const merchantSchema=z.object({name:text,address:z.string().trim().max(1000),taxId:z.string().trim().max(40),upi:z.union([z.string().regex(/^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$/),z.literal('')])}).strict();
-export type Reminder={id:string;title:string;dueAt:string|null;status:'open'|'done';createdAt:string;completedAt:string|null};
+export const REMINDER_LINK_KINDS=['customer','product','order','invoice','booking'] as const;
+export type ReminderLinkKind=typeof REMINDER_LINK_KINDS[number];
+export type Reminder={id:string;title:string;dueAt:string|null;status:'open'|'done';createdAt:string;completedAt:string|null;linkKind:ReminderLinkKind|null;linkId:string|null};
 export type Booking={id:string;customerId:string;resource:string;startsAt:string;endsAt:string;status:'confirmed'|'cancelled';createdAt:string};
 export type Merchant=z.infer<typeof merchantSchema>;
 export type Customer = { id: string; name: string; email: string };
@@ -57,6 +59,12 @@ export class BusinessStore {
       INSERT OR IGNORE INTO mb_migrations VALUES(4, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
       INSERT OR IGNORE INTO mb_migrations VALUES(1, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
     `);
+    // v5: reminders may point at one business record (customer/product/order/invoice/booking).
+    if (!this.db.prepare('SELECT 1 FROM mb_migrations WHERE version=5').get()) this.atomic(() => {
+      const cols = (this.db.prepare('PRAGMA table_info(mb_reminders)').all() as { name: string }[]).map((c) => c.name);
+      if (!cols.includes('linkKind')) this.db.exec('ALTER TABLE mb_reminders ADD COLUMN linkKind TEXT; ALTER TABLE mb_reminders ADD COLUMN linkId TEXT;');
+      this.db.prepare("INSERT INTO mb_migrations VALUES(5, strftime('%Y-%m-%dT%H:%M:%fZ','now'))").run();
+    });
   }
   close() { this.db.close(); }
   /** Persist one signature-verified webhook delivery. Each event key is recorded once per
@@ -100,13 +108,19 @@ export class BusinessStore {
   }
   reminders(): Reminder[] { return this.db.prepare('SELECT * FROM mb_reminders ORDER BY createdAt DESC,rowid DESC').all() as Reminder[]; }
   reminder(input:unknown) {
-    const parsed=z.object({title:z.string().trim().min(1).max(200),dueAt:z.string().datetime({offset:true}).nullable().default(null)}).strict().parse(input);
-    const record:Reminder={id:randomUUID(),...parsed,status:'open',createdAt:now(),completedAt:null};
-    return this.atomic(()=>{this.db.prepare('INSERT INTO mb_reminders VALUES(@id,@title,@dueAt,@status,@createdAt,@completedAt)').run(record);this.audit('reminder.created',record.id,record.title);return record;});
+    const parsed=z.object({title:z.string().trim().min(1).max(200),dueAt:z.string().datetime({offset:true}).nullable().default(null),link:z.object({kind:z.enum(REMINDER_LINK_KINDS),id:z.string().uuid()}).strict().nullable().default(null)}).strict().parse(input);
+    const record:Reminder={id:randomUUID(),title:parsed.title,dueAt:parsed.dueAt?new Date(parsed.dueAt).toISOString():null,status:'open',createdAt:now(),completedAt:null,linkKind:parsed.link?.kind??null,linkId:parsed.link?.id??null};
+    return this.atomic(()=>{
+      if(parsed.link&&!this.db.prepare(`SELECT 1 FROM mb_${parsed.link.kind}s WHERE id=?`).get(parsed.link.id))throw new BusinessError(`Linked ${parsed.link.kind} not found`,404);
+      this.db.prepare('INSERT INTO mb_reminders(id,title,dueAt,status,createdAt,completedAt,linkKind,linkId) VALUES(@id,@title,@dueAt,@status,@createdAt,@completedAt,@linkKind,@linkId)').run(record);this.audit('reminder.created',record.id,record.title);return record;});
   }
   completeReminder(id:string) {
     z.string().uuid().parse(id);
     return this.atomic(()=>{const result=this.db.prepare("UPDATE mb_reminders SET status='done',completedAt=? WHERE id=? AND status='open'").run(now(),id);if(result.changes!==1)throw new BusinessError('Open reminder not found',409);this.audit('reminder.completed',id,'Operator marked reminder done');return {id};});
+  }
+  reopenReminder(id:string) {
+    z.string().uuid().parse(id);
+    return this.atomic(()=>{const result=this.db.prepare("UPDATE mb_reminders SET status='open',completedAt=NULL WHERE id=? AND status='done'").run(id);if(result.changes!==1)throw new BusinessError('Completed reminder not found',409);this.audit('reminder.reopened',id,'Operator reopened reminder');return {id};});
   }
   bookings(): Booking[] { return this.db.prepare('SELECT * FROM mb_bookings ORDER BY startsAt').all() as Booking[]; }
   booking(input:unknown) {

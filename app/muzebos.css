@@ -217,3 +217,13 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-table { width:100%;border-collapse:collapse;font-size:11px;margin:8px 0 14px; }
 .mb-table th { text-align:left;color:var(--mb-muted);font-weight:500;letter-spacing:.5px;text-transform:uppercase;font-size:9.5px;border-bottom:1px solid var(--mb-line);padding:7px 8px; }
 .mb-table td { border-bottom:1px solid var(--mb-line);padding:7px 8px;color:var(--mb-text);overflow-wrap:anywhere; }
+@media(min-width:1001px) { .mb-mission-stats { grid-template-columns:repeat(5,1fr); } }
+.mb-filter { display:flex;gap:6px;margin:12px 0;flex-wrap:wrap; }
+.mb-console .mb-filter button { padding:6px 10px;font-size:10px; }
+.mb-console .mb-filter button[aria-pressed="true"] { border-color:var(--mb-accent);color:var(--mb-text); }
+.mb-completed { margin-top:12px;color:var(--mb-muted); }
+.mb-completed summary { cursor:pointer;font-size:10px;margin-bottom:6px; }
+.mb-mission-stats>* { min-width:0; }
+.mb-mission-stats small,.mb-mission .mb-row small { overflow-wrap:anywhere; }
+.mb-reminder-form,.mb-reminder-form label { min-width:0; }
+.mb-reminder-form select { max-width:100%;text-overflow:ellipsis; }
