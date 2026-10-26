@@ -11,6 +11,7 @@ export type FieldDef = {
   /** Hidden from the create form; set by effects. */
   system?: boolean;
 };
+/** to: 'same' keeps the current state (a recorded check such as a test run). */
 export type TransitionDef = { label: string; from: readonly string[]; to: string; inputs?: FieldDef[]; danger?: boolean };
 export type ModuleDef = {
   id: string; pillar?: number; menuId: string; title: string; noun: string; summary: string;
