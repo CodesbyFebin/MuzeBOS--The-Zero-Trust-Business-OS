@@ -26,6 +26,7 @@ const ROUTES: RouteEntry[] = [
   { route: 'bookings', load: () => import('@/app/api/bookings/route'), url: 'http://localhost/api/bookings' },
   { route: 'employee-library', load: () => import('@/app/api/employee-library/route'), url: 'http://localhost/api/employee-library' },
   { route: 'mission-control', load: () => import('@/app/api/mission-control/route'), url: 'http://localhost/api/mission-control' },
+  { route: 'mission-control/layout', load: () => import('@/app/api/mission-control/layout/route'), url: 'http://localhost/api/mission-control/layout' },
   { route: 'brain-templates', load: () => import('@/app/api/brain-templates/route'), url: 'http://localhost/api/brain-templates' },
   { route: 'ai', load: () => import('@/app/api/ai/route'), url: 'http://localhost/api/ai' },
   { route: 'analytics', load: () => import('@/app/api/analytics/route'), url: 'http://localhost/api/analytics' },
