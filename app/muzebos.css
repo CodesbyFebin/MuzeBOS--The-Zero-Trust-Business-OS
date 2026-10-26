@@ -212,6 +212,7 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
   .mb-topbar { padding:8px 12px; }
   .mb-search-btn span, .mb-search-btn kbd { display:none; }
   html:has(.mb-shell-nav) main { padding-left:14px!important;padding-right:14px!important; }
+  html:has(.mb-shell-nav) .l-frame { margin-inline:-14px!important; }
 }
 @media (prefers-reduced-motion: reduce) { html:has(.mb-shell-nav) .os-sidebar { transition:none; } }
 .mb-table { width:100%;border-collapse:collapse;font-size:11px;margin:8px 0 14px; }
