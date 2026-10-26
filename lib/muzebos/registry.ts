@@ -161,7 +161,7 @@ function utilityMenu(key: string): Omit<MenuDefinition, 'number'> {
     route: `/workspace/${key}/${slug(l.label)}`, target: l.href, status: 'existing', dependencies: [],
     summary: `Opens the existing screen at ${l.href}.`,
   }));
-  if (key === 'developer') pages.push(META_WEBHOOK_STATUS);
+  if (key === 'developer') pages.push(META_WEBHOOK_STATUS, API_REFERENCE);
   return { id: key, label: key === 'upgrade' ? 'Upgrade' : u.label, route: `/workspace/${key}`, icon: u.icon, section: 'pinned', summary: u.summary, aliases: LEGACY_ALIASES[key] ?? [], clusters: [{ id: cid, label: 'Current destinations', pages }] };
 }
 
@@ -169,6 +169,12 @@ const META_WEBHOOK_STATUS: FeatureDefinition = {
   id: 'developer.meta-webhooks', menuId: 'developer', clusterId: 'developer.overview', label: 'Meta webhook status',
   route: '/workspace/developer/meta-webhooks', status: 'available', dependencies: [],
   summary: 'Whether META_APP_SECRET and META_VERIFY_TOKEN are set (never their values), the endpoint paths, and recent deliveries.',
+};
+
+const API_REFERENCE: FeatureDefinition = {
+  id: 'developer.api-reference', menuId: 'developer', clusterId: 'developer.overview', label: 'API routes',
+  route: '/workspace/developer/api-reference', status: 'available', dependencies: [],
+  summary: 'Every app/api route file with its methods, gate and the checks found in its source, generated from the code (no plans or prices).',
 };
 
 const missionPage: FeatureDefinition = { id: 'mission.overview', menuId: 'mission', clusterId: 'mission.today', label: 'Mission Control', route: '/', status: 'available', dependencies: [], summary: 'Derived pending approvals, unpaid requests, out-of-stock alerts and persisted reminders.' };

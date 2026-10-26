@@ -1,0 +1,2415 @@
+{
+ "source": "app/api",
+ "count": 195,
+ "routes": [
+  {
+   "path": "/api/adscout/ask",
+   "file": "app/api/adscout/ask/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Ask Adscout — grounds a question in the synced store (winners, hooks, drivers, signals) and answers via the local Claude CLI. Reads only local snapshots: zero Foreplay credits per question. Honest 503 when the CLI isn't available.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/adscout/mine",
+   "file": "app/api/adscout/mine/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Concept mining: a concept expands into probe queries (Claude CLI when available, deterministic fallback otherwise), each probe hits Discovery, the pool dedupes and ranks by longevity. Explicit credit spend — this route only runs when someone submits the mine prompt.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/adscout/saved",
+   "file": "app/api/adscout/saved/route.ts",
+   "methods": [
+    "GET",
+    "POST",
+    "DELETE"
+   ],
+   "summary": "Saved ads — the swipe file. GET lists, POST saves a WallAd snapshot, DELETE unsaves by ad id.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/adscout/sync",
+   "file": "app/api/adscout/sync/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "One real sync cycle over the local watchlist — the Sync now button.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/adscout/watchlist",
+   "file": "app/api/adscout/watchlist/route.ts",
+   "methods": [
+    "GET",
+    "POST",
+    "DELETE"
+   ],
+   "summary": "The local Adscout watchlist — add by domain (one resolve call) or by a brand id already known from a mine result; remove by id.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/agents",
+   "file": "app/api/agents/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/agents/{id}/chat",
+   "file": "app/api/agents/[id]/chat/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/agents/{id}/failover",
+   "file": "app/api/agents/[id]/failover/route.ts",
+   "methods": [
+    "PATCH"
+   ],
+   "summary": "Failover (pages/feature-additions.md F9): move an agent onto another model. Needs `confirm: true` (409 without it) and logs the change to the agent's run history (A-2). Applies to agents whose config is stored (db.agents); an agent defined in code (lib/agents/real.ts) has no stored model to move, so it answers 409 a...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/agents/{id}/run",
+   "file": "app/api/agents/[id]/run/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/agents/activity",
+   "file": "app/api/agents/activity/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/agents/broadcast",
+   "file": "app/api/agents/broadcast/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/agents/deliverables/decision",
+   "file": "app/api/agents/deliverables/decision/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Approve or reject a finished agent run's output (pages/feature-additions.md F9). One decision per run (A-1): a second is a 409, never an overwrite. A rejection needs a reason. Local write only; nothing is sent.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/agents/work",
+   "file": "app/api/agents/work/route.ts",
+   "methods": [
+    "GET",
+    "POST",
+    "PATCH",
+    "DELETE"
+   ],
+   "summary": "Tasks + cron jobs for one agent (or all agents when no id given).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/ai",
+   "file": "app/api/ai/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Route and call a server model, re-routing (down only) when a provider errors.",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/analytics",
+   "file": "app/api/analytics/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/auth/check",
+   "file": "app/api/auth/check/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "The middleware's eyes. Answers two booleans and nothing else: is a password configured, and is the presented cookie the current session secret. Open path by design — it reveals no secret and cannot change state.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "open"
+  },
+  {
+   "path": "/api/auth/login",
+   "file": "app/api/auth/login/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "open"
+  },
+  {
+   "path": "/api/auth/logout",
+   "file": "app/api/auth/logout/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/auth/password",
+   "file": "app/api/auth/password/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "The password manager behind Setup → Security. set no password yet → write one (reachable only on loopback, see middleware) change current + new → new hash, new session secret (other devices signed out) rotate current → new session secret only remove current → back to open-on-this-machine-only Every action that needs...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/blueprint",
+   "file": "app/api/blueprint/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/blueprint/ask",
+   "file": "app/api/blueprint/ask/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST { question, selected } → the ask bar's answer, grounded in the selected scope (its chain, members and relations) from the graph compiled right now. Same engine as the Wizard: one headless claude exchange; an honest 503 when the binary is missing on this host.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/board/agents/{id}/run",
+   "file": "app/api/board/agents/[id]/run/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "The OS Run button, for real: trigger a board heartbeat for this agent.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/board/deliverables",
+   "file": "app/api/board/deliverables/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET → the deliverables list as ordered folders (proposal folders first, then agent files, newest first) plus the operator's decisions, so the tab can hide what has already been handled without a second round trip. Honest empty when the workspace dir is absent (a machine that doesn't host the board). `deliverables` i...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/board/deliverables/decision",
+   "file": "app/api/board/deliverables/decision/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Records the operator's decision on one piece of agent work: approve, dismiss, or leave it open, with the ability to undo back into the queue. POST { id, decision, decidedRevision?, note? } → record it POST { id, decision: null } → undo, back to the open queue POST { items: [{id, decidedRevision?}], decision } → the ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/board/live",
+   "file": "app/api/board/live/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "One aggregated snapshot of the live Paperclip board: seats (with status + model), the task queue, and recent heartbeat runs. The BoardLive strip on /agents polls this every few seconds. Unreachable board = honest `connected: false` with empty lists, still a 200, never fake data.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/bookings",
+   "file": "app/api/bookings/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/brain",
+   "file": "app/api/brain/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "No query → provider status. `?q=` → hybrid search (gbrain with local fallback).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/brain-templates",
+   "file": "app/api/brain-templates/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Read model for the Brain templates screen. Writes go through POST /api/business (idempotent commands).",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/brain/dump",
+   "file": "app/api/brain/dump/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/brain/graph",
+   "file": "app/api/brain/graph/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/brain/overview",
+   "file": "app/api/brain/overview/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/brand-deals",
+   "file": "app/api/brand-deals/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/brand-deals/draft",
+   "file": "app/api/brand-deals/draft/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Read a pending draft's current body (for the GladOS edit flow).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/brand-deals/override",
+   "file": "app/api/brand-deals/override/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Set a deal's outcome (won/lost/open) and/or its quoted amount. GladOS tracking overlay only — never touches bdpilot state, never emails.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/brand-deals/rules",
+   "file": "app/api/brand-deals/rules/route.ts",
+   "methods": [
+    "GET",
+    "PUT"
+   ],
+   "summary": "The live bdpilot rules plus their version history. `configured: false` (with the reason) on a machine that doesn't host the daemon.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/brand-deals/rules/restore",
+   "file": "app/api/brand-deals/rules/restore/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Restores a recorded rules version. Body: `{ versionId: string }`. A restore is itself a new version (nothing is ever deleted), noted as \"restore of vN\".",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/brand-deals/send",
+   "file": "app/api/brand-deals/send/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Approve a pending draft from GladOS: same verified gsend path as the Telegram tap. Gmail deletes the draft on send, so a send is atomic — a later Telegram tap on the same deal fails harmlessly.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/business",
+   "file": "app/api/business/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": true,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/calls/archive",
+   "file": "app/api/calls/archive/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "The recordings archive (pages/feature-additions.md F4): Plaud (pushed) and Fathom (pulled) in one list, newest first, `?source=plaud|fathom` filters. The Fathom pull is a free read, at most once per 10 minutes per process, and is upserted into call_recordings; without FATHOM_API_KEY nothing leaves the box. A Fathom ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/chats",
+   "file": "app/api/chats/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "The /chats rail (pages/chats.md §2): Wizard pinned first, then one thread per agent newest first, the \"New chat\" roster, and whether the model key the agent chat uses is configured (no key: composer disabled with a Set up link, never a fake reply). Reads SQLite, the Wizard project store and the key only; no model ca...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/chats/{agentId}",
+   "file": "app/api/chats/[agentId]/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "One thread, oldest first, 50 a page (`?before=<ISO>` pages back). The Wizard (`conductor`) reads the latest Wizard project; every other agent reads agent_messages. Unknown agent: 404. Reads local stores only.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/clients",
+   "file": "app/api/clients/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "The /clients payload (pages/clients.md §2): confirmed roster, work requests, the Attio confirm picker (free read, cached) and whether launches are allowed. Spends nothing. `?sample=1` on a blank install or Filming mode answers the badged fixture with no outbound request.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/clients/confirm",
+   "file": "app/api/clients/confirm/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "an Attio record id, or omitted for a hand-added client (one is minted)",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/clients/work",
+   "file": "app/api/clients/work/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Save a draft work request for a confirmed client (pages/clients.md, CL-2): one `client_work` row with status draft. No outbound call of any kind; starting it in Superset is a separate, gated POST (…/[id]/launch).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/clients/work/{id}",
+   "file": "app/api/clients/work/[id]/route.ts",
+   "methods": [
+    "PATCH"
+   ],
+   "summary": "Status change on a work request (mark done or failed, re-queue). Local write only.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/clients/work/{id}/launch",
+   "file": "app/api/clients/work/[id]/launch/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "\"Start draft in Superset\" (pages/clients.md §4, CL-3). Starts a real agent, which spends money, so: 403 unless GLADOS_WRITES=1, then 409 unless the body carries `confirm: true` (lib/gates.ts). Only a draft or failed request can launch. Success moves it to running with the workspace id; a CLI failure marks it failed ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/comms",
+   "file": "app/api/comms/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/comms/digest",
+   "file": "app/api/comms/digest/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "The morning digest (pages/feature-additions.md F3). GET the stored digest (the 07:00 cron writes it, so opening /inbox never re-reads every connector), its read marks, and whether the runner is on here. Reads SQLite only. No digest yet answers `digest: null`. POST build one now from the comms feed (free reads, nothi...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/comms/digest/read",
+   "file": "app/api/comms/digest/read/route.ts",
+   "methods": [
+    "POST",
+    "DELETE"
+   ],
+   "summary": "`entryKey` omitted = the whole digest (clears the unread dot); else one entry (lib/comms-digest.ts entryKey).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/comms/reply",
+   "file": "app/api/comms/reply/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Replies the server can actually deliver. Slack sends via the bot token. Email NEVER sends directly — it becomes a QUEUE-gated Gmail draft on the verified sender via the send daemon (see sendEmailReply); a human approves before anything leaves. WhatsApp stays a client-side deep link (the local store is read-only). A ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/compute",
+   "file": "app/api/compute/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/compute — MIOSA computers and credit balance (honest not-configured when no key).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/compute/embed",
+   "file": "app/api/compute/embed/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/compute/embed?id=<computer id> — a fresh, short-lived desktop link. Never cached.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/conductor/chat",
+   "file": "app/api/conductor/chat/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "The REAL Conductor chat — the panel talks to the board's CEO (Claude Fable 5 with its persistent session) through the standing \"Founder OS Cockpit\" issue. Async by nature: POST wakes the Conductor; GET polls the thread for replies.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/conductor/context",
+   "file": "app/api/conductor/context/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "What the Wizard panel tells the agent about the screen it's docked on.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/connections",
+   "file": "app/api/connections/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Always a check made now (and it refreshes what the pages render from, lib/swr.ts).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/connections/connect",
+   "file": "app/api/connections/connect/route.ts",
+   "methods": [
+    "POST",
+    "DELETE"
+   ],
+   "summary": "The Connections board's connect flow. Writes ONLY to .env.local (gitignored) and only key names the catalog declares for that integration — never to the operator's canonical machine files, and never arbitrary env vars. Values are accepted, stored, and NEVER echoed back. Credential resolution reads .env.local fresh a...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/connections/summary",
+   "file": "app/api/connections/summary/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "How many connectors are live, for the Bennett Legacy sidebar footer (\"n/N systems live\", FounderOS ui merge SCAFFOLD §3.2). Reads the shared stale-while-revalidate board (lib/swr.ts) the pages render from, so it never forces a new round of checks; a cold server answers once the checks finish.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/contacts/tags",
+   "file": "app/api/contacts/tags/route.ts",
+   "methods": [
+    "GET",
+    "POST",
+    "DELETE"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/content/pipelines",
+   "file": "app/api/content/pipelines/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "The saved pipeline list — read by the Pipelines board.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/content/pipelines/{id}",
+   "file": "app/api/content/pipelines/[id]/route.ts",
+   "methods": [
+    "GET",
+    "PUT",
+    "DELETE"
+   ],
+   "summary": "Replaces name/description/nodes/edges in place — id and createdAt carry over. Validated first, same as create.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/content/pipelines/{id}/run",
+   "file": "app/api/content/pipelines/[id]/run/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Compiles a saved pipeline into real production-queue tasks. This is the confirm step behind the cost-gated Run dialog — nothing queues, and no credits are implied spent, until this route is called. Re-validates the pipeline server-side even though the builder already gates saves, so a pipeline that goes stale after ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/content/pipelines/draft",
+   "file": "app/api/content/pipelines/draft/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Drafts a pipeline from a free-text brief by shelling out to the `claude` CLI — same drafting pattern as app/api/workflows/draft/route.ts. Never writes to the pipeline store; the draft only opens in the builder for the operator to review and explicitly save. Honest 503 when the CLI is missing, errors, or the reply ne...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/content/queue",
+   "file": "app/api/content/queue/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "The current queue, statuses derived against the media manifest.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/content/queue/{id}",
+   "file": "app/api/content/queue/[id]/route.ts",
+   "methods": [
+    "PATCH",
+    "DELETE"
+   ],
+   "summary": "Cancels a queued task. Delivered tasks are refused — their output is a real asset in the media library and the row is the provenance for it.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/content/queue/spec",
+   "file": "app/api/content/queue/spec/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Appends a v3 spec-carrying task straight to the queue store. Used by anything that already has a full fulfillment spec in hand rather than a CREATE-row action key — today that is the Library's \"Train new avatar\" card (spec: { model: 'soul_2', prompt: 'Train a new Soul: <name>' }), and will be the Composer's \"Queue p...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/content/refine-prompt",
+   "file": "app/api/content/refine-prompt/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Rewrites a composer's creative direction in the campaign's voice by shelling out to the `claude` CLI — same pattern as the workflow drafting route: strict-JSON-only instruction, one retry with the validation error fed back, and an honest degrade (503, \"Refinement unavailable\") when the CLI can't run. Never writes an...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/content/upload",
+   "file": "app/api/content/upload/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Real multipart upload into the content studio's reference library. Whitelisted by extension only (never by declared MIME, which the client controls); the file lands under public/content-media/uploads/<uuid>.<ext> and a row is appended to the uploads store so the Composer's reference tray and the Library's Uploads se...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/angles",
+   "file": "app/api/creative-engine/angles/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Angles grounded on the research pool; every angle cites real ad ids or is dropped.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/arcads/assets",
+   "file": "app/api/creative-engine/arcads/assets/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "The Arcads library of the default product: newest first, free text over prompts and scripts. Honest when unkeyed.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/arcads/catalog",
+   "file": "app/api/creative-engine/arcads/catalog/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Actors (grouped from situations), voices, products — cached 10 min. Honest state when unkeyed.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/arcads/health",
+   "file": "app/api/creative-engine/arcads/health/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Credits & Health: everything the widget shows, from stored facts only.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/arcads/image",
+   "file": "app/api/creative-engine/arcads/image/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/arcads/motion",
+   "file": "app/api/creative-engine/arcads/motion/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Submit N motion requests. The answer says exactly what happened: `submitted` ran, `failed` did not (with the Arcads error class each). 207 when some failed, 4xx/5xx when none went through.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/arcads/presets",
+   "file": "app/api/creative-engine/arcads/presets/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Preset templates for one preset type (the situations a preset node can pick), cached ten minutes.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/arcads/setup",
+   "file": "app/api/creative-engine/arcads/setup/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Connect Arcads, inside the software. The key itself is written by /api/connections/connect (never echoed back). This route does the rest: GET → what is known: configured, last probe, balance, products, the chosen product, the UGC path, the cap POST → {action:'verify'} runs the free probes + credits {action:'product'...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/arcads/ugc",
+   "file": "app/api/creative-engine/arcads/ugc/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/briefs",
+   "file": "app/api/creative-engine/briefs/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "A brief from an approved (or latest) script version. Deterministic, no model.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/briefs/{id}",
+   "file": "app/api/creative-engine/briefs/[id]/route.ts",
+   "methods": [
+    "PATCH"
+   ],
+   "summary": "A brief's lifecycle (SPEC S07 F24): draft, ready, sent. \"Sent\" means the brief went to a creator or editor. Stored in the campaign JSON, so it survives a reload and a restart. The sample never calls this.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/campaigns",
+   "file": "app/api/creative-engine/campaigns/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Campaign list (newest first, summaries only) and creation from a concept.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/campaigns/{id}",
+   "file": "app/api/creative-engine/campaigns/[id]/route.ts",
+   "methods": [
+    "GET",
+    "PATCH",
+    "DELETE"
+   ],
+   "summary": "angle ids that are selected; picks are also saved so the For-you feed learns",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/presets",
+   "file": "app/api/creative-engine/presets/route.ts",
+   "methods": [
+    "GET",
+    "POST",
+    "DELETE"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/research",
+   "file": "app/api/creative-engine/research/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Research: AI plans the probes → Foreplay answers → duplicates → pool. Explicit credit spend, capped by depth.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/runs",
+   "file": "app/api/creative-engine/runs/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Runs with DERIVED status. Reading advances any running Arcads job older than 15 s (no queue worker exists).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/runs/{id}/abandon",
+   "file": "app/api/creative-engine/runs/[id]/abandon/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/scripts",
+   "file": "app/api/creative-engine/scripts/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Create a script for a selected angle and write its first version.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/scripts/{id}",
+   "file": "app/api/creative-engine/scripts/[id]/route.ts",
+   "methods": [
+    "PATCH"
+   ],
+   "summary": "Approve a version, save a manual edit as a new version, or regenerate (all beats or one) as a new version.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/workflows",
+   "file": "app/api/creative-engine/workflows/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "The script a template builds from: the approved one, else the first.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/workflows/{id}",
+   "file": "app/api/creative-engine/workflows/[id]/route.ts",
+   "methods": [
+    "GET",
+    "PATCH",
+    "DELETE"
+   ],
+   "summary": "The client sends `layout` (ids, types, titles, positions, settings, edges). Runtime fields are never taken from the body, `force` included: the merge keeps the stored runId/outputs so a stale autosave can't make the engine submit a paid node twice (S05b R10). The legacy whole-node `nodes`/`edges` body is still accep...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/workflows/{id}/duplicate",
+   "file": "app/api/creative-engine/workflows/[id]/duplicate/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Duplicate a workflow: same design, \" copy\" suffix, no run state.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/workflows/{id}/run",
+   "file": "app/api/creative-engine/workflows/[id]/run/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "true: answer what the run would do (the gate's list), start nothing",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/workflows/{id}/stop",
+   "file": "app/api/creative-engine/workflows/[id]/stop/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Stop a run (S05b FR-61): abandon in-flight runs, mark unresolved nodes stopped. Arcads keeps (and charges) what it already received.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/workflows/{id}/versions",
+   "file": "app/api/creative-engine/workflows/[id]/versions/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "A workflow's saved versions, newest first (S05b FR-63).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/creative-engine/workflows/{id}/versions/{n}/restore",
+   "file": "app/api/creative-engine/workflows/[id]/versions/[n]/restore/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Restore version n: the current design is saved as a version first, then the old layout goes through the same merge as autosave, so runtime fields of nodes that still exist are kept and nothing is ever re-charged.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/cron/run",
+   "file": "app/api/cron/run/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "\"Run now\" for one scheduled job (F10). An agent run can call a paid model, so: 403 unless GLADOS_CRON=1, then 409 unless `confirm: true`. The run is recorded in cron_runs with trigger \"manual\", success or failure.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/cron/tick",
+   "file": "app/api/cron/tick/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "The cron runner's tick (pages/feature-additions.md F10). GET the dry run: every job (the 07:00 digest plus the agent crons) with its last and next firing and what is due now. Reads SQLite only; spends nothing; answers on every instance (the Scheduled card reads it). POST fire every due job. 403 unless GLADOS_CRON=1 ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/database",
+   "file": "app/api/database/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/database — the brain folder as a size tree (cached 60 s; ?fresh=1 rescans).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/database/file",
+   "file": "app/api/database/file/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/database/file?path=<relative> — size, date and a text preview; private paths show metadata only.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/departments",
+   "file": "app/api/departments/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/employee-library",
+   "file": "app/api/employee-library/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/evidence",
+   "file": "app/api/evidence/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/finances/bank-statement",
+   "file": "app/api/finances/bank-statement/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Accept a bank-statement PDF, extract its summary (income/outflow per business per month), and upsert it into the bank store. Idempotent by account+month.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/finances/statements",
+   "file": "app/api/finances/statements/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Accept an uploaded bank/CC statement CSV (multipart `file` field or a raw text/csv body), parse + categorize it, persist to the separate ledger store, and report what landed. Non-CSV / unparseable → 400, never a silent success.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/funnel",
+   "file": "app/api/funnel/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/funnel/lead-message",
+   "file": "app/api/funnel/lead-message/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "The comms feed walks live IMAP — cap it so a pinned dossier never hangs.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/interject",
+   "file": "app/api/interject/route.ts",
+   "methods": [
+    "POST",
+    "DELETE"
+   ],
+   "summary": "Home's interject composer (pages/feature-additions.md F2). Rule-based, no LLM (lib/interject.ts): a task, an agent relay (a task assigned to that agent) or a note (written to the brain inbox, embedded when Optimal Engine is up). Answers `{ kind, id, href }`.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/keys",
+   "file": "app/api/keys/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab",
+   "file": "app/api/lab/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab?page=today|radar|breakouts|playbook|studio|ledger|creatorverse &<01 2.1 params> [&from=<card index>] -> { ok, view: <Page>PageView } (01 21, D14). The UI's one page read. GET /api/lab?tab=... -> 410: the v1 tabs were replaced by the /lab pages (01 1). No page and no tab -> the Today view.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/ask",
+   "file": "app/api/lab/ask/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab/ask?q=<1 to 300 chars>[&limit=1..48][&sample=1] -> { ok, ask: AskView } (07 7.12). Internal: the UI reads Ask through /api/lab/sheet?ask=. Deterministic, no LLM call; a query is embedded locally (free) unless the OpenAI embedder is on, which is gated on the embed line.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/comments",
+   "file": "app/api/lab/comments/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "GET /api/lab/comments?postId=<id> -> { ok, comments, intent } (07 7.13): never a hash or a handle. Without postId: 200 with an empty list and the stored count (the layer's health read).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/embeddings",
+   "file": "app/api/lab/embeddings/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "GET /api/lab/embeddings -> { ok, model, dim, counts: { post, idea, comment }, total } for the active model (07 7.11).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/frames",
+   "file": "app/api/lab/frames/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "GET /api/lab/frames?post=<id>: the contact sheet image for the Post sheet's <img> (07 7.16, C16). A real sheet is served from lab_dissections.sheet_path (JPEG, as ffmpeg writes it); a fixture world (sample, Filming, FounderOS fixtures) has markers without files and gets a placeholder PNG built in memory. 404 { ok:fa...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/ideas",
+   "file": "app/api/lab/ideas/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Dismiss reason (feeds ranking, SPEC §4.11).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/intel",
+   "file": "app/api/lab/intel/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/intel — run the intelligence half of a cycle now (SPEC §10 phases 4-7): clusters, distill, trends, feeds, ideas, priors, brain. `steps` limits it. POST only: reads go through GET /api/lab. Dry/Filming makes zero paid or network calls.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/ledger",
+   "file": "app/api/lab/ledger/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab/ledger[?sample=1] -> { ok, ...LedgerView } (06 13.1). Internal and CLI; the page reads /api/lab?page=ledger.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/ledger/run",
+   "file": "app/api/lab/ledger/run/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/ledger/run -> { ok, runs } : grade, backtest and evals now (06 13.1). Dry under LAB_DRY=1 and Filming.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/morning-brief",
+   "file": "app/api/lab/morning-brief/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "GET /api/lab/morning-brief?day=YYYY-MM-DD -> MorningBriefView (default today; empty when none composed).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/oauth/{provider}/callback",
+   "file": "app/api/lab/oauth/[provider]/callback/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab/oauth/:provider/callback ?code&state | ?error -> 303 /lab?setup=keys&oauth=<provider>.<ok|denied|error> no params -> 200 text/html \"No sign-in in progress.\" (smoke-api) Never echoes a query value into the page.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/oauth/{provider}/disconnect",
+   "file": "app/api/lab/oauth/[provider]/disconnect/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/oauth/:provider/disconnect -> 200 { row }: removes the oauth-written fields (Google: also revokes).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/oauth/{provider}/start",
+   "file": "app/api/lab/oauth/[provider]/start/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/oauth/:provider/start (provider youtube | instagram) -> 200 { url } and the state cookie; the client then navigates. A POST so the GET smoke test never starts a flow. 409 when the client id or secret is missing, read-only, or dry (OAuth makes network calls).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/planner",
+   "file": "app/api/lab/planner/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab/planner -> { ok, planner: PlannerView | null, gate: { n, need } } (06 11). Closed until 20 owned posts have 72 h results.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/posts",
+   "file": "app/api/lab/posts/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/posts (01 14.3, 21; lane V owns the route): { id, action: 'flag_exogenous', reason?, note? } mark an outside push (04 3.10: left out of pattern maths from the next recompute) { id, action: 'unflag_exogenous' } clear it { id, action: 'hypothesis', text } 10 to 280 chars, owned posts only -> { ok }; 400 ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/predictions",
+   "file": "app/api/lab/predictions/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "GET /api/lab/predictions?origin=live&status=&predictor=&scriptId=&limit= -> { ok, predictions } (06 2.7).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/predictions/{id}/void",
+   "file": "app/api/lab/predictions/[id]/void/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/predictions/[id]/void { reason } -> { ok, prediction }; 404 unknown, 409 already void, 400 on a backtest row (06 2.7).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/radar",
+   "file": "app/api/lab/radar/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "GET /api/lab/radar[?sample=1] -> RadarView (05 17.3). 200 on a blank install (`never_run`). Internal: the UI reads the Radar through `/api/lab?page=radar` (01 D14).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/radar/event",
+   "file": "app/api/lab/radar/event/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab/radar/event?id=lev-... -> EventSheetView; 404 `{ error: 'No such event' }` (05 17.3). Internal.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/retention",
+   "file": "app/api/lab/retention/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab/retention?post=<id> -> { ok, postId, rows, retention: PostRetention | null, line } (06 9.3).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/retention/run",
+   "file": "app/api/lab/retention/run/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/retention/run -> { ok, youtube, instagram, runs }: fetch due retention now (06 9.2). Fixtures only under Dry and Filming.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/rules",
+   "file": "app/api/lab/rules/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "GET /api/lab/rules -> { ok, version, lexicon: { installed, sha256, citation }, rules } for the Playbook Rules list (07 7.6.6).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/run",
+   "file": "app/api/lab/run/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Limit to these platforms; default every platform with an active source that is due.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/runs",
+   "file": "app/api/lab/runs/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "GET /api/lab/runs[?limit=50&sample=1] -> { ok, advanced, finished, runs: RunRow[], spend } (v1). GET /api/lab/runs?batch=<id> -> { ok, batch: BatchProgress | null } (09.4.3, the UI's run progress read): advances first (a run polled under 3 s ago makes no Apify call), then reads the batch. `?batch=none` answers batch...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/script",
+   "file": "app/api/lab/script/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab/script?id=<scriptId>[&ver=<n>][&sample=1] -> { ok, sample, script, legacy } (07 7.16). `script` is 07's ScriptSheetView; `legacy` is the v1 ScriptSheet the v1 page still reads until lane V retires lib/lab/view.ts. 404 for an unknown id.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/scripts",
+   "file": "app/api/lab/scripts/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/scripts: script actions (v1 SPEC §4.12, 07 7.8). generate {ideaId, durationS?} draft, gate (v1 checks and the rule pack), one regenerate on failure regenerate_section {id, section} a new version with that section rewritten (CONTRAST and its rule failures fed in) save_edit {id, body} a new version from ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/setup",
+   "file": "app/api/lab/setup/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab/setup[?section=<checklist|keys|sources|schedule|spend>&sample=1&scenario=<name>] -> SetupView (08.3.1, with 09's planner, gates and forecastRecord). Internal: the UI reads it through /api/lab/sheet?setup=. Never makes a network call (AC-08-9); never carries a raw key (AC-08-2).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/setup/caps",
+   "file": "app/api/lab/setup/caps/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/setup/caps { target, usd } (08.3.2). `target` is a provider or a line with a cap env; `usd` 0 to 1000, two decimals. Writes that env with upsertEnvLocal. A cap above 0 on comments or downloads also needs its feature flag: the response says which flag is still off. When an apify provider cap is below th...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/setup/health",
+   "file": "app/api/lab/setup/health/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/setup/health { id } (08.4.1, \"Check again\"; 09 adds `apify.prices`, which forces a price book refresh). A network check runs once (free; `dry` in dry, no call); a local check is recomputed. Returns the result.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/setup/keys",
+   "file": "app/api/lab/setup/keys/route.ts",
+   "methods": [
+    "POST",
+    "DELETE"
+   ],
+   "summary": "POST /api/lab/setup/keys { env, value } -> 200 { row } DELETE /api/lab/setup/keys { env } -> 200 { row } (08.2.3) `env` must be an operator field of LAB_KEYS, a LAB_SETTINGS env, or a Setup-writable name of 08.6.2; anything else is 400 unknown_key. Values are trimmed, single line, at most 4096 characters, and checke...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/setup/pause",
+   "file": "app/api/lab/setup/pause/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/setup/pause { paused } (08.3.2): creates or deletes `PAUSED-lab` in the first existing Automation folder. Never touches the global `PAUSED` file; while that file is present the switch is disabled (409 with the reason).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/setup/schedule",
+   "file": "app/api/lab/setup/schedule/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/setup/schedule (09.5.5) { job, config } -> 200 { row } save `jobcfg:<job>`; the next tick reads it { job, action: 'run_now', override? } -> 202 { batchId } `lab-sync tick --only <job> --force --manual`, detached 400 an invalid config (everyMin under 15, more than 24 times, a bad HH:MM, a param out of r...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/sheet",
+   "file": "app/api/lab/sheet/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab/sheet?<post|event|idea|script|test|setup|ask>=<id> [&st=&ver=&post=(test prefill)&focus=&sample=1] -> { ok, sheet: SheetPayload } (01 21, D14). One loader for every sheet. An unknown id answers 200 with `view: null`, so the sheet shows its not-found copy (13.4). No sheet param: 400.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/snapshots",
+   "file": "app/api/lab/snapshots/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "The `snapshots` job runs every 30 minutes inside the one tick (08.5.1).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/sources",
+   "file": "app/api/lab/sources/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "A handle (with or without @) or a profile URL; for a feed, its key (subreddit, keyword, changelog URL).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/specimen",
+   "file": "app/api/lab/specimen/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "GET /api/lab/specimen?post=<id>[&sample=1] -> { ok, specimen: PostSheetView } (01 1: kept as an alias for agents and old links; no v2 component calls it, D14). 404 for an unknown id.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/suggestions",
+   "file": "app/api/lab/suggestions/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/suggestions — accept (it becomes tracked) or dismiss (never suggested again, SPEC §4.8).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/tests",
+   "file": "app/api/lab/tests/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "GET /api/lab/tests?kind=&status= -> { ok, tests } (06 10.7).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/tests/{id}",
+   "file": "app/api/lab/tests/[id]/route.ts",
+   "methods": [
+    "GET",
+    "PATCH"
+   ],
+   "summary": "GET /api/lab/tests/[id] -> { ok, test } (06 10.7).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/tests/{id}/judge",
+   "file": "app/api/lab/tests/[id]/judge/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/tests/[id]/judge -> { ok, test } (trial_reels only; 400 otherwise; 06 10.3).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/lab/verify-actors",
+   "file": "app/api/lab/verify-actors/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST /api/lab/verify-actors {override?} -> { runs, pending } (04 2.3). One tiny run per actor on the owned handles only, on line `apify.verify` (default cap $1). Live runs are advanced on read like any run and file their report into lab_priors `actor_fields`; dry and Filming file fixture reports at once. Past the ca...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lead-magnets",
+   "file": "app/api/lead-magnets/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Lead magnets (pages/lead-magnets.md §2). GET lists them (`?status=` filters) with the derived figures; it reads SQLite only. POST registers one; the content-gen skill posts the same body (LM-4): { name, offer?, liveUrl (https), destination: email|booking, campaign?, status?: draft|live|paused|archived, wentLiveAt?: ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/lead-magnets/{id}",
+   "file": "app/api/lead-magnets/[id]/route.ts",
+   "methods": [
+    "PATCH",
+    "DELETE"
+   ],
+   "summary": "Edit a lead magnet (status change inline, or the edit form). Validated whole.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/life/map",
+   "file": "app/api/life/map/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/metrics",
+   "file": "app/api/metrics/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/mission-control",
+   "file": "app/api/mission-control/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/modules/{module}",
+   "file": "app/api/modules/[module]/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Declarative workspace module records: list with computed fields, or create/update/transition.",
+   "idempotencyKey": true,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/plaud/ingest",
+   "file": "app/api/plaud/ingest/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Plaud recordings in (pages/feature-additions.md F4). A relay POSTs { recordings: [{ externalId, title, startedAt, durationS?, participants?, summary?, transcriptUrl? }] } with `Authorization: Bearer <PLAUD_INGEST_TOKEN>` (or the operator session). Upserts on (plaud, externalId), so a replay never duplicates. Validat...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "token"
+  },
+  {
+   "path": "/api/roadmap",
+   "file": "app/api/roadmap/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/settings/filming",
+   "file": "app/api/settings/filming/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "True when this instance is pinned to a fixed data directory and the toggle must not work — the always-on host sets GLADOS_DATA_DIR for exactly this.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/settings/modules",
+   "file": "app/api/settings/modules/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Switch one module on or off. Only rewrites .glados-modules.json; no module data is touched.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/setup/check",
+   "file": "app/api/setup/check/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Manual check-off for the few setup steps no code can verify.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/skills/{slug}",
+   "file": "app/api/skills/[slug]/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "The full SKILL.md for one real skill, loaded on demand by the reader.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/skills/create",
+   "file": "app/api/skills/create/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST { name, description, domain, group } -> writes a real draft skill (SKILL.md + GROUP) into the dir readUserSkills() reads, so it shows up in the /skills hierarchy on the next load. All sanitization/collision/ writability checks live in lib/skills-catalog.ts (createDraftSkill) so they're covered by pure unit test...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/skills/propose",
+   "file": "app/api/skills/propose/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST { description, name? } -> where a new skill would land in the REAL taxonomy: a proposed Domain/Group + name plus up to 2 alternates. Read-only — nothing is written until POST /api/skills/create confirms.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/social",
+   "file": "app/api/social/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/social/{platform}",
+   "file": "app/api/social/[platform]/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/social/dm/reply",
+   "file": "app/api/social/dm/reply/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Answer an Instagram DM from the /social inbox. Sends for real via ManyChat (sendContent). Only on a real 2xx do we store the outbound message — a failed or unconfigured send returns 502 and stores nothing, so the inbox never shows a reply that didn't actually go out.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/social/history",
+   "file": "app/api/social/history/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Live published-post history from Zernio/Late (real captions + post URLs). Distinct from /api/social/posts, which is the outgoing publish queue. `?limit=` caps the count.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/social/posts",
+   "file": "app/api/social/posts/route.ts",
+   "methods": [
+    "GET",
+    "POST",
+    "DELETE"
+   ],
+   "summary": "The post queue, newest first.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/social/series",
+   "file": "app/api/social/series/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Labelled history series for the Social pop-out charts. ?metric=audience → per-channel + \"All audience\" follower/subscriber series ?metric=dms → total DMs-over-time Growth per range is derived client-side from these points. Each series carries a series index (lib/series.ts), never a colour: the client maps it to the ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/social/sync",
+   "file": "app/api/social/sync/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Force a live follower-count sync from Zernio/Late and report what landed. GET and POST both work so it's trivial to trigger from a browser or curl.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/social/upload",
+   "file": "app/api/social/upload/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Drag-and-drop media upload for the Social composer: the server trades the file for a Late presigned slot, PUTs the bytes, and hands back the public accessUrl the post will carry. The API key never reaches the browser.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/tasks/export",
+   "file": "app/api/tasks/export/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "CSV of the tasks in the selected window — the reference's Export button.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/tools",
+   "file": "app/api/tools/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/trading",
+   "file": "app/api/trading/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "The /trading payload (pages/trading.md §2). Reads SQLite and, when a wallet address is set, one cached public Solana RPC read. Spends nothing. `?sample=1` on a blank install, or Filming mode, answers the badged fixture with no outbound request.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/trading/limits",
+   "file": "app/api/trading/limits/route.ts",
+   "methods": [
+    "GET",
+    "PATCH"
+   ],
+   "summary": "The trading agent's limits (pages/trading.md §2, T-5). GET the stored row, or `limits: null` (\"No limits saved\"; never code defaults dressed as stored). The Markets agent reads it at the start of every run with its TRADING_PUSH_TOKEN, or the operator's session. PATCH operator session only (a push token is refused). ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "token"
+  },
+  {
+   "path": "/api/trading/snapshot",
+   "file": "app/api/trading/snapshot/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "The Markets agent's push (pages/trading.md §2): one account snapshot plus its positions (at most 200), and optionally its open orders (replaced wholesale), trade log rows and the run's analysis. Authenticated by `Authorization: Bearer <TRADING_PUSH_TOKEN>` or the operator session (lib/push-auth.ts). Validated whole ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "token"
+  },
+  {
+   "path": "/api/trakyo/links",
+   "file": "app/api/trakyo/links/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "an existing Trakyo content item, or omit and pass `content` to create one first",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/usage",
+   "file": "app/api/usage/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "The /usage payload (pages/usage.md §2, lib/usage-payload.ts). Polled every 10 s while the page is visible, so it reads the reader's 60 s cache, never a fresh transcript parse (U-4). Off on demo and filming instances: then it reads nothing and says \"not available\" (U-1, AC-12). `?range=7|30`, `?sample=1` on a blank i...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/usage/push",
+   "file": "app/api/usage/push/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Another machine's usage push (pages/usage.md §2): { machine, readings: [{ plan: claude|codex|ollama, day: YYYY-MM-DD, model, input, output, cacheWrite }] } `Authorization: Bearer <USAGE_PUSH_TOKEN>`; a bad token is 401 and writes nothing (U-5). Each (plan, day) named replaces that machine's rows for it.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "token"
+  },
+  {
+   "path": "/api/ventures",
+   "file": "app/api/ventures/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/webhooks/{source}",
+   "file": "app/api/webhooks/[source]/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Meta subscription handshake for /api/webhooks/{whatsapp,instagram,messenger}.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "webhook"
+  },
+  {
+   "path": "/api/webhooks/manychat",
+   "file": "app/api/webhooks/manychat/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "ManyChat \"External Request\" ingest. ManyChat's API can't be polled for DMs, so this push endpoint is how the /social Instagram DM inbox goes live: point a ManyChat automation's External Request (POST) at this URL with a JSON body carrying the contact + message. Each message upserts by id, so replays don't duplicate....",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "webhook"
+  },
+  {
+   "path": "/api/whatsapp/avatar/{key}",
+   "file": "app/api/whatsapp/avatar/[key]/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Serve a chat's cached WhatsApp avatar. The images live outside the project (inside WhatsApp's macOS group container), so they cannot be served statically and have to come through here. The key is the numeric part of a JID and nothing else: it is re-validated here rather than trusted from the URL, and the resolved fi...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/whatsapp/media",
+   "file": "app/api/whatsapp/media/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Serve one downloaded WhatsApp media file. Like the avatar route, these live outside the project and cannot be served statically. The `f` parameter is a path, which makes containment the whole security story: it is rejected outright if it escapes, and the resolved file must still sit under Message/ after normalisatio...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/whatsapp/thread",
+   "file": "app/api/whatsapp/thread/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "One chat's history, loaded on demand. The inbox page renders every thread at once, so pulling history for all of them up front would read the whole message table on every page load — the reader asks for just the open thread.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/wizard/crew",
+   "file": "app/api/wizard/crew/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/wizard/designed",
+   "file": "app/api/wizard/designed/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/wizard/engine",
+   "file": "app/api/wizard/engine/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/wizard/projects",
+   "file": "app/api/wizard/projects/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/wizard/projects/{id}",
+   "file": "app/api/wizard/projects/[id]/route.ts",
+   "methods": [
+    "GET",
+    "PATCH",
+    "DELETE"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/wizard/send",
+   "file": "app/api/wizard/send/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "One Wizard exchange: append the user message, run the (resumed) Claude session, apply the wizard block (tasks / done / run) to the project, run any requested agents for real, append the reply with its receipts. Honest 503 when the engine is unavailable.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/workflow-runs",
+   "file": "app/api/workflow-runs/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": true,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/workflows",
+   "file": "app/api/workflows/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "The full workflow list — mirrors the shape app/workflows/page.tsx reads server-side; exposed here too so a client that only has fetch (the builder, after a save) can confirm what actually landed.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/workflows/{id}",
+   "file": "app/api/workflows/[id]/route.ts",
+   "methods": [
+    "PATCH",
+    "DELETE"
+   ],
+   "summary": "Updates an existing workflow's name, subtitle, and steps in place — the id, order, and revenue figure carry over untouched. Re-derives every step id from scratch (same `buildWorkflowSteps` the create route uses), so an edit that reorders or removes a step never leaves a stale branch pointer behind.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/workflows/{id}/versions",
+   "file": "app/api/workflows/[id]/versions/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Every recorded version of one workflow, newest first. Versions are written by the DB layer on each save, so nothing here is reconstructed.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/workflows/{id}/versions/restore",
+   "file": "app/api/workflows/[id]/versions/restore/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Restores one recorded version onto the live row. Body: `{ versionId }`. The restore is recorded as a new version (\"restore of vN\") — history only ever grows.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/workflows/draft",
+   "file": "app/api/workflows/draft/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Drafts a workflow from a free-text description by shelling out to the `claude` CLI. Validates the reply against WorkflowInputSchema (see ./logic.ts); on a validation failure, retries once with the error appended so the model can self-correct. Never writes to the database — the draft only fills the builder panel for ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  }
+ ]
+}

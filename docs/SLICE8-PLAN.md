@@ -81,7 +81,7 @@ Legend for "needs":
 
 ## Batch (d) Settings, Account, Support, Upgrade, Developer
 
-These menus are pinned utilities that already link to existing screens (setup, login, usage, roadmap, integrations, blueprint). They contain no planned pillars. Slice 8 adds a Developer API reference generated from the real `app/api` route files; no plans, prices or tiers are invented.
+These menus are pinned utilities that already link to existing screens (setup, login, usage, roadmap, integrations, blueprint). They contain no planned pillars. Slice 8 adds a Developer API reference generated from the real `app/api` route files; no plans, prices or tiers are invented. (done: /workspace/developer/api-reference, tests/muzebos-api-reference.test.ts keeps it in sync)
 
 ## Needs a provider or credentials (stay blocked/planned)
 
