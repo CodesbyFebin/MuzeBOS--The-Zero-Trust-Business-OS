@@ -7,6 +7,7 @@ const batch = process.env.MODULE_BATCH || 'a';
 const shots = process.env.TEST_SCREENSHOT_DIR;
 const BATCHES = {
   a: ['orders/pos-terminal', 'orders/returns-and-refunds', 'orders/gift-cards-and-credits', 'orders/b2b-quote-cpq', 'orders/pre-order-and-waitlist', 'stock/low-stock-alert', 'stock/warehouse-and-location-matrix', 'stock/barcode-and-qr-generator', 'stock/supplier-purchase-orders', 'stock/variant-matrix', 'stock/bundles-and-kits', 'stock/batch-and-expiry', 'stock/serial-number-registry', 'stock/reorder-point-calculator', 'stock/inter-warehouse-transfer', 'stock/shrinkage-and-damage-ledger'],
+  b: ['orders/tax-jurisdiction-matrix', 'money/pricing-and-discounts', 'money/multi-currency-converter', 'money/dispute-and-chargeback-logger', 'money/credit-notes', 'money/proforma-to-invoice'],
 };
 const extra = await import(`./muzebos-modules-flows-${batch}.mjs`).catch(() => null);
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });

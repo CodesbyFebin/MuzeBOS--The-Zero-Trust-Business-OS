@@ -30,7 +30,7 @@ Legend for "needs":
 | 74 | stock | Inter-Warehouse Transfer | DB only |
 | 75 | stock | Shrinkage & Damage Ledger | DB only |
 
-## Batch (b) Money - DB only, built in this slice
+## Batch (b) Money - DB only, built in this slice (done: all six available, tests/muzebos-modules-b.test.ts + MODULE_BATCH=b browser run)
 
 | Pillar | Menu | Page | Needs |
 |---|---|---|---|

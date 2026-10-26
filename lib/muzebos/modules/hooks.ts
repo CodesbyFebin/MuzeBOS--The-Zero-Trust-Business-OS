@@ -1,6 +1,7 @@
 import { BusinessError, type BusinessStore } from '../store';
 import { formatMoney, type ModuleRecord } from './types';
 import { productById, records, today } from './engine';
+import { MONEY_HOOKS } from './hooks-money';
 
 export type Hooks = {
   /** Field combinations that must be unique within the module, e.g. ['code'] or ['productId+serial']. */
@@ -39,7 +40,7 @@ function invoiced(store: BusinessStore, invoiceId: string, productId: string) {
   return line;
 }
 
-export const HOOKS: Record<string, Hooks> = {
+const BASE_HOOKS: Record<string, Hooks> = {
   'orders.pos-terminal': {
     validate: (store, d) => { const p = productById(store, s(d.productId)); if (p.stock < n(d.quantity)) throw new BusinessError(`Insufficient stock: ${p.name} has ${p.stock}`, 409); },
     transition: (store, r, t) => {
@@ -161,3 +162,4 @@ export const HOOKS: Record<string, Hooks> = {
     stats: (_s, recs) => [{ label: 'Units written off', value: String(recs.filter((r) => r.status === 'posted' && r.data.reason !== 'count_found').reduce((a, r) => a + n(r.data.quantity), 0)) }],
   },
 };
+export const HOOKS: Record<string, Hooks> = { ...BASE_HOOKS, ...MONEY_HOOKS };
