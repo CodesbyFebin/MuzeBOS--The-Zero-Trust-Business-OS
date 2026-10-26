@@ -12,13 +12,16 @@
  *  - blocked:   cannot be built until an external provider, credential or
  *               platform capability exists; dependencies are listed.
  */
+import { MODULES } from './modules';
+import { INFRA_PAGES } from './infra-pages';
 import type { LucideIcon } from 'lucide-react';
 import { Home, Workflow, ShieldCheck } from 'lucide-react';
 import { WORKSPACE_CATEGORIES, WORKSPACE_TOOLS, PINNED_UTILITIES, type WorkspaceTool } from '@/lib/muzebos/navigation';
 
-export type FeatureStatus = 'available' | 'existing' | 'planned' | 'blocked';
-export const FEATURE_STATUSES: FeatureStatus[] = ['available', 'existing', 'planned', 'blocked'];
-export const STATUS_LABEL: Record<FeatureStatus, string> = { available: 'Available', existing: 'Existing screen', planned: 'Planned', blocked: 'Blocked' };
+/** needs-credentials: local records work (tested); the provider action needs credentials and an adapter. */
+export type FeatureStatus = 'available' | 'existing' | 'needs-credentials' | 'planned' | 'blocked';
+export const FEATURE_STATUSES: FeatureStatus[] = ['available', 'existing', 'needs-credentials', 'planned', 'blocked'];
+export const STATUS_LABEL: Record<FeatureStatus, string> = { available: 'Available', existing: 'Existing screen', 'needs-credentials': 'Needs credentials', planned: 'Planned', blocked: 'Blocked' };
 
 export type FeatureDefinition = {
   id: string;            // stable key, e.g. "orders.orders-pipeline"
@@ -61,6 +64,7 @@ const CLUSTER_NAMES: Record<string, [string, string, string, string]> = {
 /** Pages that already have a dedicated MuzeBOS route keep it as their canonical route. */
 const DEDICATED_ROUTES: Record<number, string> = {
   3: '/workspace/orders/bookings',
+  85: '/workspace/growth/analytics',
   144: '/workspace/brain/employees',
   181: '/workspace/system/sources',
   186: '/workspace/system/webhooks',
@@ -68,10 +72,11 @@ const DEDICATED_ROUTES: Record<number, string> = {
 
 /** Pillars verified since the navigation catalogue was written: the status and scope the tests back. */
 const VERIFIED: Record<number, { status: FeatureStatus; summary: string }> = {
+  85: { status: 'available', summary: 'KPIs, monthly trend, channels, order counts, AOV, date ranges and CSV from local invoices and drafts. Profit, ROAS and cash flow are shown as unavailable with the missing inputs.' },
   186: { status: 'available', summary: 'Signature-verified Meta webhook receiver (WhatsApp, Instagram, Messenger) and its delivery log. Stores events; does not process or reply.' },
 };
 
-const PROVIDER = /whatsapp|instagram|messenger|facebook|upi gateway|upi autopay|ach|wire|pos hardware|sms|push notif|pixel|voice|kyc|aml|hardware key|passkey|cdn|container|failover|service mesh|edge cache|object storage|shelf scanner|call log/i;
+const PROVIDER = /whatsapp|instagram|messenger|facebook|upi gateway|upi autopay|\bach\b|\bwire\b|pos hardware|sms|push notif|pixel|\bvoice|invoice send|kyc|\baml\b|hardware key|passkey|cdn|container|failover|service mesh|edge cache|object storage|shelf scanner|call log/i;
 
 const CATEGORY_DEPENDENCY: Record<string, string> = {
   orders: 'Slice 3: orders, inventory and invoice integrity',
@@ -86,11 +91,16 @@ const CATEGORY_DEPENDENCY: Record<string, string> = {
   system: 'Slice 7: workflow execution and evidence',
 };
 
+/** Pillars implemented as declarative modules (lib/muzebos/modules), each covered by tests/muzebos-modules*.test.ts. */
+const MODULE_VERIFIED: Record<number, { status: FeatureStatus; summary: string }> = Object.fromEntries(
+  MODULES.filter((m) => m.pillar).map((m) => [m.pillar as number, { status: (m.provider ? 'needs-credentials' : 'available') as FeatureStatus, summary: m.summary }]),
+);
+
 function toFeature(t: WorkspaceTool, clusterId: string): FeatureDefinition {
-  const verified = VERIFIED[t.id];
+  const verified = VERIFIED[t.id] ?? MODULE_VERIFIED[t.id] ?? (INFRA_PAGES[t.id] ? { status: 'available' as FeatureStatus, summary: 'Live read-only measurements from this process, the SQLite database and the filesystem, with stated limits.' } : undefined);
   const blocked = !verified && t.status === 'planned' && PROVIDER.test(t.name);
   const status: FeatureStatus = verified?.status ?? (blocked ? 'blocked' : t.status);
-  const dependencies = status === 'available' || status === 'existing' ? [] : blocked
+  const dependencies = status === 'needs-credentials' ? ['External provider account and credentials', 'Provider dispatch adapter (not built; items stay queued)'] : status === 'available' || status === 'existing' ? [] : blocked
     ? ['External provider account and credentials', 'Verified adapter with failure/unavailable states', CATEGORY_DEPENDENCY[t.category]]
     : [CATEGORY_DEPENDENCY[t.category], 'Schema migration, validation and tests'];
   return {
@@ -122,6 +132,18 @@ const BRAIN_EXTRA: FeatureDefinition = {
   summary: 'Review attributed agent sources and their requested permissions. Nothing executes from this screen.',
 };
 
+const BRAIN_TEMPLATES: FeatureDefinition = {
+  id: 'brain.founder-templates', menuId: 'brain', clusterId: 'brain.assistants-and-employees', label: 'Founder Templates',
+  route: '/workspace/brain/templates', status: 'available', dependencies: [],
+  summary: '12 founder templates with persisted favorites and role preference. Use template creates a local draft only; nothing runs or is sent.',
+};
+
+const BRAIN_RUNTIME: FeatureDefinition = {
+  id: 'brain.ai-runtime', menuId: 'brain', clusterId: 'brain.assistants-and-employees', label: 'AI Runtime',
+  route: '/workspace/brain/runtime', status: 'available', dependencies: [],
+  summary: 'Routed chat (small/medium/large tiers, explained decisions), swarm task board, and the Jev queue where every agent-proposed write waits for your payload-bound approval. Server models need OPENROUTER_API_KEY, META_MODEL_API_KEY or a local server; on-device Llama needs WebGPU.',
+};
+
 const LEGACY_ALIASES: Record<string, string[]> = {
   orders: ['/business', '/funnel', '/clients', '/brand-deals'],
   money: ['/finances', '/trading'],
@@ -141,7 +163,7 @@ function utilityMenu(key: string): Omit<MenuDefinition, 'number'> {
     route: `/workspace/${key}/${slug(l.label)}`, target: l.href, status: 'existing', dependencies: [],
     summary: `Opens the existing screen at ${l.href}.`,
   }));
-  if (key === 'developer') pages.push(META_WEBHOOK_STATUS);
+  if (key === 'developer') pages.push(META_WEBHOOK_STATUS, API_REFERENCE);
   return { id: key, label: key === 'upgrade' ? 'Upgrade' : u.label, route: `/workspace/${key}`, icon: u.icon, section: 'pinned', summary: u.summary, aliases: LEGACY_ALIASES[key] ?? [], clusters: [{ id: cid, label: 'Current destinations', pages }] };
 }
 
@@ -151,18 +173,24 @@ const META_WEBHOOK_STATUS: FeatureDefinition = {
   summary: 'Whether META_APP_SECRET and META_VERIFY_TOKEN are set (never their values), the endpoint paths, and recent deliveries.',
 };
 
+const API_REFERENCE: FeatureDefinition = {
+  id: 'developer.api-reference', menuId: 'developer', clusterId: 'developer.overview', label: 'API routes',
+  route: '/workspace/developer/api-reference', status: 'available', dependencies: [],
+  summary: 'Every app/api route file with its methods, gate and the checks found in its source, generated from the code (no plans or prices).',
+};
+
 const missionPage: FeatureDefinition = { id: 'mission.overview', menuId: 'mission', clusterId: 'mission.today', label: 'Mission Control', route: '/', status: 'available', dependencies: [], summary: 'Derived pending approvals, unpaid requests, out-of-stock alerts and persisted reminders.' };
-const workflowsPage: FeatureDefinition = { id: 'workflows.canvas', menuId: 'workflows', clusterId: 'workflows.build', label: 'Workflow Canvas', route: '/workflows', status: 'existing', dependencies: [], summary: 'Inherited workflow editor. Execution evidence for MuzeBOS commands is planned (slice 7).' };
+const workflowsPage: FeatureDefinition = { id: 'workflows.canvas', menuId: 'workflows', clusterId: 'workflows.build', label: 'Workflow Canvas', route: '/workflows', status: 'existing', dependencies: [], summary: 'Inherited canvas editor (does not execute runs). Governed workflow runs (low-stock to reminder) with approval gates, retry, cancel and evidence live at /workflows?view=governed.' };
 const evidencePages: FeatureDefinition[] = [
   { id: 'evidence.commerce-ledger', menuId: 'evidence', clusterId: 'evidence.ledger', label: 'Commerce Evidence Ledger', route: '/workspace/evidence/commerce-ledger', target: '/business?view=evidence', status: 'available', dependencies: [], summary: 'Local commerce audit events, payload hashes and hash-chain verification.' },
-  { id: 'evidence.workflow-runs', menuId: 'evidence', clusterId: 'evidence.ledger', label: 'Workflow Run Evidence', route: '/workspace/evidence/workflow-runs', status: 'planned', dependencies: ['Slice 7: workflow execution and evidence'], summary: 'Per-run evidence for workflow executions. Not implemented.' },
+  { id: 'evidence.workflow-runs', menuId: 'evidence', clusterId: 'evidence.ledger', label: 'Workflow Run Evidence', route: '/workspace/evidence/workflow-runs', target: '/workspace/evidence?entity=workflow+run', status: 'available', dependencies: [], summary: 'Run, step, approval and tool-decision events from the governed workflow engine, filterable and exportable in the evidence explorer.' },
 ];
 
 const cat = (id: string) => WORKSPACE_CATEGORIES.find((c) => c.id === id)!;
 const MENU_LABELS: Record<string, string> = { orders: 'Orders', money: 'Money', talk: 'Talk', stock: 'Stock', growth: 'Growth', operations: 'Operations', builder: 'Builder', brain: 'Brain', foundation: 'Foundation', system: 'System' };
 const categoryMenu = (id: string, section: MenuSection): Omit<MenuDefinition, 'number'> => {
   const clusters = categoryClusters(id);
-  if (id === 'brain') clusters[2].pages.push(BRAIN_EXTRA);
+  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME); clusters[2].pages.push(BRAIN_EXTRA); }
   return { id, label: MENU_LABELS[id], route: `/workspace/${id}`, icon: cat(id).icon, section, summary: cat(id).summary, aliases: LEGACY_ALIASES[id] ?? [], clusters };
 };
 
@@ -215,7 +243,7 @@ export function breadcrumbs(pathname: string): Crumb[] {
 export function pageForSegments(menu: string, page: string) { return featureByRoute(`/workspace/${menu}/${page}`); }
 
 export function statusCounts(features: FeatureDefinition[] = ALL_FEATURES): Record<FeatureStatus, number> {
-  const out = { available: 0, existing: 0, planned: 0, blocked: 0 };
+  const out: Record<FeatureStatus, number> = { available: 0, existing: 0, 'needs-credentials': 0, planned: 0, blocked: 0 };
   for (const f of features) out[f.status]++;
   return out;
 }

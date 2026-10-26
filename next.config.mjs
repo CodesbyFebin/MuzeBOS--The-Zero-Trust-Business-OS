@@ -52,6 +52,8 @@ const nextConfig = {
       { source: '/content-media/ad-engine/:path*', destination: '/content-media/creative-engine/:path*' },
     ];
   },
+  // This is the private business workspace. Public project docs are built separately in site/.
+  async headers() { return [{ source: '/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' }] }]; },
   experimental: {
     outputFileTracingIncludes: { "/api/employee-library": ["./vendor/reference-documents/*.txt"] },
     serverComponentsExternalPackages: ['better-sqlite3', 'node-ical', 'nodemailer'],

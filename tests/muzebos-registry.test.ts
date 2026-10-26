@@ -58,10 +58,12 @@ describe('MuzeBOS feature registry', () => {
     for (const f of ALL_FEATURES) {
       expect(FEATURE_STATUSES).toContain(f.status);
       if (f.status === 'planned' || f.status === 'blocked') { expect(f.dependencies.length, f.id).toBeGreaterThan(0); expect(f.target, f.id).toBeUndefined(); }
+      else if (f.status === 'needs-credentials') { expect(f.dependencies.length, f.id).toBeGreaterThan(0); expect(f.target, f.id).toBeUndefined(); }
       else { expect(f.dependencies).toEqual([]); expect(f.target ?? (appRoute(f.route) ? f.route : undefined), f.id).toBeTruthy(); }
     }
-    expect(featureByRoute('/workspace/talk/whatsapp-hub')?.status).toBe('blocked');
-    expect(featureByRoute('/workspace/stock/barcode-and-qr-generator')?.status).toBe('planned');
+    expect(featureByRoute('/workspace/talk/whatsapp-hub')?.status).toBe('needs-credentials');
+    expect(featureByRoute('/workspace/builder/hydration-optimizer')?.status).toBe('available');
+    expect(ALL_FEATURES.filter((f) => f.status === 'planned' || f.status === 'blocked')).toEqual([]);
   });
   it('maps legacy routes onto their menus', () => {
     expect(resolveMenu('/funnel')?.id).toBe('orders');
@@ -80,7 +82,7 @@ describe('MuzeBOS feature registry', () => {
     const cmds = registryCommands();
     expect(new Set(cmds.map((c) => c.id)).size).toBe(cmds.length);
     expect(cmds.filter((c) => c.hint === 'menu')).toHaveLength(18);
-    expect(cmds.find((c) => c.href === '/workspace/talk/whatsapp-hub')?.hint).toBe('blocked');
+    expect(cmds.find((c) => c.href === '/workspace/talk/whatsapp-hub')?.hint).toBe('needs credentials');
   });
   it('short-path redirects point at canonical menu routes', async () => {
     const rules = await nextConfig.redirects!();
@@ -108,7 +110,10 @@ describe('Registry-driven shell', () => {
   it('canonical page routes redirect working pages and stub the rest without controls', () => {
     expect(() => FeaturePage({ params: { section: 'money', page: 'invoice-maker' } })).toThrow('REDIRECT /business?view=invoices');
     expect(() => FeaturePage({ params: { section: 'money', page: 'nope' } })).toThrow('NEXT_NOT_FOUND');
-    const planned = pageForSegments('stock', 'barcode-and-qr-generator')!;
+    const mod = renderToStaticMarkup(FeaturePage({ params: { section: 'stock', page: 'barcode-and-qr-generator' } }) as never);
+    expect(mod).toContain('data-feature="stock.barcode-and-qr-generator"');
+    expect(mod).toContain('Loading Barcode');
+    const planned = { ...pageForSegments('builder', 'hydration-optimizer')!, status: 'planned' as const, dependencies: ['Schema migration'], target: undefined };
     const html = renderToStaticMarkup(createElement(FeatureStub, { feature: planned }));
     expect(html).toContain('Planned');
     expect(html).toContain('Dependencies');

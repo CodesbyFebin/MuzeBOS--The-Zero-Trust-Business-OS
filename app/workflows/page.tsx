@@ -5,6 +5,7 @@ import { OPERATOR_NAME } from '@/lib/operator';
 import type { AgentRun } from '@/lib/schemas';
 import { getAppearance } from '@/lib/appearance-server';
 import { treeFor } from '@/lib/appearance';
+import { GovernedWorkflows } from '@/components/muzebos/GovernedWorkflows';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,7 @@ export const dynamic = 'force-dynamic';
  * for the roster, and the live brand-deal rules (or the reason they are not
  * configured on this machine).
  */
-export default function WorkflowsPage(props: { searchParams?: { wf?: string } }) {
+export default function WorkflowsPage(props: { searchParams?: { wf?: string; view?: string } }) {
   // Called with no argument by tests/smoke.test.ts; a parameter-level default
   // would widen the type to `| undefined` and break Next's PageProps check.
   const searchParams = props?.searchParams;
@@ -30,6 +31,9 @@ export default function WorkflowsPage(props: { searchParams?: { wf?: string } })
   const g = treeFor(getAppearance(), '/workflows') === 'glados';
   const rules = read.configured ? { configured: true as const, rules: read.rules, updatedAt: read.updatedAt } : { configured: false as const, reason: read.reason };
 
+  // The canvas editor is a full-screen fixed surface, so the governed run
+  // engine gets its own view on the same route instead of sitting under it.
+  if (searchParams?.view === 'governed') return <GovernedWorkflows />;
   return (
     <div>
       <WorkflowCanvas

@@ -1,0 +1,5 @@
+{
+  "repository": "CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS",
+  "description": "Self-hostable business OS for founders: SQLite invoicing, inventory, CRM, approval-gated AI tasks, WebLLM and audit evidence. Single-operator preview.",
+  "topics": ["self-hosted", "business-os", "small-business", "invoicing", "inventory-management", "crm", "local-first", "ai-agents", "webllm", "webgpu", "human-in-the-loop", "audit-log", "typescript", "nextjs", "sqlite", "workflow-automation"]
+}
