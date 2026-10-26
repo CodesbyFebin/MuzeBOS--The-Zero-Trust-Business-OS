@@ -49,6 +49,7 @@ const fontJetBrainsMono = localFont({
 
 export const metadata: Metadata = {
   title: BRAND.title,
+  robots: { index: false, follow: false, noarchive: true },
   description: 'Local-first business workspace with approval-bound invoicing, inventory, AI departments and audit evidence',
 };
 
