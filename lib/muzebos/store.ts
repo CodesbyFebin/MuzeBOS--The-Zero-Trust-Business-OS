@@ -10,7 +10,9 @@ const money = z.number().int().min(0).max(100_000_000);
 const text = z.string().trim().min(1).max(160);
 const customerSchema = z.object({ name: text, email: z.union([z.string().email(), z.literal('')]).default('') }).strict();
 const productSchema = z.object({ name: text, sku: text, price: money, taxBps: z.number().int().min(0).max(10_000), stock: z.number().int().min(0).max(1_000_000) }).strict();
-const draftSchema = z.object({ customerId: z.string().uuid(), lines: z.array(z.object({ productId: z.string().uuid(), quantity: z.number().int().min(1).max(10_000) }).strict()).min(1).max(100) }).strict();
+export const ORDER_CHANNELS = ['manual','walk_in','phone','whatsapp','instagram','web'] as const;
+export type OrderChannel = typeof ORDER_CHANNELS[number];
+const draftSchema = z.object({ customerId: z.string().uuid(), channel: z.enum(ORDER_CHANNELS).default('manual'), lines: z.array(z.object({ productId: z.string().uuid(), quantity: z.number().int().min(1).max(10_000) }).strict()).min(1).max(100) }).strict();
 const merchantSchema=z.object({name:text,address:z.string().trim().max(1000),taxId:z.string().trim().max(40),upi:z.union([z.string().regex(/^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$/),z.literal('')])}).strict();
 export const REMINDER_LINK_KINDS=['customer','product','order','invoice','booking'] as const;
 export type ReminderLinkKind=typeof REMINDER_LINK_KINDS[number];
@@ -21,7 +23,7 @@ export type Customer = { id: string; name: string; email: string };
 export type Product = { id: string; name: string; sku: string; price: number; taxBps: number; stock: number };
 export type Line = { productId: string; name: string; sku: string; quantity: number; unitPrice: number; taxBps: number; subtotal: number; tax: number; total: number };
 export type InvoicePayload = { merchant: Merchant; customer: Customer; lines: Line[]; currency: 'INR'; subtotal: number; tax: number; total: number };
-export type Order = { id: string; status: string; payload: InvoicePayload; hash: string; expiresAt: string; createdAt: string };
+export type Order = { id: string; status: string; payload: InvoicePayload; hash: string; expiresAt: string; createdAt: string; channel?: OrderChannel };
 export type Invoice = { id: string; number: string; orderId: string; payload: InvoicePayload; createdAt: string; payment: 'pending' | 'manually_reconciled'; reference: string | null };
 export type Audit = { seq: number; action: string; target: string; detail: string; createdAt: string; previousHash: string; hash: string };
 export type WebhookReceipt = { id: string; eventCount: number; newEvents: number };
@@ -76,6 +78,12 @@ export class BusinessStore {
       if (!cols.includes('linkKind')) this.db.exec('ALTER TABLE mb_reminders ADD COLUMN linkKind TEXT; ALTER TABLE mb_reminders ADD COLUMN linkId TEXT;');
       this.db.prepare("INSERT INTO mb_migrations VALUES(5, strftime('%Y-%m-%dT%H:%M:%fZ','now'))").run();
     });
+    // v8: where an order came from (attribution metadata; not part of the approved invoice payload).
+    if (!this.db.prepare('SELECT 1 FROM mb_migrations WHERE version=8').get()) this.atomic(() => {
+      const cols = (this.db.prepare('PRAGMA table_info(mb_orders)').all() as { name: string }[]).map((c) => c.name);
+      if (!cols.includes('channel')) this.db.exec("ALTER TABLE mb_orders ADD COLUMN channel TEXT NOT NULL DEFAULT 'manual'");
+      this.db.prepare("INSERT INTO mb_migrations VALUES(8, strftime('%Y-%m-%dT%H:%M:%fZ','now'))").run();
+    });
     // v6: an approval is a separate record bound to the canonical payload hash it approved.
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS mb_approvals(orderId TEXT PRIMARY KEY REFERENCES mb_orders(id), payloadHash TEXT NOT NULL, approvedAt TEXT NOT NULL, consumedAt TEXT, invoiceId TEXT REFERENCES mb_invoices(id));
@@ -116,7 +124,7 @@ export class BusinessStore {
   private atomic<T>(work: () => T): T { return this.db.transaction(work).immediate(); }
   customers(): Customer[] { return this.db.prepare('SELECT * FROM mb_customers ORDER BY rowid DESC').all() as Customer[]; }
   products(): Product[] { return this.db.prepare('SELECT * FROM mb_products ORDER BY rowid DESC').all() as Product[]; }
-  orders(): Order[] { return (this.db.prepare('SELECT id,status,payload,hash,expiresAt,createdAt FROM mb_orders ORDER BY rowid DESC').all() as (Omit<Order,'payload'> & {payload:string})[]).map(r => ({ ...r, payload: JSON.parse(r.payload) })); }
+  orders(): Order[] { return (this.db.prepare('SELECT id,status,payload,hash,expiresAt,createdAt,channel FROM mb_orders ORDER BY rowid DESC').all() as (Omit<Order,'payload'> & {payload:string})[]).map(r => ({ ...r, payload: JSON.parse(r.payload) })); }
   invoices(): Invoice[] { return (this.db.prepare('SELECT * FROM mb_invoices ORDER BY rowid DESC').all() as (Omit<Invoice,'payload'> & {payload:string})[]).map(r => ({ ...r, payload: JSON.parse(r.payload) })); }
   evidence(): Audit[] { return this.db.prepare('SELECT * FROM mb_audit ORDER BY seq').all() as Audit[]; }
   verifyAudit() {
@@ -231,8 +239,8 @@ export class BusinessStore {
       });
       const payload: InvoicePayload = { merchant:this.merchant(), customer, lines, currency:'INR', subtotal:lines.reduce((s,l)=>s+l.subtotal,0), tax:lines.reduce((s,l)=>s+l.tax,0), total:lines.reduce((s,l)=>s+l.total,0) };
       if (!Number.isSafeInteger(payload.total) || payload.total > 100_000_000_000) throw new BusinessError('Order amount exceeds supported limit');
-      const order: Order = { id:randomUUID(), status:'awaiting_review',payload,hash:payloadHash(payload),expiresAt:new Date(Date.now()+30*60_000).toISOString(),createdAt:now() };
-      this.db.prepare('INSERT INTO mb_orders VALUES(@id,@customerId,@status,@payload,@hash,@expiresAt,@createdAt)').run({...order,customerId:customer.id,payload:JSON.stringify(payload)});
+      const order: Order = { id:randomUUID(), status:'awaiting_review',payload,hash:payloadHash(payload),expiresAt:new Date(Date.now()+30*60_000).toISOString(),createdAt:now(), channel:parsed.channel };
+      this.db.prepare('INSERT INTO mb_orders(id,customerId,status,payload,hash,expiresAt,createdAt,channel) VALUES(@id,@customerId,@status,@payload,@hash,@expiresAt,@createdAt,@channel)').run({...order,customerId:customer.id,payload:JSON.stringify(payload)});
       this.audit('approval.requested',order.id,`Invoice draft ${order.hash}; expires ${order.expiresAt}`);
       return order;
     });

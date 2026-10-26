@@ -16,7 +16,7 @@ function fixture(s:BusinessStore,stock=5) {
 }
 afterEach(()=>{for(const s of stores.splice(0)){if(s.db.open)s.close();}for(const d of dirs.splice(0))rmSync(d,{recursive:true,force:true});vi.useRealTimers();vi.unstubAllEnvs();});
 describe('MuzeBOS real business workflow',()=>{
- it('starts blank and applies its migration idempotently',()=>{const s=fresh();expect(s.snapshot()).toMatchObject({customers:[],products:[],orders:[],invoices:[],evidence:[],auditValid:true});expect(s.db.prepare('SELECT version FROM mb_migrations ORDER BY version').all()).toEqual([{version:1},{version:2},{version:3},{version:4},{version:5},{version:6},{version:7}]);});
+ it('starts blank and applies its migration idempotently',()=>{const s=fresh();expect(s.snapshot()).toMatchObject({customers:[],products:[],orders:[],invoices:[],evidence:[],auditValid:true});expect(s.db.prepare('SELECT version FROM mb_migrations ORDER BY version').all()).toEqual([{version:1},{version:2},{version:3},{version:4},{version:5},{version:6},{version:7},{version:8}]);});
  it('calculates exact line tax, binds approval and atomically issues with pending payment',()=>{
   const s=fresh(),f=fixture(s),o=f.draft();expect(o.payload).toMatchObject({subtotal:39998,tax:7200,total:47198});expect(s.products()[0].stock).toBe(5);
   const invoice=s.issue(o.id,o.hash);expect(invoice.payload).toEqual(o.payload);expect(invoice.payment).toBe('pending');expect(s.products()[0].stock).toBe(3);expect(s.verifyAudit()).toBe(true);expect(s.orders()[0].status).toBe('issued');
