@@ -269,3 +269,20 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-table-wrap { overflow-x:auto; max-width:100%; }
 .mb-evidence .mb-table td.mb-wrap { overflow-wrap:anywhere; max-width:320px; }
 @media (max-width: 600px) { .mb-defs { grid-template-columns:minmax(0,1fr); } }
+/* Brain AI runtime */
+.ai-runtime .ai-grid { display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px;margin-top:16px; }
+.ai-runtime .ai-grid>section:first-child { grid-row:span 3; }
+.ai-runtime .ai-row { display:flex;gap:8px;align-items:center;margin:8px 0; }
+.ai-runtime .ai-row input { flex:1;min-width:0; }
+.ai-runtime input,.ai-runtime select,.ai-runtime textarea { font:inherit;color:var(--mb-text);background:transparent;border:1px solid var(--mb-line);border-radius:4px;padding:9px; }
+.ai-runtime textarea { width:100%;box-sizing:border-box; }
+.ai-runtime .ai-log { display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow:auto;padding:6px 0; }
+.ai-runtime .ai-msg { border:1px solid var(--mb-line);border-radius:4px;padding:10px;overflow-wrap:anywhere; }
+.ai-runtime .ai-you { border-color:var(--mb-accent); }
+.ai-runtime .ai-msg p { margin:6px 0;white-space:pre-wrap; }
+.ai-runtime .ai-list { list-style:none;padding:0;display:grid;gap:10px; }
+.ai-runtime .ai-board { display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:12px; }
+.ai-runtime .ai-proposal { margin-top:12px;overflow-wrap:anywhere; }
+.ai-runtime code { overflow-wrap:anywhere; }
+.ai-runtime>.mb-panel { margin-top:16px; }
+@media(max-width:800px) { .ai-runtime .ai-grid { grid-template-columns:1fr; }.ai-runtime .ai-grid>section:first-child { grid-row:auto; } }

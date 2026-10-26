@@ -130,6 +130,12 @@ const BRAIN_TEMPLATES: FeatureDefinition = {
   summary: '12 founder templates with persisted favorites and role preference. Use template creates a local draft only; nothing runs or is sent.',
 };
 
+const BRAIN_RUNTIME: FeatureDefinition = {
+  id: 'brain.ai-runtime', menuId: 'brain', clusterId: 'brain.assistants-and-employees', label: 'AI Runtime',
+  route: '/workspace/brain/runtime', status: 'available', dependencies: [],
+  summary: 'Routed chat (small/medium/large tiers, explained decisions), swarm task board, and the Jev queue where every agent-proposed write waits for your payload-bound approval. Server models need OPENROUTER_API_KEY, META_MODEL_API_KEY or a local server; on-device Llama needs WebGPU.',
+};
+
 const LEGACY_ALIASES: Record<string, string[]> = {
   orders: ['/business', '/funnel', '/clients', '/brand-deals'],
   money: ['/finances', '/trading'],
@@ -170,7 +176,7 @@ const cat = (id: string) => WORKSPACE_CATEGORIES.find((c) => c.id === id)!;
 const MENU_LABELS: Record<string, string> = { orders: 'Orders', money: 'Money', talk: 'Talk', stock: 'Stock', growth: 'Growth', operations: 'Operations', builder: 'Builder', brain: 'Brain', foundation: 'Foundation', system: 'System' };
 const categoryMenu = (id: string, section: MenuSection): Omit<MenuDefinition, 'number'> => {
   const clusters = categoryClusters(id);
-  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES); clusters[2].pages.push(BRAIN_EXTRA); }
+  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME); clusters[2].pages.push(BRAIN_EXTRA); }
   return { id, label: MENU_LABELS[id], route: `/workspace/${id}`, icon: cat(id).icon, section, summary: cat(id).summary, aliases: LEGACY_ALIASES[id] ?? [], clusters };
 };
 
