@@ -22,7 +22,8 @@
     "test:integrations-browser": "node scripts/muzebos-integrations-browser.mjs",
     "test:qualify-browser": "node scripts/muzebos-qualify-browser.mjs",
     "test:slice2-browser": "node scripts/muzebos-slice2-browser.mjs",
-    "test:slice3-browser": "node scripts/muzebos-slice3-browser.mjs"
+    "test:slice3-browser": "node scripts/muzebos-slice3-browser.mjs",
+    "test:slice4-browser": "node scripts/muzebos-slice4-browser.mjs"
   },
   "dependencies": {
     "@miosa/sdk": "^3.2.5",

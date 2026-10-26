@@ -228,3 +228,13 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-mission-stats small,.mb-mission .mb-row small { overflow-wrap:anywhere; }
 .mb-reminder-form,.mb-reminder-form label { min-width:0; }
 .mb-reminder-form select { max-width:100%;text-overflow:ellipsis; }
+
+/* Slice 4: Brain founder templates */
+.mb-template-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; min-width:0; }
+.mb-template { min-width:0; overflow-wrap:anywhere; }
+.mb-template h3 { margin:0; font-size:15px; }
+.mb-fav { display:inline-flex; align-items:center; gap:6px; }
+.mb-fav[aria-pressed='true'] { border-color:var(--mb-accent); }
+.mb-role { display:flex; flex-direction:column; gap:6px; max-width:260px; }
+.mb-draft pre { white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; }
+@media (max-width: 600px) { .mb-template-grid { grid-template-columns:minmax(0,1fr); } }

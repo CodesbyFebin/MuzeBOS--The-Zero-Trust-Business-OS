@@ -1,3 +1,4 @@
+import { BRAIN_ROLES, templateById, type BrainRole } from './brain-templates';
 import Database from 'better-sqlite3';
 import { createHash, randomUUID } from 'node:crypto';
 import fs from 'node:fs';
@@ -34,6 +35,7 @@ export function canonicalJson(value: unknown): string {
   return `{${Object.keys(value).sort().filter((k) => (value as Record<string, unknown>)[k] !== undefined).map((k) => `${JSON.stringify(k)}:${canonicalJson((value as Record<string, unknown>)[k])}`).join(',')}}`;
 }
 export const payloadHash = (payload: unknown) => createHash('sha256').update(canonicalJson(payload)).digest('hex');
+export type BrainDraft = { id: string; templateId: string; title: string; body: string; role: BrainRole; status: 'draft'; createdAt: string };
 export type Approval = { orderId: string; payloadHash: string; approvedAt: string; consumedAt: string | null; invoiceId: string | null };
 const minorUnits = (p: InvoicePayload) => [p.subtotal, p.tax, p.total, ...p.lines.flatMap((l) => [l.quantity, l.unitPrice, l.subtotal, l.tax, l.total, l.taxBps])].every(Number.isSafeInteger);
 const now = () => new Date().toISOString();
@@ -78,6 +80,12 @@ export class BusinessStore {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS mb_approvals(orderId TEXT PRIMARY KEY REFERENCES mb_orders(id), payloadHash TEXT NOT NULL, approvedAt TEXT NOT NULL, consumedAt TEXT, invoiceId TEXT REFERENCES mb_invoices(id));
       INSERT OR IGNORE INTO mb_migrations VALUES(6, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
+    `);
+    // v7: Brain template favorites and drafts created from templates. Role preference lives in mb_settings.
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS mb_template_favorites(templateId TEXT PRIMARY KEY, createdAt TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS mb_brain_drafts(id TEXT PRIMARY KEY, templateId TEXT NOT NULL, title TEXT NOT NULL, body TEXT NOT NULL, role TEXT NOT NULL, status TEXT NOT NULL CHECK(status='draft'), createdAt TEXT NOT NULL);
+      INSERT OR IGNORE INTO mb_migrations VALUES(7, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
     `);
   }
   close() { this.db.close(); }
@@ -152,6 +160,35 @@ export class BusinessStore {
   cancelBooking(id:string) {
     z.string().uuid().parse(id);
     return this.atomic(()=>{const result=this.db.prepare("UPDATE mb_bookings SET status='cancelled' WHERE id=? AND status='confirmed'").run(id);if(result.changes!==1)throw new BusinessError('Confirmed booking not found',409);this.audit('booking.cancelled',id,'Reservation released');return {id};});
+  }
+  templateFavorites(): string[] { return (this.db.prepare('SELECT templateId FROM mb_template_favorites ORDER BY createdAt,rowid').all() as {templateId:string}[]).map((r) => r.templateId); }
+  favoriteTemplate(input: unknown) {
+    const { id, favorite } = z.object({ id: z.string(), favorite: z.boolean() }).parse(input);
+    if (!templateById(id)) throw new BusinessError('Template not found', 404);
+    return this.atomic(() => {
+      const changed = favorite
+        ? this.db.prepare('INSERT OR IGNORE INTO mb_template_favorites VALUES(?,?)').run(id, now()).changes
+        : this.db.prepare('DELETE FROM mb_template_favorites WHERE templateId=?').run(id).changes;
+      if (changed) this.audit(favorite ? 'template.favorited' : 'template.unfavorited', id, 'Brain template preference');
+      return { favorites: this.templateFavorites() };
+    });
+  }
+  rolePreference(): BrainRole { const r = (this.db.prepare("SELECT value FROM mb_settings WHERE key='brain.role'").get() as {value:string}|undefined)?.value; return (BRAIN_ROLES as readonly string[]).includes(r ?? '') ? r as BrainRole : 'founder'; }
+  setRolePreference(input: unknown) {
+    const role = z.enum(BRAIN_ROLES).parse(input);
+    return this.atomic(() => { this.db.prepare("INSERT INTO mb_settings VALUES('brain.role',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(role); this.audit('brain.role.set', role, 'Role preference for template recommendations'); return { role }; });
+  }
+  brainDrafts(): BrainDraft[] { return this.db.prepare('SELECT * FROM mb_brain_drafts ORDER BY createdAt DESC,rowid DESC').all() as BrainDraft[]; }
+  /** Creates a local draft only. Nothing is sent, scheduled or run by an agent. */
+  useTemplate(input: unknown): BrainDraft {
+    const { id } = z.object({ id: z.string() }).parse(input);
+    const t = templateById(id); if (!t) throw new BusinessError('Template not found', 404);
+    return this.atomic(() => {
+      const draft: BrainDraft = { id: randomUUID(), templateId: t.id, title: `${t.name} draft`, body: t.body, role: this.rolePreference(), status: 'draft', createdAt: now() };
+      this.db.prepare('INSERT INTO mb_brain_drafts VALUES(@id,@templateId,@title,@body,@role,@status,@createdAt)').run(draft);
+      this.audit('brain.draft.created', draft.id, `From template ${t.id}; draft only, not sent or executed`);
+      return draft;
+    });
   }
   merchant(): Merchant {
     const row=this.db.prepare("SELECT value FROM mb_settings WHERE key='merchant'").get() as {value:string}|undefined;
