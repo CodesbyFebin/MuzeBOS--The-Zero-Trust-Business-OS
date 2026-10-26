@@ -70,7 +70,40 @@ export const LOW_STOCK_REMINDER: WorkflowDefinition = {
   ],
 };
 
-export const WORKFLOWS: WorkflowDefinition[] = [LOW_STOCK_REMINDER];
+/** Shape of a write an AI agent may propose. Model output is untrusted; it is parsed against this
+ *  strict schema and can only ever name the one write tool this definition grants. */
+export const AGENT_ROLES = ['inventory', 'customers', 'finance', 'operations', 'writer'] as const;
+export const AgentProposalSchema = z.object({
+  taskId: z.string().min(1).max(64).regex(/^[A-Za-z0-9_.:-]+$/),
+  role: z.enum(AGENT_ROLES),
+  tool: z.literal('reminders.create'),
+  args: z.object({ title: z.string().trim().min(1).max(180) }).strict(),
+  rationale: z.string().max(500).default(''),
+  source: z.enum(['model', 'rule']),
+  model: z.string().max(120).nullable().default(null),
+}).strict();
+export type AgentProposal = z.infer<typeof AgentProposalSchema>;
+
+/** 'Jev' gate: every write proposed by an AI agent becomes a run of this definition, which always
+ *  requires a human approval bound to the hash of the exact proposal. There is no auto-approve path. */
+export const JEV_AGENT_WRITE: WorkflowDefinition = {
+  id: 'agent-proposed-write', version: 1, name: 'Jev approval gate for agent proposals',
+  summary: 'An AI agent proposed a write. Nothing happens until a person approves the exact payload hash; then one reminder is created.',
+  trigger: { kind: 'event', description: 'Created when a Brain runtime agent proposes a tool call. Agents cannot approve or execute.' },
+  input: AgentProposalSchema,
+  inputDescription: { taskId: 'Swarm subtask id', role: 'Agent role that proposed it', tool: 'Only reminders.create is proposable', args: '{ title } of the reminder', rationale: 'Agent explanation (untrusted text)', source: 'model or rule (no model configured)', model: 'Model id when source is model' },
+  permissions: ['reminders.write'],
+  tools: ['reminders.create', 'reminders.complete'],
+  approval: { required: true, boundTo: 'payloadHash', description: 'A person approves the canonical hash of the full proposal. A changed title, tool, role or task is a different hash and is refused.' },
+  idempotency: { description: 'The same proposal returns the same run; the reminder is created at most once per run.' },
+  retry: { maxAttempts: 3, description: 'reminders.create is idempotent per run, so a failed attempt may be retried.' },
+  timeoutMs: 24 * 60 * 60 * 1000,
+  compensation: { description: 'Cancelling after execution closes the reminder this run created.', run: () => undefined },
+  plan: (_store, input) => ({ tool: input.tool, args: input.args, role: input.role, taskId: input.taskId }),
+  steps: [{ id: 'remind', label: 'Create the approved reminder', tool: 'reminders.create', run: () => undefined }],
+};
+
+export const WORKFLOWS: WorkflowDefinition[] = [LOW_STOCK_REMINDER, JEV_AGENT_WRITE];
 export const workflowById = (id: string) => WORKFLOWS.find((w) => w.id === id);
 
 /** Serializable view of a definition for the UI/API (functions and schemas removed). */
@@ -219,6 +252,14 @@ export class WorkflowEngine {
 
   /** Workflow-specific effects, dispatched by tool so a step can only do what its tool allows. */
   private perform(w: WorkflowDefinition, step: StepDefinition, ctx: StepContext) {
+    if (step.tool === 'reminders.create' && w.id === JEV_AGENT_WRITE.id) {
+      const plan = ctx.plan as { args: { title: string }; role: string };
+      const marker = `[run ${ctx.runId.slice(0, 8)}]`;
+      const exists = this.db.prepare('SELECT id FROM mb_reminders WHERE title LIKE ?').get(`%${marker}`) as { id: string } | undefined;
+      if (exists) return { reminderIds: [exists.id] };
+      const rec = this.store.reminder({ title: `${plan.args.title} ${marker}` });
+      return { reminderIds: [rec.id] };
+    }
     if (step.tool === 'reminders.create') {
       const plan = ctx.outputs.scan as LowStockPlan;
       const created: string[] = [];

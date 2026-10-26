@@ -43,7 +43,7 @@ export function GovernedWorkflows() {
         <button className="mb-primary" disabled={busy}>Plan run</button>
       </form>
     </article>}
-    {data && <section aria-label="Runs"><h2>Runs</h2>{!data.runs.length ? <p className="mb-empty">No runs yet.</p> : data.runs.map((r) => <article key={r.id} className="mb-panel mb-run" data-run={r.id} data-status={r.status}>
+    {data && <section aria-label="Runs"><h2>Runs</h2>{!data.runs.filter((r) => r.workflowId === def?.id).length ? <p className="mb-empty">No runs yet.</p> : data.runs.filter((r) => r.workflowId === def?.id).map((r) => <article key={r.id} className="mb-panel mb-run" data-run={r.id} data-status={r.status}>
       <div className="mb-row"><strong>Run {r.id.slice(0, 8)}</strong><span className="mb-badge">{r.status.replace('_', ' ')}</span></div>
       <p className="mb-muted">Threshold {r.plan.threshold}; {r.plan.products.length} product(s) at or below it. Payload <code className="mb-hash">{r.payloadHash.slice(0, 16)}…</code>{r.approvedHash && ' approved'}</p>
       {r.plan.products.length > 0 && <ul>{r.plan.products.map((p) => <li key={p.id}>{p.name} ({p.sku}): {p.stock}</li>)}</ul>}

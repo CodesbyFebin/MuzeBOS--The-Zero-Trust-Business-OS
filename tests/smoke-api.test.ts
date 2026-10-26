@@ -27,6 +27,7 @@ const ROUTES: RouteEntry[] = [
   { route: 'employee-library', load: () => import('@/app/api/employee-library/route'), url: 'http://localhost/api/employee-library' },
   { route: 'mission-control', load: () => import('@/app/api/mission-control/route'), url: 'http://localhost/api/mission-control' },
   { route: 'brain-templates', load: () => import('@/app/api/brain-templates/route'), url: 'http://localhost/api/brain-templates' },
+  { route: 'ai', load: () => import('@/app/api/ai/route'), url: 'http://localhost/api/ai' },
   { route: 'analytics', load: () => import('@/app/api/analytics/route'), url: 'http://localhost/api/analytics' },
   { route: 'evidence', load: () => import('@/app/api/evidence/route'), url: 'http://localhost/api/evidence' },
   { route: 'workflow-runs', load: () => import('@/app/api/workflow-runs/route'), url: 'http://localhost/api/workflow-runs' },
