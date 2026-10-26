@@ -27,6 +27,7 @@ const ROUTES: RouteEntry[] = [
   { route: 'employee-library', load: () => import('@/app/api/employee-library/route'), url: 'http://localhost/api/employee-library' },
   { route: 'mission-control', load: () => import('@/app/api/mission-control/route'), url: 'http://localhost/api/mission-control' },
   { route: 'brain-templates', load: () => import('@/app/api/brain-templates/route'), url: 'http://localhost/api/brain-templates' },
+  { route: 'analytics', load: () => import('@/app/api/analytics/route'), url: 'http://localhost/api/analytics' },
   { route: 'business', load: () => import('@/app/api/business/route'), url: 'http://localhost/api/business' },
   { route: 'agents', load: () => import('@/app/api/agents/route'), url: 'http://localhost/api/agents' },
   // FounderOS merge (fo/data): every new GET answers 200 on a blank install, spending nothing.

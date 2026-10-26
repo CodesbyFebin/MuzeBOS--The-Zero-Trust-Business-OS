@@ -61,6 +61,7 @@ const CLUSTER_NAMES: Record<string, [string, string, string, string]> = {
 /** Pages that already have a dedicated MuzeBOS route keep it as their canonical route. */
 const DEDICATED_ROUTES: Record<number, string> = {
   3: '/workspace/orders/bookings',
+  85: '/workspace/growth/analytics',
   144: '/workspace/brain/employees',
   181: '/workspace/system/sources',
   186: '/workspace/system/webhooks',
@@ -68,6 +69,7 @@ const DEDICATED_ROUTES: Record<number, string> = {
 
 /** Pillars verified since the navigation catalogue was written: the status and scope the tests back. */
 const VERIFIED: Record<number, { status: FeatureStatus; summary: string }> = {
+  85: { status: 'available', summary: 'KPIs, monthly trend, channels, order counts, AOV, date ranges and CSV from local invoices and drafts. Profit, ROAS and cash flow are shown as unavailable with the missing inputs.' },
   186: { status: 'available', summary: 'Signature-verified Meta webhook receiver (WhatsApp, Instagram, Messenger) and its delivery log. Stores events; does not process or reply.' },
 };
 
