@@ -38,6 +38,7 @@ const targets:Record<number,{href:string;status:'available'|'existing';scope:str
  141:{href:'/wizard',status:'existing',scope:'Inherited assistant; provider setup and tool permissions apply.'},
  143:{href:'/business?view=evidence',status:'available',scope:'Commerce hashes and audit events; no passkey assertion or hardware signature yet.'},
  144:{href:'/workspace/brain/employees',status:'available',scope:'Attributed role, routine and founder/onboarding reference documents. No autonomous execution.'},
+ 145:{href:'/workspace/brain/inference',status:'available',scope:'Size-based draft routing, exact-task Jev approval, bounded leases and provider setup status. Live model/device qualification remains separate.'},
  146:{href:'/integrations',status:'existing',scope:'Existing connector directory; do not assume executable MCP access.'},
  147:{href:'/business?view=overview',status:'available',scope:'Graph derived from local customers, products and orders; Faiss is planned.'},
  149:{href:'/business?view=orders',status:'available',scope:'Server-side schema, stock, expiry and payload-hash validation.'},
