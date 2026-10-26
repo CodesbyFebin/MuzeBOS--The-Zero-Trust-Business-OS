@@ -160,10 +160,10 @@ const META_WEBHOOK_STATUS: FeatureDefinition = {
 };
 
 const missionPage: FeatureDefinition = { id: 'mission.overview', menuId: 'mission', clusterId: 'mission.today', label: 'Mission Control', route: '/', status: 'available', dependencies: [], summary: 'Derived pending approvals, unpaid requests, out-of-stock alerts and persisted reminders.' };
-const workflowsPage: FeatureDefinition = { id: 'workflows.canvas', menuId: 'workflows', clusterId: 'workflows.build', label: 'Workflow Canvas', route: '/workflows', status: 'existing', dependencies: [], summary: 'Inherited workflow editor. Execution evidence for MuzeBOS commands is planned (slice 7).' };
+const workflowsPage: FeatureDefinition = { id: 'workflows.canvas', menuId: 'workflows', clusterId: 'workflows.build', label: 'Workflow Canvas', route: '/workflows', status: 'existing', dependencies: [], summary: 'Inherited canvas editor (does not execute runs). Governed workflow runs (low-stock to reminder) with approval gates, retry, cancel and evidence live at /workflows?view=governed.' };
 const evidencePages: FeatureDefinition[] = [
   { id: 'evidence.commerce-ledger', menuId: 'evidence', clusterId: 'evidence.ledger', label: 'Commerce Evidence Ledger', route: '/workspace/evidence/commerce-ledger', target: '/business?view=evidence', status: 'available', dependencies: [], summary: 'Local commerce audit events, payload hashes and hash-chain verification.' },
-  { id: 'evidence.workflow-runs', menuId: 'evidence', clusterId: 'evidence.ledger', label: 'Workflow Run Evidence', route: '/workspace/evidence/workflow-runs', status: 'planned', dependencies: ['Slice 7: workflow execution and evidence'], summary: 'Per-run evidence for workflow executions. Not implemented.' },
+  { id: 'evidence.workflow-runs', menuId: 'evidence', clusterId: 'evidence.ledger', label: 'Workflow Run Evidence', route: '/workspace/evidence/workflow-runs', target: '/workspace/evidence?entity=workflow+run', status: 'available', dependencies: [], summary: 'Run, step, approval and tool-decision events from the governed workflow engine, filterable and exportable in the evidence explorer.' },
 ];
 
 const cat = (id: string) => WORKSPACE_CATEGORIES.find((c) => c.id === id)!;

@@ -95,7 +95,19 @@ export class BusinessStore {
       CREATE TABLE IF NOT EXISTS mb_brain_drafts(id TEXT PRIMARY KEY, templateId TEXT NOT NULL, title TEXT NOT NULL, body TEXT NOT NULL, role TEXT NOT NULL, status TEXT NOT NULL CHECK(status='draft'), createdAt TEXT NOT NULL);
       INSERT OR IGNORE INTO mb_migrations VALUES(7, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
     `);
+    // v9: durable workflow runs (see lib/muzebos/workflows.ts). Steps and events are append/update only via the engine.
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS mb_workflow_runs(id TEXT PRIMARY KEY, workflowId TEXT NOT NULL, version INTEGER NOT NULL, status TEXT NOT NULL CHECK(status IN ('awaiting_approval','running','failed','succeeded','cancelled','compensated','timed_out')), input TEXT NOT NULL, payloadHash TEXT NOT NULL, idempotencyKey TEXT NOT NULL, error TEXT, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL, deadlineAt TEXT NOT NULL, UNIQUE(workflowId, idempotencyKey));
+      CREATE TABLE IF NOT EXISTS mb_workflow_steps(runId TEXT NOT NULL REFERENCES mb_workflow_runs(id), stepId TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('pending','succeeded','failed','compensated')), attempts INTEGER NOT NULL DEFAULT 0, output TEXT, error TEXT, updatedAt TEXT NOT NULL, PRIMARY KEY(runId, stepId));
+      CREATE TABLE IF NOT EXISTS mb_workflow_events(seq INTEGER PRIMARY KEY AUTOINCREMENT, runId TEXT NOT NULL REFERENCES mb_workflow_runs(id), stepId TEXT, type TEXT NOT NULL, detail TEXT NOT NULL, createdAt TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS mb_workflow_approvals(runId TEXT PRIMARY KEY REFERENCES mb_workflow_runs(id), payloadHash TEXT NOT NULL, approvedAt TEXT NOT NULL);
+      CREATE INDEX IF NOT EXISTS mb_workflow_events_run ON mb_workflow_events(runId, seq);
+      INSERT OR IGNORE INTO mb_migrations VALUES(9, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
+    `);
   }
+  /** Engine hooks: run work in one IMMEDIATE transaction / append a hash-chained evidence event. */
+  transact<T>(work: () => T): T { return this.atomic(work); }
+  appendEvidence(action: string, target: string, detail: string) { this.audit(action, target, detail); }
   close() { this.db.close(); }
   /** Persist one signature-verified webhook delivery. Each event key is recorded once per
    *  source, so a retried batch only adds the events not seen before. Written (and audited)
