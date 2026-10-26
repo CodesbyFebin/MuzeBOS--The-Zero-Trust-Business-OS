@@ -286,3 +286,21 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .ai-runtime code { overflow-wrap:anywhere; }
 .ai-runtime>.mb-panel { margin-top:16px; }
 @media(max-width:800px) { .ai-runtime .ai-grid { grid-template-columns:1fr; }.ai-runtime .ai-grid>section:first-child { grid-row:auto; } }
+
+/* Declarative module workspaces (slice 8) */
+.mb-module .mb-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;align-items:end}
+.mb-module .mb-field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mb-muted)}
+.mb-module .mb-field input,.mb-module .mb-field select,.mb-module .mb-field textarea,.mb-module td input,.mb-module select,.mb-module .mb-lines input{background:var(--mb-raised);color:var(--mb-text);border:1px solid var(--mb-line);border-radius:6px;padding:6px 8px;min-width:0}
+.mb-module .mb-lines{grid-column:1/-1;border:1px solid var(--mb-line);border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.mb-module .mb-check{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mb-text)}
+.mb-module .mb-form .mb-actions{grid-column:1/-1}
+.mb-module button{background:var(--mb-raised);color:var(--mb-text);border:1px solid var(--mb-line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.mb-module button.mb-primary{background:var(--mb-accent);border-color:var(--mb-accent)}
+.mb-module button.mb-danger{border-color:var(--mb-danger);color:var(--mb-danger)}
+.mb-module button:disabled{opacity:.5;cursor:not-allowed}
+.mb-module .mb-alert-error{border-color:var(--mb-danger);color:var(--mb-danger)}
+.mb-module .mb-stats{display:flex;flex-wrap:wrap;gap:20px}
+.mb-module .mb-stats>div{display:flex;flex-direction:column;gap:2px}
+.mb-module .mb-table-wrap{overflow-x:auto}
+.mb-module td{vertical-align:top;font-size:12px}
+@media (max-width:640px){.mb-module .mb-form{grid-template-columns:1fr}}
