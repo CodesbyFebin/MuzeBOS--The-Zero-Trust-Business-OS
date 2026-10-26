@@ -136,7 +136,9 @@ export function perform(store: BusinessStore, moduleId: string, raw: unknown): M
       if (!t.from.includes(cur.status)) throw new BusinessError(`Cannot ${t.label.toLowerCase()} a ${def.noun} in state ${cur.status}`, 409);
       const input = t.inputs ? parseOr422(dataSchema(t.inputs.map((f) => ({ ...f, system: false }))), act.input) as Record<string, unknown> : {};
       const patch = hooks?.transition?.(store, cur, act.transition, input) ?? {};
-      status = patch.status ?? t.to; data = { ...cur.data, ...patch.data };
+      // Inputs named after a system field are recorded on the record (e.g. a root cause or payment reference).
+      const recorded = Object.fromEntries(Object.entries(input).filter(([k]) => def.fields.some((f) => f.system && f.name === k)));
+      status = patch.status ?? t.to; data = { ...cur.data, ...recorded, ...patch.data };
       detail = `${act.transition}: ${cur.status} -> ${status}`;
     }
     const version = cur.version + 1;
