@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { BRAND } from '@/lib/brand';
 import { workspaceTitle } from '@/lib/muzebos/navigation';
+import { MuzeTopbar } from '@/components/muzebos/MuzeTopbar';
 import { WizardIcon } from '@/lib/nav';
 import { GButton } from '@/components/g';
 import type { UiStyle } from '@/lib/appearance';
@@ -56,6 +57,8 @@ export function Topbar({ ui = 'classic' }: { ui?: UiStyle } = {}) {
     return () => window.removeEventListener('scroll', onScroll);
   }, [g]);
   const toggleDock = () => window.dispatchEvent(new CustomEvent(CONDUCTOR_TOGGLE_EVENT));
+
+  if (BRAND.id === 'muzebos') return <MuzeTopbar onSearch={openPalette} />;
 
   if (g) {
     // GTopbar (S00 §5.5): sans breadcrumb, kit icon buttons, no AdPilot accent override (C30)

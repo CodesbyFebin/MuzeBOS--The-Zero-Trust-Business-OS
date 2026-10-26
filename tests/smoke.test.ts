@@ -49,6 +49,7 @@ const PAGES: PageEntry[] = [
   { file: 'workspace/system/sources/page.tsx', load: () => import('@/app/workspace/system/sources/page') },
   { file: 'page.tsx', load: () => import('@/app/page') },
   { file: 'workspace/[section]/page.tsx', load: () => import('@/app/workspace/[section]/page'), props: {params:{section:'orders'}} },
+  { file: 'workspace/[section]/[page]/page.tsx', load: () => import('@/app/workspace/[section]/[page]/page'), props: {params:{section:'stock', page:'barcode-and-qr-generator'}} },
   { file: 'business/page.tsx', load: () => import('@/app/business/page') },
   { file: 'brand-deals/page.tsx', load: () => import('@/app/brand-deals/page') },
   // fo/clients (founderos-ui pages/clients.md, lead-magnets.md)
