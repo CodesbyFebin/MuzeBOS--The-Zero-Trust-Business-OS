@@ -1,115 +1,127 @@
-# MuzeBOS hackathon contribution disclosure
+# MuzeBOS at the Meta Global AI Developer Hackathon (Oct 26 to Nov 4, 2026)
 
-**Submission candidate, not a statement of eligibility or acceptance.** This
-project extends an existing product. Track selection and permission to build on
-an existing product must be confirmed with the organizers before submission.
-Do not submit it as a wholly new codebase or call every existing feature event work.
+**Theme:** Build for Your World. **Track:** Indie developer (solo).
+**One line:** a zero-trust business OS for solo founders. Meta models do the
+thinking, and nothing they propose touches your books until you approve the
+exact payload.
 
-## Frozen pre-event baseline
+## Problem
 
-Everything reachable from `1105e64ca6c6791170e619d9f446c81b9e6aec22` is pre-event
-work for this submission. That commit is dated 2026-10-26 (14:05:01 UTC).
-Its tree is `1820a253be4ea5f91a50d650954ae0b460331816`.
-The participant guide supplied by the founder describes an October 27–November 4
-build period. We use this conservative boundary even though the public event
-page describes an October 26 kickoff. Git timestamps alone are not independent
-proof of when work was performed; reviewers can inspect the actual diff.
+A solo founder runs sales, invoicing, stock, follow-ups and support alone.
+AI assistants can draft all of that, but handing an LLM write access to
+invoices and inventory is a risk most founders won't take, so the work stays
+manual. MuzeBOS lets Meta models plan and propose operations work. A
+deterministic gate called **Jev** makes sure every write waits for a human who
+approves the canonical hash of the exact proposal. If the payload is changed,
+the hash no longer matches and the write is refused. There is no auto-approve
+path.
 
-```sh
-git show 1105e64ca6c6791170e619d9f446c81b9e6aec22 --stat
-git diff --stat 1105e64ca6c6791170e619d9f446c81b9e6aec22...HEAD
-git diff 1105e64ca6c6791170e619d9f446c81b9e6aec22...HEAD -- lib/muzebos/inference
+## What was built during the hackathon vs. inherited (read this first)
+
+The hackathon began at the kickoff on **Mon Oct 26, 12:00 PM ET (16:00 UTC)**.
+The schedule lists the building period as Oct 27 to Nov 4. The commit dates
+below are taken from `git log`.
+
+| Range | Dates (UTC) | Origin | Contents |
+| --- | --- | --- | --- |
+| `fb4a953`..`0362e27` | Oct 25 12:36 to 17:50 | **Inherited / pre-event** | FounderOS fork (MIT, see `LICENSE`, `THIRD_PARTY_NOTICES.md`, `founderos/`), MuzeBOS reference UI, local commerce desk, 18-section navigation, 29 reviewed upstream sources |
+| `c722dbe`..`9daa66b` (PRs #3 to #20) | Oct 25 23:54 to Oct 26 12:16 | **Pre-event** (all committed before the 16:00 UTC kickoff) | Feature registry, Meta webhook receiver, Mission Control, payload-bound approvals and atomic issuance, Brain templates, analytics, workflows and evidence, AI runtime (tier router, swarm sorter, Jev gate), module engine, provider and infra pages, 220-route crawl |
+| `feat/hackathon-submission` (this PR) | Oct 27 onward | **Built during the hackathon** | Items listed below |
+
+Per the rules, the demo shows **only the rows marked built during the
+hackathon**. Pre-event screens may appear briefly as context and are labelled
+that way.
+
+### Built during the hackathon
+
+1. `lib/muzebos/ai/meta.ts` contains the Meta Model API adapters:
+   - Muse Spark (`muse-spark-1.3`) and Muse Wonder (`muse-wonder-1.0`) over the
+     OpenAI-compatible `POST https://api.meta.ai/v1/chat/completions`.
+   - Muse Image (`muse-image-1.0`, `POST /v1/images/generations`).
+   - Muse Voice Transcribe (`muse-voice-transcribe-1.0`, `POST /v1/asr/transcribe`).
+   - A Baseten adapter for open-weight **Muse Spark Open** (`meta-models/muse-spark-open-1026`,
+     `https://inference.baseten.co/v1`).
+2. `lib/muzebos/ai/ops-agent.ts` is the agentic ops flow:
+   - The swarm splits one messy founder request into subtasks.
+   - Write-like subtasks go to Muse Spark (small/medium tier), Muse Wonder
+     (large tier) or Muse Spark Open on Baseten.
+   - Model output is parsed as untrusted JSON against a strict schema.
+   - Valid proposals are filed with Jev, and nothing executes.
+3. `scripts/hackathon-demo.ts` (`npm run demo:agent`) runs that flow from the
+   CLI. It calls the models live when a key is set. Otherwise it runs in a
+   labelled `rule` mode and makes no model call.
+4. `tests/hackathon-meta.test.ts` has 8 tests with mocked fetch. They cover the
+   endpoints and model ids, the key alias, the Baseten id, Wonder/Spark routing,
+   refusal of unlisted tools, and the no-key rule mode.
+5. This file, the README judge section, and `docs/hackathon/*`: the demo
+   script, X post and submission field drafts.
+
+## Meta models: where and how
+
+The ids and endpoints come from https://dev.meta.ai/docs/models,
+https://dev.meta.ai/docs/protocols/chat-completions and the Baseten Muse Spark
+Open docs, all read on 2026-10-27.
+
+| Model | Id | Endpoint | Used for in MuzeBOS | Status |
+| --- | --- | --- | --- | --- |
+| Muse Spark 1.3 | `muse-spark-1.3` | `api.meta.ai/v1/chat/completions` | Small and medium subtasks in the ops agent | Code and mocked tests. **No live call made yet** |
+| Muse Wonder | `muse-wonder-1.0` | same | Large, multi-step planning subtasks | Same |
+| Muse Spark Open (open weights) | `meta-models/muse-spark-open-1026` | Baseten `inference.baseten.co/v1/chat/completions` | Alternative engine (`--baseten`), aimed at the open-weight bonus | Same |
+| Muse Image | `muse-image-1.0` | `/v1/images/generations` | Adapter only (planned: product image drafts) | Response shape assumed OpenAI-style, unverified |
+| Muse Voice Transcribe | `muse-voice-transcribe-1.0` | `/v1/asr/transcribe` | Adapter only (planned: voice memo to ops request) | Form field names unverified |
+| SAM 3.1 | `sam-3.1` | `/v1/responses` | Not used yet | Not implemented |
+| Muse Glimmer | open weights, self-host | vLLM/llama.cpp via `MUZEBOS_LOCAL_OPENAI_BASE_URL` (pre-event local provider) | Possible local engine | Not tested |
+
+## Architecture
+
+```
+founder request ──► swarm sortTask (deterministic split, role + tier)
+                     │ write-like subtasks only
+                     ▼
+        tier router: small/medium ─► Muse Spark 1.3      (Meta Model API)
+                     large ────────► Muse Wonder 1.0     (Meta Model API)
+                     --baseten ────► Muse Spark Open 1026 (Baseten)
+                     ▼
+        parseModelProposal: first JSON object, strict zod schema,
+        tool allow-list (reminders.create only); task/role/model fixed by caller
+                     ▼
+        Jev gate: workflow run, approval bound to canonical payload hash
+                     ▼
+        human approves in Brain → one write, evidence logged; else nothing
 ```
 
-| Origin | Scope | Submission treatment |
-| --- | --- | --- |
-| FounderOS/GladOS inherited source | Existing Next.js workspace, Brain/chat and integration foundations; original copyright retained in `LICENSE` | Inherited, not event-built. Initial MuzeBOS history already contains this source; a pristine separately pinned FounderOS import was not supplied, so no unsupported line-by-line authorship claim is made |
-| Pre-event MuzeBOS development | Entire frozen baseline: 18-destination shell, business records, invoice/stock transactions, evidence, Jev/workflow engine, browser/local/Meta Wonder/OpenRouter inference, worker leases, bounded delegation, reference imports and public docs | Existing product, not claimed as new hackathon functionality |
-| Other upstream material | Precisely scoped imports and references in `THIRD_PARTY_NOTICES.md` and `docs/MUZEBOS-UPSTREAM-INTEGRATIONS.md` | Their notices and restrictions remain; not represented as original or as 29 integrated services |
-| New submission-PR delta, October 27 | Baseten Muse Spark Open transport/routing; allowlisted Meta Spark selection; provider-response rejection checks; completed-server-output → Jev reminder proposal handoff; interface controls; bounded demo runner, tests and submission materials | Only this diff is claimed as event work, subject to organizer track/rule confirmation |
+## How to run
 
-The initial #22 head `2db8d32bba207565efe095abd5394f9241511b99` is also
-part of the event contribution, not the frozen pre-event baseline. Its model
-constants, operations sorter and form/video drafts are retained or revised here.
-The original key-presence-triggered API runner is replaced by the approved-lease
-path; unqualified image/voice sketches are disabled until their contracts and
-approval bridge are verified. This is a hardening of #22, not a second entry.
-
-## New work and reproducibility
-
-- `lib/muzebos/inference/routing.ts`, `types.ts`, `store.ts`: add the Baseten lane
-  and Meta Spark configuration while retaining the prior routing and approval core.
-- `providers.ts`: Baseten transport on its fixed HTTPS origin, with no redirect,
-  tool call, legacy function call or truncated-output acceptance. The existing Meta
-  transport is extended, not presented as newly invented.
-- `jev-bridge.ts`: completed Meta/Baseten drafts with matching payload and output
-  hashes can propose **one local reminder**. Strict JSON validation is performed
-  locally; model structured-output enforcement is not assumed. The proposal is
-  bound to source hashes and awaits a **separate** exact-payload approval in the
-  existing Jev workflow engine. Repeating it returns the same workflow run.
-- `app/api/inference/route.ts`, `InferenceWorkspace.tsx`: protected proposal command,
-  Baseten route selector and a handoff to the existing governed-workflow desk.
-- `lib/muzebos/ai/ops-agent.ts`: preserves the request sorter as a bounded draft-only
-  intake. Key presence never dispatches calls; each task awaits Jev. Selected
-  workspace model is explicit; no mixed-model live-swarm claim.
-- `scripts/hackathon-demo.ts`: isolated synthetic-business demonstration, two gates
-  per provider, at most one API request per provider per invocation, no retries or
-  paid fallback. It never sends money, issues invoices, publishes or messages people.
-- `tests/muzebos-hackathon.test.ts` and related qualification: protocol fixtures,
-  approval boundaries, provenance tampering, refusal and replay tests.
-
-## What is actually verified?
-
-Read [qualification](docs/hackathon/VERIFICATION.md) for measured checks. **No live
-Meta or Baseten call is claimed by this PR.** The real HTTPS adapters exist, but
-credentials, access to the event model and billing readiness require a live test.
-A fixture report is not evidence of model inference or Meta-credit usage.
-
-| Route | Exact model in this demo | Evidence boundary |
-| --- | --- | --- |
-| Meta Model API | `muse-spark-1.3` | Documented API; fixture-tested locally, live account execution unverified |
-| Baseten Inference | `meta-models/muse-spark-open-1026` | Exact ID in supplied participant guide; live availability unverified, no silent replacement with a different slug |
-| Existing Meta default | `muse-wonder-1.0` | Pre-event adapter retained; not Wonder Full and not new event work |
-
-All model calls and business effects **in the submission demo path** pass the
-existing Jev approval mechanism. This is not a claim that every legacy route in
-the inherited application uses this new pipeline. Inference is draft-only; the
-new handoff grants no arbitrary tool, shell, payment, invoice or messaging scope.
-Approvals use the existing single-operator trust boundary, not new WebAuthn or
-multi-tenant authorization. The local chain is unanchored and is not a zk proof.
-
-## Judge entry point
-
-Start with [the judge guide](docs/hackathon/JUDGES.md), then
-[the demo runbook and timed script](docs/hackathon/DEMO.md).
-An offline fixture walkthrough is reproducible without keys:
-
-```sh
-npm ci
-npm run hackathon:demo -- --fixture both
+```bash
+npm install
+npm run demo:agent                       # no key: labelled rule mode, no model call
+META_MODEL_API_KEY=... npm run demo:agent  # live Muse Spark / Wonder
+BASETEN_API_KEY=... npm run demo:agent -- --baseten   # live Muse Spark Open
+npm run dev                              # UI; Jev queue at /workspace/brain/runtime
+npx vitest run tests/hackathon-meta.test.ts
 ```
 
-The generated report is explicitly `evidenceMode: fixture`. Only after configuring
-credentials and provider-side spending controls should the founder run interactive
-`--live` mode, review exact hashes and assess the resulting live evidence. A
-provider credit notification is not a hard dollar cap.
+## Honest limitations
 
-## Rules, sources and founder-owned steps
+- **No live Meta model call has been made from this repo yet.** The build box
+  has no key. The demo video must be recorded after a live run.
+- Jev can only approve `reminders.create`. Invoices are still issued through
+  the pre-event human approval desk, not by agents.
+- The Muse Image and Voice Transcribe adapters are not wired to the UI, and
+  their request/response shapes are unverified. SAM 3.1 is not used.
+- Single-operator local preview: no rate limiter, unencrypted SQLite, nothing
+  sent to external messaging providers.
+- This is not certified as zero-trust or production-ready. "Zero-trust" is the
+  design goal: models are untrusted and every write needs a human-approved
+  hash.
 
-The founder supplied a participant-guide attachment on October 27, 2026. It is
-context, not an independently authenticated copy of all binding rules. Confirm
-latest eligibility, track, build period, team and submission requirements at:
+## Built during the event: batch 2 (stacked PR #23)
 
-- [Meta event page](https://dev.meta.ai/events/global-hackathon)
-- [Cerebral Valley event details](https://cerebralvalley.ai/e/meta-ai-developer-hackathon/details)
-- [Meta API quickstart](https://dev.meta.ai/docs/quickstart)
-- [Baseten model API overview](https://docs.baseten.co/inference/model-apis/overview)
-- [Baseten reasoning behavior](https://docs.baseten.co/inference/model-apis/reasoning)
+These features were written clean-room during the hackathon. They are based on product behaviour we observed in public docs and sites. No code or assets were copied. See docs/hackathon/COMPETITORS.md.
 
-The public repo and earlier stacked PR merges are already complete. The new
-submission PR is #22; its final tested revision is reviewed separately. The founder must claim their own credits,
-confirm model access and spending controls, record an honest ≤3-minute video,
-list all actual contributors, confirm the permitted track and submit on Cerebral
-Valley. The X post is a draft only. No judging score, prize, eligibility, compliance,
-24/7 uptime, native-mobile capability, physical WebGPU execution or zkVM operation
-is promised. No claim that the application is entirely Meta open source is made.
+| Feature | Inspired by (observed behaviour) | Files |
+|---|---|---|
+| Lead and worker missions. Every mission starts from a rule plan. It also files one Muse Wonder lead-plan draft. That draft needs Jev approval, and once it completes its plan can be adopted. Each ready write subtask files a Muse Spark or Baseten worker draft, which also needs approval. When an approved worker draft completes, it becomes a reminders.create proposal, and that proposal needs a second approval. A dependent task wakes only after its prerequisites finish, and is cancelled if one of them fails. No model is called directly. | desplega-ai/agent-swarm (MIT) | lib/muzebos/ai/lead.ts, app/api/muzebos/missions/route.ts, components/muzebos/MissionsBoard.tsx, /workspace/brain/missions |
+| Goals with linked projects and check-ins. A rule check-in draft is computed from the numbers alone. A Muse Spark draft is filed as a gated inference task and parsed strictly. No draft is saved until a human posts it. | Operately (Apache-2.0 core) | lib/muzebos/goals.ts, app/api/muzebos/goals/route.ts, components/muzebos/GoalsBoard.tsx, /workspace/brain/goals |
+
+Tests: tests/hackathon-missions-goals.test.ts (8 tests). They use injected protocol fixtures only; no live Meta call has been made yet.
