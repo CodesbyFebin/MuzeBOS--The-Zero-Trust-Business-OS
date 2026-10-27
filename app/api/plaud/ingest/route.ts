@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { authorizePush } from '@/lib/push-auth';
@@ -16,7 +17,7 @@ export const runtime = 'nodejs';
 export async function POST(req: Request) {
   const auth = authorizePush(req, 'PLAUD_INGEST_TOKEN');
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
-  const parsed = PlaudIngestSchema.safeParse(await req.json().catch(() => null));
+  const parsed = PlaudIngestSchema.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'invalid ingest', issues: parsed.error.flatten() }, { status: 400 });
   const repo = getDb().callRecordings;
   const ids = parsed.data.recordings.map((r) => repo.upsert({ ...r, source: 'plaud' }).id);

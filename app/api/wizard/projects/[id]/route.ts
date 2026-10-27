@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { deleteProject, readProject, setTaskState, updateProject } from '@/lib/wizard/store';
@@ -19,7 +20,7 @@ const PatchSchema = z.object({
 
 export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const parsed = PatchSchema.safeParse(await request.json().catch(() => null));
+  const parsed = PatchSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: 'invalid patch' }, { status: 400 });
   const { task, ...rest } = parsed.data;
   let project = Object.keys(rest).length ? updateProject(params.id, rest) : readProject(params.id);

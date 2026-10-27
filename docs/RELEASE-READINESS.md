@@ -29,7 +29,7 @@ Written on 2026-10-28 (IST) **before** changes on branch `fix/release-readiness`
 | Gate | Status | Evidence |
 |---|---|---|
 | 1 Approval journey | PASS (local fixture) | `tests/release-gate1-approval.test.ts` 7/7 (approve, then exactly one reminder; reject; expiry; changed or tampered proposal; refused tool; cross-DB). Browser: `npm run test:qualify-browser` exit 0 includes "separate Jev approval link", "approval before reminder execution", "durable approved reminder" and "Jev hash link reload". |
-| 2 Dependencies | FAIL (1 high open, documented) | Audit went from 12 findings to 1 (zod GHSA-mrhx-c7xc-m3w5), with a mitigation in place. See docs/SECURITY-TRIAGE.md. |
+| 2 Dependencies | PASS (scan) | `npm audit --omit=dev` exit 0, 0 vulnerabilities after zod 4.6.7 (fix/zod4). Array bounds and streaming body cap tested. See docs/SECURITY-TRIAGE.md. A clean scan is not proof of a secure deployment. |
 | 3 Overdue-invoice workflow | FAIL (not built yet) | Still open. With no model key on the box it would also be BLOCKED for a live run. |
 | 4 Event and eligibility | UNCONFIRMED | Official page: https://dev.meta.ai/events/global-hackathon (submissions due Nov 4, 9:00 PM ET; Indie and Startup tracks). Existing-codebase eligibility is UNCONFIRMED. Question for the organizers: "May a project submitted to the Meta Global AI Developer Hackathon build on a codebase that existed before Oct 26, 2026, provided the Meta-model work done during the event is identified in the submission?" |
 
@@ -49,6 +49,9 @@ Gate 4 checklist: [ ] track chosen  [ ] demo video recorded  [ ] submission rece
 The 8 skipped tests are not counted as passing. Mocked or fixture-backed: the browser Jev journey uses a fixture inference server (`scripts/muzebos-jev-browser-fixture.ts`), and no paid model or provider was called. No HTTP smoke script is configured beyond the crawl.
 
 ### Verdict
-**NOT READY.** Gate 2 has one high finding still open, Gate 3 is not built, and Gate 4 eligibility is unconfirmed.
+**NOT READY.** Gate 3 is not built, and Gate 4 eligibility is unconfirmed.
 
 No defensible numeric score available.
+
+### CI for #30 (Node 22, GitHub Actions)
+Both `test` jobs passed (runs 40598410733 and 40598416214): `npm ci`, typecheck, test, build.

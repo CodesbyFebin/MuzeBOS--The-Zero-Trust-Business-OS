@@ -4,7 +4,7 @@ import { runtimeEnv } from '@/lib/creds';
 import { BusinessError } from '@/lib/muzebos/store';
 import { InferenceStore } from './store';
 import type { InferencePayload, Route } from './types';
-const responseSchema = z.object({ choices: z.array(z.object({ message: z.object({ content: z.string().min(1).max(100000), tool_calls: z.array(z.unknown()).optional(), function_call: z.unknown().optional() }), finish_reason: z.string().nullable().optional() })).min(1), usage: z.object({ prompt_tokens: z.number().int().min(0).max(1_000_000).optional(), completion_tokens: z.number().int().min(0).max(1_000_000).optional() }).optional() });
+const responseSchema = z.object({ choices: z.array(z.object({ message: z.object({ content: z.string().min(1).max(100000), tool_calls: z.array(z.unknown()).optional(), function_call: z.unknown().optional() }), finish_reason: z.string().nullable().optional() })).min(1).max(1000), usage: z.object({ prompt_tokens: z.number().int().min(0).max(1_000_000).optional(), completion_tokens: z.number().int().min(0).max(1_000_000).optional() }).optional() });
 export { validLocalEndpoint } from './endpoint';
 import { validLocalEndpoint } from './endpoint';
 export async function callTextProvider(payload: InferencePayload, route: Route, env: Record<string, string | undefined> = runtimeEnv(), fetcher: typeof fetch = fetch) {

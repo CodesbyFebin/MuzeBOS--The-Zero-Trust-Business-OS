@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { runClaude } from '@/app/api/workflows/draft/logic';
@@ -24,7 +25,7 @@ const RefineRequestSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const parsed = RefineRequestSchema.safeParse(await request.json().catch(() => null));
+  const parsed = RefineRequestSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: 'a prompt and model are required' }, { status: 400 });
   }

@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createWorkflow, readCampaign, readWorkflows } from '@/lib/creative-engine/store';
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
 const Body = z.object({ campaignId: z.string(), name: z.string().min(1).max(80).default('New workflow'), template: z.string().optional() });
 
 export async function POST(request: Request) {
-  const parsed = Body.safeParse(await request.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const campaign = readCampaign(parsed.data.campaignId);
   if (!campaign) return NextResponse.json({ ok: false, error: 'campaign not found' }, { status: 404 });

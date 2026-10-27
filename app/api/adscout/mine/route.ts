@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createForeplayClient } from '@/lib/foreplay/client';
@@ -43,7 +44,7 @@ async function expandProbes(concept: string): Promise<{ probes: string[]; expand
 }
 
 export async function POST(request: Request) {
-  const parsed = MineRequestSchema.safeParse(await request.json().catch(() => null));
+  const parsed = MineRequestSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: 'a concept (3-300 chars) is required' }, { status: 400 });
   }

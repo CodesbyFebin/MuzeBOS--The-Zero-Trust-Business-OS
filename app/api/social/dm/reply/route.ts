@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getDb } from '@/lib/data';
@@ -18,7 +19,7 @@ const ReplySchema = z.object({
  * a reply that didn't actually go out.
  */
 export async function POST(request: Request): Promise<Response> {
-  const parsed = ReplySchema.safeParse(await request.json().catch(() => null));
+  const parsed = ReplySchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.flatten() }, { status: 400 });
   }

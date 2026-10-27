@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { BRAND } from '@/lib/brand';
 import { getDb } from '@/lib/data';
@@ -24,7 +25,7 @@ const SYSTEM = [
 export async function POST(req: Request) {
   let body: { question?: unknown; selected?: unknown };
   try {
-    body = (await req.json()) as typeof body;
+    body = (await readJsonBounded(req)) as typeof body;
   } catch {
     return NextResponse.json({ ok: false, error: 'bad json' }, { status: 400 });
   }

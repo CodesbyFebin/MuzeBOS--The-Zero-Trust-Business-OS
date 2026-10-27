@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getDb } from '@/lib/data';
@@ -11,7 +12,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const parsed = ContactTagSchema.safeParse(await request.json().catch(() => null));
+  const parsed = ContactTagSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
 const RemoveSchema = z.object({ person: z.string().min(1), channel: z.string().min(1) });
 
 export async function DELETE(request: Request) {
-  const parsed = RemoveSchema.safeParse(await request.json().catch(() => null));
+  const parsed = RemoveSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

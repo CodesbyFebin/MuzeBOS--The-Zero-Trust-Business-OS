@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { realAgents } from '@/lib/agents/real';
@@ -12,7 +13,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
   let message = '';
   let screenContext: string | undefined;
   try {
-    const body = (await req.json()) as { message?: unknown; context?: unknown };
+    const body = (await readJsonBounded(req)) as { message?: unknown; context?: unknown };
     message = typeof body.message === 'string' ? body.message.trim() : '';
     screenContext = typeof body.context === 'string' && body.context.trim() ? body.context.slice(0, 4000) : undefined;
   } catch {

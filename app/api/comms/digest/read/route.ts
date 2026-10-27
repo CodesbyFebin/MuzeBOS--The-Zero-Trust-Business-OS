@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getDb } from '@/lib/data';
@@ -11,7 +12,7 @@ const Body = z.object({ digestId: z.string().min(1), entryKey: z.string().max(40
 
 /** POST marks read; DELETE is the undo. Local writes only. */
 export async function POST(req: Request) {
-  const parsed = Body.safeParse(await req.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'digestId required' }, { status: 400 });
   const db = getDb();
   if (!db.commsDigests.get(parsed.data.digestId)) return NextResponse.json({ error: 'unknown digest' }, { status: 404 });
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const parsed = Body.safeParse(await req.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'digestId required' }, { status: 400 });
   getDb().commsDigests.reads.unmark(parsed.data.digestId, parsed.data.entryKey ?? '');
   return NextResponse.json({ ok: true });

@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { isConfirmed } from '@/lib/gates';
@@ -30,7 +31,7 @@ export async function PATCH(req: Request) {
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
   if (auth.via === 'token') return NextResponse.json({ error: 'limits are changed by the operator only' }, { status: 403 });
 
-  const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
+  const body = (await readJsonBounded(req).catch(() => null)) as Record<string, unknown> | null;
   if (!body || typeof body !== 'object') return NextResponse.json({ error: 'JSON body required' }, { status: 400 });
 
   const t = getDb().trading;

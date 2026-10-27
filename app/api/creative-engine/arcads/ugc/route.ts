@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { CapError, submitUgc } from '@/lib/creative-engine/generate';
@@ -11,7 +12,7 @@ export const maxDuration = 120;
 const Body = z.object({ campaignId: z.string(), scriptId: z.string(), situationId: z.string(), voiceId: z.string().nullable().optional(), productId: z.string().nullable().optional(), override: z.boolean().optional() });
 
 export async function POST(request: Request) {
-  const parsed = Body.safeParse(await request.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const campaign = readCampaign(parsed.data.campaignId);
   if (!campaign) return NextResponse.json({ ok: false, error: 'campaign not found' }, { status: 404 });

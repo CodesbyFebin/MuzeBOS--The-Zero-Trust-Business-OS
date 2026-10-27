@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
@@ -17,7 +18,7 @@ const Body = z.object({
  * starting it in Superset is a separate, gated POST (…/[id]/launch).
  */
 export async function POST(req: Request) {
-  const parsed = Body.safeParse(await req.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'clientId and brief are required', issues: parsed.error.flatten() }, { status: 400 });
   const db = getDb();
   if (!db.clientConfirmations.get(parsed.data.clientId)) {

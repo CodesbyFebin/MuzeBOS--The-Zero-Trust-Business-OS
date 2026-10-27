@@ -18,7 +18,7 @@ export const runtime = 'nodejs';
 
 const RunSchema = z.object({
   /** Limit to these platforms; default every platform with an active source that is due. */
-  platforms: z.array(LabPlatformSchema).optional(),
+  platforms: z.array(LabPlatformSchema).max(1000).optional(),
   /** Pass the monthly cap once (the SpendGate's second confirm). */
   override: z.boolean().optional(),
   /** Answer what would run (actors, handles, item ceilings, this month's spend) without starting anything. */

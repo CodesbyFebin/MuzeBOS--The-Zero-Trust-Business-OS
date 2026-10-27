@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { WorkflowSchema, type Workflow } from '@/lib/schemas';
@@ -16,7 +17,7 @@ export async function PATCH(request: Request, props: { params: Promise<{ id: str
   const existing = db.workflows.get(params.id);
   if (!existing) return NextResponse.json({ error: `unknown workflow: ${params.id}` }, { status: 404 });
 
-  const parsed = WorkflowInputSchema.safeParse(await request.json().catch(() => null));
+  const parsed = WorkflowInputSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const workflow: Workflow = {

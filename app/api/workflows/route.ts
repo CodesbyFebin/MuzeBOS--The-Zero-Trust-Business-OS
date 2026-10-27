@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
@@ -17,7 +18,7 @@ export async function GET() {
  *  existing row — always inserts a fresh id — so a double-submit at worst
  *  creates two workflows, never corrupts one. */
 export async function POST(request: Request) {
-  const parsed = WorkflowInputSchema.safeParse(await request.json().catch(() => null));
+  const parsed = WorkflowInputSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const db = getDb();

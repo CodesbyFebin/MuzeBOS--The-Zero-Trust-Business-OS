@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import {
@@ -52,7 +53,7 @@ export async function GET() {
  * link second, as two calls, so a failed link never recreates the content.
  */
 export async function POST(req: Request) {
-  const body = await req.json().catch(() => null);
+  const body = await readJsonBounded(req).catch(() => null);
   const refused = gateResponse('GLADOS_WRITES', body);
   if (refused) return refused;
   if (!trakyoKey()) return NextResponse.json({ error: 'Trakyo is not configured', setupHref: setupHrefFor('trakyo') }, { status: 503 });

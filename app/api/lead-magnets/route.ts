@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { getDb } from '@/lib/data';
@@ -32,7 +33,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const parsed = LeadMagnetInputSchema.safeParse(await req.json().catch(() => null));
+  const parsed = LeadMagnetInputSchema.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'invalid lead magnet', issues: parsed.error.flatten() }, { status: 400 });
   const now = new Date().toISOString();
   const magnet = getDb().leadMagnets.insert({ ...parsed.data, id: randomUUID(), createdAt: now, updatedAt: now });

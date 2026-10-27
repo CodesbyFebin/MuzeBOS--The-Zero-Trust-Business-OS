@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
@@ -28,7 +29,7 @@ const Unconfirm = z.object({ clientId: z.string().min(1).max(200), confirmed: z.
  *   { clientId, confirmed: false }             unconfirm (work rows stay)
  */
 export async function POST(req: Request) {
-  const body = await req.json().catch(() => null);
+  const body = await readJsonBounded(req).catch(() => null);
   const db = getDb();
 
   const un = Unconfirm.safeParse(body);

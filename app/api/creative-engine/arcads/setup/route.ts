@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createArcadsClient, explainArcadsError, resolveArcadsAuth } from '@/lib/arcads/client';
@@ -51,7 +52,7 @@ const Body = z.discriminatedUnion('action', [
 ]);
 
 export async function POST(request: Request) {
-  const parsed = Body.safeParse(await request.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const b = parsed.data;
   try {

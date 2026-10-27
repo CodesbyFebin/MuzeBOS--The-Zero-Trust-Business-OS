@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import path from 'node:path';
 import { z } from 'zod';
@@ -18,7 +19,7 @@ const SetKeySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const parsed = SetKeySchema.safeParse(await request.json().catch(() => null));
+  const parsed = SetKeySchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

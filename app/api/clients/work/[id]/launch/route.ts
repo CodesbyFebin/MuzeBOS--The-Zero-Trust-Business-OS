@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { launchSupersetDraft, supersetKey } from '@/lib/connectors/superset';
@@ -16,7 +17,7 @@ export const runtime = 'nodejs';
  */
 export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const body = await req.json().catch(() => null);
+  const body = await readJsonBounded(req).catch(() => null);
   const refused = gateResponse('GLADOS_WRITES', body);
   if (refused) return refused;
 

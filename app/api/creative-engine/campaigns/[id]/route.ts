@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { deleteCampaign, mutateCampaign, readCampaign } from '@/lib/creative-engine/store';
@@ -12,7 +13,7 @@ export const runtime = 'nodejs';
 const PatchSchema = z.object({
   name: z.string().trim().min(1).max(CAMPAIGN_NAME_MAX).optional(),
   /** angle ids that are selected; picks are also saved so the For-you feed learns */
-  selectedAngleIds: z.array(z.string()).optional(),
+  selectedAngleIds: z.array(z.string()).max(1000).optional(),
   adsWanted: z.number().int().min(0).max(50).optional(),
 });
 
@@ -25,7 +26,7 @@ export async function GET(_req: Request, props: { params: Promise<{ id: string }
 
 export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const parsed = PatchSchema.safeParse(await request.json().catch(() => null));
+  const parsed = PatchSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const patch = parsed.data;
   const campaign = mutateCampaign(params.id, (c) => {
