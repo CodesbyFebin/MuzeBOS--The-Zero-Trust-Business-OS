@@ -27,3 +27,15 @@ Precondition: an invoice older than the payment terms. A fresh demo DB has
 none, so either set terms to 0 days via the API (`{"action":"terms","days":0}`,
 owner/manager), which makes every existing pending invoice overdue, or say on camera
 that there is nothing to remind.
+
+## 5-step story with the DEMO seed
+
+`MUZEBOS_DB=/tmp/demo.sqlite npm run seed:demo-story` (refuses a database that already has records; every record is fictional and the first evidence row is `demo.seeded`). Demo payment terms are 0 days so an invoice is overdue without backdating records.
+
+1. `/workspace/money/command-center`: Friction Radar shows the overdue invoice, the payment claim, the unreviewed order and low stock, each with its playbook.
+2. `/workspace/money/overdue`: draft the reminder. Without a key it is labelled FIXTURE.
+3. Send to Jev, approve the exact hash. With no sending integration it is recorded as not sent.
+4. Back on Command Center, Payment Proof Inbox: match `DEMOUTR0001` to the invoice with the same total. Only now is that invoice reconciled.
+5. `/workspace/evidence`: every step is in the chain and it verifies.
+
+Covered by `tests/release-demo-story.test.ts`.
