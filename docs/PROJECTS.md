@@ -105,3 +105,17 @@ PR credits FounderOS and every existing MuzeBOS feature as inherited/pre-event.
 - Blocked externally: live model calls, credits/access and provider spending setup.
 - Founder-owned: track/rules confirmation, video, X publication and platform submission.
 - No submission, live-model, 24/7 swarm, zkVM or eligibility claim.
+
+
+## Submission-readiness audit — 2026-10-28
+
+Audited remote main `4ce3a44` (tree `beb7902`), public repo and successful main CI.
+Submission remains blocked; a 100/100 readiness claim is unsupported.
+
+- Found P1: inference handoff links to a workflow view that hides agent proposals.
+- Audit patch: direct Jev-tab link and real browser/API/SQLite approval regression.
+- Fresh production npm audit: 12 flagged packages (1 critical, 7 high, 1 moderate, 3 low); reachability/upgrade triage pending, no exploit claim.
+- Still blocked: live Meta/Baseten evidence, permitted track, final video/platform receipt.
+- Competitive gap: fixed-reminder demo does not demonstrate useful business reasoning.
+- Full findings and closure conditions: `docs/hackathon/SUBMISSION-AUDIT.md`.
+- Patch qualification: 5,030 tests passed, 8 skipped; 41 focused checks passed; types/build and all four production browser suites passed, including the real Jev approval/reminder flow. Follow-up patch prepared for review.
