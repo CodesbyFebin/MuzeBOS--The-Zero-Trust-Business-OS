@@ -146,3 +146,12 @@ Tests: tests/hackathon-chief-of-staff.test.ts (3 tests).
 
 Tests: tests/hackathon-pipeline-finance.test.ts (4 tests, injected fixtures only).
 
+## Built during the event: batch 5 (stacked PR on batch 4)
+
+| Feature | Inspired by (observed behaviour) | Files |
+|---|---|---|
+| Per-department permission walls: a fixed map of which data each department agent may read (customers, invoices, expenses, pipeline, cash). A read outside it is refused with 403 and logged in the audit chain. Operations sees only its own expenses. | Agent-Staff (department data isolation) | lib/muzebos/biz/departments.ts, app/api/muzebos/walls/route.ts, components/muzebos/DepartmentWalls.tsx, app/workspace/brain/department-walls/page.tsx |
+| Layered memory: L1 session, L2 department, L3 company, L4 owner preferences. People write trusted notes within their role. Agent notes are drafts until a person promotes them, and agents can't write L4. `contextFor` returns only trusted notes inside the department wall, within a character budget. Muse compaction is a gated inference draft and is stored only as an L3 draft. | clawcompany (4-layer memory), hive (L1/L2/L3) | lib/muzebos/biz/memory.ts, app/api/muzebos/memory/route.ts, components/muzebos/MemoryBoard.tsx, app/workspace/brain/memory/page.tsx |
+
+Tests: tests/hackathon-walls-memory.test.ts (3 tests, injected fixtures only).
+

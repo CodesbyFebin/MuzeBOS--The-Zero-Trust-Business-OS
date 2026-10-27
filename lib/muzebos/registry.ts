@@ -169,6 +169,11 @@ const MONEY_HACK: FeatureDefinition[] = [
   mk('expenses', 'Expense Approvals', 'Claims that nobody can approve themselves, with department and amount limits for managers.'),
 ];
 
+const BRAIN_HACK: FeatureDefinition[] = [
+  mk('department-walls', 'Department Walls', 'Each department agent reads only its own data; refused reads are logged as evidence.', 'brain'),
+  mk('memory', 'Layered Memory', 'Session, department, company and owner memory; agent and Muse notes stay drafts until a person promotes them.', 'brain'),
+];
+
 const LEGACY_ALIASES: Record<string, string[]> = {
   orders: ['/business', '/funnel', '/clients', '/brand-deals'],
   money: ['/finances', '/trading'],
@@ -216,7 +221,7 @@ const MENU_LABELS: Record<string, string> = { orders: 'Orders', money: 'Money', 
 const categoryMenu = (id: string, section: MenuSection): Omit<MenuDefinition, 'number'> => {
   const clusters = categoryClusters(id);
   if (id === 'money') clusters[0].pages.push(...MONEY_HACK.map((f) => ({ ...f, clusterId: clusters[0].id })));
-  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME, BRAIN_MISSIONS, BRAIN_GOALS, BRAIN_CHIEF); clusters[2].pages.push(BRAIN_EXTRA); }
+  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME, BRAIN_MISSIONS, BRAIN_GOALS, BRAIN_CHIEF, ...BRAIN_HACK.map((f) => ({ ...f, clusterId: clusters[0].id }))); clusters[2].pages.push(BRAIN_EXTRA); }
   return { id, label: MENU_LABELS[id], route: `/workspace/${id}`, icon: cat(id).icon, section, summary: cat(id).summary, aliases: LEGACY_ALIASES[id] ?? [], clusters };
 };
 
