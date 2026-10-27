@@ -16,7 +16,8 @@ export function generateStaticParams() {
   return FRAME_STATES.map((state) => ({ state }));
 }
 
-export default function LabFramePage({ params }: { params: { state: string } }) {
+export default async function LabFramePage(props: { params: Promise<{ state: string }> }) {
+  const params = await props.params;
   const state = params.state;
   if (!isFrameState(state)) notFound();
   return (

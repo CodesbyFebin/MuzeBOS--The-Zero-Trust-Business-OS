@@ -41,7 +41,7 @@ const patch = (body: unknown) =>
 describe('PATCH /api/content/queue/[id]', () => {
   test('re-points the task to a real campaign', async () => {
     const { PATCH } = await import('@/app/api/content/queue/[id]/route');
-    const res = await PATCH(patch({ campaignId: 'openai-gpt6-astra-launch' }), { params: { id: 'task-a' } });
+    const res = await PATCH(patch({ campaignId: 'openai-gpt6-astra-launch' }), { params: Promise.resolve({ id: 'task-a' }) });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.task.campaignId).toBe('openai-gpt6-astra-launch');
@@ -53,25 +53,25 @@ describe('PATCH /api/content/queue/[id]', () => {
 
   test('rejects an unknown campaign with 400', async () => {
     const { PATCH } = await import('@/app/api/content/queue/[id]/route');
-    const res = await PATCH(patch({ campaignId: 'not-a-real-campaign' }), { params: { id: 'task-a' } });
+    const res = await PATCH(patch({ campaignId: 'not-a-real-campaign' }), { params: Promise.resolve({ id: 'task-a' }) });
     expect(res.status).toBe(400);
   });
 
   test('rejects a missing campaignId with 400', async () => {
     const { PATCH } = await import('@/app/api/content/queue/[id]/route');
-    const res = await PATCH(patch({}), { params: { id: 'task-a' } });
+    const res = await PATCH(patch({}), { params: Promise.resolve({ id: 'task-a' }) });
     expect(res.status).toBe(400);
   });
 
   test('404s on an unknown task id', async () => {
     const { PATCH } = await import('@/app/api/content/queue/[id]/route');
-    const res = await PATCH(patch({ campaignId: 'openai-gpt6-astra-launch' }), { params: { id: 'not-a-real-task' } });
+    const res = await PATCH(patch({ campaignId: 'openai-gpt6-astra-launch' }), { params: Promise.resolve({ id: 'not-a-real-task' }) });
     expect(res.status).toBe(404);
   });
 
   test('leaves every other field on the row untouched', async () => {
     const { PATCH } = await import('@/app/api/content/queue/[id]/route');
-    const res = await PATCH(patch({ campaignId: 'openai-gpt6-astra-launch' }), { params: { id: 'task-a' } });
+    const res = await PATCH(patch({ campaignId: 'openai-gpt6-astra-launch' }), { params: Promise.resolve({ id: 'task-a' }) });
     const body = await res.json();
     expect(body.task.title).toBe(baseTask.title);
     expect(body.task.model).toBe(baseTask.model);

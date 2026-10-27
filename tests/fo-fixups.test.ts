@@ -61,7 +61,7 @@ async function seedTasks() {
 async function renderTasks(cookie: string, searchParams: Record<string, string>): Promise<string> {
   appearance = cookie;
   const { default: TasksPage } = await import('@/app/tasks/page');
-  return renderWithRouter(TasksPage({ searchParams }) as ReactElement);
+  return renderWithRouter((await TasksPage({ searchParams: Promise.resolve(searchParams) })) as ReactElement);
 }
 
 // ── 1 + 8: /tasks?task=<id> opens the board on that task ─────────────────

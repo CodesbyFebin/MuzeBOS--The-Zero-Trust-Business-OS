@@ -160,12 +160,12 @@ describe('store + runs (derived status, never stored)', () => {
     const proof = { ads: [], medianDays: null, drivers: {}, note: '' };
     mutateCampaign(c.id, (x) => ({ ...x, briefs: [{ id: 'brf-t1', scriptId: 's1', angleId: 'a1', title: 't', markdown: '#', proof, status: 'ready', at: new Date().toISOString() }] }));
     const req = (body: unknown) => new Request('http://x/api/creative-engine/briefs/brf-t1', { method: 'PATCH', body: JSON.stringify(body) });
-    const ok = await PATCH(req({ status: 'sent' }), { params: { id: 'brf-t1' } });
+    const ok = await PATCH(req({ status: 'sent' }), { params: Promise.resolve({ id: 'brf-t1' }) });
     expect(ok.status).toBe(200);
     expect(readCampaign(c.id)?.briefs[0].status).toBe('sent');
-    expect((await PATCH(req({ status: 'shipped' }), { params: { id: 'brf-t1' } })).status).toBe(400);
+    expect((await PATCH(req({ status: 'shipped' }), { params: Promise.resolve({ id: 'brf-t1' }) })).status).toBe(400);
     expect(readCampaign(c.id)?.briefs[0].status).toBe('sent');
-    expect((await PATCH(req({ status: 'draft' }), { params: { id: 'brf-nope' } })).status).toBe(404);
+    expect((await PATCH(req({ status: 'draft' }), { params: Promise.resolve({ id: 'brf-nope' }) })).status).toBe(404);
   });
   test('ledger: last real charge ignores dry entries', () => {
     appendLedger({ at: new Date().toISOString(), kind: 'motion', model: 'seedance-2.0', durationSec: 8, creditsCharged: 0, runId: 'r1', dry: true, source: 'dry' });

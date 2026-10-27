@@ -17,7 +17,8 @@ const Body = z.object({ model: z.string().trim().min(1).max(120) });
  * an agent defined in code (lib/agents/real.ts) has no stored model to move,
  * so it answers 409 and changes nothing rather than pretending.
  */
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const body = await req.json().catch(() => null);
   const parsed = Body.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'model is required' }, { status: 400 });

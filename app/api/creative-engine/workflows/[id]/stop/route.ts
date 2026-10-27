@@ -7,7 +7,8 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 /** Stop a run (S05b FR-61): abandon in-flight runs, mark unresolved nodes stopped. Arcads keeps (and charges) what it already received. */
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
+export async function POST(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const w = stopWorkflow(params.id);
   if (!w) return NextResponse.json({ ok: false, error: 'not found' }, { status: 404 });
   const runs = listRuns(w.campaignId);

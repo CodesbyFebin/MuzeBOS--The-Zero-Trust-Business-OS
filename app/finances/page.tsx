@@ -25,9 +25,9 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-export default async function FinancesPage(route: { searchParams?: { sample?: string } }) {
+export default async function FinancesPage(route: { searchParams?: Promise<{ sample?: string }> }) {
   // tolerant of a bare call (tests/smoke.test.ts renders pages without props)
-  const searchParams = route?.searchParams;
+  const searchParams = (await route?.searchParams);
   const stripeKeyed = configuredProcessors(runtimeEnv()).some((p) => p.id === 'stripe' && p.configured);
 
   // Stripe is only "live" when the API actually answers — a present-but-invalid

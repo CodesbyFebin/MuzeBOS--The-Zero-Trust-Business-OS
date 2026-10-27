@@ -9,7 +9,8 @@ export const runtime = 'nodejs';
 const VoidBody = z.object({ reason: z.string().min(3).max(280) });
 
 /** POST /api/lab/predictions/[id]/void { reason } -> { ok, prediction }; 404 unknown, 409 already void, 400 on a backtest row (06 2.7). */
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const parsed = VoidBody.safeParse(await body(request));
   if (!parsed.success) return json({ ok: false, error: 'give a reason of 3 to 280 characters' }, 400);
   const ctx = resolveLab({ sample: new URL(request.url).searchParams.get('sample') === '1' });

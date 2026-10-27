@@ -114,7 +114,7 @@ describe('view model (lib/chats-view.ts)', () => {
     const db = getDb();
     const before = db.agentMessages.byAgent('crm-pulse').length;
     const { POST } = await import('@/app/api/agents/[id]/chat/route');
-    const res = await POST(new Request('http://localhost/api/agents/crm-pulse/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ message: 'Pipeline today?' }) }), { params: { id: 'crm-pulse' } });
+    const res = await POST(new Request('http://localhost/api/agents/crm-pulse/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ message: 'Pipeline today?' }) }), { params: Promise.resolve({ id: 'crm-pulse' }) });
     expect(res.status).toBe(200);
     const rows = db.agentMessages.byAgent('crm-pulse');
     expect(rows.length - before).toBe(2); // the operator's turn and the agent's turn
@@ -130,9 +130,9 @@ describe('view model (lib/chats-view.ts)', () => {
     expect(rail.threads[0]).toMatchObject({ agentId: 'conductor', pinned: true });
     expect(rail.composer).toMatchObject({ enabled: false });
     const { GET } = await import('@/app/api/chats/[agentId]/route');
-    const body = await (await GET(new Request('http://localhost/api/chats/conductor'), { params: { agentId: 'conductor' } })).json();
+    const body = await (await GET(new Request('http://localhost/api/chats/conductor'), { params: Promise.resolve({ agentId: 'conductor' }) })).json();
     expect(body.agent).toMatchObject({ id: 'conductor', name: 'Wizard', source: 'wizard' });
-    expect((await GET(new Request('http://localhost/api/chats/nope'), { params: { agentId: 'nope' } })).status).toBe(404);
+    expect((await GET(new Request('http://localhost/api/chats/nope'), { params: Promise.resolve({ agentId: 'nope' }) })).status).toBe(404);
   });
 });
 
@@ -176,8 +176,8 @@ describe('trees render every state', () => {
 
   test('the page forks on the appearance and renders', async () => {
     const Page = (await import('@/app/chats/page')).default;
-    await expect(Page({ searchParams: {} })).resolves.toBeTruthy();
-    await expect(Page({ searchParams: { sample: '1', agent: 'daily-briefing' } })).resolves.toBeTruthy();
+    await expect(Page({ searchParams: Promise.resolve({}) })).resolves.toBeTruthy();
+    await expect(Page({ searchParams: Promise.resolve({ sample: '1', agent: 'daily-briefing' }) })).resolves.toBeTruthy();
   });
 });
 

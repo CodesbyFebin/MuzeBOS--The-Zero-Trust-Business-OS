@@ -17,15 +17,18 @@ export const dynamic = 'force-dynamic';
  * every tree renders (glados-ui SPEC X5). `?sample=1` on a blank install and
  * Filming mode render the badged fixture and make no outbound request.
  */
-export default async function ClientsPage({ searchParams = {} }: { searchParams?: Record<string, string | string[] | undefined> }) {
-  const sample = searchParams.sample === '1' ? '?sample=1' : '';
-  const mode = foMode(`http://localhost/clients${sample}`, clientsBlank());
-  const payload = await clientsPayload(mode);
-  const selected = typeof searchParams.client === 'string' ? searchParams.client : null;
-  const view = buildClientsView(payload, { selected });
-  const setup = { attio: setupHrefFor('attio'), superset: setupHrefFor('superset') };
-  const tree = treeFor(getAppearance(), '/clients');
-  if (tree === 'glados') return <ClientsG view={view} setup={setup} />;
-  if (tree === 'legacy') return <ClientsLegacy view={view} setup={setup} />;
-  return <ClientsClassic view={view} setup={setup} />;
+export default async function ClientsPage(
+ props: { searchParams?: Promise<Record<string, string | string[] | undefined>> }
+) {
+ const searchParams = (await props.searchParams) ?? {};
+ const sample = searchParams.sample === '1' ? '?sample=1' : '';
+ const mode = foMode(`http://localhost/clients${sample}`, clientsBlank());
+ const payload = await clientsPayload(mode);
+ const selected = typeof searchParams.client === 'string' ? searchParams.client : null;
+ const view = buildClientsView(payload, { selected });
+ const setup = { attio: setupHrefFor('attio'), superset: setupHrefFor('superset') };
+ const tree = treeFor(getAppearance(), '/clients');
+ if (tree === 'glados') return <ClientsG view={view} setup={setup} />;
+ if (tree === 'legacy') return <ClientsLegacy view={view} setup={setup} />;
+ return <ClientsClassic view={view} setup={setup} />;
 }

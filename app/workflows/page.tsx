@@ -18,10 +18,10 @@ export const dynamic = 'force-dynamic';
  * for the roster, and the live brand-deal rules (or the reason they are not
  * configured on this machine).
  */
-export default function WorkflowsPage(props: { searchParams?: { wf?: string; view?: string } }) {
+export default async function WorkflowsPage(props: { searchParams?: Promise<{ wf?: string; view?: string }> }) {
   // Called with no argument by tests/smoke.test.ts; a parameter-level default
   // would widen the type to `| undefined` and break Next's PageProps check.
-  const searchParams = props?.searchParams;
+  const searchParams = (await props?.searchParams);
   const db = getDb();
   const workflows = db.workflows.all();
   const agents = db.agents.all().map((a) => ({ id: a.id, name: a.name, status: a.status }));

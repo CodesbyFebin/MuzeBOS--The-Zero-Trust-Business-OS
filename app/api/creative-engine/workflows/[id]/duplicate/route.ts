@@ -5,7 +5,8 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 /** Duplicate a workflow: same design, " copy" suffix, no run state. */
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
+export async function POST(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const w = readWorkflow(params.id);
   if (!w) return NextResponse.json({ ok: false, error: 'not found' }, { status: 404 });
   const name = `${w.name.slice(0, 75)} copy`;

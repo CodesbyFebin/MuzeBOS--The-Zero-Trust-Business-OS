@@ -55,14 +55,14 @@ describe('slice 9d Mission Control layouts', () => {
 });
 
 describe('slice 9d no registry route renders FeatureStub', () => {
-  it(`all ${ALL_FEATURES.length} registry pages render a workspace or redirect, never .mb-stub`, () => {
+  it(`all ${ALL_FEATURES.length} registry pages render a workspace or redirect, never .mb-stub`, async () => {
     expect(ALL_FEATURES.length).toBe(230);
     const stubs: string[] = [];
     for (const f of ALL_FEATURES) {
       const dedicated = f.route === '/' ? 'app/page.tsx' : `app${f.route}/page.tsx`;
       if (fs.existsSync(dedicated)) { if (fs.readFileSync(dedicated, 'utf8').includes('FeatureStub')) stubs.push(`${f.route}: dedicated page uses FeatureStub`); continue; }
       const [section, page] = f.route.replace(/^\/workspace\//, '').split('/');
-      try { const html = renderToStaticMarkup(FeaturePage({ params: { section, page } }) as never); if (html.includes('mb-stub')) stubs.push(f.route); }
+      try { const html = renderToStaticMarkup(await FeaturePage({ params: Promise.resolve({ section, page }) }) as never); if (html.includes('mb-stub')) stubs.push(f.route); }
       catch (e) { if (!String((e as Error).message).startsWith('REDIRECT ')) stubs.push(`${f.route}: ${(e as Error).message}`); }
     }
     expect(stubs).toEqual([]);
