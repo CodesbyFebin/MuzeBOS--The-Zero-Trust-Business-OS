@@ -11,26 +11,25 @@ function fail(e: unknown) {
 }
 const lane = { lane: z.enum(['meta', 'baseten']).default('meta'), paidConsent: z.boolean().default(false) };
 import { listExpenses, submitExpense, decideExpense, withdrawExpense, cannotDecide, MANAGER_LIMIT, EXPENSE_CATEGORIES } from '@/lib/muzebos/biz/expenses';
-import { listMembers, addMember } from '@/lib/muzebos/biz/members';
+import { listMembers } from '@/lib/muzebos/biz/members';
+import { currentMember, requireMember } from '@/lib/muzebos/biz/accounts';
 const cmd = z.discriminatedUnion('action', [
-  z.object({ action: z.literal('submit'), actorId: z.string().max(64), expense: z.unknown() }),
-  z.object({ action: z.literal('decide'), actorId: z.string().max(64), expenseId: z.string(), decision: z.string(), hash: z.string(), reason: z.string().optional() }),
-  z.object({ action: z.literal('withdraw'), actorId: z.string().max(64), expenseId: z.string().max(64) }),
-  z.object({ action: z.literal('addMember'), actorId: z.string().max(64), member: z.unknown() }),
+  z.object({ action: z.literal('submit'), expense: z.unknown() }),
+  z.object({ action: z.literal('decide'), expenseId: z.string(), decision: z.string(), hash: z.string(), reason: z.string().optional() }),
+  z.object({ action: z.literal('withdraw'), expenseId: z.string().max(64) }),
 ]);
 export async function GET(req: Request) {
   try {
-    businessAccess(req); const s = businessStore(); const actor = new URL(req.url).searchParams.get('actorId');
+    businessAccess(req); const s = businessStore(); const me = currentMember(s, req); const actor = me?.id ?? null;
     const members = listMembers(s); const expenses = listExpenses(s).map((e) => ({ ...e, blockedFor: actor && members.some((m) => m.id === actor) ? cannotDecide(s, actor, e) : null }));
-    return NextResponse.json({ members, expenses, managerLimit: MANAGER_LIMIT, categories: EXPENSE_CATEGORIES });
+    return NextResponse.json({ me, members, expenses, managerLimit: MANAGER_LIMIT, categories: EXPENSE_CATEGORIES });
   } catch (e) { return fail(e); }
 }
 export async function POST(req: Request) {
   try {
-    businessAccess(req); const c = cmd.parse(await req.json()); const s = businessStore();
-    if (c.action === 'submit') return NextResponse.json({ expense: submitExpense(s, c.actorId, c.expense) });
-    if (c.action === 'withdraw') return NextResponse.json({ expense: withdrawExpense(s, c.actorId, c.expenseId) });
-    if (c.action === 'addMember') return NextResponse.json({ member: addMember(s, c.actorId, c.member) });
-    const { action: _a, actorId, ...d } = c; return NextResponse.json({ expense: decideExpense(s, actorId, d) });
+    businessAccess(req); const c = cmd.parse(await req.json()); const s = businessStore(); const me = requireMember(s, req);
+    if (c.action === 'submit') return NextResponse.json({ expense: submitExpense(s, me.id, c.expense) });
+    if (c.action === 'withdraw') return NextResponse.json({ expense: withdrawExpense(s, me.id, c.expenseId) });
+    const { action: _a, ...d } = c; return NextResponse.json({ expense: decideExpense(s, me.id, d) });
   } catch (e) { return fail(e); }
 }

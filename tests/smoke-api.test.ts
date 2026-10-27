@@ -37,6 +37,7 @@ const ROUTES: RouteEntry[] = [
   { route: 'muzebos/expenses', load: () => import('@/app/api/muzebos/expenses/route'), url: 'http://localhost/api/muzebos/expenses' },
   { route: 'muzebos/walls', load: () => import('@/app/api/muzebos/walls/route'), url: 'http://localhost/api/muzebos/walls' },
   { route: 'muzebos/memory', load: () => import('@/app/api/muzebos/memory/route'), url: 'http://localhost/api/muzebos/memory' },
+  { route: 'muzebos/auth', load: () => import('@/app/api/muzebos/auth/route'), url: 'http://localhost/api/muzebos/auth' },
   { route: 'muzebos/founder', load: () => import('@/app/api/muzebos/founder/route'), url: 'http://localhost/api/muzebos/founder' },
   { route: 'analytics', load: () => import('@/app/api/analytics/route'), url: 'http://localhost/api/analytics' },
   { route: 'evidence', load: () => import('@/app/api/evidence/route'), url: 'http://localhost/api/evidence' },

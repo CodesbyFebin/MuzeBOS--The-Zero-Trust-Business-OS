@@ -1,12 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { postTo, InferenceNote } from './bizClient';
+import { postTo, InferenceNote, SignedInAs, type Me } from './bizClient';
 type Mem = { id: string; layer: string; scope: string; text: string; status: string; author: string; promotedBy: string | null };
-type Member = { id: string; name: string; role: string; department: string };
 const post = postTo('/api/muzebos/memory');
 export function MemoryBoard() {
-  const [d, setD] = useState<{ memory: Mem[]; members: Member[]; layers: Record<string, string>; departments: string[] } | null>(null);
-  const [error, setError] = useState<string | null>(null); const [actor, setActor] = useState('owner');
+  const [d, setD] = useState<{ memory: Mem[]; me: Me; layers: Record<string, string>; departments: string[] } | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [f, setF] = useState({ layer: 'L2', scope: 'finance', text: '' }); const [task, setTask] = useState<string | null>(null);
   const [ctx, setCtx] = useState({ role: 'finance', sessionId: 'demo', query: '' }); const [ctxOut, setCtxOut] = useState<{ entries: Mem[]; used: number; budget: number } | null>(null);
   const load = async () => { try { const r = await fetch('/api/muzebos/memory'); const j = await r.json(); if (!r.ok) throw new Error(j.error); setD(j); } catch (e) { setError((e as Error).message); } };
@@ -17,12 +16,11 @@ export function MemoryBoard() {
     <p className="mb-muted">L1 session, L2 department, L3 company, L4 owner preferences. People write trusted notes. Agent and Muse notes stay drafts until a person promotes them. Agents get only trusted notes, and never another department&apos;s.</p>
     {error && <p className="mb-alert" role="alert">{error}</p>}
     {d && <>
-      <section className="mb-panel" aria-label="Write memory"><h2>Write a note</h2>
-        <select aria-label="Acting member" value={actor} onChange={(e) => setActor(e.target.value)}>{d.members.map((x) => <option key={x.id} value={x.id}>{x.name} ({x.role}, {x.department})</option>)}</select>
+      <section className="mb-panel" aria-label="Write memory"><h2>Write a note</h2><SignedInAs me={d.me} />
         <select aria-label="Layer" value={f.layer} onChange={(e) => setF({ ...f, layer: e.target.value })}>{Object.entries(d.layers).map(([k, v]) => <option key={k} value={k}>{k} {v}</option>)}</select>
         {(f.layer === 'L1' || f.layer === 'L2') && <input aria-label="Scope (department or session id)" value={f.scope} onChange={(e) => setF({ ...f, scope: e.target.value })} />}
         <input aria-label="Note" value={f.text} onChange={(e) => setF({ ...f, text: e.target.value })} />
-        <button onClick={run(async () => { await post({ action: 'remember', actorId: actor, memory: { layer: f.layer, scope: f.scope, text: f.text } }); setF({ ...f, text: '' }); })}>Save as trusted</button>
+        <button onClick={run(async () => { await post({ action: 'remember', memory: { layer: f.layer, scope: f.scope, text: f.text } }); setF({ ...f, text: '' }); })}>Save as trusted</button>
       </section>
       <section className="mb-panel" aria-label="Compaction"><h2>Muse compaction</h2><InferenceNote/>
         <button onClick={run(async () => { const j = await post({ action: 'requestCompaction' }); setTask(j.task.id); })}>Ask Muse to compact</button>
@@ -37,7 +35,7 @@ export function MemoryBoard() {
       </section>
       <table className="mb-table"><thead><tr><th>Layer</th><th>Scope</th><th>Note</th><th>Status</th><th>Author</th><th></th></tr></thead>
         <tbody>{d.memory.length === 0 ? <tr><td colSpan={6}>No memory yet.</td></tr> : d.memory.map((m) => <tr key={m.id}><td>{m.layer}</td><td>{m.scope}</td><td>{m.text}</td><td>{m.status}</td><td>{m.author}</td>
-          <td>{m.status === 'draft' && <button onClick={run(() => post({ action: 'promote', actorId: actor, id: m.id }))}>Promote</button>}<button onClick={run(() => post({ action: 'forget', actorId: actor, id: m.id }))}>Forget</button></td></tr>)}</tbody></table>
+          <td>{m.status === 'draft' && <button onClick={run(() => post({ action: 'promote', id: m.id }))}>Promote</button>}<button onClick={run(() => post({ action: 'forget', id: m.id }))}>Forget</button></td></tr>)}</tbody></table>
     </>}
   </div>;
 }
