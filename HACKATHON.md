@@ -26,7 +26,7 @@ git diff 1105e64ca6c6791170e619d9f446c81b9e6aec22...HEAD -- lib/muzebos/inferenc
 | FounderOS/GladOS inherited source | Existing Next.js workspace, Brain/chat and integration foundations; original copyright retained in `LICENSE` | Inherited, not event-built. Initial MuzeBOS history already contains this source; a pristine separately pinned FounderOS import was not supplied, so no unsupported line-by-line authorship claim is made |
 | Pre-event MuzeBOS development | Entire frozen baseline: 18-destination shell, business records, invoice/stock transactions, evidence, Jev/workflow engine, browser/local/Meta Wonder/OpenRouter inference, worker leases, bounded delegation, reference imports and public docs | Existing product, not claimed as new hackathon functionality |
 | Other upstream material | Precisely scoped imports and references in `THIRD_PARTY_NOTICES.md` and `docs/MUZEBOS-UPSTREAM-INTEGRATIONS.md` | Their notices and restrictions remain; not represented as original or as 29 integrated services |
-| New submission-PR delta, October 27 | Baseten Muse Spark Open transport/routing; allowlisted Meta Spark selection; provider-response rejection checks; completed-server-output → Jev reminder proposal handoff; interface controls; bounded demo runner, tests and submission materials | Only this diff is claimed as event work, subject to organizer track/rule confirmation |
+| New submission work, October 27–28 | Baseten Muse Spark Open transport/routing; allowlisted Meta Spark selection; provider-response rejection checks; completed-server-output → Jev reminder proposal handoff; interface controls; bounded demo runner, tests and submission materials | Only this diff is claimed as event work, subject to organizer track/rule confirmation |
 
 The initial #22 head `2db8d32bba207565efe095abd5394f9241511b99` is also
 part of the event contribution, not the frozen pre-event baseline. Its model
@@ -34,6 +34,12 @@ constants, operations sorter and form/video drafts are retained or revised here.
 The original key-presence-triggered API runner is replaced by the approved-lease
 path; unqualified image/voice sketches are disabled until their contracts and
 approval bridge are verified. This is a hardening of #22, not a second entry.
+
+The October 28 follow-up audit patch corrects the browser handoff to the existing
+Jev approval tab and adds a complete browser/API/SQLite reminder regression.
+See [submission audit](docs/hackathon/SUBMISSION-AUDIT.md) for the remaining live,
+security and final-artifact gates. This follow-up is also event-window work;
+the existing Jev engine remains credited as pre-event.
 
 ## New work and reproducibility
 
