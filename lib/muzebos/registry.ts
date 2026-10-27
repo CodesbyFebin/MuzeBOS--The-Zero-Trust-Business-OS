@@ -144,6 +144,18 @@ const BRAIN_RUNTIME: FeatureDefinition = {
   summary: 'Routed chat (small/medium/large tiers, explained decisions), swarm task board, and the Jev queue where every agent-proposed write waits for your payload-bound approval. Server models need OPENROUTER_API_KEY, META_MODEL_API_KEY or a local server; on-device Llama needs WebGPU.',
 };
 
+const BRAIN_MISSIONS: FeatureDefinition = {
+  id: 'brain.missions', menuId: 'brain', clusterId: 'brain.assistants-and-employees', label: 'Missions',
+  route: '/workspace/brain/missions', status: 'available', dependencies: [],
+  summary: 'Lead agent (Muse Wonder or rule planner) splits a request into dependent subtasks; Muse Spark workers run ready tasks; every write becomes a Jev proposal. Built during the Meta hackathon.',
+};
+
+const BRAIN_GOALS: FeatureDefinition = {
+  id: 'brain.goals', menuId: 'brain', clusterId: 'brain.assistants-and-employees', label: 'Goals & Check-ins',
+  route: '/workspace/brain/goals', status: 'available', dependencies: [],
+  summary: 'Measurable goals linked to projects, with check-ins. Muse Spark drafts a check-in from the numbers; nothing saves until you post it. Built during the Meta hackathon.',
+};
+
 const LEGACY_ALIASES: Record<string, string[]> = {
   orders: ['/business', '/funnel', '/clients', '/brand-deals'],
   money: ['/finances', '/trading'],
@@ -190,7 +202,7 @@ const cat = (id: string) => WORKSPACE_CATEGORIES.find((c) => c.id === id)!;
 const MENU_LABELS: Record<string, string> = { orders: 'Orders', money: 'Money', talk: 'Talk', stock: 'Stock', growth: 'Growth', operations: 'Operations', builder: 'Builder', brain: 'Brain', foundation: 'Foundation', system: 'System' };
 const categoryMenu = (id: string, section: MenuSection): Omit<MenuDefinition, 'number'> => {
   const clusters = categoryClusters(id);
-  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME); clusters[2].pages.push(BRAIN_EXTRA); }
+  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME, BRAIN_MISSIONS, BRAIN_GOALS); clusters[2].pages.push(BRAIN_EXTRA); }
   return { id, label: MENU_LABELS[id], route: `/workspace/${id}`, icon: cat(id).icon, section, summary: cat(id).summary, aliases: LEGACY_ALIASES[id] ?? [], clusters };
 };
 

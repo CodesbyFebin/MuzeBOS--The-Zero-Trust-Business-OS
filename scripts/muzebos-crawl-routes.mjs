@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 const base = process.env.TEST_BASE_URL || 'http://127.0.0.1:4100';
 const routes = JSON.parse(execFileSync('npx', ['tsx', '-e', "import('./lib/muzebos/registry.ts').then(m=>console.log(JSON.stringify((m.ALL_FEATURES??m.default.ALL_FEATURES).map(f=>f.route))))"], { encoding: 'utf8' }).trim().split('\n').pop());
-assert.equal(routes.length, 220);
+assert.equal(routes.length, 222);
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 const summary = [];
 for (const vp of [{ name: 'desktop', width: 1440, height: 1000 }, { name: 'mobile', width: 390, height: 844, isMobile: true, hasTouch: true }]) {
