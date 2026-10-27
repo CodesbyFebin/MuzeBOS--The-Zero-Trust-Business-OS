@@ -82,8 +82,8 @@ studied for observed behaviour only.
 | Observer critique of agent proposals (injection, drift) | cyber-ai-team | High (fits zero-trust) | **Built during the event** (PR #26); advisory only |
 | Tiered autonomy | gquthier, cyber-ai-team, dswh | Medium | Adopted as an **advisory label only**; MuzeBOS never auto-approves |
 | Human approval bound to the exact payload | cyber-ai-team (replay protection) | Already ours | Inherited before the event (Jev) |
-| Deal pipeline with win probability, founder dashboard (runway, MRR) | BoomBigNose (AGPL), coreBOS | High | Not built yet; next candidate (clean-room only) |
-| Expenses where nobody approves their own | BoomBigNose (AGPL) | Medium | Not built; single-operator preview has one user |
+| Deal pipeline with win probability, founder dashboard (runway, MRR) | BoomBigNose (AGPL), coreBOS | High | **Built during the event** (PR #27), clean-room |
+| Expenses where nobody approves their own | BoomBigNose (AGPL) | Medium | **Built during the event** (PR #27), multi-member rules |
 | Per-department permission walls | Agent-Staff, dswh | Medium | Partly there: agents are limited to roles and one tool |
 | Layered memory | clawcompany, hive, cyber-ai-team | Medium | Not built |
 | Per-user credential fan-out, federation, SSO | townsquare | Low for a solo founder | Skipped |
