@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 201,
+ "count": 202,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1925,6 +1925,19 @@
    ],
    "summary": "Declarative workspace module records: list with computed fields, or create/update/transition.",
    "idempotencyKey": true,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/muzebos/chief-of-staff",
+   "file": "app/api/muzebos/chief-of-staff/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
    "originCheck": true,
    "schemaValidated": true,
    "access": "session"

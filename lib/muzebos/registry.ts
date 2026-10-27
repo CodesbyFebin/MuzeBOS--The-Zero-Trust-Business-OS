@@ -156,6 +156,12 @@ const BRAIN_GOALS: FeatureDefinition = {
   summary: 'Measurable goals linked to projects, with check-ins. Muse Spark drafts a check-in from the numbers; nothing saves until you post it. Built during the Meta hackathon.',
 };
 
+const BRAIN_CHIEF: FeatureDefinition = {
+  id: 'brain.chief-of-staff', menuId: 'brain', clusterId: 'brain.assistants-and-employees', label: 'Chief of Staff',
+  route: '/workspace/brain/chief-of-staff', status: 'available', dependencies: [],
+  summary: 'One brief across approvals, missions, goals and decisions, with an observer that flags risky agent proposals. Advisory only. Built during the Meta hackathon.',
+};
+
 const LEGACY_ALIASES: Record<string, string[]> = {
   orders: ['/business', '/funnel', '/clients', '/brand-deals'],
   money: ['/finances', '/trading'],
@@ -202,7 +208,7 @@ const cat = (id: string) => WORKSPACE_CATEGORIES.find((c) => c.id === id)!;
 const MENU_LABELS: Record<string, string> = { orders: 'Orders', money: 'Money', talk: 'Talk', stock: 'Stock', growth: 'Growth', operations: 'Operations', builder: 'Builder', brain: 'Brain', foundation: 'Foundation', system: 'System' };
 const categoryMenu = (id: string, section: MenuSection): Omit<MenuDefinition, 'number'> => {
   const clusters = categoryClusters(id);
-  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME, BRAIN_MISSIONS, BRAIN_GOALS); clusters[2].pages.push(BRAIN_EXTRA); }
+  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME, BRAIN_MISSIONS, BRAIN_GOALS, BRAIN_CHIEF); clusters[2].pages.push(BRAIN_EXTRA); }
   return { id, label: MENU_LABELS[id], route: `/workspace/${id}`, icon: cat(id).icon, section, summary: cat(id).summary, aliases: LEGACY_ALIASES[id] ?? [], clusters };
 };
 
