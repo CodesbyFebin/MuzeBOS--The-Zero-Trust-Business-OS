@@ -33,6 +33,7 @@ Written on 2026-10-28 (IST) **before** changes on branch `fix/release-readiness`
 | 3 Overdue-invoice workflow | PASS (fixture) · live BLOCKED · real send UNVERIFIED | Branch `feat/gate3-overdue`. `/workspace/money/overdue` plus `/api/muzebos/overdue`, `lib/muzebos/overdue{,-core}.ts`, workflow `overdue-invoice-reminder` (only grant of `messages.send`). `tests/release-gate3-overdue.test.ts` 7/7: findings come only from stored pending invoices with no reference; cited fields; uncertainty (derived due date, assumed 30-day terms unless configured); a FIXTURE label and BLOCKED gate with no key or price and no network call; a live call capped (350 max_tokens, 15 s timeout, 64 KB response, 2,000-char prompt, 20 calls/day, USD 0.02/call, USD 0.25/day, which needs a configured price) and validated, with a bad, timed-out or invalid draft falling back to fixture; Jev hash approval required; with no sender, a `not_sent` record; with a sender, queued once and handed off once; reconcile after approval gives a stale hash and nothing sent; evidence chain verifies. Live: no Meta key on the box, so BLOCKED. Real send: no inbox or gsend on the box; the hand-off path is tested only with a stub sender. |
 | 5 v4 port (records) | PASS (local tests) | Branch `feat/v4-port` (stacked on `feat/gate3-overdue`). `lib/muzebos/records.ts`, `POST /api/muzebos/records` (member + `finance.read`; backup needs `members.manage`; unauthenticated POST answers 403 locally). `tests/release-v4-port.test.ts` 5/5: UPI QR amount from the stored invoice, 409 without UPI or after reconcile; stock ledger balanced and detects a direct edit; tax CSV formula neutralising; redacted evidence export with chain status that detects tampering; backup reopened and verified. See docs/MERGE.md. Backups unencrypted and local only. |
 | 6 Command Center (Friction Radar + features 2-7) | PASS (local tests) | Branch `feat/friction-radar` (stacked on `feat/v4-port`). `/workspace/money/command-center`, `/api/muzebos/command-center`, `lib/muzebos/command-center.ts`. `tests/release-command-center.test.ts` 6/6: radar items come from records with refs, severity order and a playbook for every kind; promises kept only by a bank reference; a payment claim never reconciles by itself, needs the exact amount, and references are single-use; brief figures carry sources and say UNVERIFIED on a broken chain; bundle approval is all-or-nothing under one hash, and drift approves nothing and is recorded; near-misses read from evidence. Deterministic, no model call. GET read access follows the existing `businessAccess` pattern (same as `/api/muzebos/overdue`). |
+| 7 Demo seed (5-step story) | PASS (local fixture) | Branch `feat/demo-seed` (stacked on `feat/friction-radar`). `npm run seed:demo-story` writes fictional records (first evidence row `demo.seeded`), refuses a non-empty DB (checked: second run refused), uses 0-day demo terms instead of backdating. `tests/release-demo-story.test.ts` 2/2 walks radar → FIXTURE draft (no network) → Jev approval (not sent, no sender) → matched claim → chain verifies. Script in docs/hackathon/DEMO-SCRIPT.md. Live model call and real send are not exercised. |
 | 4 Event and eligibility | UNCONFIRMED | Official page: https://dev.meta.ai/events/global-hackathon (submissions due Nov 4, 9:00 PM ET; Indie and Startup tracks). Existing-codebase eligibility is UNCONFIRMED. Question for the organizers: "May a project submitted to the Meta Global AI Developer Hackathon build on a codebase that existed before Oct 26, 2026, provided the Meta-model work done during the event is identified in the submission?" |
 
 Gate 4 checklist: [ ] track chosen  [ ] demo video recorded  [ ] submission receipt received. None of these has been verified here.
@@ -96,6 +97,19 @@ No defensible numeric score available.
 | `npx vitest run tests/release-command-center.test.ts` | 0 | 6/6 |
 | `npm run build` | 0 | Next 15.5.28 |
 | crawl against `next start -p 4100` | 0 | 232/232 desktop and 232/232 mobile, 0 stubs |
+| `npm run test:qualify-browser` | 0 | PASS |
+| `npm audit --omit=dev` | 0 | 0 vulnerabilities |
+
+No defensible numeric score available.
+
+## Demo seed (feat/demo-seed), checks run 2026-10-27 UTC
+
+| Command | Exit | Result |
+|---|---|---|
+| `npx tsc --noEmit -p .` | 0 | 0 errors |
+| `npx vitest run` | 1 | 5087 passed, 1 failed (known `lab-v2-g-copy`; `lab-v2-g.test.ts` file-level), 8 skipped |
+| `npm run build` | 0 | Next 15.5.28 |
+| crawl | 0 | 232/232 desktop and mobile, 0 stubs |
 | `npm run test:qualify-browser` | 0 | PASS |
 | `npm audit --omit=dev` | 0 | 0 vulnerabilities |
 
