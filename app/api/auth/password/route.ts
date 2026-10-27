@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { SESSION_COOKIE } from '@/lib/auth-gate';
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'expected application/json' }, { status: 415 });
   }
 
-  const parsed = Body.safeParse(await req.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'bad request' }, { status: 400 });
   const body = parsed.data;
   const configured = isConfigured();

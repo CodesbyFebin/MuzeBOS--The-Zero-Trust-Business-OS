@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { PipelineInputSchema, createPipeline, readPipelines, validatePipeline, type Pipeline } from '@/lib/content-pipelines';
 
@@ -14,7 +15,7 @@ export async function GET() {
  * problem list rather than saved half-working.
  */
 export async function POST(request: Request) {
-  const parsed = PipelineInputSchema.safeParse(await request.json().catch(() => null));
+  const parsed = PipelineInputSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const draft: Pipeline = { id: 'draft', createdAt: '', updatedAt: '', ...parsed.data };

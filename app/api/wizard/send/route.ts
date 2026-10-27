@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getDb } from '@/lib/data';
@@ -21,7 +22,7 @@ export const maxDuration = 180;
 const SendSchema = z.object({ projectId: z.string().min(1), text: z.string().min(1).max(8000) });
 
 export async function POST(request: Request) {
-  const parsed = SendSchema.safeParse(await request.json().catch(() => null));
+  const parsed = SendSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: 'projectId and text required' }, { status: 400 });
   const project = readProject(parsed.data.projectId);
   if (!project) return NextResponse.json({ ok: false, error: 'no such project' }, { status: 404 });

@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { adStore } from '@/lib/foreplay/store';
@@ -17,7 +18,7 @@ export const runtime = 'nodejs';
 const AskSchema = z.object({ question: z.string().min(3).max(600) });
 
 export async function POST(request: Request) {
-  const parsed = AskSchema.safeParse(await request.json().catch(() => null));
+  const parsed = AskSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: 'a question (3-600 chars) is required' }, { status: 400 });
   }

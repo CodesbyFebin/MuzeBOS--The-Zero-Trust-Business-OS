@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { probeFree } from '@/lib/creative-engine/health';
@@ -20,7 +21,7 @@ const ProbeBody = z.object({ model: z.enum(VIDEO_MODELS).optional(), override: z
 
 /** POST with no body: the free probes. POST {model}: the paid per-model probe (one cheapest request, recorded on delivery). */
 export async function POST(request: Request) {
-  const body = ProbeBody.safeParse(await request.json().catch(() => ({})));
+  const body = ProbeBody.safeParse(await readJsonBounded(request).catch(() => ({})));
   if (body.success && body.data.model) {
     try {
       const { run, failed } = await submitModelProbe(body.data.model, body.data.override);

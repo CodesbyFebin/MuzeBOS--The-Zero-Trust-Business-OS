@@ -23,7 +23,7 @@ export type NodeSpec = {
   tint: string;
   inputs: Port[];
   outputs: Port[];
-  settings: z.ZodTypeAny;
+  settings: z.ZodType<Record<string, unknown>>;
   /** true = resolved locally in the engine, no Arcads call */
   local?: boolean;
   /** one line for the palette */

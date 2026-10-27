@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { buildPrompt, parseWorkflowDraft, runClaude } from './logic';
@@ -17,7 +18,7 @@ const DraftRequestSchema = z.object({ prompt: z.string().min(1).max(4000) });
  * honest `unavailable` state rather than fabricating a draft.
  */
 export async function POST(request: Request) {
-  const parsed = DraftRequestSchema.safeParse(await request.json().catch(() => null));
+  const parsed = DraftRequestSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: 'a prompt is required' }, { status: 400 });
 
   const first = await runClaude(buildPrompt(parsed.data.prompt));

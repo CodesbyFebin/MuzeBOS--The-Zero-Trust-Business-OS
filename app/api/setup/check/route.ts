@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getDb } from '@/lib/data';
@@ -13,7 +14,7 @@ const Body = z.object({
 
 /** Manual check-off for the few setup steps no code can verify. */
 export async function POST(req: Request) {
-  const parsed = Body.safeParse(await req.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: parsed.error.flatten() }, { status: 400 });
   }

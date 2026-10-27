@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { generateAngles } from '@/lib/creative-engine/angles';
@@ -13,7 +14,7 @@ const Body = z.object({ campaignId: z.string() });
 
 /** Angles grounded on the research pool; every angle cites real ad ids or is dropped. */
 export async function POST(request: Request) {
-  const parsed = Body.safeParse(await request.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: 'campaignId required' }, { status: 400 });
   const campaign = readCampaign(parsed.data.campaignId);
   if (!campaign) return NextResponse.json({ ok: false, error: 'campaign not found' }, { status: 404 });

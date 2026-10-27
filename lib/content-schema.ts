@@ -62,7 +62,7 @@ export type SpecMedia = z.infer<typeof SpecMediaSchema>;
 export const TaskSpecSchema = z.object({
   model: z.string().min(1),
   params: z
-    .record(z.union([z.string(), z.number(), z.boolean(), z.array(z.string()), z.array(z.number())]))
+    .record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.array(z.string()), z.array(z.number())]))
     .default({}),
   aspectRatio: z.string().nullable().default(null),
   duration: z.number().nullable().default(null),

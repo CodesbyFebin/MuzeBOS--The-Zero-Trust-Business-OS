@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { editedVersion, writeScript } from '@/lib/creative-engine/scripts';
@@ -14,7 +15,7 @@ const Body = z.object({
   campaignId: z.string(),
   action: z.enum(['approve', 'edit', 'regenerate']),
   version: z.number().int().min(1).optional(), // approve
-  beats: z.array(BeatSchema).optional(), // edit
+  beats: z.array(BeatSchema).max(1000).optional(), // edit
   cta: z.string().max(140).optional(), // edit
   instruction: z.string().max(400).optional(), // regenerate (whole or "beat N")
   beatIndex: z.number().int().min(0).optional(), // regenerate one beat
@@ -23,7 +24,7 @@ const Body = z.object({
 /** Approve a version, save a manual edit as a new version, or regenerate (all beats or one) as a new version. */
 export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const parsed = Body.safeParse(await request.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const b = parsed.data;
   const campaign = readCampaign(b.campaignId);

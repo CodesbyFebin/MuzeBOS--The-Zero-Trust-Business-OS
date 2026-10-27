@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { WorkflowEdgeSchema, WorkflowNodeSchema } from '@/lib/creative-engine/schemas';
@@ -36,8 +37,8 @@ const Patch = z.object({
   name: z.string().min(1).max(80).optional(),
   layout: LayoutSchema.optional(),
   /** legacy body: runtime fields in it are ignored */
-  nodes: z.array(WorkflowNodeSchema).optional(),
-  edges: z.array(WorkflowEdgeSchema).optional(),
+  nodes: z.array(WorkflowNodeSchema).max(1000).optional(),
+  edges: z.array(WorkflowEdgeSchema).max(1000).optional(),
   baseUpdatedAt: z.string().optional(),
   force: z.boolean().optional(),
   reset: z.boolean().optional(),
@@ -47,7 +48,7 @@ const Patch = z.object({
 
 export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const parsed = Patch.safeParse(await request.json().catch(() => null));
+  const parsed = Patch.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const p = parsed.data;
   const current = readWorkflow(params.id);

@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { submitImage } from '@/lib/creative-engine/generate';
@@ -11,7 +12,7 @@ export const maxDuration = 120;
 const Body = z.object({ campaignId: z.string(), model: z.enum(IMAGE_MODELS).default('nano-banana-2'), prompt: z.string().min(10).max(2000), aspectRatio: z.enum(['1:1', '16:9', '9:16']).default('1:1'), productId: z.string().nullable().optional() });
 
 export async function POST(request: Request) {
-  const parsed = Body.safeParse(await request.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const campaign = readCampaign(parsed.data.campaignId);
   if (!campaign) return NextResponse.json({ ok: false, error: 'campaign not found' }, { status: 404 });

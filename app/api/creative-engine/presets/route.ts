@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
@@ -15,7 +16,7 @@ export async function GET() {
 const Body = z.object({ name: z.string().min(1).max(60), controls: ConsoleControlsSchema.partial() });
 
 export async function POST(request: Request) {
-  const parsed = Body.safeParse(await request.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const preset = { id: `pre-${randomUUID().slice(0, 6)}`, name: parsed.data.name, builtin: false, controls: parsed.data.controls, at: new Date().toISOString() };
   writePresets([preset, ...readPresets()]);

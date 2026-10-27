@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
@@ -13,7 +14,7 @@ export async function GET() {
 
 const CreateSchema = z.object({
   caption: z.string().min(1, 'caption is required'),
-  platforms: z.array(SocialPlatformSchema).min(1, 'pick at least one platform'),
+  platforms: z.array(SocialPlatformSchema).min(1, 'pick at least one platform').max(1000),
   mediaUrl: z.string().url().nullish(),
   scheduledFor: z.string().nullish(),
 });
@@ -24,7 +25,7 @@ const CreateSchema = z.object({
  * up. Wiring an actual Zernio publish is a deliberate later step.
  */
 export async function POST(request: Request) {
-  const parsed = CreateSchema.safeParse(await request.json().catch(() => null));
+  const parsed = CreateSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const post: SocialPost = {

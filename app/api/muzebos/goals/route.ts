@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -14,7 +15,7 @@ function fail(e: unknown) {
 export async function GET(req: Request) { try { businessAccess(req); return NextResponse.json({ goals: listGoals(businessStore()) }); } catch (e) { return fail(e); } }
 export async function POST(req: Request) {
   try {
-    businessAccess(req); const body = cmd.parse(await req.json()); const s = businessStore();
+    businessAccess(req); const body = cmd.parse(await readJsonBounded(req)); const s = businessStore();
     switch (body.action) {
       case 'createGoal': return NextResponse.json({ goal: createGoal(s, body) });
       case 'addProject': return NextResponse.json({ goal: addProject(s, body) });

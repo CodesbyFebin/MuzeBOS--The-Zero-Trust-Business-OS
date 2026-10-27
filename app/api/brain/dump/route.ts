@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { ingestBrainDump } from '@/lib/brain-dump';
@@ -9,11 +10,11 @@ const DumpSchema = z.object({
   text: z.string().min(1),
   title: z.string().optional(),
   folder: z.string().regex(/^[a-z0-9-]+$/i),
-  tags: z.array(z.string()).default([]),
+  tags: z.array(z.string()).max(1000).default([]),
 });
 
 export async function POST(request: Request) {
-  const parsed = DumpSchema.safeParse(await request.json().catch(() => null));
+  const parsed = DumpSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

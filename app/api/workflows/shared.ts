@@ -17,7 +17,7 @@ export const WorkflowStepInputSchema = z.object({
   ownerKind: WorkflowOwnerKindSchema,
   owner: z.string().min(1),
   hoursPerWeek: z.number().nonnegative(),
-  tools: z.array(z.string()),
+  tools: z.array(z.string()).max(1000),
   automation: z
     .object({
       title: z.string().min(1),
@@ -34,7 +34,7 @@ export const WorkflowStepInputSchema = z.object({
   edgeLabel: z.string().nullable().optional(),
   ownerAgentId: z.string().min(1).nullable().optional(),
   kind: z.string().min(1).optional(),
-  config: z.record(z.unknown()).optional(),
+  config: z.record(z.string(), z.unknown()).optional(),
   pos: z.object({ x: z.number(), y: z.number() }).nullable().optional(),
 });
 export type WorkflowStepInput = z.infer<typeof WorkflowStepInputSchema>;
@@ -43,7 +43,7 @@ export const WorkflowInputSchema = z
   .object({
     name: z.string().min(1, 'name is required'),
     subtitle: z.string(),
-    steps: z.array(WorkflowStepInputSchema).min(1, 'a workflow needs at least one step'),
+    steps: z.array(WorkflowStepInputSchema).min(1, 'a workflow needs at least one step').max(1000),
     ratioTarget: z.number().min(0).max(1).nullable().optional(),
     // Label for the version this save records ("moved approve step", …).
     note: z.string().optional(),

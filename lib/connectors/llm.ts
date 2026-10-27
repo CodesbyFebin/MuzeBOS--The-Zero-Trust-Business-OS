@@ -17,7 +17,7 @@ export type LlmMessage = { role: LlmRole; content: string };
 export type LlmToolSpec = {
   name: string;
   description: string;
-  parameters: z.ZodTypeAny;
+  parameters: z.ZodType<Record<string, unknown>>;
   execute: (args: Record<string, unknown>) => Promise<unknown>;
 };
 

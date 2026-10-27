@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getDb } from '@/lib/data';
@@ -14,7 +15,7 @@ const Body = z.object({
 /** Status change on a work request (mark done or failed, re-queue). Local write only. */
 export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const parsed = Body.safeParse(await req.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'status must be draft, queued, running, done or failed' }, { status: 400 });
   const work = getDb().clientWork.setStatus(params.id, parsed.data.status, { detail: parsed.data.detail });
   if (!work) return NextResponse.json({ error: 'unknown work request' }, { status: 404 });

@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { newScript, writeScript } from '@/lib/creative-engine/scripts';
@@ -14,7 +15,7 @@ const Body = z.object({ campaignId: z.string(), angleId: z.string(), framework: 
 
 /** Create a script for a selected angle and write its first version. */
 export async function POST(request: Request) {
-  const parsed = Body.safeParse(await request.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const { campaignId, angleId, framework } = parsed.data;
   const controls = ScriptControlsSchema.parse(parsed.data.controls);

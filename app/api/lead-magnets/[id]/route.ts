@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { LeadMagnetPatchSchema } from '@/lib/schemas';
@@ -8,7 +9,7 @@ export const runtime = 'nodejs';
 /** Edit a lead magnet (status change inline, or the edit form). Validated whole. */
 export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const parsed = LeadMagnetPatchSchema.safeParse(await req.json().catch(() => null));
+  const parsed = LeadMagnetPatchSchema.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'invalid change', issues: parsed.error.flatten() }, { status: 400 });
   if (Object.keys(parsed.data).length === 0) return NextResponse.json({ error: 'nothing to change' }, { status: 400 });
   const magnet = getDb().leadMagnets.update(params.id, parsed.data);

@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { authorizePush } from '@/lib/push-auth';
@@ -15,7 +16,7 @@ export const runtime = 'nodejs';
 export async function POST(req: Request) {
   const auth = authorizePush(req, 'USAGE_PUSH_TOKEN');
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
-  const parsed = UsagePushSchema.safeParse(await req.json().catch(() => null));
+  const parsed = UsagePushSchema.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'invalid push', issues: parsed.error.flatten() }, { status: 400 });
   const stored = getDb().usageReadings.replaceForMachine(parsed.data.machine, parsed.data.readings);
   return NextResponse.json({ ok: true, machine: parsed.data.machine, stored });

@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -29,7 +30,7 @@ export async function GET(req: Request) {
 }
 export async function POST(req: Request) {
   try {
-    businessAccess(req); const c = cmd.parse(await req.json()); const s = businessStore();
+    businessAccess(req); const c = cmd.parse(await readJsonBounded(req)); const s = businessStore();
     if (c.action === 'setup') return withSession({ ok: true }, setupWorkspace(s, c.setup).token, req);
     if (c.action === 'signIn') return withSession({ ok: true }, signIn(s, c.credentials).token, req);
     if (c.action === 'redeem') return withSession({ ok: true }, redeemMagicLink(s, c.link).token, req);

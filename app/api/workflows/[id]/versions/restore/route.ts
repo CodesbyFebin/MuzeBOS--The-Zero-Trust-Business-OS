@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { WorkflowSchema } from '@/lib/schemas';
@@ -9,7 +10,7 @@ export const dynamic = 'force-dynamic';
  *  ever grows. */
 export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
  const params = await props.params;
- const body = (await request.json().catch(() => null)) as { versionId?: unknown } | null;
+ const body = (await readJsonBounded(request).catch(() => null)) as { versionId?: unknown } | null;
  if (typeof body?.versionId !== 'string') return NextResponse.json({ error: 'versionId required' }, { status: 400 });
  const db = getDb();
  const existing = db.workflows.get(params.id);

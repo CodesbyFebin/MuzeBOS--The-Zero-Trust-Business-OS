@@ -45,3 +45,9 @@ Scan command: `npm audit --omit=dev` (also run with `--json`). Package manager: 
 | Why it is still open | Moving to zod 4 means changing about 154 files the week before the deadline, and it has not been tested here. Planned next action: migrate to zod 4 on a separate branch and drop this entry once `npm audit --omit=dev` reports 0. |
 
 Nothing is suppressed. There is no `audit-level` override and no ignore file, and the scan still exits 1 because of this finding.
+
+## Update: zod 4 migration (branch fix/zod4, 2026-10-28 IST)
+- zod 3.25.76 → **4.6.7**. Changes: `z.record(v)` → `z.record(z.string(), v)` (16 sites); issue `.type` → `.origin` (console-ui); `ZodTypeAny` → `ZodType<Record<string, unknown>>` for tool/node settings.
+- Every `z.array` in `app/api/**` and `lib/muzebos/**` now has an upper bound (12 added, `.max(1000)`); enforced by `tests/release-zod4-bounds.test.ts`. Schemas in `lib/schemas.ts` (mostly stored-data read schemas) are not bounded yet.
+- Streaming cap: `lib/bounded-body.ts` `readJsonBounded()` replaces all `await req.json()` / `await request.json()` in `app/api` (96 call sites, now enforced by test). It stops reading a chunked body without Content-Length at 2 MB. Routes surface it through their existing error handling (often 400, not always 413).
+- `npm audit --omit=dev` → **found 0 vulnerabilities**, exit 0.
