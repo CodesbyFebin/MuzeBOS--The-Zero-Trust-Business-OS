@@ -3,12 +3,15 @@
  * Operately (Apache-2.0 core): measurable goals linked to projects, with regular check-ins.
  * No Operately code or assets are used. Built during the Meta hackathon (PR #23).
  *
- * Muse Spark can DRAFT a check-in; the draft is returned, never saved. A human saves it.
+ * A rule draft is instant. A Muse Spark draft is an InferenceStore task gated by Jev approval;
+ * its output is returned for editing and never saved. A human posts the check-in.
  */
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { BusinessError, type BusinessStore } from './store';
-import { metaChat, metaKey, META_MODELS } from './ai/meta';
+import { InferenceStore } from './inference/store';
+import { routes, fingerprint } from './inference/routing';
+import { runtimeEnv } from '@/lib/creds';
 
 type Env = Record<string, string | undefined>;
 export const CHECKIN_STATUS = ['on_track', 'at_risk', 'off_track'] as const;
@@ -79,16 +82,16 @@ export function ruleDraft(g: Goal, now = new Date()): CheckinDraft {
   const done = g.projects.filter((p) => p.done).length;
   return { status, source: 'rule', saved: false, note: `${g.title}: ${g.current}${g.unit} of ${g.target}${g.unit} (${g.progress}%)${exp === null ? '' : `, ${exp}% expected by now`}. Projects: ${done}/${g.projects.length} done.` };
 }
-export async function draftCheckin(s: BusinessStore, goalId: string, opts: { env?: Env; fetch?: typeof fetch; now?: Date } = {}): Promise<CheckinDraft & { note2?: string }> {
-  const g = getGoal(s, goalId); const env = opts.env ?? process.env; const base = ruleDraft(g, opts.now);
-  if (!metaKey(env)) return base;
-  try {
-    const r = await metaChat(META_MODELS.spark, [
-      { role: 'system', content: 'You draft a short weekly goal check-in for a small business owner. Use only the facts given; do not invent numbers. Reply with ONLY JSON {"status":"on_track|at_risk|off_track","note":"..."}' },
-      { role: 'user', content: JSON.stringify({ goal: g.title, unit: g.unit, start: g.start, target: g.target, current: g.current, due: g.due, progressPct: g.progress, ruleAssessment: base.status, projects: g.projects.map((p) => ({ title: p.title, done: !!p.done })), recentCheckins: g.checkins.slice(0, 3).map((c) => ({ status: c.status, note: c.note })) }) },
-    ], { env, fetch: opts.fetch });
-    const m = r.text.match(/\{[\s\S]*\}/); const d = m ? DraftSchema.safeParse(JSON.parse(m[0])) : null;
-    if (d?.success) return { ...d.data, source: r.model, saved: false };
-    return { ...base, note2: 'Model draft failed validation; showing the rule draft.' };
-  } catch (e) { return { ...base, note2: `Model call failed: ${(e as Error).message.slice(0, 160)}` }; }
+/** Files a Muse Spark check-in draft as an InferenceStore task. It costs nothing until it is approved in the Jev inference queue. */
+export function requestModelDraft(s: BusinessStore, goalId: string, opts: { env?: Env; lane?: 'meta' | 'baseten'; paidConsent?: boolean } = {}) {
+  const g = getGoal(s, goalId); const base = ruleDraft(g);
+  const facts = JSON.stringify({ goal: g.title, unit: g.unit, start: g.start, target: g.target, current: g.current, due: g.due, progressPct: g.progress, ruleAssessment: base.status, projects: g.projects.map((p) => ({ title: p.title, done: !!p.done })), recentCheckins: g.checkins.slice(0, 3).map((c) => ({ status: c.status, note: c.note })) });
+  return new InferenceStore(s, () => routes(opts.env ?? runtimeEnv())).create({ title: `Check-in draft: ${g.title.slice(0, 120)}`, prompt: `Draft a short weekly goal check-in for a small business owner using only these facts; do not invent numbers. Return exactly {"status":"on_track|at_risk|off_track","note":"..."}, no markdown. Facts: ${facts}`, kind: 'draft', lane: opts.lane ?? 'meta', maxTokens: 512, paidConsent: !!opts.paidConsent });
+}
+/** Reads a completed, approved draft. It is returned for human editing and never saved. */
+export function readModelDraft(s: BusinessStore, taskId: string, opts: { env?: Env } = {}): CheckinDraft {
+  const t = new InferenceStore(s, () => routes(opts.env ?? runtimeEnv())).task(taskId);
+  if (t.state !== 'completed' || t.approvedHash !== t.hash || fingerprint(t.payload) !== t.hash || !t.output || fingerprint(t.output) !== t.outputHash) throw new BusinessError('An approved, completed draft with intact evidence is required', 409);
+  let d; try { d = DraftSchema.strict().parse(JSON.parse(t.output)); } catch { throw new BusinessError('Draft was not exactly the expected JSON; nothing saved', 422); }
+  return { ...d, source: t.payload.model, saved: false };
 }
