@@ -136,7 +136,7 @@ Tests: tests/hackathon-missions-goals.test.ts (8 tests). They use injected proto
 
 Tests: tests/hackathon-chief-of-staff.test.ts (3 tests).
 
-## Built during the event: batch 4 (stacked PR on #26)
+## Built during the event: batch 4 (PR #27, stacked on #26)
 
 | Feature | Inspired by (observed behaviour) | Files |
 |---|---|---|
@@ -146,7 +146,7 @@ Tests: tests/hackathon-chief-of-staff.test.ts (3 tests).
 
 Tests: tests/hackathon-pipeline-finance.test.ts (4 tests, injected fixtures only).
 
-## Built during the event: batch 5 (stacked PR on batch 4)
+## Built during the event: batch 5 (stacked PR #28 on #27)
 
 | Feature | Inspired by (observed behaviour) | Files |
 |---|---|---|

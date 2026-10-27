@@ -84,7 +84,7 @@ studied for observed behaviour only.
 | Human approval bound to the exact payload | cyber-ai-team (replay protection) | Already ours | Inherited before the event (Jev) |
 | Deal pipeline with win probability, founder dashboard (runway, MRR) | BoomBigNose (AGPL), coreBOS | High | **Built during the event** (PR #27), clean-room |
 | Expenses where nobody approves their own | BoomBigNose (AGPL) | Medium | **Built during the event** (PR #27), multi-member rules |
-| Per-department permission walls | Agent-Staff, dswh | Medium | **Built during the event** (batch 5 PR), clean-room |
-| Layered memory | clawcompany, hive, cyber-ai-team | Medium | **Built during the event** (batch 5 PR), clean-room |
+| Per-department permission walls | Agent-Staff, dswh | Medium | **Built during the event** (PR #28), clean-room |
+| Layered memory | clawcompany, hive, cyber-ai-team | Medium | **Built during the event** (PR #28), clean-room |
 | Per-user credential fan-out, federation, SSO | townsquare | Low for a solo founder | Skipped |
 | Skills/CLAUDE.md starter kits | BoS_OS_*, company-os-starter-kit, sylph, rojenwai | Low (docs, not product) | Skipped |
