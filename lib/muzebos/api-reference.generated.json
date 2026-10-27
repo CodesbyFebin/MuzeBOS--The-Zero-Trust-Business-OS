@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 209,
+ "count": 210,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -2041,6 +2041,18 @@
     "POST"
    ],
    "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/muzebos/records",
+   "file": "app/api/muzebos/records/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST only: every record export requires a signed-in member with the right permission.",
    "idempotencyKey": false,
    "originCheck": true,
    "schemaValidated": true,
