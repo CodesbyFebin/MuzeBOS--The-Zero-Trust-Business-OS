@@ -1,6 +1,6 @@
 # Project board
 
-Updated: 2026-10-25
+Updated: 2026-10-26
 
 ## MuzeBOS commerce and reference UI
 
@@ -54,3 +54,54 @@ Updated: 2026-10-25
 - [x] Publish qualified integration source to GitHub.
 
 GitHub CI and merge state are tracked live in [PR #1](https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/1). External service deployment remains outside this qualification.
+
+## Inference workspace — 2026-10-26
+
+| Area | State |
+| --- | --- |
+| Persistent inference queue, routing and exact-task Jev gate | Verified locally; see MUZEBOS-INFERENCE-VERIFICATION.md |
+| Leased browser/server workers, cancellation and bounded delegation | Implemented; domain and process tests pass |
+| WebLLM Web Worker and mobile control UI | Browser control checks passed; physical GPU inference unverified |
+| Ollama, Meta Wonder and OpenRouter text protocols | Implemented; fixture-tested, live endpoints/credentials not configured |
+| Muse Code/Wonder Full and OpenClaw execution | Blocked pending qualified isolated runtime and per-tool bridge |
+| zkVM proof generation/verification | Not configured; no proof claims |
+| Docker Compose and hidden-password bootstrap | Prepared; Docker unavailable for runtime qualification |
+
+- [x] Keep the existing repository and 18-destination navigation.
+- [x] Add durable draft execution and finite policy limits.
+- [x] Complete local build/browser qualification and prepare the reviewable inference change.
+
+Inference publication and CI are tracked on `feat/inference-swarm` and the repository pull-request list. External execution/deployment gates remain blocked as listed above.
+
+## Feature-stack integration and search documentation — 2026-10-26
+
+| Area | State |
+| --- | --- |
+| 13 open feature PRs | All 13 source heads included while preserving persistent inference; merge state is tracked in the integration PR |
+| Public README and seven answer-oriented guides | Verified metadata/links/rendering; evidence and limits remain explicit |
+| Static project documentation export | Built and rendered at desktop/mobile sizes; no Pages deployment claimed |
+| Private workspace indexing controls | Implemented; authentication retained |
+| About description/topics | Description and all 16 topics saved and verified on GitHub, October 27; Website remains blank pending deployment |
+| Verification | See MUZEBOS-SEARCH-RELEASE.md |
+
+- [x] Inspect live PR dependency stack and source conflicts.
+- [x] Preserve both persistent inference and stacked business modules.
+- [x] Add accurate public answers, structured metadata and contribution guidance.
+- [x] Qualify focused behavior, production build, app/browser flows and public docs.
+- [x] Prepare the combined integration and full-suite CI merge gate; live merge state is linked in MUZEBOS-SEARCH-RELEASE.md.
+- [ ] Verify public-site deployment and search measurements separately.
+
+
+## Hackathon submission candidate — 2026-10-27
+
+Frozen pre-event baseline: `1105e64ca6c6791170e619d9f446c81b9e6aec22`.
+All prior feature PRs are merged and the repository is public. This new submission
+PR credits FounderOS and every existing MuzeBOS feature as inherited/pre-event.
+
+- New: Baseten Spark Open adapter, Meta Spark model selection and response checks.
+- New: completed server draft to separately approved Jev reminder proposal.
+- New: bounded fixture/live demo runner and judge/video/X draft materials.
+- Qualification: 5,030 tests passed, 8 skipped; typecheck/build and four production browser suites passed. See `docs/hackathon/VERIFICATION.md`.
+- Blocked externally: live model calls, credits/access and provider spending setup.
+- Founder-owned: track/rules confirmation, video, X publication and platform submission.
+- No submission, live-model, 24/7 swarm, zkVM or eligibility claim.

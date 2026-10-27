@@ -1,145 +1,144 @@
-> **Hackathon judges:** start with [HACKATHON.md](HACKATHON.md). It covers the
-> theme, the Meta models used (Muse Spark 1.3, Muse Wonder, Muse Spark Open on
-> Baseten), the Jev approval-gate architecture, and an exact table of what was
-> built during the event versus inherited from FounderOS and pre-event work.
-> Try it: `npm install && npm run demo:agent` (set `META_MODEL_API_KEY` for live
-> Meta calls).
-
 # MuzeBOS — The Zero-Trust Business OS
+
+**A self-hostable business workspace for founders and small businesses, with
+SQLite invoicing, inventory, CRM, approval-gated AI tasks and audit evidence.**
 
 Run your business. Approve what matters. Verify what happened.
 
-A self-hostable business workspace built from FounderOS. MuzeBOS adds a real,
-local SQLite commerce desk to the inherited business and AI department screens,
-with a dark operational interface inspired by the supplied reference.
+[![CI](https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/actions/workflows/ci.yml)
 
-**Version 0.1.1: single-operator local preview.** The name describes the design
-goal; this release is not a claim of independently certified zero-trust security
-or production readiness.
+[Documentation](docs/search/README.md) · [Self-host](docs/search/self-hosting.md) ·
+[Invoice approvals](docs/search/invoice-approvals.md) ·
+[WebLLM inference](docs/search/webllm-inference.md) ·
+[Evidence and limits](docs/search/verification.md) · [Contribute](CONTRIBUTING.md)
 
-## Daily founder workspace
+**Release posture: single-operator local preview (package 0.1.1).** The project
+name describes a security design goal; it is not an independent certification or
+production-readiness claim. MuzeBOS extends the attributed FounderOS/GladOS source.
 
-The sidebar has 18 destinations, with daily categories first and five utilities
-pinned below. All 205 requested pillars are organized inside category hubs with
-Available, Existing, or Planned labels. The home page is Mission Control: it
-shows real approvals, pending invoice requests, stockouts, tasks, persistent
-reminders, actual relationships, audit events and connector status. Updates poll
-every 20 seconds while visible; errors retain the last timestamped snapshot.
-See [navigation and status details](docs/MUZEBOS-NAVIGATION.md).
+## Hackathon reviewers
 
-## What works locally
+This is an **existing FounderOS-based product**. Only the new submission-PR delta
+is proposed as event work: Baseten Muse Spark Open routing, explicit Meta Spark
+selection, a completed-draft → Jev reminder handoff and reproducible demo tooling.
+Provider adapters are implemented and fixture-tested; **live API execution remains
+unverified**. No eligibility, prize or entire-product event-build claim is made.
 
-- Customers and a product catalog with unique SKUs and opening stock.
-- Invoice drafts with integer money, deterministic per-line tax rounding,
-  exact payload hashes, and 30-minute approval expiry.
-- Explicit approve/reject actions. Issuance rechecks stock and atomically writes
-  the invoice, stock movements, order state, and audit event.
-- Retry idempotency and rejection of altered/replayed approvals.
-- Immutable-by-application invoice snapshots, including merchant details.
-- Printable invoices (browser Print → Save as PDF), configurable merchant
-  profile, optional UPI deep links, and explicit manual payment reconciliation.
-- A graph of actual customers, products and orders; counts come from the database.
-- A local tamper-evident event chain, with verification in the evidence view.
-- The original FounderOS screens, connectors, knowledge tools, agent roster,
-  and operator-password setup are retained. Their own configuration and
-  limitations still apply; they are not newly verified live integrations.
+Start with [provenance and contribution disclosure](HACKATHON.md),
+[the judge guide](docs/hackathon/JUDGES.md),
+[the demo/video script](docs/hackathon/DEMO.md) and
+[qualification evidence](docs/hackathon/VERIFICATION.md).
+`npm run hackathon:demo -- --fixture both` runs without model credentials.
 
-A generated UPI request is **not payment confirmation**. Manual reconciliation
-is labeled separately from provider-verified settlement. Invoice tax rates and
-business details are merchant supplied; this is not GST filing or a registered
-e-invoice service.
+## What is MuzeBOS?
 
-## Start
+MuzeBOS organizes daily business work into Orders, Money, Talk, Stock and Growth,
+with weekly operations/AI tools and setup controls below. Mission Control reads
+persisted records for approvals, reminders, stock alerts, activity and real
+customer/product/order relationships. Its 18 primary destinations organize the
+205 requested pillars; a page's local scope and provider dependencies remain
+explicit. Page count is not a count of fully deployed integrations.
 
-Use **Node.js 22 LTS** (the tested runtime).
+| Area | Implemented scope | Boundary |
+| --- | --- | --- |
+| Commerce | Customers, catalog, order drafts, merchant invoice profile and issuance | Merchant-supplied business/tax details |
+| Approval | Exact canonical payload hash, expiry, stock recheck and atomic commit | A model cannot authorize its own business write |
+| Inventory | Stock movements and bounded local stock/warehouse modules | Supplier and delivery services need separate integration |
+| Money | Integer minor units, invoice snapshots, UPI request and manual reconciliation | Request ≠ settlement; no universal zero-fee claim |
+| Workflows | Durable local workflow state, approvals, retry policy and evidence | Only explicitly implemented tools execute |
+| AI workspace | Persistent draft queue, Jev review, bounded delegation and worker leases | Live providers and physical WebGPU inference unverified |
+| Provider pages | Local records, secret references, connection probes and queued outboxes | Configuration/probe ≠ successful dispatch |
+| Evidence | Filterable/exportable local event chain and source-linked records | A DB administrator can rewrite an unanchored chain |
 
-```bash
+## Run on your own machine
+
+Use **Node.js 22** and the locked dependencies:
+
+```sh
 npm ci
 npm run dev
 ```
 
-Open http://localhost:4100. Real mode is the default. No fabricated business
-records are inserted. The inherited demo mode is optional; the MuzeBOS commerce
-store remains separate and always contains real operator-entered records.
+Open `http://localhost:4100`. Real mode is the default; no fabricated business
+records are inserted. Configure an operator password under Settings → Security
+before any remote access. The startup wrapper restricts binding until setup.
+For production compilation: `npm run build`, then `npm start`.
 
-The startup wrapper binds to loopback until an operator password is configured
-under **Settings → Security**. Keep it private. Use a private-network deployment
-with TLS and configure a password before permitting remote access.
+Read [self-hosting](docs/search/self-hosting.md) and
+[operations/recovery](docs/MUZEBOS-OPERATIONS.md). `MUZEBOS_DB` selects commerce
+storage; `GLADOS_DB` selects inherited workspace storage. Secrets remain in
+ignored environment files. Use private TLS and the correct `MUZEBOS_ORIGIN`.
+Responsive web access is supported; no native Android/iOS or offline-sync release
+is claimed.
 
-```bash
+## Try approval-bound invoicing
+
+1. Add merchant details, a customer and a product with stock.
+2. Create a draft; review quantities, prices, tax and the exact payload hash.
+3. Approve and issue before expiry. Stock is rechecked inside the transaction.
+4. Inspect the issued invoice, inventory movement and audit evidence.
+5. Payment stays pending until evidence is recorded. Independently check the bank
+   before manual reconciliation; it is labelled separately from provider settlement.
+
+See [invoice approval](docs/search/invoice-approvals.md),
+[API](docs/MUZEBOS-API.md) and [UPI/tax limits](docs/search/upi-and-tax.md).
+Local tax calculations are not GST filing or government e-invoice registration.
+
+## WebLLM, Jev and model routing
+
+Open Brain → Inference & agent workspace (`/workspace/brain/inference`) for
+persistent tasks. Small/medium/large routing is deterministic. Jev binds approval
+to the exact task, model and configuration. Browser WebLLM loads an explicit
+Llama model in a Web Worker; a separate Node worker supports configured Ollama,
+Meta Wonder API and OpenRouter text routes. Failed attempts require review;
+there is no silent paid fallback in this persistent workspace.
+
+The merged feature stack also includes `/workspace/brain/runtime`, an experimental
+interactive proposal interface with different cost/fallback behavior. Its write
+proposal gate is not the persistent dispatch gate. See
+[the distinction and setup](docs/search/webllm-inference.md).
+
+Muse Code/Wonder Full, OpenClaw tool execution and zkVM proving remain blocked
+until their external runtime, isolation and verification bridges are qualified.
+No live model call, 24-hour uptime or zk proof is claimed by this release.
+
+## Verification and contributions
+
+```sh
 npm run typecheck
 npm test -- --maxWorkers=4 --minWorkers=1
 npm run build
-npm start
+npm run docs:build
 ```
 
-The inherited build produces many pages and can require several minutes.
+Browser qualification uses disposable DBs and Playwright; never point it at your
+business database. Read [the integration/search release record](docs/MUZEBOS-SEARCH-RELEASE.md)
+for this change's executed checks and [feature/evidence limits](docs/search/verification.md)
+for what they establish. Older verification reports apply to their recorded revisions.
 
-Browser verification uses Playwright: install a Chromium browser with
-`npx playwright install chromium`, start the app with disposable
-`MUZEBOS_DB` and `GLADOS_DB` paths, then run `npm run test:browser`.
-This test creates real local records; never point it at your business database.
+[Contributing](CONTRIBUTING.md) explains reproduction, tests and evidence standards.
+[Security reporting](SECURITY.md) covers private disclosure. Do not post credentials,
+customer data or private invoice records in issues.
 
-## Try the real workflow
+## Public documentation and search
 
-1. Open Invoices → Merchant invoice profile. Enter your business details and,
-   optionally, a UPI ID. Save. Verify those details before using an invoice.
-2. Add a customer in Customers.
-3. Add a product in Inventory with its price, tax rate, and stock.
-4. Create a draft in Orders. Check items, quantities, totals, and payload hash.
-5. Approve & issue. Observe the invoice and stock change together.
-6. Open Invoices; payment remains pending. Print the invoice or use an optional
-   UPI request. Enter a bank reference only after independently checking payment.
-7. Open Evidence to inspect the issuance and manual reconciliation events.
+The answer-oriented [documentation hub](docs/search/README.md) covers concrete
+setup, invoice, inference, payment and data questions. `npm run docs:build` exports
+seven static pages to `site/` with distinct metadata, canonical links, structured
+source/article data and a public-docs-only sitemap. Those pages are prepared for
+separate hosting; their generated canonical URLs do not mean deployment is live.
+The operational app sends `noindex` directives and keeps its authentication gate.
 
-The form currently adds one SKU per draft. The API supports multi-line drafts.
-Catalog updates, invoice credit/void workflows, and stock replenishment UI are
-not part of this initial commerce release.
+No special file, keyword count or schema guarantees search rankings or AI citations.
+See [search implementation and measurement](docs/SEARCH-OPTIMIZATION.md).
 
-## Configuration
+## Attribution and upstream work
 
-See `.env.example`. The inherited `GLADOS_*` variables remain compatible.
+Derived from the supplied FounderOS (on GladOS) source. Original MIT copyright
+and attribution remain in [LICENSE](LICENSE); upstream names remain in internal
+compatibility code. MuzeBOS changes: CodesbyFebin, 2026.
 
-| Variable | Purpose |
-| --- | --- |
-| `MUZEBOS_DB` | Absolute commerce database path; default `data/muzebos-business.db` |
-| `MUZEBOS_ORIGIN` | Exact browser origin for commerce mutations behind a proxy |
-| `GLADOS_DEFAULT_MODE` | `real` by default; inherited demo content requires opt-in |
-| `GLADOS_HOST` | Bind interface; startup wrapper refuses remote bind without password |
-| `PORT` | Default `4100` |
-
-The commerce API is `/api/business`. Mutations require same-origin requests and
-an `Idempotency-Key` UUID. See [API](docs/MUZEBOS-API.md).
-
-## Scope and remaining gates
-
-This release retains single-operator authentication. Passkeys, individual
-accounts, RBAC, tenant isolation, durable commerce workers, live Meta messaging,
-vision-to-product recognition, verified payment webhooks, global tax compliance,
-and an independent security assessment remain incomplete.
-
-No unsupported Meta model identifiers or endpoints have been added. No external
-provider is called by the new commerce flow. No pilot metrics, customers,
-transaction volumes or accuracy results are claimed.
-
-See [architecture and threat model](docs/MUZEBOS-ARCHITECTURE.md),
-[verification](docs/MUZEBOS-VERIFICATION.md), and
-[deployment and recovery](docs/MUZEBOS-OPERATIONS.md).
-
-## Attribution
-
-Derived from the supplied FounderOS (on GladOS) source. The original MIT license
-and copyright remain in [LICENSE](LICENSE). Internal directory names, historical
-design documents, environment keys, and compatibility code retain upstream
-names intentionally. New MuzeBOS work: CodesbyFebin, 2026.
-
-## Reviewed upstream integrations
-
-The source catalog covers 29 pinned repositories, with licenses and integration
-status kept separate from deployment claims. New local sections include resource
-bookings, an attributed AI employee/founder prompt library, and a limited
-browser-local permission review using AgentShield's MIT normalizer.
-
-See [integration review](docs/MUZEBOS-UPSTREAM-INTEGRATIONS.md) and
-[third-party notices](THIRD_PARTY_NOTICES.md). No external applications or
-autonomous employee schedules are launched by these sections.
+The 29-repository review separates source/licensing from live integrations.
+Read [reviewed integrations](docs/MUZEBOS-UPSTREAM-INTEGRATIONS.md) and
+[third-party notices](THIRD_PARTY_NOTICES.md). External services, model weights and
+provider terms retain their own licences and limits.

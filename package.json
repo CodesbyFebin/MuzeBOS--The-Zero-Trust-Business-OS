@@ -2,7 +2,7 @@
   "name": "muzebos",
   "version": "0.1.1",
   "private": true,
-  "description": "MuzeBOS — local-first business workspace with approval-bound invoicing and evidence",
+  "description": "Self-hostable business OS with SQLite invoicing, inventory, CRM, approval-gated AI tasks and audit evidence",
   "scripts": {
     "dev": "node scripts/serve.mjs dev",
     "build": "next build",
@@ -21,6 +21,9 @@
     "test:mission-browser": "node scripts/muzebos-mission-browser.mjs",
     "test:integrations-browser": "node scripts/muzebos-integrations-browser.mjs",
     "test:qualify-browser": "node scripts/muzebos-qualify-browser.mjs",
+    "inference:worker": "tsx scripts/inference-worker.ts",
+    "inference:once": "tsx scripts/inference-worker.ts --once",
+    "inference:bootstrap": "tsx scripts/inference-bootstrap.ts",
     "test:slice2-browser": "node scripts/muzebos-slice2-browser.mjs",
     "test:slice3-browser": "node scripts/muzebos-slice3-browser.mjs",
     "test:slice4-browser": "node scripts/muzebos-slice4-browser.mjs",
@@ -28,10 +31,14 @@
     "test:slice7-browser": "node scripts/muzebos-slice7-browser.mjs",
     "test:slice9-browser": "node scripts/muzebos-slice9-browser.mjs",
     "test:slice8-browser": "node scripts/muzebos-modules-browser.mjs",
-    "demo:agent": "tsx scripts/hackathon-demo.ts"
+    "docs:build": "node scripts/build-project-site.mjs",
+    "repo:metadata": "node scripts/update-repository-metadata.mjs",
+    "hackathon:demo": "node --import tsx scripts/hackathon-demo.ts",
+    "demo:agent": "node --import tsx scripts/hackathon-demo.ts"
   },
   "dependencies": {
     "@miosa/sdk": "^3.2.5",
+    "@mlc-ai/web-llm": "^0.2.86",
     "@notionhq/client": "^5.22.0",
     "@slack/web-api": "^7.16.0",
     "@types/d3-force": "^3.0.10",
@@ -63,5 +70,21 @@
     "typescript": "^5.6.2",
     "vitest": "^2.1.1"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "self-hosted",
+    "business-os",
+    "invoicing",
+    "inventory",
+    "crm",
+    "webllm",
+    "ai-agents"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/issues"
+  }
 }

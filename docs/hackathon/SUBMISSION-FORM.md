@@ -1,14 +1,24 @@
-# Submission form drafts (Cerebral Valley platform; user submits)
+# Submission form draft — founder reviews and submits
 
-- **Project name:** MuzeBOS: The Zero-Trust Business OS
-- **Track:** Indie developer
-- **Theme:** Build for Your World
-- **Tagline:** Meta models plan your business ops. Nothing gets written until you approve the exact payload.
-- **Description:** Solo founders juggle invoices, stock and follow-ups alone. MuzeBOS splits a founder's plain-language request into agent subtasks. Small ones go to Muse Spark 1.3 and large planning ones to Muse Wonder through the Meta Model API, or to open-weight Muse Spark Open on Baseten. Every proposed write is parsed as untrusted JSON and held at Jev, an approval gate bound to the canonical payload hash. Built on a FounderOS fork. HACKATHON.md lists exactly what was built during the event.
-- **Meta models used:** muse-spark-1.3, muse-wonder-1.0 (Meta Model API); meta-models/muse-spark-open-1026 (Baseten). Adapters exist for muse-image-1.0 and muse-voice-transcribe-1.0 but aren't in the demo.
-- **What was built during the hackathon:** see HACKATHON.md, section "Built during the hackathon" (branch feat/hackathon-submission).
-- **Repo:** https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS (must be public before submitting)
-- **Demo video:** [unlisted YouTube/Loom link, 3:00 max]
-- **X post link (Most Viral):** [link after posting]
-- **Bonus prizes to flag:** Best Agentic Use-Case; Best Build on Meta Open Weight Models (only if the Baseten run is real)
-- **Team:** Febin Francis (solo)
+- Project: MuzeBOS — The Zero-Trust Business OS.
+- Theme candidate: Build for Your World.
+- Track: **Unconfirmed**. Existing FounderOS-based product; confirm organizer
+  permission and correct track before submission. Do not default to Indie.
+- Description: A new model-to-business handoff on an existing founder workspace.
+  Meta/Baseten draft inference requires Jev approval; completed strict reminder
+  proposals require a separate payload-bound action approval. The inherited
+  workspace and approval engine are pre-event work disclosed in HACKATHON.md.
+- Event contribution: the complete #22 diff plus its hardening/integration commits,
+  compared with frozen pre-event main `1105e64` and the earlier feature stack.
+- Models: adapters target `muse-spark-1.3` and `meta-models/muse-spark-open-1026`;
+  **live calls unverified**. Existing `muse-wonder-1.0` adapter retained. Image,
+  voice and SAM are not working submission integrations.
+- Repo: https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS (public).
+- Video: **pending actual live run and recording**, maximum three minutes.
+- X post: **pending real video and publication**; see X-POST.md for draft copy.
+- Team: founder must list all actual contributors accurately.
+- Bonuses: claim only after satisfying the current rules and producing real
+  provider evidence. No eligibility, credits or prize claim is made here.
+- Public event deadline checked October 27: November 4, 2026 at 9 PM ET,
+  converted with America/New_York to November 5 at 7:30 AM IST. Use 6:30 AM IST
+  as the founder's earlier submission target; confirm current platform deadline.

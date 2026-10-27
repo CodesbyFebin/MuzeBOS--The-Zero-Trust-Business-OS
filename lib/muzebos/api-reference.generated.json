@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 198,
+ "count": 199,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1283,6 +1283,19 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/inference",
+   "file": "app/api/inference/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": true,
+   "originCheck": true,
+   "schemaValidated": true,
    "access": "session"
   },
   {

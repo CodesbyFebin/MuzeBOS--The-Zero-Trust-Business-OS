@@ -104,10 +104,9 @@ describe('concurrent issuance across processes cannot oversell', () => {
     const orders = Array.from({ length: 8 }, () => s.draft({ customerId: c.id, lines: [{ productId: p.id, quantity: 4 }] }));
     s.close();
     const startAt = Date.now() + 2500;
-    const tsx = path.join(process.cwd(), 'node_modules', '.bin', 'tsx');
     const worker = path.join(process.cwd(), 'tests', 'helpers', 'issue-worker.ts');
     const half = (k: number) => orders.filter((_, i) => i % 2 === k).map((o) => `${o.id}:${o.hash}`);
-    const [r1, r2] = await Promise.all([0, 1].map((k) => run(tsx, [worker, file, String(startAt), ...half(k)], { cwd: process.cwd() })));
+    const [r1, r2] = await Promise.all([0, 1].map((k) => run(process.execPath, ['--import', 'tsx', worker, file, String(startAt), ...half(k)], { cwd: process.cwd() })));
     const outcomes = [...JSON.parse(r1.stdout), ...JSON.parse(r2.stdout)] as string[];
     expect(outcomes.filter((o) => o.startsWith('ok')).length).toBe(2);
     expect(outcomes.filter((o) => o === 'refused:409').length).toBe(6);
