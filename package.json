@@ -2,7 +2,7 @@
   "name": "muzebos",
   "version": "0.1.1",
   "private": true,
-  "description": "MuzeBOS \u2014 local-first business workspace with approval-bound invoicing and evidence",
+  "description": "MuzeBOS — local-first business workspace with approval-bound invoicing and evidence",
   "scripts": {
     "dev": "node scripts/serve.mjs dev",
     "build": "next build",
@@ -27,7 +27,8 @@
     "test:slice5-browser": "node scripts/muzebos-slice5-browser.mjs",
     "test:slice7-browser": "node scripts/muzebos-slice7-browser.mjs",
     "test:slice9-browser": "node scripts/muzebos-slice9-browser.mjs",
-    "test:slice8-browser": "node scripts/muzebos-modules-browser.mjs"
+    "test:slice8-browser": "node scripts/muzebos-modules-browser.mjs",
+    "demo:agent": "tsx scripts/hackathon-demo.ts"
   },
   "dependencies": {
     "@miosa/sdk": "^3.2.5",

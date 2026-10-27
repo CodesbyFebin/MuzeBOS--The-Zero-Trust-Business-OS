@@ -1,3 +1,10 @@
+> **Hackathon judges:** start with [HACKATHON.md](HACKATHON.md). It covers the
+> theme, the Meta models used (Muse Spark 1.3, Muse Wonder, Muse Spark Open on
+> Baseten), the Jev approval-gate architecture, and an exact table of what was
+> built during the event versus inherited from FounderOS and pre-event work.
+> Try it: `npm install && npm run demo:agent` (set `META_MODEL_API_KEY` for live
+> Meta calls).
+
 # MuzeBOS — The Zero-Trust Business OS
 
 Run your business. Approve what matters. Verify what happened.
