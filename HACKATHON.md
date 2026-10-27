@@ -114,3 +114,14 @@ npx vitest run tests/hackathon-meta.test.ts
 - This is not certified as zero-trust or production-ready. "Zero-trust" is the
   design goal: models are untrusted and every write needs a human-approved
   hash.
+
+## Built during the event: batch 2 (stacked PR #23)
+
+These features were written clean-room during the hackathon. They are based on product behaviour we observed in public docs and sites. No code or assets were copied. See docs/hackathon/COMPETITORS.md.
+
+| Feature | Inspired by (observed behaviour) | Files |
+|---|---|---|
+| Lead and worker missions. Muse Wonder plans subtasks with dependencies. Muse Spark workers run each ready task. A dependent task starts only after its prerequisites finish, and is cancelled if one of them fails. Every write goes into the Jev queue. Without a key, a rule fallback runs. | desplega-ai/agent-swarm (MIT) | lib/muzebos/ai/lead.ts, app/api/muzebos/missions/route.ts, components/muzebos/MissionsBoard.tsx, /workspace/brain/missions |
+| Goals with linked projects and check-ins. Muse Spark drafts a check-in using only the goal's own numbers. The draft is never saved until a human posts it. | Operately (Apache-2.0 core) | lib/muzebos/goals.ts, app/api/muzebos/goals/route.ts, components/muzebos/GoalsBoard.tsx, /workspace/brain/goals |
+
+Tests: tests/hackathon-missions-goals.test.ts (7 tests). They use mocked model calls; no live Meta call has been made yet.
