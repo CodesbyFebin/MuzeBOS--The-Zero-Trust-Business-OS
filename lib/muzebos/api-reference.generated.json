@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 202,
+ "count": 205,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1943,6 +1943,32 @@
    "access": "session"
   },
   {
+   "path": "/api/muzebos/expenses",
+   "file": "app/api/muzebos/expenses/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/muzebos/founder",
+   "file": "app/api/muzebos/founder/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
    "path": "/api/muzebos/goals",
    "file": "app/api/muzebos/goals/route.ts",
    "methods": [
@@ -1958,6 +1984,19 @@
   {
    "path": "/api/muzebos/missions",
    "file": "app/api/muzebos/missions/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/muzebos/pipeline",
+   "file": "app/api/muzebos/pipeline/route.ts",
    "methods": [
     "GET",
     "POST"
