@@ -67,3 +67,6 @@ Both `test` jobs passed (runs 40598410733 and 40598416214): `npm ci`, typecheck,
 | `npm run test:qualify-browser` | 0 | PASS |
 | `npm audit --omit=dev` | 0 | 0 vulnerabilities |
 | `GET /api/muzebos/overdue` (fresh DB) | 200 | `liveGate.reason`: "BLOCKED: no Meta model API key configured", `senderConnected:false` |
+
+### CI for #31 (Node 22)
+Both `test` jobs passed (runs 40600003065 and 40600007878).
