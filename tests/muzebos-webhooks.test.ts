@@ -138,7 +138,7 @@ describe('route handler', () => {
     vi.doMock('@/lib/muzebos/store', async (orig) => ({ ...(await orig<object>()), businessStore: () => s }));
     vi.stubEnv('META_APP_SECRET', SECRET);
     const { POST, GET } = await import('@/app/api/webhooks/[source]/route');
-    const p = { params: { source: 'whatsapp' } };
+    const p = { params: Promise.resolve({ source: 'whatsapp' }) };
     const big = new ReadableStream<Uint8Array>({ pull(c) { c.enqueue(new Uint8Array(64 * 1024)); } });
     expect((await POST(new Request('http://x', { method: 'POST', body: big, duplex: 'half' } as RequestInit), p)).status).toBe(413);
     const b = wa('wamid.route');
@@ -146,7 +146,7 @@ describe('route handler', () => {
     const ok = await POST(new Request('http://x', { method: 'POST', body: b, headers: { 'x-hub-signature-256': sign(b) } }), p);
     expect([ok.status, await ok.text(), ok.headers.get('cache-control')]).toEqual([200, 'ok', 'no-store']);
     expect(s.webhookDeliveries()).toHaveLength(1);
-    expect((await POST(new Request('http://x', { method: 'POST', body: b }), { params: { source: 'sms' } })).status).toBe(404);
+    expect((await POST(new Request('http://x', { method: 'POST', body: b }), { params: Promise.resolve({ source: 'sms' }) })).status).toBe(404);
     expect((await GET(new Request('http://x/?hub.mode=subscribe&hub.verify_token=a'), p)).status).toBe(503);
     vi.stubEnv('META_APP_SECRET', '');
     expect((await POST(new Request('http://x', { method: 'POST', body: b, headers: { 'x-hub-signature-256': sign(b) } }), p)).status).toBe(503);

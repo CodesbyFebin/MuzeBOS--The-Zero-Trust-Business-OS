@@ -15,14 +15,14 @@ export const dynamic = 'force-dynamic';
  * URL and is resolved here, so every metric on the page is computed against
  * one window rather than each panel choosing its own.
  */
-export default function TasksPage(props: { searchParams?: { range?: string; task?: string } }) {
+export default async function TasksPage(props: { searchParams?: Promise<{ range?: string; task?: string }> }) {
   const db = getDb();
   // `props?` because the smoke test renders every page with no arguments at
   // all; a default parameter here would fail Next's generated PageProps.
-  const range = resolveRange(props?.searchParams?.range);
+  const range = resolveRange((await props?.searchParams)?.range);
   const tasks = db.agentTasks.all();
   // ?task=<id> (Home's Needs you, the composer): open the board on that task
-  const linked = linkedTask(tasks, props?.searchParams?.task);
+  const linked = linkedTask(tasks, (await props?.searchParams)?.task);
   // a year of runs covers the widest range the pill offers
   const runs = db.agentRuns.recent(5000);
 

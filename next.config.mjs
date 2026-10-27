@@ -54,12 +54,9 @@ const nextConfig = {
   },
   // This is the private business workspace. Public project docs are built separately in site/.
   async headers() { return [{ source: '/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' }] }]; },
-  experimental: {
-    outputFileTracingIncludes: { "/api/employee-library": ["./vendor/reference-documents/*.txt"] },
-    serverComponentsExternalPackages: ['better-sqlite3', 'node-ical', 'nodemailer'],
-    // instrumentation.ts: warms the live-read caches at boot (lib/warm.ts) and starts the cron tick when GLADOS_CRON=1 (SPEC O7).
-    instrumentationHook: true,
-  },
+  outputFileTracingIncludes: { "/api/employee-library": ["./vendor/reference-documents/*.txt"] },
+  serverExternalPackages: ['better-sqlite3', 'node-ical', 'nodemailer'],
+  // instrumentation.ts (on by default in Next 15): warms the live-read caches at boot (lib/warm.ts) and starts the cron tick when GLADOS_CRON=1 (SPEC O7).
 };
 
 export default nextConfig;

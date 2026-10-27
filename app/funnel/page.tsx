@@ -40,21 +40,22 @@ import { filmingMode } from '@/lib/paths';
 
 export const dynamic = 'force-dynamic';
 
-export default async function FunnelDashboardPage({
-  searchParams,
-}: {
-  searchParams?: {
-    venture?: string;
-    stage?: string;
-    view?: string;
-    period?: string;
-    grain?: string;
-    compare?: string;
-    lane?: string;
-    lead?: string;
-    sample?: string;
-  };
-}) {
+export default async function FunnelDashboardPage(
+  props0: {
+    searchParams?: Promise<{
+      venture?: string;
+      stage?: string;
+      view?: string;
+      period?: string;
+      grain?: string;
+      compare?: string;
+      lane?: string;
+      lead?: string;
+      sample?: string;
+    }>;
+  }
+) {
+  const searchParams = await props0.searchParams;
   const ventureParsed = FunnelVentureSchema.safeParse(searchParams?.venture);
   const venture = ventureParsed.success ? ventureParsed.data : undefined;
   const stageParsed = FunnelStageSchema.safeParse(searchParams?.stage);

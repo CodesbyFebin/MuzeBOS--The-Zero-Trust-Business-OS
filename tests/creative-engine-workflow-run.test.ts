@@ -183,7 +183,7 @@ describe('conflict stamp and history labels (FR-20, FR-28)', () => {
   test('an engine write during a run never looks like another tab; a design change elsewhere does', async () => {
     const { w } = twoImages();
     const route = await import('@/app/api/creative-engine/workflows/[id]/route');
-    const patch = (body: unknown) => route.PATCH(new Request('http://x', { method: 'PATCH', body: JSON.stringify(body) }), { params: { id: w.id } });
+    const patch = (body: unknown) => route.PATCH(new Request('http://x', { method: 'PATCH', body: JSON.stringify(body) }), { params: Promise.resolve({ id: w.id }) });
     const base = readWorkflow(w.id)!.layoutAt!;
     expect(base).toBeTruthy();
     mutateWorkflow(w.id, (x) => ({ ...x, runStartedAt: new Date().toISOString() })); // the engine
@@ -249,10 +249,10 @@ describe('stop, reset undo, versions, Deliver', () => {
     const { w, a } = twoImages();
     const versions = await import('@/app/api/creative-engine/workflows/[id]/versions/route');
     const restore = await import('@/app/api/creative-engine/workflows/[id]/versions/[n]/restore/route');
-    expect((await versions.GET(new Request('http://x'), { params: { id: 'nope' } })).status).toBe(404);
-    expect((await versions.POST(new Request('http://x', { method: 'POST', body: '{}' }), { params: { id: w.id } })).status).toBe(200);
+    expect((await versions.GET(new Request('http://x'), { params: Promise.resolve({ id: 'nope' }) })).status).toBe(404);
+    expect((await versions.POST(new Request('http://x', { method: 'POST', body: '{}' }), { params: Promise.resolve({ id: w.id }) })).status).toBe(200);
     mutateWorkflow(w.id, (x) => ({ ...x, name: 'renamed', nodes: x.nodes.map((n) => (n.id === a.id ? { ...n, x: 999, runId: 'keep-me' } : n)) }));
-    const res = await restore.POST(new Request('http://x', { method: 'POST' }), { params: { id: w.id, n: '1' } });
+    const res = await restore.POST(new Request('http://x', { method: 'POST' }), { params: Promise.resolve({ id: w.id, n: '1' }) });
     expect(res.status).toBe(200);
     const after = readWorkflow(w.id)!;
     expect(after.name).toBe('two');

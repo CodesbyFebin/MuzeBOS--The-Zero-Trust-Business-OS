@@ -15,7 +15,8 @@ import { SetupG } from '@/components/agents/SetupG';
 
 export const dynamic = 'force-dynamic';
 
-export default function AgentSetupPage({ params }: { params: { id: string } }) {
+export default async function AgentSetupPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const agent = getDb().agents.all().find((a) => a.id === params.id);
   if (!agent) notFound();
   const spec = setupFor(agent.id);

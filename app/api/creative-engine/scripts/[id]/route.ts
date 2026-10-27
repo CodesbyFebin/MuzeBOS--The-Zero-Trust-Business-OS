@@ -21,7 +21,8 @@ const Body = z.object({
 });
 
 /** Approve a version, save a manual edit as a new version, or regenerate (all beats or one) as a new version. */
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const parsed = Body.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const b = parsed.data;

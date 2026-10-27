@@ -13,13 +13,14 @@ export const dynamic = 'force-dynamic';
  * model comes from lib/trading-page.ts; the trees only render it. Under
  * Bennett Legacy (/trading is in L_READY) the Legacy tree renders the same model.
  */
-export default async function TradingPage({ searchParams = {} }: { searchParams?: TradingSearch }) {
-  const page = await buildTradingPage(searchParams);
-  const tree = treeFor(getAppearance(), '/trading');
-  const g = tree === 'glados';
-  if (!page.ok) return tree === 'legacy' ? <TradingLegacyError message={page.error} /> : <TradingError message={page.error} g={g} />;
-  const props = { model: page.model, pushPath: page.pushPath, setup: page.setup };
-  if (tree === 'legacy') return <TradingLegacy {...props} />;
-  if (g) return <TradingG {...props} />;
-  return <TradingClassic {...props} />;
+export default async function TradingPage(props0: { searchParams?: Promise<TradingSearch> }) {
+ const searchParams = await props0.searchParams;
+ const page = await buildTradingPage(searchParams);
+ const tree = treeFor(getAppearance(), '/trading');
+ const g = tree === 'glados';
+ if (!page.ok) return tree === 'legacy' ? <TradingLegacyError message={page.error} /> : <TradingError message={page.error} g={g} />;
+ const props = { model: page.model, pushPath: page.pushPath, setup: page.setup };
+ if (tree === 'legacy') return <TradingLegacy {...props} />;
+ if (g) return <TradingG {...props} />;
+ return <TradingClassic {...props} />;
 }

@@ -5,7 +5,8 @@ import { infraReport } from '@/lib/muzebos/infra';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 /** Live measurements for an infra page (process, DB, filesystem). Read-only. */
-export async function GET(req: Request, { params }: { params: { page: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ page: string }> }) {
+  const params = await props.params;
   try {
     businessAccess(req);
     const r = infraReport(businessStore(), params.page);

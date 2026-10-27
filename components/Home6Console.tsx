@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { headers } from 'next/headers';
+import { headers, type UnsafeUnwrappedHeaders } from 'next/headers';
 import { ChevronRight, ArrowUpRight, Calendar } from 'lucide-react';
 import { getDb } from '@/lib/data';
 import { allConnectorStatuses } from '@/lib/connectors';
@@ -62,7 +62,7 @@ function greeting(): string {
 function servingPort(): string | null {
   if (process.env.PORT) return process.env.PORT;
   try {
-    const host = headers().get('host') ?? '';
+    const host = (headers() as unknown as UnsafeUnwrappedHeaders).get('host') ?? '';
     const m = host.match(/:(\d+)$/);
     return m ? m[1] : null;
   } catch {

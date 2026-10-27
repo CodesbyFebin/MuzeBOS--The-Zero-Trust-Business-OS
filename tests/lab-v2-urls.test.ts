@@ -37,7 +37,7 @@ describe('AC-01-1 legacy ?tab= redirects', () => {
     const { default: Page } = await import('@/app/lab/page');
     let thrown: unknown = null;
     try {
-      await Page({ searchParams: { tab: 'trends', sample: '1' } });
+      await Page({ searchParams: Promise.resolve({ tab: 'trends', sample: '1' }) });
     } catch (e) {
       thrown = e;
     }

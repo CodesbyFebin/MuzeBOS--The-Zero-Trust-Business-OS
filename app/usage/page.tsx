@@ -14,7 +14,8 @@ export const dynamic = 'force-dynamic';
  * the trees then poll the API every 10 s while visible. Off on demo and
  * filming instances, where nothing under the home directory is read.
  */
-export default async function UsagePage({ searchParams = {} }: { searchParams?: { range?: string; sample?: string } }) {
+export default async function UsagePage(props: { searchParams?: Promise<{ range?: string; sample?: string }> }) {
+  const searchParams = (await props.searchParams) ?? {};
   const q = new URLSearchParams();
   if (searchParams.range) q.set('range', searchParams.range);
   if (searchParams.sample) q.set('sample', searchParams.sample);

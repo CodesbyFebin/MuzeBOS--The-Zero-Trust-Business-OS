@@ -60,13 +60,13 @@ describe('workflow versions', () => {
     const db = getDb();
     db.workflows.insert(workflow('wf-r', 'Original'), 'seed');
     db.workflows.insert(workflow('wf-r', 'Edited'), 'edit');
-    const list = await listVersions(new Request('http://test'), { params: { id: 'wf-r' } });
+    const list = await listVersions(new Request('http://test'), { params: Promise.resolve({ id: 'wf-r' }) });
     const { versions } = (await list.json()) as { versions: { id: string; version: number }[] };
     expect(versions.map((v) => v.version)).toEqual([2, 1]);
 
     const res = await restoreVersion(
       new Request('http://test', { method: 'POST', body: JSON.stringify({ versionId: 'wf-r-v1' }) }),
-      { params: { id: 'wf-r' } },
+      { params: Promise.resolve({ id: 'wf-r' }) },
     );
     expect(res.status).toBe(200);
     const body = (await res.json()) as { workflow: Workflow; versions: { version: number; note: string }[] };
@@ -81,7 +81,7 @@ describe('workflow versions', () => {
     db.workflows.insert(workflow('wf-b', 'B'), 'seed');
     const res = await restoreVersion(
       new Request('http://test', { method: 'POST', body: JSON.stringify({ versionId: 'wf-a-v1' }) }),
-      { params: { id: 'wf-b' } },
+      { params: Promise.resolve({ id: 'wf-b' }) },
     );
     expect(res.status).toBe(404);
   });

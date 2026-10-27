@@ -22,6 +22,16 @@ export function BrainRuntime() {
   const [gpu, setGpu] = useState<'checking' | 'supported' | 'unsupported'>('checking'); const [gpuWhy, setGpuWhy] = useState('');
   const [loadPct, setLoadPct] = useState(''); const engine = useRef<Engine | null>(null); const [engineReady, setEngineReady] = useState(false);
   const [tab, setTab] = useState<'chat' | 'board' | 'jev'>('chat');
+  useEffect(() => {
+    const selectLinkedTab = () => {
+      const linked = window.location.hash.slice(1);
+      if (linked === 'jev' || linked === 'board' || linked === 'chat') setTab(linked);
+    };
+    selectLinkedTab();
+    window.addEventListener('hashchange', selectLinkedTab);
+    return () => window.removeEventListener('hashchange', selectLinkedTab);
+  }, []);
+
 
   const load = useCallback(async () => { try { const r = await fetch('/api/ai', { cache: 'no-store' }); const d = await r.json(); if (!r.ok) throw new Error(d.error); setInfo(d); setError(''); } catch (e) { setError(e instanceof Error ? e.message : 'Runtime unavailable'); } }, []);
   useEffect(() => { void load(); }, [load]);

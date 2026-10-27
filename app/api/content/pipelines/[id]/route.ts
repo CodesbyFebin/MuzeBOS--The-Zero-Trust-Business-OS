@@ -3,7 +3,8 @@ import { PipelineInputSchema, deletePipeline, getPipeline, updatePipeline, valid
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(_request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const pipeline = getPipeline(params.id);
   if (!pipeline) return NextResponse.json({ error: `unknown pipeline: ${params.id}` }, { status: 404 });
   return NextResponse.json({ pipeline });
@@ -11,7 +12,8 @@ export async function GET(_request: Request, { params }: { params: { id: string 
 
 /** Replaces name/description/nodes/edges in place — id and createdAt carry
  *  over. Validated first, same as create. */
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const existing = getPipeline(params.id);
   if (!existing) return NextResponse.json({ error: `unknown pipeline: ${params.id}` }, { status: 404 });
 
@@ -26,7 +28,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   return NextResponse.json({ pipeline });
 }
 
-export async function DELETE(_request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const removed = deletePipeline(params.id);
   if (!removed) return NextResponse.json({ error: `unknown pipeline: ${params.id}` }, { status: 404 });
   return NextResponse.json({ ok: true });
