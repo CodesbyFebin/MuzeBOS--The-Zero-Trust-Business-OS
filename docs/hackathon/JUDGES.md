@@ -29,7 +29,7 @@ flowchart TD
    cases. Run the full test/type/build commands in `VERIFICATION.md` for regression.
 5. For the interface, run `npm run dev`, open `/workspace/brain/inference`, choose
    Meta or Baseten, create a draft, review its hash, and separately review a valid
-   completed proposal under `/workflows?view=governed`. Live worker execution needs
+   completed proposal under `/workspace/brain/runtime#jev`. Live worker execution needs
    credentials, server opt-in and an approved task. An unconfigured route is blocked.
 
 ## Meta contribution
