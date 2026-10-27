@@ -1,3 +1,4 @@
+import { META_MODELS, BASETEN_MUSE_SPARK_OPEN, metaKey, basetenKey } from '../ai/meta';
 import { createHash } from 'node:crypto';
 import { validLocalEndpoint } from './endpoint';
 import { runtimeEnv } from '@/lib/creds';
@@ -15,7 +16,8 @@ export function routes(env: Record<string, string | undefined> = runtimeEnv()): 
   const candidates = [
     { provider: 'browser' as const, model: BROWSER_MODEL, endpoint: null, configured: true, reason: 'Requires WebGPU, an explicit model download and an active browser.', paid: false },
     { provider: 'ollama' as const, model: env.MUZEBOS_OLLAMA_MODEL || 'llama3.2:3b', endpoint: localEndpoint, configured: !!localEndpoint, reason: 'Set MUZEBOS_OLLAMA_URL and install the selected model. Configuration is not a health check.', paid: false },
-    { provider: 'meta' as const, model: 'muse-wonder-1.0', endpoint: 'https://api.meta.ai/v1', configured: !!env.MODEL_API_KEY && paid, reason: 'Requires MODEL_API_KEY and MUZEBOS_INFERENCE_PAID=1. Wonder Full is a separate Muse Code product.', paid: true },
+    { provider: 'meta' as const, model: env.MUZEBOS_META_MODEL || META_MODELS.wonder, endpoint: 'https://api.meta.ai/v1', configured: !!metaKey(env) && paid && ([META_MODELS.wonder, META_MODELS.spark] as string[]).includes(env.MUZEBOS_META_MODEL || META_MODELS.wonder), reason: 'Requires META_MODEL_API_KEY (or legacy MODEL_API_KEY), MUZEBOS_INFERENCE_PAID=1 and an allowlisted Meta model (muse-wonder-1.0 or muse-spark-1.3). Wonder Full is a separate Muse Code product.', paid: true },
+    { provider: 'baseten' as const, model: BASETEN_MUSE_SPARK_OPEN, endpoint: 'https://inference.baseten.co/v1', configured: !!basetenKey(env) && paid, reason: 'Requires BASETEN_API_KEY and MUZEBOS_INFERENCE_PAID=1. Hackathon model slug comes from the participant guide; account availability requires a live check.', paid: true },
     { provider: 'openrouter' as const, model: env.MUZEBOS_OPENROUTER_MODEL || '', endpoint: 'https://openrouter.ai/api/v1', configured: !!env.OPENROUTER_API_KEY && !!env.MUZEBOS_OPENROUTER_MODEL && (paid || !!env.MUZEBOS_OPENROUTER_MODEL?.endsWith(':free')), reason: 'Requires a key and explicit model. Non-free routes require paid opt-in; provider limits still apply.', paid: !env.MUZEBOS_OPENROUTER_MODEL?.endsWith(':free') },
     { provider: 'openclaw' as const, model: 'openclaw/default', endpoint: null, configured: false, reason: 'External tool-capable gateway requires an independently qualified isolation and approval bridge. Not enabled by a URL alone.', paid: true },
     { provider: 'muse-code' as const, model: 'Muse Wonder Full', endpoint: null, configured: false, reason: 'Requires a Muse Code subscription, isolated runner and per-tool approval bridge. No generic API substitution.', paid: true },

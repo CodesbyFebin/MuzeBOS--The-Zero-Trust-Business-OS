@@ -1,9 +1,10 @@
+import { metaKey, basetenKey } from '../ai/meta';
 import { z } from 'zod';
 import { runtimeEnv } from '@/lib/creds';
 import { BusinessError } from '@/lib/muzebos/store';
 import { InferenceStore } from './store';
 import type { InferencePayload, Route } from './types';
-const responseSchema = z.object({ choices: z.array(z.object({ message: z.object({ content: z.string().min(1).max(100000), tool_calls: z.array(z.unknown()).optional() }) })).min(1), usage: z.object({ prompt_tokens: z.number().int().min(0).max(1_000_000).optional(), completion_tokens: z.number().int().min(0).max(1_000_000).optional() }).optional() });
+const responseSchema = z.object({ choices: z.array(z.object({ message: z.object({ content: z.string().min(1).max(100000), tool_calls: z.array(z.unknown()).optional(), function_call: z.unknown().optional() }), finish_reason: z.string().nullable().optional() })).min(1), usage: z.object({ prompt_tokens: z.number().int().min(0).max(1_000_000).optional(), completion_tokens: z.number().int().min(0).max(1_000_000).optional() }).optional() });
 export { validLocalEndpoint } from './endpoint';
 import { validLocalEndpoint } from './endpoint';
 export async function callTextProvider(payload: InferencePayload, route: Route, env: Record<string, string | undefined> = runtimeEnv(), fetcher: typeof fetch = fetch) {
@@ -11,7 +12,8 @@ export async function callTextProvider(payload: InferencePayload, route: Route, 
   let endpoint: string, key: string | undefined;
   switch (route.provider) {
     case 'ollama': { const local = validLocalEndpoint(route.endpoint || ''); if (!local) throw new BusinessError('Ollama endpoint must be a configured local/private URL', 409); endpoint = `${local}/chat/completions`; break; }
-    case 'meta': endpoint = 'https://api.meta.ai/v1/chat/completions'; key = env.MODEL_API_KEY; break;
+    case 'meta': endpoint = 'https://api.meta.ai/v1/chat/completions'; key = metaKey(env) || undefined; break;
+    case 'baseten': endpoint = 'https://inference.baseten.co/v1/chat/completions'; key = basetenKey(env) || undefined; break;
     case 'openrouter': endpoint = 'https://openrouter.ai/api/v1/chat/completions'; key = env.OPENROUTER_API_KEY; break;
     default: throw new BusinessError('This route requires its dedicated qualified runner', 409);
   }
@@ -22,7 +24,8 @@ export async function callTextProvider(payload: InferencePayload, route: Route, 
   let size = 0; const chunks: Uint8Array[] = [];
   for (;;) { const { value, done } = await reader.read(); if (done) break; size += value.byteLength; if (size > 256000) { await reader.cancel(); throw new BusinessError('Provider response exceeded limit', 502); } chunks.push(value); }
   const parsed = responseSchema.parse(JSON.parse(Buffer.concat(chunks).toString('utf8')));
-  if (parsed.choices[0].message.tool_calls?.length) throw new BusinessError('Tool calls are not authorized in inference drafts', 409);
+  if (parsed.choices[0].message.tool_calls?.length || parsed.choices[0].message.function_call != null) throw new BusinessError('Tool calls are not authorized in inference drafts', 409);
+  if (route.provider === 'baseten' ? parsed.choices[0].finish_reason !== 'stop' : parsed.choices[0].finish_reason && parsed.choices[0].finish_reason !== 'stop') throw new BusinessError('Provider output did not finish normally; review before retrying', 502);
   return { output: parsed.choices[0].message.content, usage: parsed.usage ? { promptTokens: parsed.usage.prompt_tokens, completionTokens: parsed.usage.completion_tokens } : undefined };
 }
 export async function runServerOnce(store: InferenceStore, workerId: string, env: Record<string, string | undefined> = runtimeEnv(), fetcher: typeof fetch = fetch) {

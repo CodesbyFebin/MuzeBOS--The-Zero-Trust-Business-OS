@@ -9,6 +9,9 @@ import { GET as bookings } from '@/app/api/bookings/route';
 import { GET as library } from '@/app/api/employee-library/route';
 import { POST } from '@/app/api/business/route';
 import { GET as inferenceGet, POST as inferencePost } from '@/app/api/inference/route';
+import { InferenceStore } from '@/lib/muzebos/inference/store';
+import { routes } from '@/lib/muzebos/inference/routing';
+import { runServerOnce } from '@/lib/muzebos/inference/providers';
 import { businessStore } from '@/lib/muzebos/store';
 const dir = mkdtempSync(path.join(tmpdir(), 'mb-integration-api-'));
 const req = (route: string) => new Request(`http://localhost${route}`);
@@ -47,6 +50,25 @@ describe('New integration API boundaries', () => {
     expect((await POST(post({ action: 'cancelBooking', id: booking.id }))).status).toBe(200);
     expect(businessStore().verifyAudit()).toBe(true);
   });
+  it('protects the server-output handoff and returns one unapproved workflow on replay', async () => {
+    const env = { BASETEN_API_KEY: 'fixture', MUZEBOS_INFERENCE_PAID: '1' };
+    const store = new InferenceStore(businessStore(), () => routes(env));
+    const task = store.create({ title: 'API proposal', prompt: 'Propose a reminder', kind: 'draft', lane: 'baseten', paidConsent: true });
+    store.approve(task.id, task.hash);
+    await runServerOnce(store, 'fixture', env, (async () => new Response(JSON.stringify({ choices: [{ message: { content: '{"tool":"reminders.create","args":{"title":"Review synthetic stock"}}' }, finish_reason: 'stop' }] }))) as typeof fetch);
+    const payload = { action: 'proposeAction', id: task.id };
+    const make = (origin = 'http://localhost', key = randomUUID()) => new Request('http://localhost/api/inference', { method: 'POST', headers: { origin, 'content-type': 'application/json', 'idempotency-key': key }, body: JSON.stringify(payload) });
+    access.valid = false; expect((await inferencePost(make())).status).toBe(401); access.valid = true;
+    expect((await inferencePost(make('https://other.example'))).status).toBe(403);
+    const key = randomUUID(); const first = await inferencePost(make('http://localhost', key));
+    expect(first.status).toBe(200); expect(first.headers.get('cache-control')).toBe('no-store');
+    const run = (await first.json()).result; expect(run.status).toBe('awaiting_approval');
+    expect((await (await inferencePost(make('http://localhost', key))).json()).result.id).toBe(run.id);
+    expect((await (await inferencePost(make())).json()).result.id).toBe(run.id);
+    expect(businessStore().db.prepare('SELECT COUNT(*) n FROM mb_reminders').get()).toEqual({ n: 0 });
+    expect(businessStore().verifyAudit()).toBe(true);
+  });
+
   it('gates inference access and exact-task approval without leaking leases', async () => {
     access.valid = false;
     expect((await inferenceGet(req('/api/inference'))).status).toBe(401);

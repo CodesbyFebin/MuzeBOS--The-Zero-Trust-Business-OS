@@ -32,7 +32,9 @@
     "test:slice9-browser": "node scripts/muzebos-slice9-browser.mjs",
     "test:slice8-browser": "node scripts/muzebos-modules-browser.mjs",
     "docs:build": "node scripts/build-project-site.mjs",
-    "repo:metadata": "node scripts/update-repository-metadata.mjs"
+    "repo:metadata": "node scripts/update-repository-metadata.mjs",
+    "hackathon:demo": "node --import tsx scripts/hackathon-demo.ts",
+    "demo:agent": "node --import tsx scripts/hackathon-demo.ts"
   },
   "dependencies": {
     "@miosa/sdk": "^3.2.5",

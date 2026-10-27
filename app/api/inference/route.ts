@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { businessAccess } from '@/lib/muzebos/http';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
 import { InferenceStore } from '@/lib/muzebos/inference/store';
+import { proposeInferenceAction } from '@/lib/muzebos/inference/jev-bridge';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const id = z.string().uuid();
@@ -10,6 +11,7 @@ const command = z.discriminatedUnion('action', [
   z.object({ action: z.literal('create'), data: z.unknown() }).strict(),
   z.object({ action: z.literal('approve'), id, hash: z.string().regex(/^[a-f0-9]{64}$/) }).strict(),
   z.object({ action: z.literal('cancel'), id }).strict(),
+  z.object({ action: z.literal('proposeAction'), id }).strict(),
   z.object({ action: z.literal('delegate'), id, children: z.unknown() }).strict(),
   z.object({ action: z.literal('claimBrowser'), workerId: z.string().min(1).max(100) }).strict(),
   z.object({ action: z.literal('renewBrowser'), id, token: id }).strict(),
@@ -34,6 +36,7 @@ export async function POST(req: Request) {
       if (c.action === 'create') return store.create(c.data);
       if (c.action === 'approve') return store.approve(c.id, c.hash);
       if (c.action === 'cancel') return store.cancel(c.id);
+      if (c.action === 'proposeAction') return proposeInferenceAction(store, c.id);
       if (c.action === 'delegate') return store.delegate(c.id, c.children);
       if (c.action === 'claimBrowser') return store.claim(c.workerId, 'browser');
       if (store.task(c.id).payload.provider !== 'browser') throw new BusinessError('Browser cannot complete a server route', 403);

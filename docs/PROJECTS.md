@@ -81,7 +81,7 @@ Inference publication and CI are tracked on `feat/inference-swarm` and the repos
 | Public README and seven answer-oriented guides | Verified metadata/links/rendering; evidence and limits remain explicit |
 | Static project documentation export | Built and rendered at desktop/mobile sizes; no Pages deployment claimed |
 | Private workspace indexing controls | Implemented; authentication retained |
-| About description/topics | Reviewed config and preview/apply command prepared; remote settings unverified |
+| About description/topics | Description and all 16 topics saved and verified on GitHub, October 27; Website remains blank pending deployment |
 | Verification | See MUZEBOS-SEARCH-RELEASE.md |
 
 - [x] Inspect live PR dependency stack and source conflicts.
@@ -90,3 +90,18 @@ Inference publication and CI are tracked on `feat/inference-swarm` and the repos
 - [x] Qualify focused behavior, production build, app/browser flows and public docs.
 - [x] Prepare the combined integration and full-suite CI merge gate; live merge state is linked in MUZEBOS-SEARCH-RELEASE.md.
 - [ ] Verify public-site deployment and search measurements separately.
+
+
+## Hackathon submission candidate — 2026-10-27
+
+Frozen pre-event baseline: `1105e64ca6c6791170e619d9f446c81b9e6aec22`.
+All prior feature PRs are merged and the repository is public. This new submission
+PR credits FounderOS and every existing MuzeBOS feature as inherited/pre-event.
+
+- New: Baseten Spark Open adapter, Meta Spark model selection and response checks.
+- New: completed server draft to separately approved Jev reminder proposal.
+- New: bounded fixture/live demo runner and judge/video/X draft materials.
+- Qualification: 5,030 tests passed, 8 skipped; typecheck/build and four production browser suites passed. See `docs/hackathon/VERIFICATION.md`.
+- Blocked externally: live model calls, credits/access and provider spending setup.
+- Founder-owned: track/rules confirmation, video, X publication and platform submission.
+- No submission, live-model, 24/7 swarm, zkVM or eligibility claim.

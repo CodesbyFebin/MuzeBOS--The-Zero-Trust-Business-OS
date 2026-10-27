@@ -16,6 +16,20 @@ Run your business. Approve what matters. Verify what happened.
 name describes a security design goal; it is not an independent certification or
 production-readiness claim. MuzeBOS extends the attributed FounderOS/GladOS source.
 
+## Hackathon reviewers
+
+This is an **existing FounderOS-based product**. Only the new submission-PR delta
+is proposed as event work: Baseten Muse Spark Open routing, explicit Meta Spark
+selection, a completed-draft → Jev reminder handoff and reproducible demo tooling.
+Provider adapters are implemented and fixture-tested; **live API execution remains
+unverified**. No eligibility, prize or entire-product event-build claim is made.
+
+Start with [provenance and contribution disclosure](HACKATHON.md),
+[the judge guide](docs/hackathon/JUDGES.md),
+[the demo/video script](docs/hackathon/DEMO.md) and
+[qualification evidence](docs/hackathon/VERIFICATION.md).
+`npm run hackathon:demo -- --fixture both` runs without model credentials.
+
 ## What is MuzeBOS?
 
 MuzeBOS organizes daily business work into Orders, Money, Talk, Stock and Growth,

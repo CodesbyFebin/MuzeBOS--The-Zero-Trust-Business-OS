@@ -4,7 +4,7 @@ import { BusinessError, BusinessStore, digest } from '@/lib/muzebos/store';
 import { chooseRoute, fingerprint, routes } from './routing';
 import { BROWSER_CONTEXT } from './types';
 import type { InferencePayload, InferenceTask, Lane, Lease, Route } from './types';
-const taskInput = z.object({ title: z.string().trim().min(1).max(160), prompt: z.string().trim().min(1).max(12000), kind: z.enum(['draft', 'analysis', 'plan', 'code']), lane: z.enum(['auto', 'browser', 'ollama', 'meta', 'openrouter', 'openclaw', 'muse-code']).default('auto'), maxTokens: z.number().int().min(32).max(2048).default(512), paidConsent: z.boolean().default(false) }).strict();
+const taskInput = z.object({ title: z.string().trim().min(1).max(160), prompt: z.string().trim().min(1).max(12000), kind: z.enum(['draft', 'analysis', 'plan', 'code']), lane: z.enum(['auto', 'browser', 'ollama', 'meta', 'baseten', 'openrouter', 'openclaw', 'muse-code']).default('auto'), maxTokens: z.number().int().min(32).max(2048).default(512), paidConsent: z.boolean().default(false) }).strict();
 const usageInput = z.object({ promptTokens: z.number().int().min(0).max(1_000_000).optional(), completionTokens: z.number().int().min(0).max(1_000_000).optional() }).strict();
 type Row = Omit<InferenceTask, 'payload' | 'usage'> & { payload: string; usage: string | null; leaseToken: string | null };
 const decode = ({ payload, usage, leaseToken: _, ...row }: Row): InferenceTask => ({ ...row, payload: JSON.parse(payload), usage: usage ? JSON.parse(usage) : null });

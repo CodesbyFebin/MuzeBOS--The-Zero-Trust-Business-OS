@@ -46,6 +46,24 @@ try {
   assert.match(await page.locator('.mb-console').innerText(), /inference.completed/); await page.unroute('**/api/inference');
   await page.setViewportSize({ width: 390, height: 844 }); await page.reload({ waitUntil: 'networkidle' });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Inference page overflows mobile viewport');
+  // Isolated UI fixture for the new completed-server handoff; API authorization is tested separately.
+  const serverTask = { ...state.tasks.find(t => t.id === lease.task.id), id: crypto.randomUUID(), state: 'completed', output: '{"tool":"reminders.create","args":{"title":"Synthetic server proposal"}}', outputHash: 'a'.repeat(64) };
+  serverTask.payload = { ...serverTask.payload, title: 'Fixture server proposal', provider: 'baseten', model: 'meta-models/muse-spark-open-1026' };
+  let handoffs = 0;
+  await page.route('**/api/inference', async route => {
+    if (route.request().method() === 'GET') return route.fulfill({ json: { ...state, tasks: [serverTask] } });
+    assert.deepEqual(route.request().postDataJSON(), { action: 'proposeAction', id: serverTask.id });
+    handoffs++;
+    return route.fulfill({ json: { result: { id: 'ui-fixture-run', status: 'awaiting_approval' } } });
+  });
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.locator('.mb-booking-row').filter({ hasText: 'Fixture server proposal' }).getByRole('button', { name: 'Review task', exact: true }).click();
+  await page.getByRole('button', { name: 'Send proposal to Jev', exact: true }).click();
+  await page.getByText('Operation saved. Inference outputs remain drafts.', { exact: true }).waitFor();
+  assert.equal(handoffs, 1);
+  assert.equal(await page.getByRole('link', { name: 'Open Jev action approvals', exact: true }).getAttribute('href'), '/workflows?view=governed');
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Server proposal handoff overflows mobile viewport');
+  await page.unroute('**/api/inference');
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ result: 'PASS', checks: ['18 sidebar entries', 'WebGPU absence is explicit', 'persisted task creation', 'size and agent assignment', 'exact Jev approval', 'reload persistence', 'lease token hidden from snapshot', 'fixture-only completion contract', 'bounded child task review', 'provider readiness labels', 'no false zkVM proof', 'stale snapshot retained', 'mobile layout', 'no runtime errors'], limits: ['No physical WebGPU inference, paid provider or external agent runtime exercised'] }));
+  console.log(JSON.stringify({ result: 'PASS', checks: ['18 sidebar entries', 'WebGPU absence is explicit', 'persisted task creation', 'size and agent assignment', 'exact Jev approval', 'reload persistence', 'lease token hidden from snapshot', 'fixture-only completion contract', 'bounded child task review', 'provider readiness labels', 'no false zkVM proof', 'stale snapshot retained', 'mobile layout', 'fixture server proposal handoff', 'separate Jev approval link', 'no runtime errors'], limits: ['No physical WebGPU inference, paid provider or external agent runtime exercised'] }));
 } finally { await browser.close(); }
