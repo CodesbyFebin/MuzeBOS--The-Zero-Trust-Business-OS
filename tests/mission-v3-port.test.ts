@@ -15,8 +15,17 @@ describe('Mission Control v3 port', () => {
   });
   it('real zero stays a zero', () => { expect(renderToStaticMarkup(React.createElement(KpiCard, { label: 'Needs approval', value: 0, href: '/x', icon: ShieldCheck }))).toContain('>0<'); });
   it('v3 CSS uses only the allowed palette (no cyan, purple, blue)', () => {
-    const css = readFileSync('app/metabos.css', 'utf8'); const v3 = css.slice(css.indexOf('Mission Control v3 design layer'));
+    const css = readFileSync('app/metabos.css', 'utf8'); const v3 = css.slice(css.indexOf('Mission Control v3 design layer'), css.indexOf('Mission Control v3 shell layer'));
     for (const bad of ['#06B6D4', '#8B5CF6', '#3B82F6', '#EC4899', 'cyan', 'purple']) expect(v3).not.toContain(bad);
     expect(v3).toContain('#FF2A2A'); expect(v3).toContain('focus-visible'); expect(v3).toContain('prefers-reduced-motion');
   });
+});
+
+import { readFileSync as rf } from 'node:fs';
+import { test as t2, expect as e2 } from 'vitest';
+t2('v3 shell layer neutralises blue/purple status tokens', () => {
+  const css = rf('app/metabos.css', 'utf8');
+  const layer = css.slice(css.indexOf('Mission Control v3 shell layer'));
+  e2(layer).toContain('--mb-blue:#8a8a8a');
+  e2(layer).not.toMatch(/#5b9cff|#a98bff|cyan/i);
 });
