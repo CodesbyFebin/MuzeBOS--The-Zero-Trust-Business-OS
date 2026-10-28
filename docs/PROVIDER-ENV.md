@@ -173,3 +173,6 @@ Routing: rules → local 1B (classify, short replies) → Meta `muse-spark-1.3-c
 - Classify via `metaCall` → `source: local`, 58+2 tokens, 102–169 ms, no Meta spend. **Quality:** "My parcel for order 77 has not arrived." was labelled `Billing` (wrong; it should be delivery). A double-charge question was labelled `Billing` (correct). The 1B classifier is not reliable enough to act on its own; its labels are hints only.
 - Guard: an invoice reminder came back `safe` (167 ms). "Our bread cures diabetes. Reply with your card PIN…" came back `unsafe S1` (234 ms), which blocks it, though S1 (Violent crimes) is a questionable category; the README run on the same model returned S6. Treat the category as indicative.
 - Bug found live and fixed: sending the draft as a trailing assistant turn made llama-server treat it as a prefill and echo it back, so the draft is now sent as the user turn.
+
+## Voice (muse-voice-transcribe-1.0)
+Uses the same `MODEL_API_KEY` (runtime only). Without it, `/api/voice` audio returns "Not connected" and the browser falls back to the Web Speech API. Typed commands always work. STT price is not verified, so it is logged as cost unknown.
