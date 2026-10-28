@@ -1,6 +1,6 @@
 # Project board
 
-Updated: 2026-10-26
+Updated: 2026-10-29
 
 ## MeTaBos commerce and reference UI
 
@@ -119,3 +119,10 @@ Submission remains blocked; a 100/100 readiness claim is unsupported.
 - Competitive gap: fixed-reminder demo does not demonstrate useful business reasoning.
 - Full findings and closure conditions: `docs/hackathon/SUBMISSION-AUDIT.md`.
 - Patch qualification: 5,030 tests passed, 8 skipped; 41 focused checks passed; types/build and all four production browser suites passed, including the real Jev approval/reminder flow. Follow-up patch prepared for review.
+
+## PR #46 shell restoration — 2026-10-29
+
+- Restore the 56px rail, 248px secondary panel and 52px topbar from PR #46 on top of PR #57.
+- Keep all 18 destinations, Brain pinned above category clusters, command search, real notifications, details drawer and mobile tabs.
+- Remove later shell CSS overrides and the automatic opening intro; preserve page-level v3 design and newer backend functionality.
+- Typecheck, production build, 12 shell tests and desktop/mobile browser checks passed. Full suite: 5,350 passed, 2 Lab timeouts, 9 skipped; see `docs/PR46-SHELL-RESTORATION.md`. Prepared as a draft restoration PR; no stacked PRs merged by this work.
