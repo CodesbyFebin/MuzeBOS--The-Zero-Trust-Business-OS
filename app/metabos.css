@@ -396,3 +396,5 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-intro .mb-button { cursor:pointer;border:1px solid var(--mb-line);border-radius:4px;background:transparent;color:var(--mb-text);font:inherit; }
 .mb-intro .mb-button.mb-primary { background:var(--mb-accent);border-color:var(--mb-accent);color:#fff; }
 .mb-intro .mb-button:focus-visible { outline:2px solid #fff;outline-offset:2px; }
+.mb-demo-banner { background:var(--mb-accent-dim);border-bottom:1px solid var(--mb-accent);color:var(--mb-text);font-size:12px;padding:8px 16px; }
+.mb-limit-form { display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:11px; } .mb-limit-form input { width:90px;min-height:36px; } .mb-widget .mb-link { background:none;border:0;padding:0;margin-top:6px;min-height:auto; }
