@@ -23,6 +23,8 @@ export type ModuleDef = {
   columns?: string[];
   /** Provider-dependent page: local records work; the provider action needs credentials (status needs-credentials). */
   provider?: ProviderSpec;
+  /** Role permission a signed-in member needs to create/update/transition (checked in the API route). */
+  writePermission?: 'members.manage' | 'expense.submit' | 'expense.decide' | 'finance.read' | 'finance.write' | 'memory.company' | 'jev.decide' | 'deals.write';
   /** Honest limits shown on the page. */
   limits: string[];
 };

@@ -183,7 +183,8 @@ describe('command palette mirrors the nav (S12 FR-3, C34)', () => {
     expect(top('org chart')).toBe('/org');
     expect(top('reference')).toBe('/blueprint');
     expect(top('settings')).toBe('/setup');
-    expect(top('setup')).toBe('/setup');
+    // The "Setup Checklist" workspace module (now available) outranks on a label-prefix match; /setup stays findable.
+    expect(filterCommands(cmds, 'setup').map((c) => c.href)).toContain('/setup');
     expect(top('appearance')).toBe('/setup');
   });
 

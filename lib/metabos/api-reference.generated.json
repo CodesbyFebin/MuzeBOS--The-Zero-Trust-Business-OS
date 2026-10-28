@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 212,
+ "count": 214,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1214,6 +1214,19 @@
    "access": "session"
   },
   {
+   "path": "/api/dispatch",
+   "file": "app/api/dispatch/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Outbound sends (WhatsApp, SMTP email, Razorpay payment link, OpenRouter completion) behind Jev approval.",
+   "idempotencyKey": true,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
    "path": "/api/employee-library",
    "file": "app/api/employee-library/route.ts",
    "methods": [
@@ -2092,6 +2105,19 @@
    "summary": "Declarative workspace module records: list with computed fields, or create/update/transition.",
    "idempotencyKey": true,
    "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/passkeys",
+   "file": "app/api/passkeys/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "WebAuthn passkeys for the signed-in member: register, verify (step-up), list, remove.",
+   "idempotencyKey": false,
+   "originCheck": false,
    "schemaValidated": true,
    "access": "session"
   },
