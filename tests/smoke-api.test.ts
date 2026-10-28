@@ -34,6 +34,7 @@ const ROUTES: RouteEntry[] = [
   { route: 'muzebos/goals', load: () => import('@/app/api/muzebos/goals/route'), url: 'http://localhost/api/muzebos/goals' },
   { route: 'muzebos/chief-of-staff', load: () => import('@/app/api/muzebos/chief-of-staff/route'), url: 'http://localhost/api/muzebos/chief-of-staff' },
   { route: 'muzebos/pipeline', load: () => import('@/app/api/muzebos/pipeline/route'), url: 'http://localhost/api/muzebos/pipeline' },
+  { route: 'muzebos/hubs/[hub]', load: () => import('@/app/api/muzebos/hubs/[hub]/route'), url: 'http://localhost/api/muzebos/hubs/money', params: { hub: 'money' } },
   { route: 'muzebos/command-center', load: () => import('@/app/api/muzebos/command-center/route'), url: 'http://localhost/api/muzebos/command-center' },
   { route: 'muzebos/overdue', load: () => import('@/app/api/muzebos/overdue/route'), url: 'http://localhost/api/muzebos/overdue' },
   { route: 'muzebos/expenses', load: () => import('@/app/api/muzebos/expenses/route'), url: 'http://localhost/api/muzebos/expenses' },
@@ -176,7 +177,7 @@ function discoverGetRoutes(dir: string, base = ''): string[] {
 }
 
 /** Routes that hold business records: a signed-out GET must be refused (401), never 200. */
-const MEMBER_ONLY = new Set(['muzebos/command-center', 'muzebos/overdue', 'ai', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'muzebos/chief-of-staff', 'muzebos/expenses', 'muzebos/founder', 'muzebos/goals', 'muzebos/memory', 'muzebos/missions', 'muzebos/pipeline', 'muzebos/walls', 'providers/[module]', 'workflow-runs']);
+const MEMBER_ONLY = new Set(['muzebos/hubs/[hub]', 'muzebos/command-center', 'muzebos/overdue', 'ai', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'muzebos/chief-of-staff', 'muzebos/expenses', 'muzebos/founder', 'muzebos/goals', 'muzebos/memory', 'muzebos/missions', 'muzebos/pipeline', 'muzebos/walls', 'providers/[module]', 'workflow-runs']);
 describe('platform smoke — every GET API route answers 200 with JSON', () => {
   test.each(ROUTES)('GET /api/$route', async ({ route, load, url, params }) => {
     const mod = await load();
