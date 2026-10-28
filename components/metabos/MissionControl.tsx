@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { MissionGraph } from './MissionGraph';
 import { VoiceAssistant } from './VoiceAssistant';
+import { KpiCard } from './KpiCard';
 import { LayoutEditor } from './MissionLayoutEditor';
 import { DEFAULT_LAYOUT, type MissionWidget } from '@/lib/metabos/mission-layout-client';
 import { ArrowUpRight, Check, Clock3, ListTodo, Package, RefreshCw, ShieldCheck, Wallet } from 'lucide-react';
@@ -43,18 +44,18 @@ export function MissionControl() {
  const stale=!!data&&tick-Date.parse(data.asOf)>60_000;
  const shown=data?data.todo.filter(t=>filter==='all'||(filter==='overdue'?t.overdue:t.dueToday)):[];
  const unknown=data&&Object.values(data.sources).some(s=>s!=='available');
- return <div className="mb-console mb-mission"><header className="mb-heading"><div><span className="mb-eyebrow">FOUNDER HQ / OBSERVE · REVIEW · ACT</span><h1>Mission Control</h1><p>Your orders, money, conversations and stock. One operational view.</p></div><div className="mb-live-state"><span className={`mb-badge ${error?'mb-state-warning':''}`}><span className="mb-dot"/>{error?'UPDATE FAILED':stale?'STALE':refreshing?'UPDATING':'AUTO-REFRESH · 20s'}</span><small>{data?`Last received ${date(data.asOf)}`:'Waiting for local status'}</small><button aria-label="Refresh mission status" onClick={()=>refresh().catch(e=>setError(e.message))}><RefreshCw size={13}/></button></div></header><VoiceAssistant/>
+ return <div className="mb-console mb-mission mb-v3" data-design="v3"><header className="mb-heading"><div><span className="mb-eyebrow">FOUNDER HQ / OBSERVE · REVIEW · ACT</span><h1>Mission Control</h1><p>Your orders, money, conversations and stock. One operational view.</p></div><div className="mb-live-state"><span className={`mb-badge ${error?'mb-state-warning':''}`}><span className="mb-dot"/>{error?'UPDATE FAILED':stale?'STALE':refreshing?'UPDATING':'AUTO-REFRESH · 20s'}</span><small>{data?`Last received ${date(data.asOf)}`:'Waiting for local status'}</small><button aria-label="Refresh mission status" onClick={()=>refresh().catch(e=>setError(e.message))}><RefreshCw size={13}/></button></div></header><VoiceAssistant/>
  {stale&&!error&&<div role="alert" className="mb-alert" data-stale>Data is stale: last received {date(data!.asOf)}. Refresh to update.</div>}{error&&<div role="alert" className="mb-alert">{error}{data&&' · Showing the last received snapshot. Its timestamp has not changed.'}</div>}{notice&&<div role="status" className="mb-notice"><Check size={14}/>{notice}</div>}
  {!data?<div className="mb-panel mb-empty">{error?'Status unavailable. Retry to reconnect.':'Reading business records, tasks and connector status…'}</div>:<>
  {unknown&&<div className="mb-notice">Some sources are unavailable or excluded because inherited preview mode is on. No sample tasks or connector counts are used here.</div>}
 {(()=>{const W:Record<MissionWidget,React.ReactNode>={
-stats:<> <div className="mb-stats mb-mission-stats">{[
- {title:'Needs approval',value:data.counters.awaitingApproval,note:`${data.counters.expiredApprovals} expired drafts`,href:'/business?view=orders',icon:ShieldCheck},
- {title:'Outstanding invoices',value:amount(data.counters.paymentPendingMinor),note:`${data.counters.paymentPending} issued, unpaid · requests not tracked`,href:'/business?view=invoices',icon:Wallet},
- {title:'Settled (manual)',value:amount(data.counters.settledMinor),note:`${data.counters.settled} reconciled by operator · not provider-verified`,href:'/business?view=invoices',icon:Check},
- {title:'To do',value:data.counters.openTodos,note:`${data.counters.dueToday} due today · ${data.counters.overdue} overdue · ${data.counters.openTasks} tasks`,href:'#mission-todo',icon:ListTodo},
- {title:'Low stock',value:data.counters.lowStock+data.counters.outOfStock,note:`${data.counters.outOfStock} out · ${data.counters.lowStock} at or below ${data.counters.lowStockUnits} units`,href:'/business?view=inventory',icon:Package},
- ].map(s=><Link className="mb-stat-link" key={s.title} href={s.href}><span><s.icon size={14}/>{s.title}<ArrowUpRight size={12}/></span><strong>{s.value}</strong><small>{s.note}</small></Link>)}</div></>,
+stats:<> <div className="mb-kpi-grid mb-mission-stats" data-testid="mission-kpis">{([
+ {title:'Needs approval',value:data.counters.awaitingApproval,note:`${data.counters.expiredApprovals} expired drafts`,href:'/business?view=orders',icon:ShieldCheck,tone:data.counters.awaitingApproval?'amber':'neutral'},
+ {title:'Outstanding invoices',value:data.counters.paymentPending?amount(data.counters.paymentPendingMinor):null,note:`${data.counters.paymentPending} issued, unpaid · requests not tracked`,href:'/business?view=invoices',icon:Wallet,tone:data.counters.paymentPending?'amber':'neutral'},
+ {title:'Settled (manual)',value:data.counters.settled?amount(data.counters.settledMinor):null,note:`${data.counters.settled} reconciled by operator · not provider-verified`,href:'/business?view=invoices',icon:Check,tone:data.counters.settled?'green':'neutral'},
+ {title:'To do',value:data.counters.openTodos,note:`${data.counters.dueToday} due today · ${data.counters.overdue} overdue · ${data.counters.openTasks} tasks`,href:'#mission-todo',icon:ListTodo,tone:data.counters.overdue?'red':'neutral'},
+ {title:'Low stock',value:data.counters.products?data.counters.lowStock+data.counters.outOfStock:null,note:`${data.counters.outOfStock} out · ${data.counters.lowStock} at or below ${data.counters.lowStockUnits} units`,href:'/business?view=inventory',icon:Package,tone:data.counters.outOfStock?'red':data.counters.lowStock?'amber':'neutral'},
+ ] as const).map(s=><KpiCard key={s.title} label={s.title} value={s.value} sub={s.note} href={s.href} icon={s.icon} tone={s.tone}/>)}</div></>,
 launchers:<> <div className="mb-daily-launchers">{WORKSPACE_CATEGORIES.filter(c=>c.cadence==='Daily').map(c=><Link key={c.id} href={`/workspace/${c.id}`}><c.icon size={15}/><span>{c.label}</span><ArrowUpRight size={12}/></Link>)}</div></>,
 graph:<MissionGraph graph={data.graph}/>,
 attention:<> <section className="mb-panel mb-attention"><div className="mb-panel-head"><h2>Attention desk</h2><span className="mb-badge">OBSERVED BUSINESS STATE</span></div>{!data.approvals.length&&!data.stockouts.length&&!data.lowStock.length&&!data.counters.paymentPending?<p className="mb-empty">No pending approvals, unpaid invoices or stockouts in the current records.</p>:<>
