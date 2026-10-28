@@ -24,6 +24,8 @@ export class InferenceStore {
       CREATE INDEX IF NOT EXISTS mb_inference_queue ON mb_inference_tasks(state,createdAt);
       CREATE TABLE IF NOT EXISTS mb_inference_workers(id TEXT PRIMARY KEY,transport TEXT NOT NULL,lastSeen TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS mb_inference_attempts(taskId TEXT NOT NULL,attempt INTEGER NOT NULL,maxTokens INTEGER NOT NULL,createdAt TEXT NOT NULL,PRIMARY KEY(taskId,attempt));
+      CREATE TABLE IF NOT EXISTS mb_inference_limits(id INTEGER PRIMARY KEY CHECK(id=1),maxAttempts INTEGER NOT NULL,maxTokens INTEGER NOT NULL,updatedBy TEXT,updatedAt TEXT NOT NULL);
+      INSERT OR IGNORE INTO mb_inference_limits VALUES(1,50,65536,NULL,'1970-01-01T00:00:00.000Z');
       CREATE TABLE IF NOT EXISTS mb_inference_delegations(parentId TEXT PRIMARY KEY REFERENCES mb_inference_tasks(id));
       INSERT OR IGNORE INTO mb_inference_migrations VALUES(1);
     `);
@@ -97,13 +99,25 @@ export class InferenceStore {
       this.event('expired', task.id, 'Approval invalidated; old worker cannot commit');
     }
   }
+  /** Daily inference spend limits, stored in SQLite and editable only by the owner. */
+  limits(): { maxAttempts: number; maxTokens: number; updatedBy: string | null; updatedAt: string } {
+    return this.business.db.prepare('SELECT maxAttempts,maxTokens,updatedBy,updatedAt FROM mb_inference_limits WHERE id=1').get() as never;
+  }
+  setLimits(maxAttempts: number, maxTokens: number, by: string) {
+    if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 0 || maxAttempts > 10000) throw new BusinessError('maxAttempts must be 0-10000');
+    if (!Number.isSafeInteger(maxTokens) || maxTokens < 0 || maxTokens > 100_000_000) throw new BusinessError('maxTokens must be 0-100000000');
+    this.business.db.prepare('UPDATE mb_inference_limits SET maxAttempts=?,maxTokens=?,updatedBy=?,updatedAt=? WHERE id=1').run(maxAttempts, maxTokens, by, this.now());
+    this.business.appendEvidence('inference.limits', 'limits', `${maxAttempts} attempts, ${maxTokens} tokens by ${by}`);
+    return this.limits();
+  }
   claim(workerId: string, transport: 'browser' | 'server'): Lease | null {
     return this.atomic(() => {
       this.heartbeat(workerId, transport); this.recover();
       const running = (this.business.db.prepare("SELECT COUNT(*) AS n FROM mb_inference_tasks WHERE state='running'").get() as { n: number }).n;
       if (running >= 2) return null;
       const budget = this.business.db.prepare('SELECT COUNT(*) AS n,COALESCE(SUM(maxTokens),0) AS tokens FROM mb_inference_attempts WHERE createdAt>=?').get(this.now().slice(0, 10)) as { n: number; tokens: number };
-      if (budget.n >= 50 || budget.tokens >= 65536) return null;
+      const lim = this.limits();
+      if (budget.n >= lim.maxAttempts || budget.tokens >= lim.maxTokens) return null;
       const candidates = this.business.db.prepare("SELECT * FROM mb_inference_tasks WHERE state='queued' ORDER BY createdAt,id").all() as Row[];
       for (const row of candidates) {
         const task = decode(row);
@@ -117,7 +131,7 @@ export class InferenceStore {
           this.business.db.prepare("UPDATE mb_inference_tasks SET state='awaiting_approval',approvedHash=NULL,error='Route configuration changed; review required' WHERE id=?").run(task.id);
           this.event('reroute-blocked', task.id, 'No silent provider fallback'); continue;
         }
-        if (budget.tokens + task.payload.maxTokens > 65536) continue;
+        if (budget.tokens + task.payload.maxTokens > lim.maxTokens) continue;
         const token = randomUUID();
         this.business.db.prepare('INSERT INTO mb_inference_attempts VALUES(?,?,?,?)').run(task.id, task.attempts + 1, task.payload.maxTokens, this.now());
         this.business.db.prepare("UPDATE mb_inference_tasks SET state='running',attempts=attempts+1,workerId=?,leaseToken=?,leaseUntil=?,startedAt=? WHERE id=?").run(workerId, token, new Date(this.clock() + 120_000).toISOString(), this.now(), task.id);
@@ -178,6 +192,6 @@ export class InferenceStore {
     const workers = (this.business.db.prepare('SELECT * FROM mb_inference_workers ORDER BY lastSeen DESC LIMIT 50').all() as { id: string; transport: string; lastSeen: string }[]).map(w => ({ ...w, online: this.clock() - new Date(w.lastSeen).getTime() < 90_000 }));
     const counters = this.business.db.prepare("SELECT COUNT(*) AS total,COALESCE(SUM(state='awaiting_approval'),0) AS awaitingApproval,COALESCE(SUM(state='queued'),0) AS queued,COALESCE(SUM(state='running'),0) AS running,COALESCE(SUM(state='completed'),0) AS completed FROM mb_inference_tasks").get();
     const budget = this.business.db.prepare('SELECT COUNT(*) AS attempts,COALESCE(SUM(maxTokens),0) AS reservedOutputTokens FROM mb_inference_attempts WHERE createdAt>=?').get(this.now().slice(0, 10));
-    return { tasks, workers, budget, counters, routes: this.catalog(), evidence: this.business.evidence().filter(e => e.action.startsWith('inference.')).slice(-50).reverse(), auditValid: this.business.verifyAudit(), proof: { state: 'not_configured', detail: 'No zkVM prover/verifier configured. Hashes are audit bindings, not zero-knowledge proofs.' } };
+    return { tasks, workers, budget: { ...(budget as object), limits: this.limits() }, counters, routes: this.catalog(), evidence: this.business.evidence().filter(e => e.action.startsWith('inference.')).slice(-50).reverse(), auditValid: this.business.verifyAudit(), proof: { state: 'not_configured', detail: 'No zkVM prover/verifier configured. Hashes are audit bindings, not zero-knowledge proofs.' } };
   }
 }

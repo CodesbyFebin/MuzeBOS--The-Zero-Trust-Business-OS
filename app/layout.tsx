@@ -8,6 +8,7 @@ import { Topbar } from '@/components/Topbar';
 import { CommandPalette } from '@/components/CommandPalette';
 import { ConductorPanel } from '@/components/ConductorPanel';
 import { getDb } from '@/lib/data';
+import { filmingMode } from '@/lib/paths';
 import { ACTION_COMMANDS, EXTERNAL_COMMANDS, viewCommands, type Command } from '@/lib/palette';
 import { APPEARANCE_INIT_SCRIPT, htmlAttributes } from '@/lib/appearance';
 import { getAppearance } from '@/lib/appearance-server';
@@ -112,6 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <NavProgress />
               </Suspense>
             </ShellOnly>
+            {filmingMode() && <div role="status" className="mb-demo-banner" data-testid="demo-banner">Demo data: filming mode is on, so these records come from demo-data/ and are not your business. Turn it off in Settings.</div>}
             <main className="min-w-0 flex-1 px-8 pb-16 pt-7 wide:px-10 ultra:px-12">
               {/* Width tiers: 1280 on laptops · 1760 on large monitors ·
                   full-bleed on 32"/ultrawide. See tailwind screens wide/ultra. */}

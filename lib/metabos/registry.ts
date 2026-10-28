@@ -33,6 +33,8 @@ export type FeatureDefinition = {
   target?: string;       // where the working screen lives today (existing/available only)
   status: FeatureStatus;
   summary: string;
+  /** Reviewed backing of an inherited (existing) screen; not a blocker. */
+  backing?: string[];
   dependencies: string[]; // required before status can move to available
   keywords?: string;
   // Master-prompt contract fields (filled in by withContract below).
@@ -272,7 +274,39 @@ const MENU_LIST: Omit<MenuDefinition, 'number'>[] = [
   { id: 'evidence', label: 'Evidence', route: '/workspace/evidence', icon: ShieldCheck, section: 'core', summary: 'Inspect commerce actions, payload hashes and audit verification.', aliases: [], clusters: [{ id: 'evidence.ledger', label: 'Ledgers', pages: evidencePages }] },
   ...['settings', 'upgrade', 'support', 'developer', 'account'].map(utilityMenu),
 ];
-export const MENUS: MenuDefinition[] = MENU_LIST.map((m, i) => ({ ...m, number: i + 1 }));
+
+/**
+ * Reviewed backing for every inherited ("existing") screen (docs/MOCK-AUDIT.md). LOCAL = reads and writes
+ * only the local SQLite DB or process; anything else names the provider/env var it needs. Sample/filming
+ * data on these screens is opt-in only (?sample=1 or filming mode) and badged.
+ */
+const LOCAL = 'Backed by the local SQLite database only (no provider needed)';
+export const EXISTING_BACKING: Record<string, string[]> = {
+  'orders.deals-and-pipeline': [LOCAL, 'Optional live CRM/attribution: TRAKYO_API_KEY (else local DB)'],
+  'talk.business-inbox': ['Meta inbox: META_APP_SECRET, META_VERIFY_TOKEN and a connected Page/WhatsApp token'],
+  'talk.email-inbox': ['Email connector credentials set on /integrations (IMAP/Gmail)'],
+  'growth.social-media-studio': ['Meta publishing token (MUZEBOS_META_ACCESS_TOKEN); not a verified publishing adapter'],
+  'growth.campaign-manager': ['Meta Marketing API token; external calls need separate verification'],
+  'operations.tasks-and-goals': [LOCAL],
+  'builder.theme-customizer': [LOCAL],
+  'brain.ai-assistant': ['Model provider key (OPENROUTER_API_KEY or configured provider)'],
+  'brain.tool-registry': [LOCAL, 'Each connector needs its own credentials'],
+  'foundation.settings-and-sovereignty': [LOCAL],
+  'system.integrations-and-adapters': [LOCAL, 'Each connector needs its own credentials'],
+  'workflows.canvas': [LOCAL, 'Canvas does not execute runs; governed runs live at /workflows?view=governed'],
+  'settings.application-settings': [LOCAL],
+  'settings.merchant-profile': [LOCAL],
+  'settings.connections': [LOCAL, 'Each connector needs its own credentials'],
+  'upgrade.inspect-usage': [LOCAL, 'Shows "Usage unavailable" when no provider usage is recorded'],
+  'support.customer-inbox': ['Meta inbox: META_APP_SECRET, META_VERIFY_TOKEN and a connected Page/WhatsApp token'],
+  'support.setup-checklist': [LOCAL],
+  'support.project-roadmap': [LOCAL],
+  'developer.integration-directory': [LOCAL, 'Each connector needs its own credentials'],
+  'developer.system-blueprint': [LOCAL],
+  'account.operator-security': [LOCAL],
+  'account.sign-in-manage-session': [LOCAL],
+};
+export const MENUS: MenuDefinition[] = MENU_LIST.map((m, i) => ({ ...m, number: i + 1, clusters: m.clusters.map((c) => ({ ...c, pages: c.pages.map((f) => (f.status === 'existing' && EXISTING_BACKING[f.id] ? { ...f, backing: EXISTING_BACKING[f.id] } : f)) })) }));
 
 export const PINNED_MENUS = MENUS.filter((m) => m.section === 'pinned');
 export const SCROLL_MENUS = MENUS.filter((m) => m.section !== 'pinned');

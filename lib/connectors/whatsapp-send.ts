@@ -19,7 +19,7 @@ import { BRAND } from '@/lib/brand';
  *     message; outside that window only approved templates go through
  */
 
-const GRAPH = 'https://graph.facebook.com/v21.0';
+const GRAPH = 'https://graph.facebook.com/v25.0';
 
 export type SendCreds = { phoneNumberId: string; token: string };
 

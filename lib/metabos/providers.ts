@@ -54,7 +54,7 @@ export async function testConnection(store: BusinessStore, module: string, opts:
   const at = new Date().toISOString();
   let result: TestResult;
   if (cfg.tester === 'none') result = { status: 'no-live-test', message: cfg.note ?? 'No live test exists for this provider.', at };
-  else if (!cfg.configured) result = { status: 'not-configured', message: `Not configured: set ${cfg.secrets.filter((s) => !s.isSet).map((s) => s.ref).join(', ')}`, at };
+  else if (!cfg.configured) result = { status: 'not-configured', message: `Not connected — add ${cfg.secrets.filter((s) => !s.isSet).map((s) => s.ref).join(', ')}`, at };
   else {
     const v = (k: string) => env[cfg.secrets.find((s) => s.key === k)!.ref]!;
     const signal = AbortSignal.timeout(ms);
@@ -65,7 +65,7 @@ export async function testConnection(store: BusinessStore, module: string, opts:
         result = banner === '220' ? { status: 'ok', message: 'SMTP server answered 220 (TCP reachability only; credentials not exercised)', at } : { status: 'failed', message: `SMTP banner ${banner}`, at };
       } else {
         const req: Record<string, () => [string, RequestInit]> = {
-          'meta-graph': () => [`https://graph.facebook.com/v19.0/me?fields=id`, { headers: { authorization: `Bearer ${v('access_token')}` } }],
+          'meta-graph': () => [`https://graph.facebook.com/v25.0/me?fields=id`, { headers: { authorization: `Bearer ${v('access_token')}` } }],
           razorpay: () => ['https://api.razorpay.com/v1/payments?count=1', { headers: { authorization: `Basic ${Buffer.from(`${v('key_id')}:${v('key_secret')}`).toString('base64')}` } }],
           cloudflare: () => ['https://api.cloudflare.com/client/v4/user/tokens/verify', { headers: { authorization: `Bearer ${v('api_token')}` } }],
           openrouter: () => ['https://openrouter.ai/api/v1/key', { headers: { authorization: `Bearer ${v('api_key')}` } }],
