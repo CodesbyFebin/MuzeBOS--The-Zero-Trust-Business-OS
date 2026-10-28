@@ -5,7 +5,7 @@ import { businessStore, BusinessError } from '@/lib/muzebos/store';
 import { businessAccess } from '@/lib/muzebos/http';
 import { requireMember, requirePermission } from '@/lib/muzebos/biz/accounts';
 import { WorkflowEngine, OVERDUE_INVOICE_REMINDER } from '@/lib/muzebos/workflows';
-import { findOverdue, draftReminder, proposeReminder, dispatchOutbound, outbound, liveGate, termsDays, setTermsDays, senderConnectedFromEnv, DRAFT_LIMITS } from '@/lib/muzebos/overdue';
+import { findOverdue, draftReminder, proposeReminder, dispatchOutbound, outbound, liveGate, termsDays, setTermsDays, senderConnectedFromEnv, DRAFT_LIMITS, spendLimits, setSpendLimits, spendLimitsSchema } from '@/lib/muzebos/overdue';
 import { sendEmailReply } from '@/lib/connectors/email';
 import { runtimeEnv } from '@/lib/creds';
 export const dynamic = 'force-dynamic';
@@ -21,13 +21,14 @@ const cmd = z.discriminatedUnion('action', [
   z.object({ action: z.literal('propose'), invoiceId: id, subject: z.string().max(200), body: z.string().max(2000), mode: z.enum(['live', 'fixture']), model: z.string().max(120).nullable() }),
   z.object({ action: z.literal('approve'), runId: id, hash: z.string().regex(/^[a-f0-9]{64}$/) }),
   z.object({ action: z.literal('reject'), runId: id }),
+  z.object({ action: z.literal('limits'), limits: spendLimitsSchema }),
   z.object({ action: z.literal('terms'), days: z.number().int().min(0).max(365) }),
 ]);
 const engineFor = (s: ReturnType<typeof businessStore>) => new WorkflowEngine(s, { senderConnected: () => senderConnectedFromEnv(runtimeEnv()) });
 const view = (s: ReturnType<typeof businessStore>) => {
   const e = engineFor(s); const env = runtimeEnv();
   return {
-    findings: findOverdue(s), terms: termsDays(s), liveGate: liveGate(s, env), limits: DRAFT_LIMITS,
+    findings: findOverdue(s), terms: termsDays(s), liveGate: liveGate(s, env), limits: { ...DRAFT_LIMITS, ...spendLimits(s) },
     senderConnected: senderConnectedFromEnv(env),
     runs: e.runs(100).filter((r) => r.workflowId === OVERDUE_INVOICE_REMINDER.id).map((r) => ({ ...r, steps: e.steps(r.id) })),
     outbound: outbound(s).map(({ body: _b, ...m }) => m),
@@ -41,6 +42,7 @@ export async function POST(req: Request) {
     businessAccess(req); const c = cmd.parse(await readJsonBounded(req)); const s = businessStore(); const me = requireMember(s, req); requirePermission(me, 'finance.read');
     if (c.action === 'draft') return NextResponse.json({ draft: await draftReminder(s, c.invoiceId, { env: runtimeEnv() }) });
     if (c.action === 'propose') return NextResponse.json({ run: proposeReminder(s, c, Date.now(), engineFor(s)) });
+    if (c.action === 'limits') { requirePermission(me, 'finance.write'); setSpendLimits(s, me.id, c.limits); return NextResponse.json(view(s)); }
     requirePermission(me, 'jev.decide');
     if (c.action === 'terms') { setTermsDays(s, c.days); return NextResponse.json(view(s)); }
     const e = engineFor(s);
