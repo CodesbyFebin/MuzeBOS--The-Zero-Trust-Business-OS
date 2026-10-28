@@ -1,0 +1,203 @@
+import React, { useState } from 'react';
+import { MemoryFabricLayer } from '../types/metabos.ts';
+import {
+  Database,
+  Search,
+  HardDrive,
+  Cpu,
+  Layers,
+  Sparkles,
+  ShieldCheck,
+  CheckCircle2,
+  FileText,
+  Clock,
+  ArrowRight,
+} from 'lucide-react';
+
+interface MemoryStewardProps {
+  layers: MemoryFabricLayer[];
+  onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
+}
+
+export const MemorySteward: React.FC<MemoryStewardProps> = ({ layers, onToast }) => {
+  const [selectedLayerNum, setSelectedLayerNum] = useState<number>(3);
+  const [searchQuery, setSearchQuery] = useState('autonomous agent orchestration');
+  const [searchResults, setSearchResults] = useState<
+    { title: string; score: number; layer: string; preview: string }[]
+  >([
+    {
+      title: 'Llama 4 Multi-Agent Supervisor Pattern',
+      score: 0.94,
+      layer: 'Qdrant (Vectors)',
+      preview: 'Hierarchical routing topology between Chief Operating Agent and 20 Swarm Leaders using 10M token context window.',
+    },
+    {
+      title: 'Kubernetes Agent Sandbox Isolation Benchmarks',
+      score: 0.91,
+      layer: 'Qdrant (Vectors)',
+      preview: 'Kata-fc microVM boot times under 250ms with managed egress restricting RFC1918 and cloud metadata IPs.',
+    },
+    {
+      title: 'FOSS Cost Threshold Policy (Postgres Immutable)',
+      score: 0.88,
+      layer: 'Pinned Identity',
+      preview: 'Mandatory declaration of license, self-hostability, data-sharing risk, and self-hosted cloud alternatives.',
+    },
+  ]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    // Simulate Qdrant vector retrieval with similarity cosine scoring
+    setSearchResults([
+      {
+        title: `Semantic Vector Result for "${searchQuery}"`,
+        score: +(0.85 + Math.random() * 0.12).toFixed(2),
+        layer: 'Qdrant Vector DB',
+        preview: `Indexed embeddings for high-dimensional semantic match matching "${searchQuery}" across technical briefs and candidate ledgers.`,
+      },
+      {
+        title: 'Company Identity & Safe Action Policy',
+        score: +(0.8 + Math.random() * 0.1).toFixed(2),
+        layer: 'PostgreSQL Pinned',
+        preview: 'Autonomy threshold boundaries: Impact score < 5 internal dispatch, Impact score > 7 owner cryptographic authorization.',
+      },
+      {
+        title: 'Canonical Ledger & Invoice INV-2026-1031',
+        score: +(0.75 + Math.random() * 0.1).toFixed(2),
+        layer: 'ERPNext / PostgreSQL',
+        preview: 'Linear Technologies recruitment fee $38,500 with SHA-256 tamper-proof verification stamp.',
+      },
+    ]);
+
+    onToast(`Qdrant vector query retrieved 3 semantic matches for "${searchQuery}"!`, 'info');
+  };
+
+  const currentLayer = layers.find((l) => l.layer === selectedLayerNum) || layers[2];
+
+  return (
+    <div className="space-y-6 max-w-[1400px] mx-auto">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-[#111622] border border-white/10">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white tracking-tight">Four-Layer Memory Fabric</h2>
+            <span className="mono text-[10px] px-2 py-0.5 rounded-full bg-[#8b5cf6]/20 text-[#8b5cf6] border border-[#8b5cf6]/30 font-semibold">
+              QDRANT + POSTGRESQL + REDIS + ERPNEXT
+            </span>
+          </div>
+          <p className="mono text-xs text-white/50 mt-1">
+            Unified long-term business recall instead of ephemeral, disconnected chat windows
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 mono text-xs text-[#00ff9d] bg-[#00ff9d]/10 border border-[#00ff9d]/20 px-3.5 py-1.5 rounded-xl">
+          <ShieldCheck className="w-4 h-4" />
+          <span>Cryptographically Governed Memory</span>
+        </div>
+      </div>
+
+      {/* 4 Layers Architectural Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {layers.map((l) => {
+          const isSelected = selectedLayerNum === l.layer;
+
+          return (
+            <div
+              key={l.layer}
+              onClick={() => setSelectedLayerNum(l.layer)}
+              className={`p-5 rounded-2xl bg-[#111622] border cursor-pointer transition-all duration-200 relative ${
+                isSelected
+                  ? 'border-[#8b5cf6] shadow-[0_0_20px_rgba(139,92,246,0.3)]'
+                  : 'border-white/10 hover:border-white/20'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="mono text-xs font-bold text-[#8b5cf6]">LAYER 0{l.layer}</span>
+                <span className="mono text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                  {l.status.toUpperCase()}
+                </span>
+              </div>
+
+              <h3 className="font-bold text-sm text-white">{l.name}</h3>
+              <p className="mono text-[11px] text-[#00d4ff] mt-0.5">{l.technology}</p>
+              <p className="text-xs text-white/60 mt-2 leading-relaxed line-clamp-2">{l.purpose}</p>
+
+              <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-2 mono text-[10px] text-white/40">
+                <span>Storage: {l.storageUsage}</span>
+                <span className="text-white font-bold">{l.itemCount.toLocaleString()} items</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Layer 3: Interactive Qdrant Semantic Retrieval Simulator */}
+      <div className="p-6 rounded-2xl bg-[#0b0f18] border border-white/10 space-y-5">
+        <div className="flex items-center justify-between border-b border-white/5 pb-3">
+          <div>
+            <h3 className="font-bold text-sm text-white flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#8b5cf6]" />
+              <span>Qdrant Semantic Memory Query Engine</span>
+            </h3>
+            <p className="mono text-[11px] text-white/40">
+              Cosine vector similarity search across technical documentation, resumes, and operating state
+            </p>
+          </div>
+          <span className="mono text-[11px] text-white/40">Vector Dimensions: 1536</span>
+        </div>
+
+        {/* Search Bar */}
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <div className="flex-1 flex items-center gap-2.5 bg-[#111622] border border-white/10 px-4 py-2.5 rounded-xl text-xs">
+            <Search className="w-4 h-4 text-white/40" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Query semantic memory (e.g. agent topology, compliance rules)..."
+              className="w-full bg-transparent outline-none text-white placeholder:text-white/30 mono"
+            />
+          </div>
+          <button
+            type="submit"
+            className="px-5 py-2.5 rounded-xl bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-bold mono text-xs shadow-lg transition"
+          >
+            Vector Search
+          </button>
+        </form>
+
+        {/* Semantic Results */}
+        <div className="space-y-3">
+          <div className="mono text-[11px] text-white/40 uppercase font-semibold">
+            Top Semantic Matches (Ranked by Cosine Similarity):
+          </div>
+
+          <div className="space-y-2.5">
+            {searchResults.map((res, i) => (
+              <div
+                key={i}
+                className="p-4 rounded-xl bg-[#111622] border border-white/5 hover:border-white/15 transition space-y-1.5"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="font-bold text-xs text-white flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5 text-[#00d4ff]" />
+                    <span>{res.title}</span>
+                  </div>
+                  <div className="flex items-center gap-2 mono text-[11px]">
+                    <span className="text-white/40">{res.layer}</span>
+                    <span className="px-2 py-0.5 rounded bg-[#00ff9d]/15 text-[#00ff9d] font-bold">
+                      {(res.score * 100).toFixed(0)}% Match
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-white/70 leading-relaxed font-mono">{res.preview}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

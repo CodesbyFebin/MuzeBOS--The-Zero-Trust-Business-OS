@@ -1,0 +1,236 @@
+export type SwarmCategory =
+  | 'ENG'
+  | 'IT'
+  | 'SALES'
+  | 'MKT'
+  | 'CS'
+  | 'FIN'
+  | 'LEG'
+  | 'HR'
+  | 'SEC'
+  | 'OPS'
+  | 'RSR'
+  | 'GEN';
+
+export type SandboxIsolation = 'kata-fc' | 'gvisor' | 'runc';
+
+export interface SandboxInstance {
+  id: string;
+  name: string;
+  swarmId: string;
+  category: SwarmCategory;
+  roleProfile: 'code-exec' | 'code-light' | 'research' | 'api-light' | 'writing';
+  isolation: SandboxIsolation;
+  status: 'active' | 'warm-pool' | 'executing' | 'idle';
+  cpuLimit: string;
+  memLimit: string;
+  vllmModel: string;
+  currentTask?: string;
+  uptimeHours: number;
+}
+
+export interface Swarm {
+  id: string;
+  name: string;
+  namespace: string;
+  primaryCategory: SwarmCategory;
+  secondaryCategory: SwarmCategory;
+  leaderModel: string; // e.g. "Llama 4 Scout FP8 (2x H100)"
+  leaderGpus: string;
+  activeWorkers: number;
+  totalSandboxes: number;
+  warmPoolReplicas: number;
+  kpiHealth: number; // 0-100%
+  currentFocus: string;
+  latencyMs: number;
+  tokensPerSec: number;
+  color: string;
+}
+
+export interface ApprovalRequest {
+  id: string;
+  title: string;
+  category: SwarmCategory;
+  originAgent: string;
+  originSwarm: string;
+  impactScore: number; // 0 - 10
+  riskClass: 'internal' | 'external' | 'financial' | 'legal';
+  requestedAmount?: number;
+  currency?: string;
+  description: string;
+  precedentRecordId?: string;
+  proposedAction: string;
+  status: 'pending' | 'approved' | 'rejected';
+  timestamp: string;
+  nonce: string;
+  auditHash: string;
+  observerCritique?: string;
+}
+
+export interface AuditEvent {
+  id: string;
+  seq: number;
+  timestamp: string;
+  actor: string; // e.g. "COA-Maverick", "Swarm-01-Leader", "Owner"
+  action: string;
+  target: string;
+  result: 'succeeded' | 'escalated' | 'vetoed' | 'critiqued';
+  impactScore: number;
+  prevHash: string;
+  hash: string;
+  detail: string;
+}
+
+export interface WorkflowNode {
+  id: string;
+  label: string;
+  type: 'webhook' | 'agent' | 'script' | 'llm' | 'crm' | 'outreach' | 'gate';
+  category?: SwarmCategory;
+  description: string;
+  modelOrRuntime: string;
+  status: 'idle' | 'running' | 'success' | 'failed';
+  lastRunMs: number;
+  codeOrPrompt: string;
+}
+
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description: string;
+  triggerType: string;
+  nodes: WorkflowNode[];
+  edges: { from: string; to: string }[];
+  active: boolean;
+  totalRuns: number;
+  successRate: number;
+  avgDurationSec: number;
+}
+
+export interface CandidateRecord {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  location: string;
+  skills: string[];
+  source: 'GitHub' | 'LinkedIn' | 'StackOverflow';
+  score: number;
+  status: 'Sourced' | 'Screened' | 'Submitted' | 'Interview' | 'Offer' | 'Placed';
+  salary: string;
+  summary: string;
+  reasoning: string;
+  email: string;
+  githubStars?: number;
+}
+
+export interface ERPInvoice {
+  id: string;
+  invoiceNo: string;
+  customer: string;
+  date: string;
+  dueDate: string;
+  amount: number;
+  currency: string;
+  tax: number;
+  status: 'Paid' | 'Pending' | 'Draft' | 'Escalated';
+  verificationHash: string;
+  qrPayload: string;
+  items: { description: string; qty: number; unitPrice: number; taxRate: number }[];
+}
+
+export interface MemoryFabricLayer {
+  layer: 1 | 2 | 3 | 4;
+  name: string;
+  technology: string;
+  storageUsage: string;
+  purpose: string;
+  itemCount: number;
+  status: 'synced' | 'indexing' | 'operational';
+}
+
+export interface RoleBacklogItem {
+  id: string;
+  roleTitle: string;
+  category: SwarmCategory;
+  urgency: 'high' | 'medium' | 'low';
+  justification: string;
+  status: 'proposed' | 'approved' | 'active';
+  suggestedProfile: 'code-exec' | 'code-light' | 'research' | 'api-light' | 'writing';
+}
+
+export interface MarketplaceAgent {
+  id: string;
+  name: string;
+  tagline: string;
+  author: string;
+  version: string;
+  category: SwarmCategory;
+  description: string;
+  rating: number; // 0 - 5.0
+  reviewsCount: number;
+  downloads: number;
+  verified: boolean;
+  license: string; // e.g. "Apache 2.0", "MIT"
+  modelCompat: string; // e.g. "Llama 4 Scout (17B/109B)"
+  isolation: SandboxIsolation;
+  minVram: string;
+  mcpTools: string[];
+  installed: boolean;
+  installedSwarmId?: string;
+  isDeveloperOwned?: boolean;
+  systemPromptSnippet: string;
+  masteryLevel: number; // 1 - 10
+}
+
+export interface CollabUser {
+  id: string;
+  name: string;
+  roleTitle: string;
+  type: 'human' | 'agent';
+  color: string;
+  status: 'active' | 'idle' | 'typing';
+  currentLine: number;
+  avatar: string;
+}
+
+export interface CollabComment {
+  id: string;
+  authorName: string;
+  authorType: 'human' | 'agent';
+  authorColor: string;
+  lineNumber: number;
+  text: string;
+  timestamp: string;
+  resolved: boolean;
+  replies: {
+    id: string;
+    authorName: string;
+    authorType: 'human' | 'agent';
+    authorColor: string;
+    text: string;
+    timestamp: string;
+  }[];
+}
+
+export interface CollabRevision {
+  id: string;
+  versionNumber: string;
+  timestamp: string;
+  author: string;
+  authorType: 'human' | 'agent';
+  commitMsg: string;
+  content: string;
+  sha: string;
+}
+
+export interface CollabDocument {
+  id: string;
+  title: string;
+  fileExt: string;
+  category: SwarmCategory;
+  content: string;
+  lastModified: string;
+  activeCollaborators: CollabUser[];
+  comments: CollabComment[];
+  revisions: CollabRevision[];
+}

@@ -1,0 +1,305 @@
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Terminal,
+  Send,
+  Brain,
+  ShieldAlert,
+  Sparkles,
+  Bot,
+  User,
+  Zap,
+  RefreshCw,
+  Cpu,
+  CornerDownLeft,
+} from 'lucide-react';
+import { GoogleGenAI } from '@google/genai';
+
+interface Message {
+  id: string;
+  sender: 'owner' | 'coa' | 'observer' | 'system';
+  name: string;
+  avatarColor: string;
+  text: string;
+  timestamp: string;
+  critique?: string;
+  impactScore?: number;
+}
+
+interface AiTerminalProps {
+  onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
+}
+
+export const AiTerminal: React.FC<AiTerminalProps> = ({ onToast }) => {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 'm1',
+      sender: 'coa',
+      name: 'Chief Operating Agent (Llama 4 Maverick)',
+      avatarColor: '#00ff9d',
+      text: 'MeTaBos OS initialized. All 20 Swarms report healthy telemetry. vLLM Scout shared pool running 16 replicas (142k tps). How may I assist with executive decision-making or swarm task routing?',
+      timestamp: '20:00:15',
+    },
+    {
+      id: 'm2',
+      sender: 'observer',
+      name: 'Observer Agent (Independent Critique)',
+      avatarColor: '#8b5cf6',
+      text: 'Observer online. Monitoring governor outputs for prompt-injection, uncontained egress, and policy drift. Current drift index: 0.02 (Optimal).',
+      timestamp: '20:00:18',
+    },
+  ]);
+
+  const [inputVal, setInputVal] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [debateMode, setDebateMode] = useState(true);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const handleSendMessage = async (customPrompt?: string) => {
+    const textToSend = customPrompt || inputVal;
+    if (!textToSend.trim() || isProcessing) return;
+
+    const userMsg: Message = {
+      id: `usr-${Date.now()}`,
+      sender: 'owner',
+      name: 'Owner (Console)',
+      avatarColor: '#ffffff',
+      text: textToSend,
+      timestamp: new Date().toLocaleTimeString(),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    if (!customPrompt) setInputVal('');
+    setIsProcessing(true);
+
+    // Call Gemini API if available, or generate contextual autonomous response
+    let coaResponseText = '';
+    let observerResponseText = '';
+
+    try {
+      // Check if GEMINI_API_KEY is available in browser / client environment
+      const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (window as any).process?.env?.GEMINI_API_KEY;
+
+      if (apiKey && apiKey !== 'MY_GEMINI_API_KEY') {
+        const ai = new GoogleGenAI({ apiKey });
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: `You are the Chief Operating Agent (COA) of MeTaBos, a governed AI company operating system running a team of 20 swarms and 500 sandboxes on a self-hosted Llama 4 stack. The user says: "${textToSend}". Respond in 2-3 concise, highly operational, executive sentences. Address resource allocation, impact score, and actions taken.`,
+        });
+        coaResponseText = response.text || '';
+      }
+    } catch (e) {
+      // Fallback to rich deterministic domain responses
+    }
+
+    if (!coaResponseText) {
+      // High-craft contextual domain reasoning
+      const q = textToSend.toLowerCase();
+      if (q.includes('gpu') || q.includes('cost') || q.includes('budget')) {
+        coaResponseText =
+          'Current GPU cluster burn is $85,400/mo across 8× H200 (COA Maverick) and 16× H100 (vLLM Scout pool). We are tracking 68% below the $280,000/mo proprietary API ceiling. Swarm 05 spot scale APPR-2026-084 is awaiting your sign-off in the Executive Cockpit.';
+        observerResponseText =
+          'Critique: Spot instance volatility risk is acceptable given warm pool buffer. Ensure non-urgent batch tasks are tagged with fault-tolerant checkpointing.';
+      } else if (q.includes('hire') || q.includes('talent') || q.includes('candidate')) {
+        coaResponseText =
+          'Swarm 02 & Swarm 12 have sourced 247 candidates in the last 24h. Top recommendation: Elena Morozov (96% fit for Linear Sr React role) and Sarah Chen (98% fit for Autonomous AI orchestration). Automated outreach drafts are prepared.';
+        observerResponseText =
+          'Critique: Resume verification confirmed via public repository commits. No compensation drift detected against client bands.';
+      } else if (q.includes('security') || q.includes('egress') || q.includes('trivy')) {
+        coaResponseText =
+          'Swarm 05 (Cyber Security) reports 0 uncontained egress violations. All 500 sandboxes have automountServiceAccountToken: false and cloud metadata IP 169.254.169.254 strictly blocked by Caddy edge NetworkPolicy.';
+        observerResponseText =
+          'Critique: SOC threat index zero. RFC1918 internal isolation verified. Kata-fc hypervisor overhead remains under 4% CPU.';
+      } else {
+        coaResponseText = `Task analyzed by Maverick reasoning core (Impact Score: 4.8/10). Directive assigned to Swarm 01 (Engineering) and Swarm 20 (Strategy) under durable Temporal saga. Execution telemetry logged to hash-chained audit record.`;
+        observerResponseText = `Critique: Impact score verified below 5.0 autonomy escalation threshold. Internal dispatch authorized without owner approval gate.`;
+      }
+    }
+
+    setTimeout(() => {
+      const coaMsg: Message = {
+        id: `coa-${Date.now()}`,
+        sender: 'coa',
+        name: 'Chief Operating Agent (Llama 4 Maverick)',
+        avatarColor: '#00ff9d',
+        text: coaResponseText,
+        timestamp: new Date().toLocaleTimeString(),
+      };
+
+      setMessages((prev) => [...prev, coaMsg]);
+
+      if (debateMode && observerResponseText) {
+        setTimeout(() => {
+          const obsMsg: Message = {
+            id: `obs-${Date.now()}`,
+            sender: 'observer',
+            name: 'Observer Agent (Adversarial Critique)',
+            avatarColor: '#8b5cf6',
+            text: observerResponseText,
+            timestamp: new Date().toLocaleTimeString(),
+          };
+          setMessages((prev) => [...prev, obsMsg]);
+          setIsProcessing(false);
+        }, 600);
+      } else {
+        setIsProcessing(false);
+      }
+    }, 500);
+  };
+
+  return (
+    <div className="space-y-4 max-w-[1400px] mx-auto">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-[#111622] border border-white/10">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white tracking-tight">Executive AI Terminal & Multi-Agent Debate</h2>
+            <span className="mono text-[10px] px-2 py-0.5 rounded-full bg-[#00ff9d]/20 text-[#00ff9d] border border-[#00ff9d]/30 font-semibold">
+              COA + OBSERVER TWIN ARCHITECTURE
+            </span>
+          </div>
+          <p className="mono text-xs text-white/50 mt-1">
+            Governor decision reasoning scrutinized in real-time by independent adversarial critique
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setDebateMode(!debateMode)}
+            className={`px-3 py-1.5 rounded-xl mono text-xs font-semibold flex items-center gap-1.5 transition ${
+              debateMode
+                ? 'bg-[#8b5cf6] text-white shadow-lg'
+                : 'bg-white/5 text-white/60 hover:text-white'
+            }`}
+          >
+            <ShieldAlert className="w-3.5 h-3.5" />
+            <span>Observer Critique Mode: {debateMode ? 'ON' : 'OFF'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Terminal Viewport */}
+      <div className="rounded-2xl bg-[#0b0f18] border border-white/10 overflow-hidden flex flex-col h-[520px]">
+        {/* Top Window Bar */}
+        <div className="flex items-center justify-between px-4 py-3 bg-[#111622] border-b border-white/5 mono text-xs text-white/50">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#00ff9d]" />
+            </div>
+            <span className="ml-2 font-semibold text-white/70">metabos-coa-observer-session</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span>Model: Llama 4 Maverick (400B)</span>
+            <span>·</span>
+            <span>Context: 1,000,000 tokens</span>
+          </div>
+        </div>
+
+        {/* Message Thread */}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.map((m) => {
+            const isUser = m.sender === 'owner';
+            const isObserver = m.sender === 'observer';
+
+            return (
+              <div
+                key={m.id}
+                className={`flex gap-3 max-w-3xl ${isUser ? 'ml-auto flex-row-reverse' : ''}`}
+              >
+                <div
+                  className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-black font-bold text-xs"
+                  style={{ background: m.avatarColor }}
+                >
+                  {isUser ? <User className="w-4 h-4 text-black" /> : isObserver ? <ShieldAlert className="w-4 h-4 text-white" /> : <Brain className="w-4 h-4 text-black" />}
+                </div>
+
+                <div className={`space-y-1 ${isUser ? 'text-right' : ''}`}>
+                  <div className="flex items-center gap-2 mono text-[11px] text-white/40">
+                    <span className="font-semibold text-white/80">{m.name}</span>
+                    <span>{m.timestamp}</span>
+                  </div>
+
+                  <div
+                    className={`p-3.5 rounded-2xl text-xs leading-relaxed mono ${
+                      isUser
+                        ? 'bg-white text-black font-medium'
+                        : isObserver
+                        ? 'bg-[#8b5cf6]/10 border border-[#8b5cf6]/30 text-white'
+                        : 'bg-[#111622] border border-white/10 text-white/90'
+                    }`}
+                  >
+                    {m.text}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {isProcessing && (
+            <div className="flex items-center gap-2 mono text-xs text-[#00ff9d] p-2">
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              <span>COA & Observer synthesizing reasoning...</span>
+            </div>
+          )}
+        </div>
+
+        {/* Quick Suggestion Chips */}
+        <div className="px-4 py-2 border-t border-white/5 bg-[#111622]/40 flex items-center gap-2 overflow-x-auto text-[11px] mono">
+          <span className="text-white/40 shrink-0">Prompts:</span>
+          {[
+            'Evaluate cluster GPU budget vs API costs',
+            'Review pending high-impact approval queue',
+            'Inspect network egress security rules',
+            'Propose new autonomous role for Role Backlog',
+          ].map((prompt, i) => (
+            <button
+              key={i}
+              onClick={() => handleSendMessage(prompt)}
+              className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white whitespace-nowrap transition border border-white/5"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+
+        {/* Input Bar */}
+        <div className="p-3 bg-[#111622] border-t border-white/10">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendMessage();
+            }}
+            className="flex items-center gap-2"
+          >
+            <div className="flex-1 flex items-center gap-2 bg-[#0b0f18] border border-white/10 px-4 py-2.5 rounded-xl">
+              <Terminal className="w-4 h-4 text-white/40 shrink-0" />
+              <input
+                type="text"
+                value={inputVal}
+                onChange={(e) => setInputVal(e.target.value)}
+                placeholder="Give strategic directive to Chief Operating Agent or query swarm state..."
+                className="w-full bg-transparent outline-none text-white text-xs mono placeholder:text-white/30"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isProcessing}
+              className="h-10 px-4 rounded-xl bg-[#00ff9d] hover:bg-[#00e68d] text-black font-bold mono text-xs flex items-center gap-1.5 transition shadow-lg shrink-0"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Execute</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -1,0 +1,238 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Search,
+  Command,
+  Play,
+  RotateCcw,
+  Shield,
+  Layers,
+  Database,
+  Briefcase,
+  Zap,
+  Cpu,
+  FileCheck,
+  X,
+  ArrowRight,
+  ShoppingBag,
+  Users,
+} from 'lucide-react';
+
+interface CommandPaletteProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onNavigate: (tab: string) => void;
+  onTriggerAction: (actionKey: string) => void;
+}
+
+export const CommandPalette: React.FC<CommandPaletteProps> = ({
+  isOpen,
+  onClose,
+  onNavigate,
+  onTriggerAction,
+}) => {
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        if (isOpen) onClose();
+        else onClose(); // parent handles toggle
+      }
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const commands = [
+    {
+      id: 'nav-3d',
+      title: 'Open 3D Cyber Cluster Topology',
+      subtitle: 'Inspect Three.js K8s nodes, COA Core and 20 Swarms in 3D',
+      category: 'Navigation',
+      icon: Layers,
+      action: () => {
+        onNavigate('3d');
+        onClose();
+      },
+    },
+    {
+      id: 'nav-cockpit',
+      title: 'Executive Cockpit & Approvals',
+      subtitle: 'Chief Operating Agent (Maverick) + Observer critique & HITL gate',
+      category: 'Navigation',
+      icon: Shield,
+      action: () => {
+        onNavigate('cockpit');
+        onClose();
+      },
+    },
+    {
+      id: 'nav-workflows',
+      title: 'Automated Workflow Manager',
+      subtitle: 'Visual DAG pipelines with Temporal durable state replay',
+      category: 'Navigation',
+      icon: Zap,
+      action: () => {
+        onNavigate('workflows');
+        onClose();
+      },
+    },
+    {
+      id: 'nav-swarms',
+      title: 'Swarm & Sandbox Registry',
+      subtitle: 'Catalog of 20 swarms and 500 sandboxes (Kata-fc / gVisor / runc)',
+      category: 'Navigation',
+      icon: Cpu,
+      action: () => {
+        onNavigate('swarms');
+        onClose();
+      },
+    },
+    {
+      id: 'nav-marketplace',
+      title: 'Open AI Agent Marketplace',
+      subtitle: 'Browse, deploy, and monetize specialized autonomous AI employees',
+      category: 'Navigation',
+      icon: ShoppingBag,
+      action: () => {
+        onNavigate('marketplace');
+        onClose();
+      },
+    },
+    {
+      id: 'nav-collab',
+      title: 'Open Collaborative Workspace',
+      subtitle: 'Multi-agent and human live co-editing, comments, and version control',
+      category: 'Navigation',
+      icon: Users,
+      action: () => {
+        onNavigate('collab');
+        onClose();
+      },
+    },
+    {
+      id: 'nav-erp',
+      title: 'Canonical System of Record (ERPNext)',
+      subtitle: 'Candidate Kanban pipeline, Invoicing and General Ledger',
+      category: 'Navigation',
+      icon: Briefcase,
+      action: () => {
+        onNavigate('erp');
+        onClose();
+      },
+    },
+    {
+      id: 'nav-memory',
+      title: 'Four-Layer Memory Fabric',
+      subtitle: 'Pinned Identity, Temporal State, Qdrant Vector search, ERP records',
+      category: 'Navigation',
+      icon: Database,
+      action: () => {
+        onNavigate('memory');
+        onClose();
+      },
+    },
+    {
+      id: 'act-run-sourcing',
+      title: 'Run Talent Sourcing Workflow',
+      subtitle: 'Execute full pipeline: Webhook -> Scrape -> Enrich -> Score -> CRM -> Email',
+      category: 'Action',
+      icon: Play,
+      action: () => {
+        onTriggerAction('run_sourcing');
+        onClose();
+      },
+    },
+    {
+      id: 'act-verify-audit',
+      title: 'Verify Cryptographic Audit Hash Chain',
+      subtitle: 'Check SHA-256 sequential linkages across all state transitions',
+      category: 'Action',
+      icon: FileCheck,
+      action: () => {
+        onTriggerAction('verify_audit');
+        onClose();
+      },
+    },
+  ];
+
+  const filtered = commands.filter(
+    (c) =>
+      c.title.toLowerCase().includes(query.toLowerCase()) ||
+      c.subtitle.toLowerCase().includes(query.toLowerCase()) ||
+      c.category.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-start justify-center pt-20 p-4 animate-fade-in">
+      <div className="w-full max-w-xl bg-[#111622] border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        {/* Search Input Bar */}
+        <div className="flex items-center gap-3 p-4 border-b border-white/10 bg-[#0b0f18]">
+          <Search className="w-5 h-5 text-white/40 shrink-0" />
+          <input
+            type="text"
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Type a command or search across MeTaBos OS..."
+            className="w-full bg-transparent outline-none text-white text-sm mono placeholder:text-white/30"
+          />
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-xs mono"
+          >
+            ESC
+          </button>
+        </div>
+
+        {/* Command List */}
+        <div className="max-h-[360px] overflow-y-auto p-2 space-y-1">
+          {filtered.map((cmd) => {
+            const Icon = cmd.icon;
+            return (
+              <div
+                key={cmd.id}
+                onClick={cmd.action}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:border-[#00ff9d] transition">
+                  <Icon className="w-4 h-4 text-white/70 group-hover:text-[#00ff9d] transition" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm text-white group-hover:text-[#00ff9d] transition">
+                      {cmd.title}
+                    </span>
+                    <span className="mono text-[10px] px-1.5 py-0.2 rounded bg-white/5 text-white/40">
+                      {cmd.category}
+                    </span>
+                  </div>
+                  <div className="mono text-xs text-white/40 truncate mt-0.5">{cmd.subtitle}</div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-white/70 transition shrink-0" />
+              </div>
+            );
+          })}
+
+          {filtered.length === 0 && (
+            <div className="p-8 text-center text-xs text-white/30 mono">
+              No matching commands found for "{query}"
+            </div>
+          )}
+        </div>
+
+        {/* Footer info */}
+        <div className="p-3 bg-[#0b0f18] border-t border-white/5 flex items-center justify-between mono text-[10px] text-white/40">
+          <span>MeTaBos OS v1.0 · Llama 4 Agent Framework</span>
+          <span>Press ⌘K to open anytime</span>
+        </div>
+      </div>
+    </div>
+  );
+};
