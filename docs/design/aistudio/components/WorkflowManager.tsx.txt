@@ -1,0 +1,280 @@
+import React, { useState } from 'react';
+import { WorkflowTemplate, WorkflowNode } from '../types/metabos.ts';
+import {
+  Play,
+  CheckCircle2,
+  Clock,
+  Code2,
+  Terminal,
+  Zap,
+  ArrowRight,
+  Plus,
+  Sliders,
+  AlertCircle,
+  FileText,
+  Webhook,
+  Bot,
+  Send,
+  Database,
+  ShieldAlert,
+} from 'lucide-react';
+
+interface WorkflowManagerProps {
+  workflows: WorkflowTemplate[];
+  onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
+}
+
+export const WorkflowManager: React.FC<WorkflowManagerProps> = ({
+  workflows,
+  onToast,
+}) => {
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState(workflows[0]?.id || '');
+  const [activeWorkflow, setActiveWorkflow] = useState<WorkflowTemplate>(workflows[0]);
+  const [selectedNodeId, setSelectedNodeId] = useState<string>(workflows[0]?.nodes[0]?.id || '');
+  const [isRunning, setIsRunning] = useState(false);
+  const [activeRunningNodeId, setActiveRunningNodeId] = useState<string | null>(null);
+  const [executionLogs, setExecutionLogs] = useState<string[]>([
+    `[${new Date().toLocaleTimeString()}] Workflow initialized in Temporal state machine`,
+    `[${new Date().toLocaleTimeString()}] Listening for incoming webhook triggers on :8443`,
+  ]);
+
+  const currentWorkflow = workflows.find((w) => w.id === selectedWorkflowId) || activeWorkflow;
+  const selectedNode = currentWorkflow.nodes.find((n) => n.id === selectedNodeId) || currentWorkflow.nodes[0];
+
+  // Helper icon selector based on node type
+  const getNodeIcon = (type: WorkflowNode['type']) => {
+    switch (type) {
+      case 'webhook':
+        return Webhook;
+      case 'agent':
+        return Bot;
+      case 'script':
+        return Code2;
+      case 'llm':
+        return Zap;
+      case 'crm':
+        return Database;
+      case 'outreach':
+        return Send;
+      case 'gate':
+        return ShieldAlert;
+      default:
+        return Terminal;
+    }
+  };
+
+  // Run Step-by-Step Simulation
+  const handleRunSimulation = async () => {
+    if (isRunning) return;
+    setIsRunning(true);
+    setExecutionLogs((prev) => [
+      `[${new Date().toLocaleTimeString()}] ▶ Executing workflow "${currentWorkflow.name}"`,
+      ...prev,
+    ]);
+
+    for (let i = 0; i < currentWorkflow.nodes.length; i++) {
+      const node = currentWorkflow.nodes[i];
+      setActiveRunningNodeId(node.id);
+      setSelectedNodeId(node.id);
+
+      // Simulation delay per node
+      const duration = 500 + Math.random() * 400;
+      await new Promise((r) => setTimeout(r, duration));
+
+      setExecutionLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] ✓ Node [${node.label}] executed (${Math.round(duration)}ms)`,
+        ...prev,
+      ]);
+    }
+
+    setActiveRunningNodeId(null);
+    setIsRunning(false);
+    onToast(`Workflow "${currentWorkflow.name}" ran successfully!`, 'success');
+  };
+
+  return (
+    <div className="space-y-6 max-w-[1400px] mx-auto">
+      {/* Top Header & Workflow Selector */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-[#111622] border border-white/10">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white tracking-tight">
+              Automated Workflow Management
+            </h2>
+            <span className="mono text-[10px] px-2 py-0.5 rounded-full bg-[#00ff9d]/20 text-[#00ff9d] border border-[#00ff9d]/30 font-semibold">
+              TEMPORAL / N8N RUNTIME
+            </span>
+          </div>
+          <p className="mono text-xs text-white/50 mt-1">
+            Governed DAG pipelines with deterministic state replay and human approval gates
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {/* Template dropdown selector */}
+          <select
+            value={selectedWorkflowId}
+            onChange={(e) => {
+              setSelectedWorkflowId(e.target.value);
+              const wf = workflows.find((w) => w.id === e.target.value);
+              if (wf) {
+                setActiveWorkflow(wf);
+                setSelectedNodeId(wf.nodes[0]?.id || '');
+              }
+            }}
+            className="h-10 px-3 rounded-xl bg-[#0b0f18] border border-white/10 text-xs font-semibold text-white outline-none cursor-pointer"
+          >
+            {workflows.map((w) => (
+              <option key={w.id} value={w.id}>
+                {w.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Run Button */}
+          <button
+            onClick={handleRunSimulation}
+            disabled={isRunning}
+            className={`h-10 px-5 rounded-xl font-bold text-xs mono flex items-center gap-2 transition ${
+              isRunning
+                ? 'bg-white/20 text-white/50 cursor-not-allowed'
+                : 'bg-white text-black hover:bg-[#00ff9d] shadow-lg'
+            }`}
+          >
+            <Play className={`w-3.5 h-3.5 ${isRunning ? 'animate-spin' : ''}`} />
+            <span>{isRunning ? 'Executing Pipeline...' : 'Run Simulation'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Visual Pipeline Canvas */}
+      <div className="p-6 rounded-2xl bg-[#0b0f18] border border-white/10 overflow-x-auto relative">
+        <div className="flex items-center justify-between pb-4 border-b border-white/5 mb-6">
+          <div className="flex items-center gap-2 text-xs mono text-white/50">
+            <span>Trigger: <strong className="text-white">{currentWorkflow.triggerType}</strong></span>
+            <span>·</span>
+            <span>Total Runs: <strong className="text-white">{currentWorkflow.totalRuns}</strong></span>
+            <span>·</span>
+            <span>Success: <strong className="text-[#00ff9d]">{currentWorkflow.successRate}%</strong></span>
+          </div>
+
+          <div className="mono text-[11px] text-white/40">
+            Click any node below to inspect code & prompt context
+          </div>
+        </div>
+
+        {/* Nodes Flowchart Track */}
+        <div className="flex items-center gap-4 min-w-[960px] py-4 relative">
+          {currentWorkflow.nodes.map((node, index) => {
+            const Icon = getNodeIcon(node.type);
+            const isSelected = selectedNodeId === node.id;
+            const isCurrentlyRunning = activeRunningNodeId === node.id;
+
+            return (
+              <React.Fragment key={node.id}>
+                <div
+                  onClick={() => setSelectedNodeId(node.id)}
+                  className={`relative flex-1 min-w-[150px] max-w-[200px] p-4 rounded-xl border bg-[#111622] cursor-pointer transition-all duration-200 ${
+                    isCurrentlyRunning
+                      ? 'border-[#00ff9d] shadow-[0_0_25px_rgba(0,255,157,0.4)] scale-105'
+                      : isSelected
+                      ? 'border-[#00d4ff] shadow-[0_0_15px_rgba(0,212,255,0.25)]'
+                      : 'border-white/10 hover:border-white/20'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+                      <Icon className={`w-4 h-4 ${isCurrentlyRunning ? 'text-[#00ff9d]' : 'text-white/80'}`} />
+                    </div>
+                    <span className="mono text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-white/50 uppercase">
+                      {node.type}
+                    </span>
+                  </div>
+
+                  <div className="font-bold text-xs text-white leading-tight line-clamp-1">{node.label}</div>
+                  <div className="mono text-[10px] text-white/40 mt-1 line-clamp-1">{node.modelOrRuntime}</div>
+
+                  <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2 mono text-[10px] text-white/40">
+                    <span>Avg</span>
+                    <span className="text-[#00d4ff]">{node.lastRunMs}ms</span>
+                  </div>
+                </div>
+
+                {index < currentWorkflow.nodes.length - 1 && (
+                  <ArrowRight className="w-4 h-4 text-white/20 shrink-0" />
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Bottom Grid: Node Detail Inspector + Live Execution Logs */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_0.9fr] gap-6">
+        {/* Node Inspector Panel */}
+        <div className="p-5 rounded-2xl bg-[#111622] border border-white/10 space-y-4">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+            <div className="flex items-center gap-2">
+              <Code2 className="w-4 h-4 text-[#00d4ff]" />
+              <h3 className="font-bold text-sm text-white">
+                Node Inspector: <span className="text-[#00d4ff]">{selectedNode.label}</span>
+              </h3>
+            </div>
+            <span className="mono text-[11px] text-white/40">Runtime: {selectedNode.modelOrRuntime}</span>
+          </div>
+
+          <div>
+            <div className="mono text-[11px] text-white/40 uppercase font-semibold mb-1.5">
+              Code / Prompt Specification:
+            </div>
+            <div className="p-3.5 rounded-xl bg-black/60 border border-white/5 font-mono text-xs text-white/80 leading-relaxed overflow-x-auto whitespace-pre-wrap">
+              {selectedNode.codeOrPrompt}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 mono text-xs">
+            <div className="p-3 rounded-xl bg-[#0b0f18] border border-white/5">
+              <div className="text-[10px] text-white/40">Node Type</div>
+              <div className="font-bold text-white mt-1 uppercase">{selectedNode.type}</div>
+            </div>
+            <div className="p-3 rounded-xl bg-[#0b0f18] border border-white/5">
+              <div className="text-[10px] text-white/40">Last Execution</div>
+              <div className="font-bold text-[#00ff9d] mt-1">{selectedNode.lastRunMs}ms</div>
+            </div>
+            <div className="p-3 rounded-xl bg-[#0b0f18] border border-white/5">
+              <div className="text-[10px] text-white/40">Retry Policy</div>
+              <div className="font-bold text-white mt-1">3x Backoff</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Live Execution Log Terminal */}
+        <div className="p-5 rounded-2xl bg-[#111622] border border-white/10 flex flex-col justify-between space-y-4">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+            <div className="flex items-center gap-2">
+              <Terminal className="w-4 h-4 text-[#00ff9d]" />
+              <h3 className="font-bold text-sm text-white">Temporal Execution Stream</h3>
+            </div>
+            <span className="mono text-[10px] px-2 py-0.5 rounded-full bg-[#00ff9d]/15 text-[#00ff9d]">
+              RECORDING
+            </span>
+          </div>
+
+          <div className="h-[220px] overflow-y-auto space-y-1.5 font-mono text-[11px] text-white/70 p-3 rounded-xl bg-black/50 border border-white/5">
+            {executionLogs.map((log, idx) => (
+              <div key={idx} className="leading-relaxed">
+                <span className="text-white/30">{log.slice(0, 11)}</span>
+                <span className="text-white/80">{log.slice(11)}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between mono text-[11px] text-white/40 border-t border-white/5 pt-2">
+            <span>Durable Task Queue: main-worker-queue</span>
+            <span>Deterministic Replay Enabled</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

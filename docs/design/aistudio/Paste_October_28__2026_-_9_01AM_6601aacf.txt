@@ -1,0 +1,617 @@
+# MeTaBos — 500 Self-Evolving AI Employees (Blueprint Section 15)
+
+**Open-source, self-hosted, MCP-connected, human-approved. Each employee lives in its own sandbox, learns from peers, and evolves to mastery.**
+
+---
+
+## 15.1 Design Principles
+
+| Principle | Implementation |
+|-----------|---------------|
+| **Open-source only** | Every agent is a Llama 4 Scout/Maverick instance running on the shared vLLM pool. No proprietary model calls. |
+| **Self-evolving** | Each agent has a **Skill Memory** (persistent, per-role) that grows via: (a) task completion reflection, (b) peer skill transfer, (c) observer critique feedback. Inspired by Hermes Agent's learning loop + OpenSkill's open-world skill acquisition. |
+| **Dedicated sandbox** | 1 agent = 1 `Sandbox` CRD. No sharing. Full isolation. |
+| **MCP-native** | Every agent connects to the outside world exclusively via **MCP servers** (15,930+ public servers available). No custom glue code. |
+| **Human approval gate** | **ALL outgoing actions** (external API calls, emails, payments, deployments, legal filings) require owner approval via the Next.js console before execution. Internal actions (memory writes, internal queries, skill updates) are autonomous below impact threshold. |
+| **Peer learning** | Agents in the same swarm share a **Skill Exchange** (Qdrant collection per swarm). When Agent A masters a sub-task, its skill is published. Agent B in the same role can pull it. |
+| **Mastery progression** | Each agent has a **Skill Level** (1–10) per sub-capability. Level advances only when: (a) task success rate >90% over 50 tasks, (b) Observer Agent validates no drift, (c) skill is peer-reviewed by 2+ same-role agents. |
+
+---
+
+## 15.2 Agent Anatomy (per employee)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Sandbox: swarm-01/agent-007 (AI Code Reviewer)                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  LLM: Llama 4 Scout (shared vLLM pool, AWQ)             │   │
+│  │  Context: 131K tokens                                   │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Skill Memory (persistent, per-agent)                    │   │
+│  │  - skills/ (markdown files, versioned)                   │   │
+│  │  - trajectories/ (last 100 task traces)                  │   │
+│  │  - peer_skills/ (pulled from Skill Exchange)            │   │
+│  │  - mastery.json (skill levels per sub-capability)       │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  MCP Client (connects to MCP Gateway)                    │   │
+│  │  - Tools: 5–30 MCP servers (role-specific)              │   │
+│  │  - Plugins: 1–5 Agent Plugin bundles (Aug 2026 spec)    │   │
+│  │  - Connectors: OAuth2/OIDC tokens (scoped, per-task)    │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Governance Layer                                        │   │
+│  │  - Outgoing action → Approval Gate (human)              │   │
+│  │  - Internal action → Autonomous (below threshold)       │   │
+│  │  - Audit: every action logged (hash-chained)            │   │
+│  │  - Replay protection + expiry + consumed-state check    │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 15.3 Self-Evolution Loop
+
+```
+         ┌─────────────────────────────────────────────────┐
+         │              SKILL EVOLUTION CYCLE               │
+         └─────────────────────────────────────────────────┘
+
+  Task assigned
+       │
+       ▼
+  ┌─────────┐     ┌──────────────┐     ┌─────────────────┐
+  │ EXECUTE │────▶│ REFLECT      │────▶│ EXTRACT SKILL   │
+  │ (vLLM)  │     │ (success/    │     │ (markdown +     │
+  │         │     │  failure)    │     │  example code)  │
+  └─────────┘     └──────────────┘     └────────┬────────┘
+                                                │
+              ┌─────────────────────────────────┼─────────────────┐
+              ▼                                 ▼                 ▼
+     ┌─────────────────┐            ┌──────────────────┐  ┌─────────────┐
+     │ PUBLISH to      │            │ PEER REVIEW      │  │ MASTERY     │
+     │ Skill Exchange  │            │ (2+ same-role    │  │ CHECK       │
+     │ (Qdrant, per    │            │  agents validate)│  │ (success >  │
+     │  swarm)         │            │                  │  │  90%, 50    │
+     └────────┬────────┘            └────────┬─────────┘  │  tasks)     │
+              │                              │            └──────┬──────┘
+              │                              │                   │
+              ▼                              ▼                   ▼
+     ┌─────────────────┐            ┌──────────────────┐  ┌─────────────┐
+     │ OTHER AGENTS    │            │ OBSERVER AGENT   │  │ LEVEL UP    │
+     │ PULL + ADAPT    │            │ (independent     │  │ mastery.json│
+     │ (cross-learning)│            │  critique)       │  │ → unlock    │
+     └─────────────────┘            └──────────────────┘  │ harder tasks│
+                                                          └─────────────┘
+```
+
+### Skill File Format (per agent, per sub-capability)
+
+```markdown
+# skill: code-review-security-scan
+level: 7/10
+last_updated: 2026-10-28T14:32:00Z
+success_rate: 94.2% (last 50 tasks)
+peer_validations: 3
+observer_approved: true
+
+## Instructions
+1. Parse diff for new dependencies
+2. Check against CVE database (MCP: cve-lookup)
+3. Flag OWASP Top 10 patterns
+4. Generate severity-scored report
+5. If critical → escalate to owner approval
+
+## Example
+Input: diff adding `requests` without TLS pinning
+Output: "MEDIUM: requests library without verify=True..."
+
+## Peer Skills Referenced
+- skill: dependency-vuln-check (from agent-012, level 8)
+- skill: owasp-pattern-match (from agent-003, level 9)
+
+## Failure Modes (learned)
+- Missed transitive deps in monorepo → fixed by adding `--recursive` flag
+- False positive on test fixtures → added path exclusion
+```
+
+---
+
+## 15.4 MCP Architecture (Central Gateway)
+
+**~15,930 public MCP servers** available (official registry: `registry.modelcontextprotocol.io`). MeTaBos uses a **central MCP Gateway** (self-hosted) that all 500 agents connect through.
+
+### Why a Gateway (not direct connections)
+
+| Concern | Solution |
+|---------|----------|
+| Auth | Gateway holds OAuth2/OIDC tokens; agents get scoped, per-task, expiring credentials |
+| Approval gate | **ALL outgoing MCP calls pass through the gateway → approval check → execute or reject** |
+| Audit | Every tool call logged with agent ID, timestamp, parameters, result |
+| Rate limiting | Per-agent, per-swarm, per-tool quotas |
+| FOSS policy | Gateway enforces: no data-sharing, no hosted-service dependency without declaration |
+| Discovery | Agents query the gateway for available tools matching their role |
+
+### MCP Gateway Deployment (in control-plane namespace)
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-gateway
+  namespace: control-plane
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: gateway
+        image: metabos/mcp-gateway:1.0
+        ports:
+        - containerPort: 9000   # MCP Streamable HTTP
+        - containerPort: 9001   # Admin/audit API
+        env:
+        - name: APPROVAL_ENDPOINT
+          value: "http://fastapi.control-plane.svc:8443/api/approvals"
+        - name: AUDIT_DB
+          value: "postgresql://metabos:***@postgres.control-plane.svc:5432/audit"
+        - name: REGISTRY_URL
+          value: "https://registry.modelcontextprotocol.io/v0"
+        resources:
+          requests: {cpu: "2", memory: "4Gi"}
+          limits: {cpu: "4", memory: "8Gi"}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-gateway
+  namespace: control-plane
+spec:
+  selector:
+    app: mcp-gateway
+  ports:
+  - name: mcp
+    port: 9000
+    targetPort: 9000
+  - name: admin
+    port: 9001
+    targetPort: 9001
+```
+
+### Agent → MCP Call Flow (with approval)
+
+```
+Agent (sandbox)
+    │
+    │  MCP request: "send email to client@x.com"
+    ▼
+MCP Gateway (control-plane)
+    │
+    ├── 1. Auth check (scoped token valid?)
+    ├── 2. Policy check (OPA: is this tool allowed for this role?)
+    ├── 3. Classification: internal vs EXTERNAL
+    │       │
+    │       ├── INTERNAL (memory write, internal query) → EXECUTE
+    │       │
+    │       └── EXTERNAL (email, payment, deploy, legal)
+    │               │
+    │               ▼
+    │         ┌─────────────────────────────┐
+    │         │  APPROVAL GATE              │
+    │         │  - Create approval record   │
+    │         │  - Notify owner (console +  │
+    │         │    Telegram + email)        │
+    │         │  - TTL: 30 min (expires)    │
+    │         │  - Replay protection        │
+    │         └──────────────┬──────────────┘
+    │                        │
+    │              ┌─────────┴─────────┐
+    │              ▼                   ▼
+    │         APPROVED             REJECTED
+    │         (owner clicks)       (or TTL expires)
+    │              │                   │
+    │              ▼                   ▼
+    │         EXECUTE via         LOG + NOTIFY
+    │         MCP server          agent: "blocked"
+    │              │
+    │              ▼
+    └──────────────┘
+         │
+         ▼
+    MCP Server (e.g., gmail-mcp, github-mcp, erpnext-mcp)
+         │
+         ▼
+    External system
+```
+
+**Key rule: No agent can bypass the gateway. NetworkPolicy enforces: sandboxes can ONLY reach `mcp-gateway:9000` for external tool calls. Direct egress to external APIs is blocked.**
+
+---
+
+## 15.5 Skills, Plugins, Connectors per Role
+
+### Abstraction Layers (per Agent Plugins 1.0 spec, Aug 2026)
+
+| Layer | What it is | Example (AI SDR) |
+|-------|-----------|-----------------|
+| **Skill** | Procedural knowledge (markdown + code). "How to do X." | `skill: cold-email-personalization.md` |
+| **Plugin** | Portable bundle: skill + connectors + tools. "Everything needed for role X." | `plugin: ai-sdr-outbound-v2.mcpb` |
+| **Connector** | Authenticated link to one external system. "Access to Y." | `connector: gmail-oauth2` (scoped: send-only) |
+| **MCP Server** | The protocol endpoint that exposes tools. "The API." | `mcp-server: gmail` (tools: send, read, search) |
+
+### Per-Role MCP Server Assignments (examples)
+
+| Role (Sandbox) | MCP Servers (tools) | Plugins | Connectors |
+|---------------|--------------------:|---------|-----------|
+| AI SWE (code-exec) | `github`, `git`, `docker`, `kubernetes`, `npm`, `pypi`, `jira` | `plugin: ci-cd-pipeline.mcpb` | GitHub OAuth, Docker registry |
+| AI Code Reviewer | `github`, `sonarqube`, `snyk`, `semgrep` | `plugin: security-review.mcpb` | GitHub OAuth (PR read) |
+| AI SRE | `datadog`, `prometheus`, `grafana`, `pagerduty`, `kubernetes` | `plugin: incident-response.mcpb` | Datadog API, PagerDuty API |
+| AI SDR | `gmail`, `linkedin`, `apollo`, `clay`, `hubspot` | `plugin: outbound-sequence.mcpb` | Gmail OAuth (send), LinkedIn API |
+| AI Content Writer | `notion`, `wordpress`, `semrush`, `surfer`, `canva` | `plugin: seo-content.mcpb` | WordPress API, Notion token |
+| AI Support Agent | `zendesk`, `intercom`, `slack`, `notion` (KB) | `plugin: ticket-resolution.mcpb` | Zendesk API, Intercom API |
+| AI Bookkeeper | `erpnext`, `quickbooks`, `xero`, `plaid`, `dext` | `plugin: monthly-close.mcpb` | ERPNext API, Plaid OAuth |
+| AI Legal Reviewer | `docuSign`, `ironclad`, `westlaw`, `lexis` | `plugin: contract-review.mcpb` | DocuSign API, Ironclad API |
+| AI Recruiter | `greenhouse`, `lever`, `linkedin`, `gmail`, `calendar` | `plugin: candidate-pipeline.mcpb` | Greenhouse API, LinkedIn API |
+| AI SOC Analyst | `splunk`, `crowdstrike`, `panther`, `thehive` | `plugin: threat-triage.mcpb` | Splunk API, CrowdStrike API |
+| AI Researcher | `arxiv`, `semanticscholar`, `web-search`, `notion` | `plugin: market-intel.mcpb` | ArXiv API, web search API |
+| AI CEO / Orchestrator | `erpnext`, `jira`, `slack`, `gmail`, `calendar` | `plugin: executive-briefing.mcpb` | All internal (no external without approval) |
+
+### Full 500-Role MCP Matrix (summary by category)
+
+| Category | Agent Count | Primary MCP Servers | External Approval Required? |
+|----------|:-----------:|--------------------:|:---------------------------:|
+| ENG (80) | 80 | github, git, docker, k8s, jira, sonarqube, snyk, npm, pypi | Deploy, merge to main, infra changes |
+| SALES (60) | 60 | gmail, linkedin, apollo, hubspot, salesforce, slack | Send email, create CRM record, schedule meeting |
+| MKT (60) | 60 | wordpress, notion, semrush, canva, buffer, mailchimp | Publish content, send campaign, spend on ads |
+| CS (60) | 60 | zendesk, intercom, slack, notion, helpscout | Send reply to customer, escalate, refund |
+| FIN (50) | 50 | erpnext, plaid, quickbooks, xero, dext, bill.com | Create invoice, process payment, file tax |
+| LEG (40) | 40 | docuSign, ironclad, westlaw, lexis, pandadoc | Sign contract, file document, send legal notice |
+| HR (40) | 40 | greenhouse, lever, linkedin, gmail, calendar, workday | Send offer, terminate, post job, access PII |
+| SEC (35) | 35 | splunk, crowdstrike, panther, thehive, swatch | Block IP, revoke access, file incident, notify |
+| OPS (35) | 35 | erpnext, cin7, netSuite, samsara, jira | Place order, modify inventory, dispatch |
+| RSR (30) | 30 | arxiv, semanticscholar, web-search, notion, crunchbase | Publish report, share externally |
+| IT (30) | 30 | kubernetes, terraform, ansible, prometheus, grafana | Modify infra, restart service, change DNS |
+| GEN (40) | 40 | (role-dependent, multi-domain) | Varies by task |
+
+---
+
+## 15.6 Human Approval (JEV Gate) — All Outgoing Actions
+
+**"JEV" = Just-in-time External Validation.** Every action that touches the outside world requires owner approval.
+
+### Approval Matrix
+
+| Action Class | Examples | Approval | TTL |
+|-------------|----------|----------|-----|
+| **Internal** (autonomous) | Memory write, skill update, internal query, peer skill pull | None | — |
+| **Internal-high** (logged, no gate) | Create new role, modify workflow, update KPI | Observer review (async) | — |
+| **External-low** (auto-approve with log) | Read-only API call, fetch data, search | None (logged) | — |
+| **External-medium** (owner approval) | Send email, create CRM record, post to social, schedule meeting | **JEV: owner clicks approve** | 30 min |
+| **External-high** (owner + Observer) | Send payment, sign contract, deploy to prod, file legal, terminate employee | **JEV: owner + Observer Agent both approve** | 15 min |
+| **External-critical** (owner + 2-person) | >$10K spend, legal filing, data deletion, security credential change | **JEV: owner + second human (configurable)** | 10 min |
+
+### Approval Record Schema (PostgreSQL)
+
+```sql
+CREATE TABLE approvals (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    agent_id      UUID NOT NULL,          -- which sandbox requested
+    swarm_id      TEXT NOT NULL,
+    action_class  TEXT NOT NULL,          -- internal / external-low / medium / high / critical
+    tool_name     TEXT NOT NULL,          -- MCP tool (e.g., "gmail.send")
+    parameters    JSONB NOT NULL,         -- full tool call params
+    impact_score  NUMERIC(2,1) NOT NULL,  -- 0-10
+    status        TEXT DEFAULT 'pending', -- pending / approved / rejected / expired
+    approved_by   UUID,                   -- owner JWT sub
+    observer_ok   BOOLEAN,                -- Observer Agent validated
+    created_at    TIMESTAMPTZ DEFAULT now(),
+    expires_at    TIMESTAMPTZ NOT NULL,   -- TTL from action_class
+    resolved_at   TIMESTAMPTZ,
+    audit_hash    TEXT NOT NULL           -- hash chain: H(prev_hash || this_record)
+);
+```
+
+### Next.js Console — Approval Queue (UI)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  MeTaBos Owner Console — Approval Queue                         │
+├─────────────────────────────────────────────────────────────────┤
+│  🔴 3 CRITICAL  │  🟡 12 MEDIUM  │  🟢 45 LOW (auto)          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ 🔴 CRITICAL — Agent 047 (AI Bookkeeper, Swarm 03)       │   │
+│  │ Action: erpnext.create_invoice                          │   │
+│  │ Params: {customer: "Acme Corp", amount: $12,450,        │   │
+│  │          due: 2026-11-15}                               │   │
+│  │ Impact: 9.2/10 | TTL: 7 min remaining                   │   │
+│  │ Evidence: [link to task context]                         │   │
+│  │ Observer: ✅ Validated (matches PO #4471)               │   │
+│  │                                                         │   │
+│  │     [ ✅ APPROVE ]    [ ❌ REJECT ]    [ 📋 DETAILS ]  │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ 🟡 MEDIUM — Agent 023 (AI SDR, Swarm 02)               │   │
+│  │ Action: gmail.send                                      │   │
+│  │ Params: {to: "cto@startup-x.com", subject: "Re: ...",  │   │
+│  │          body: "..."}                                   │   │
+│  │ Impact: 5.1/10 | TTL: 22 min remaining                 │   │
+│  │                                                         │   │
+│  │     [ ✅ APPROVE ]    [ ❌ REJECT ]    [ 📋 DETAILS ]  │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Notification Channels (simultaneous)
+
+| Channel | Trigger |
+|---------|---------|
+| Next.js console (WebSocket) | Real-time, all classes |
+| Telegram bot | External-medium and above |
+| Email | External-high and above |
+| SMS (configurable) | External-critical only |
+| PagerDuty (optional) | External-critical + business hours off |
+
+---
+
+## 15.7 Peer Learning & Skill Exchange
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Skill Exchange (per swarm, Qdrant collection)                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  swarm-01-skills (Qdrant collection)                             │
+│  ├── skill: code-review-security-scan (agent-007, level 7)      │
+│  ├── skill: ci-pipeline-debug (agent-003, level 8)              │
+│  ├── skill: k8s-deploy-rollback (agent-012, level 6)            │
+│  ├── skill: incident-postmortem (agent-019, level 9)            │
+│  └── ... (grows over time)                                      │
+│                                                                  │
+│  Access: read-only for all agents in swarm-01                    │
+│  Write: only the agent that created the skill                    │
+│  Validation: Observer Agent + 2 peer agents before publish       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Cross-Swarm Learning (controlled)
+
+| Mechanism | How |
+|-----------|-----|
+| **Swarm-to-swarm** | COA identifies a skill in Swarm 01 that would benefit Swarm 05. Creates a "skill transfer" approval. Owner approves. Skill is copied to Swarm 05's collection with attribution. |
+| **Role-specific global** | All "AI Bookkeeper" agents across all swarms share a `global-finance-skills` collection. When one masters a new reconciliation pattern, all benefit. |
+| **Failure sharing** | When an agent fails, the failure mode is published (anonymized) to the swarm's `failure-modes` collection. Other agents learn what NOT to do. |
+
+### Mastery Progression
+
+```
+Level 1:  New agent. Base skill from role template. 0 tasks done.
+Level 2:  10 tasks completed, >70% success.
+Level 3:  25 tasks, >80% success. First peer skill pulled.
+Level 4:  50 tasks, >85% success. Observer validated.
+Level 5:  100 tasks, >88% success. Can teach (skill published).
+Level 6:  200 tasks, >90% success. Handles edge cases.
+Level 7:  350 tasks, >92% success. Peer-reviewed by 3+ agents.
+Level 8:  500 tasks, >94% success. Observer: "mastery confirmed."
+Level 9:  750 tasks, >96% success. Creates new sub-skills.
+Level 10: 1000+ tasks, >97% success. "Master." Can mentor new agents.
+```
+
+**Level gates are enforced by the COA.** An agent at Level 3 cannot be assigned Level 7 tasks. The COA routes by mastery level.
+
+---
+
+## 15.8 Central Orchestration (20 Managers → 500 Employees)
+
+### Manager = Swarm Leader (Llama 4 Scout, dedicated 2× H100)
+
+Each manager handles 25 agents (not 50 — revised for governance depth):
+
+| Manager | Swarm | Agents | Categories |
+|---------|-------|--------|-----------|
+| M-01 | swarm-01 | 25 | ENG (code) |
+| M-02 | swarm-02 | 25 | ENG (infra/DevOps) |
+| M-03 | swarm-03 | 25 | IT |
+| M-04 | swarm-04 | 25 | SALES (outbound) |
+| M-05 | swarm-05 | 25 | SALES (inbound/CRM) |
+| M-06 | swarm-06 | 25 | MKT (content) |
+| M-07 | swarm-07 | 25 | MKT (ads/social) |
+| M-08 | swarm-08 | 25 | CS (tickets) |
+| M-09 | swarm-09 | 25 | CS (voice/onboarding) |
+| M-10 | swarm-10 | 25 | FIN (bookkeeping) |
+| M-11 | swarm-11 | 25 | FIN (tax/compliance) |
+| M-12 | swarm-12 | 25 | LEG (contracts) |
+| M-13 | swarm-13 | 25 | LEG (compliance/e-discovery) |
+| M-14 | swarm-14 | 25 | HR (recruiting) |
+| M-15 | swarm-15 | 25 | HR (people ops) |
+| M-16 | swarm-16 | 25 | SEC (SOC) |
+| M-17 | swarm-17 | 25 | SEC (vuln/cloud) |
+| M-18 | swarm-18 | 25 | OPS (procurement/logistics) |
+| M-19 | swarm-19 | 25 | RSR (intel/research) |
+| M-20 | swarm-20 | 25 | GEN (orchestrators/multi-role) |
+
+### Manager Responsibilities
+
+| Duty | Frequency |
+|------|-----------|
+| Task assignment (from COA queue) | Continuous |
+| Monitor agent health (heartbeat, error rate) | Every 30s |
+| Route tasks by mastery level | Per task |
+| Trigger skill evolution cycle | After each task batch |
+| Report KPIs to COA | Every 5 min |
+| Handle agent failures (restart, reassign) | Event-driven |
+| Validate skill publications (before Qdrant write) | Per skill |
+| Escalate to COA (capacity issues, repeated failures) | Event-driven |
+
+### COA → Manager → Agent (task flow)
+
+```
+Owner instruction / Trigger
+    │
+    ▼
+COA (Maverick, 8× H200)
+  - Classify task
+  - Select swarm (category match)
+  - Select manager
+  - Set impact score + approval class
+    │
+    ▼
+Manager (Scout, 2× H100, per swarm)
+  - Select agent (mastery level match)
+  - Claim sandbox from warm pool
+  - Inject task + context + available skills
+  - Set TTL
+    │
+    ▼
+Agent (Scout, shared vLLM, in sandbox)
+  - Execute task
+  - Call MCP tools via gateway
+  - External actions → JEV approval gate
+  - Complete → reflect → extract skill
+    │
+    ▼
+Manager
+  - Validate output
+  - Trigger skill publication (if quality met)
+  - Release sandbox back to pool
+  - Report to COA
+    │
+    ▼
+COA
+  - Update company state
+  - Log to audit
+  - Notify owner (if high-impact)
+```
+
+---
+
+## 15.9 Sandbox Configuration (per agent)
+
+Each of the 500 agents gets its **own dedicated sandbox** (not shared). The 5 `SandboxTemplate` profiles per swarm determine the *execution shape*; the agent identity is injected at claim time.
+
+### Per-Agent Persistent Storage
+
+```yaml
+# Each sandbox has 3 volumes:
+volumeClaimTemplates:
+- name: workspace          # Task files, code, temp (1 GiB)
+- name: skill-memory       # Persistent skill files (512 Mi, NEVER deleted)
+- name: trajectories       # Last 100 task traces (256 Mi, rolling)
+```
+
+**`skill-memory` is the key volume.** It persists across sandbox restarts. When an agent is released and re-claimed, its skills are intact. This is what makes "self-evolving" real — the agent doesn't reset.
+
+### NetworkPolicy (per sandbox — strict)
+
+```yaml
+egress:
+# 1. vLLM inference (LLM calls)
+- to:
+  - namespaceSelector: {matchLabels: {name: inference}}
+  ports: [{protocol: TCP, port: 8000}]
+
+# 2. MCP Gateway (ALL external tool calls go through here)
+- to:
+  - namespaceSelector: {matchLabels: {name: control-plane}}
+  ports: [{protocol: TCP, port: 9000}]   # MCP Gateway
+
+# 3. Control plane API (task state, approvals, memory)
+- to:
+  - namespaceSelector: {matchLabels: {name: control-plane}}
+  ports: [{protocol: TCP, port: 8443}]   # FastAPI
+
+# 4. Qdrant (skill exchange, retrieval memory)
+- to:
+  - namespaceSelector: {matchLabels: {name: control-plane}}
+  ports: [{protocol: TCP, port: 6333}]
+
+# NO direct external egress. Period.
+# All external calls MUST go through MCP Gateway → approval → execute.
+```
+
+**This is the critical security property:** an agent in a sandbox **cannot** make a direct HTTP call to Gmail, GitHub, or any external API. It MUST go through the MCP Gateway, which enforces the JEV approval gate.
+
+---
+
+## 15.10 FOSS-First Agent Stack (per sandbox)
+
+| Component | Technology | License |
+|-----------|-----------|---------|
+| LLM | Llama 4 Scout (via shared vLLM) | Llama 4 Community License |
+| Agent runtime | Custom FastAPI worker | Apache 2.0 (MeTaBos) |
+| Skill engine | Inspired by OpenSkill + Hermes Agent patterns | Apache 2.0 / MIT |
+| MCP client | `mcp` Python SDK (official) | MIT |
+| Memory | Qdrant (vector) + PostgreSQL (structured) | Apache 2.0 |
+| Workflow | Temporal (durable execution) | MIT |
+| Isolation | Kata Containers / gVisor | Apache 2.0 |
+| Audit | PostgreSQL (hash-chained) | — |
+
+**No proprietary components in the agent runtime.** The LLM weights are open (Llama 4). The MCP protocol is open. The skill format is open markdown. Everything is inspectable.
+
+---
+
+## 15.11 Updated Architecture Table (final)
+
+| Layer | Technology |
+|-------|-----------|
+| **Model — Governance** | Llama 4 Maverick (400B), vLLM, 8× H200, FP8 |
+| **Model — Managers** | Llama 4 Scout (109B), vLLM, 2× H100 per manager × 20 |
+| **Model — Workers** | Llama 4 Scout (109B), shared vLLM pool (16× 1-H100, AWQ) |
+| **Agent Framework** | Llama 4 Agent Framework + custom skill evolution loop |
+| **Self-Evolution** | Skill extraction → peer review → Qdrant publish → mastery levels (1–10) |
+| **MCP Gateway** | Self-hosted, central, all external tool calls routed through it |
+| **MCP Servers** | 15,930+ available; ~200 curated per deployment (role-specific) |
+| **Plugins** | Agent Plugins 1.0 format (`.mcpb`), per-role bundles |
+| **Approval (JEV)** | All external actions → owner approval via console/Telegram/email |
+| **Execution** | K8s Agent Sandbox v1.0.7, 500 dedicated sandboxes |
+| **Isolation** | Kata-fc (code), gVisor (research), runc (API-only) |
+| **Memory** | 4-layer: pinned identity, workflow state, Qdrant retrieval, ERPNext canonical |
+| **Skill Memory** | Per-agent persistent volume (markdown skills + trajectories) |
+| **Skill Exchange** | Per-swarm Qdrant collection + global role-specific collections |
+| **System of Record** | ERPNext + PostgreSQL |
+| **Frontend** | Next.js owner console (approvals, agents, skills, audit) |
+| **Governance** | JWT, OPA, hash-chained audit, JEV approval gates |
+| **Observability** | Prometheus, Grafana, Alertmanager |
+| **Deployment** | Helm, Docker Compose (dev), Caddy edge |
+| **Interoperability** | MCP (tools), A2A (agent-to-agent), Agent Plugins 1.0 (distribution) |
+
+---
+
+## 15.12 Numbers Summary
+
+| Metric | Value |
+|--------|-------|
+| Total AI employees | 500 |
+| Managers (swarm leaders) | 20 |
+| COA (governor) | 1 |
+| Observer Agent | 1 |
+| Dedicated sandboxes | 500 |
+| SandboxTemplates | 100 (5 × 20 swarms) |
+| Warm pools | 100 |
+| MCP Gateway instances | 3 (HA) |
+| MCP servers curated | ~200 (from 15,930 available) |
+| Agent Plugins (per-role bundles) | ~50 (one per role archetype) |
+| Connectors (OAuth/OIDC) | ~80 (scoped, per-task tokens) |
+| Skill collections (Qdrant) | 20 swarm + 12 global role = 32 |
+| JEV approval records/week (est.) | 5,000–20,000 (depends on external action rate) |
+| GPU total | 8 H200 + 56 H100 + 2 L4 |
+| Non-GPU nodes | ~50 × 16 vCPU / 64 GiB |
+
+---
+
+Want me to generate the **MCP Gateway FastAPI service** code, the **skill evolution loop** (Temporal workflow), or the **Helm values file** for the 500-sandbox + 20-manager + MCP gateway deployment?
+
