@@ -1,4 +1,5 @@
 'use client';
+import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Download, RefreshCw } from 'lucide-react';
 import type { Analytics } from '@/lib/metabos/analytics';
@@ -16,7 +17,7 @@ function preset(id: string): { from: string; to: string } {
 }
 const PRESETS = [['all', 'All time'], ['month', 'This month'], ['30', 'Last 30 days'], ['90', 'Last 90 days'], ['year', 'This year']] as const;
 
-export function AnalyticsWorkspace() {
+export function AnalyticsWorkspace({ children }: { children?: React.ReactNode } = {}) {
   const [range, setRange] = useState({ from: '', to: '' });
   const [active, setActive] = useState('all');
   const [data, setData] = useState<Analytics | null>(null);
@@ -54,5 +55,6 @@ export function AnalyticsWorkspace() {
         <section className="mb-panel" aria-label="Unavailable metrics"><h2>Not available</h2>{data.unavailable.map((u) => <article key={u.metric} className="mb-unavailable" data-metric={u.metric}><div className="mb-row"><strong>{u.metric}</strong><span className="mb-badge">Unavailable</span></div><ul>{u.missing.map((m) => <li key={m}>Missing: {m}</li>)}</ul></article>)}</section>
       </div>
     </>}
+    {children}
   </div>;
 }
