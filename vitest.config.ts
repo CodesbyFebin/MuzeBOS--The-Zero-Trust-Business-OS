@@ -13,12 +13,14 @@ export default defineConfig({
   // Pages/components use the automatic JSX runtime (no `import React`), same as
   // Next builds them — without this, importing a *.tsx page throws
   // "React is not defined" under the classic runtime.
-  esbuild: {
-    jsx: 'automatic',
+  oxc: {
+    jsx: { runtime: 'automatic' },
   },
   test: {
     include: ['tests/**/*.test.ts'],
     environment: 'node',
+    // vitest 4 runs files in forks; heavy lab suites exceed 5 s under full parallel load.
+    testTimeout: 30000,
     // Hermetic creds: .env.local is a live credential store read fresh at call
     // time (lib/creds.ts), so tests must never see the operator's real file. Tests
     // that exercise the store point this at their own tmp path.
