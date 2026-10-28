@@ -859,3 +859,8 @@ None of the raw hits shows mock data in default (real) mode. Every fixture path 
 | `components/lab/v2/classic/Frame.tsx:124` | Kept: Lab/Creative dry-run fixtures; only under LAB_DRY=1 or Filming (opt-in); out of MeTaBos business scope |
 | `components/lab/v2/g/setup/SetupSections.tsx:54` | Kept: Lab/Creative dry-run fixtures; only under LAB_DRY=1 or Filming (opt-in); out of MeTaBos business scope |
 | `components/lab/v2/g/Frame.tsx:136` | Kept: Lab/Creative dry-run fixtures; only under LAB_DRY=1 or Filming (opt-in); out of MeTaBos business scope |
+
+## feat/real-adapters
+- 16 workspace pages that were local-SQLite-only now have real modules: persisted CRUD, role-gated writes, evidence and tests. `account.sign-in-manage-session` stays existing because it is the real auth screen.
+- `/api/dispatch`: WhatsApp, SMTP, Razorpay payment-link and OpenRouter adapters, gated by Jev approval and an idempotency key. Tests use a mocked HTTP/SMTP layer and are labelled that way. No live send has been made.
+- `/api/passkeys`: WebAuthn registration and step-up verification. Tests sign real ES256 assertions with a software authenticator. Passkeys don't issue sessions.
