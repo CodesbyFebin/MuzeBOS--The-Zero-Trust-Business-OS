@@ -1,8 +1,8 @@
-import { memberRead } from '@/lib/muzebos/member-read';
+import { memberRead } from '@/lib/metabos/member-read';
 import { NextResponse } from 'next/server';
-import { businessStore, BusinessError } from '@/lib/muzebos/store';
-import { businessAccess } from '@/lib/muzebos/http';
-import { infraReport } from '@/lib/muzebos/infra';
+import { businessStore, BusinessError } from '@/lib/metabos/store';
+import { businessAccess } from '@/lib/metabos/http';
+import { infraReport } from '@/lib/metabos/infra';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 /** Live measurements for an infra page (process, DB, filesystem). Read-only. */

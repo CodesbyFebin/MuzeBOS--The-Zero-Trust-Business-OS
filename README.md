@@ -1,4 +1,4 @@
-# MuzeBOS — The Zero-Trust Business OS
+# MeTaBos — The Zero-Trust Business OS
 
 **A self-hostable business workspace for founders and small businesses, with
 SQLite invoicing, inventory, CRM, approval-gated AI tasks and audit evidence.**
@@ -14,7 +14,7 @@ Run your business. Approve what matters. Verify what happened.
 
 **Release posture: single-operator local preview (package 0.1.1).** The project
 name describes a security design goal; it is not an independent certification or
-production-readiness claim. MuzeBOS extends the attributed FounderOS/GladOS source.
+production-readiness claim. MeTaBos extends the attributed FounderOS/GladOS source.
 
 ## Hackathon reviewers
 
@@ -30,9 +30,9 @@ Start with [provenance and contribution disclosure](HACKATHON.md),
 [qualification evidence](docs/hackathon/VERIFICATION.md).
 `npm run hackathon:demo -- --fixture both` runs without model credentials.
 
-## What is MuzeBOS?
+## What is MeTaBos?
 
-MuzeBOS organizes daily business work into Orders, Money, Talk, Stock and Growth,
+MeTaBos organizes daily business work into Orders, Money, Talk, Stock and Growth,
 with weekly operations/AI tools and setup controls below. Mission Control reads
 persisted records for approvals, reminders, stock alerts, activity and real
 customer/product/order relationships. Its 18 primary destinations organize the
@@ -65,7 +65,7 @@ before any remote access. The startup wrapper restricts binding until setup.
 For production compilation: `npm run build`, then `npm start`.
 
 Read [self-hosting](docs/search/self-hosting.md) and
-[operations/recovery](docs/MUZEBOS-OPERATIONS.md). `MUZEBOS_DB` selects commerce
+[operations/recovery](docs/METABOS-OPERATIONS.md). `MUZEBOS_DB` selects commerce
 storage; `GLADOS_DB` selects inherited workspace storage. Secrets remain in
 ignored environment files. Use private TLS and the correct `MUZEBOS_ORIGIN`.
 Responsive web access is supported; no native Android/iOS or offline-sync release
@@ -81,7 +81,7 @@ is claimed.
    before manual reconciliation; it is labelled separately from provider settlement.
 
 See [invoice approval](docs/search/invoice-approvals.md),
-[API](docs/MUZEBOS-API.md) and [UPI/tax limits](docs/search/upi-and-tax.md).
+[API](docs/METABOS-API.md) and [UPI/tax limits](docs/search/upi-and-tax.md).
 Local tax calculations are not GST filing or government e-invoice registration.
 
 ## WebLLM, Jev and model routing
@@ -112,7 +112,7 @@ npm run docs:build
 ```
 
 Browser qualification uses disposable DBs and Playwright; never point it at your
-business database. Read [the integration/search release record](docs/MUZEBOS-SEARCH-RELEASE.md)
+business database. Read [the integration/search release record](docs/METABOS-SEARCH-RELEASE.md)
 for this change's executed checks and [feature/evidence limits](docs/search/verification.md)
 for what they establish. Older verification reports apply to their recorded revisions.
 
@@ -136,9 +136,11 @@ See [search implementation and measurement](docs/SEARCH-OPTIMIZATION.md).
 
 Derived from the supplied FounderOS (on GladOS) source. Original MIT copyright
 and attribution remain in [LICENSE](LICENSE); upstream names remain in internal
-compatibility code. MuzeBOS changes: CodesbyFebin, 2026.
+compatibility code. MeTaBos changes: CodesbyFebin, 2026.
 
 The 29-repository review separates source/licensing from live integrations.
-Read [reviewed integrations](docs/MUZEBOS-UPSTREAM-INTEGRATIONS.md) and
+Read [reviewed integrations](docs/METABOS-UPSTREAM-INTEGRATIONS.md) and
 [third-party notices](THIRD_PARTY_NOTICES.md). External services, model weights and
 provider terms retain their own licences and limits.
+
+> **Naming note:** the product is now MeTaBos. Environment variables keep the `MUZEBOS_` prefix so existing deployments keep working, and an existing `data/muzebos-business.db` is still opened when no `data/metabos-business.db` exists. The GitHub repo name is unchanged.

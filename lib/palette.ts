@@ -1,4 +1,4 @@
-import { MENUS, ALL_FEATURES, STATUS_LABEL } from '@/lib/muzebos/registry';
+import { MENUS, ALL_FEATURES, STATUS_LABEL } from '@/lib/metabos/registry';
 import { BRAND } from '@/lib/brand';
 import { NAV_EXTRA, NAV_ITEMS, groupOf } from '@/lib/nav';
 
@@ -55,10 +55,10 @@ export function viewCommands(): Command[] {
       hint: 'view',
     };
   });
-  return BRAND.id === 'muzebos' ? [...views, ...registryCommands()] : views;
+  return BRAND.id === 'metabos' ? [...views, ...registryCommands()] : views;
 }
 
-/** MuzeBOS: every main menu and registry page, each tagged with its honest status. */
+/** MeTaBos: every main menu and registry page, each tagged with its honest status. */
 export function registryCommands(): Command[] {
   const menus = MENUS.map((m) => ({ id: `mb-menu-${m.id}`, label: m.label, keywords: `menu ${m.id} ${m.summary}`, href: m.route, hint: 'menu' }));
   const pages = ALL_FEATURES.filter((f) => f.route !== '/').map((f) => {

@@ -1,2 +1,2 @@
-import { BrainTemplatesWorkspace } from '@/components/muzebos/BrainTemplatesWorkspace';
+import { BrainTemplatesWorkspace } from '@/components/metabos/BrainTemplatesWorkspace';
 export default function BrainTemplatesPage() { return <BrainTemplatesWorkspace/>; }

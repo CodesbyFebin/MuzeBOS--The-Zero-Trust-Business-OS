@@ -18,9 +18,9 @@ describe('zod 4 and API-boundary bounds', () => {
     expect(maj > 4 || (maj === 4 && (min > 6 || (min === 6 && pat >= 6)))).toBe(true);
   });
 
-  it('every z.array in app/api and lib/muzebos has an upper bound', () => {
+  it('every z.array in app/api and lib/metabos has an upper bound', () => {
     const offenders: string[] = [];
-    for (const f of [...walk('app/api'), ...walk('lib/muzebos')]) {
+    for (const f of [...walk('app/api'), ...walk('lib/metabos')]) {
       const s = fs.readFileSync(f, 'utf8');
       let i = 0;
       for (;;) {

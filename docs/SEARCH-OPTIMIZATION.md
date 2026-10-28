@@ -1,6 +1,6 @@
 # Search, answer-engine and generative-engine implementation
 
-Scope: MuzeBOS public repository and separately hostable project documentation.
+Scope: MeTaBos public repository and separately hostable project documentation.
 Date: 2026-10-26. Audience: founders, SMB operators and developers evaluating
 self-hosted commerce and approval-gated AI. India-specific questions cover UPI
 requests and GST limits; no unsupported global tax/payment capability is claimed.
@@ -17,7 +17,7 @@ No traffic, ranking improvement or citation lift is measured or inferred here.
 
 | Canonical public-docs path | Intent | Differentiating evidence |
 | --- | --- | --- |
-| `/` | Understand MuzeBOS | Scope, attribution and answer hub |
+| `/` | Understand MeTaBos | Scope, attribution and answer hub |
 | `/self-hosting/` | Run privately | Actual Node/SQLite setup and deployment limits |
 | `/invoice-approvals/` | Understand transaction trust | Payload approval, stock recheck and atomic records |
 | `/webllm-inference/` | Choose inference workflow | Persistent dispatch versus interactive proposal interface |

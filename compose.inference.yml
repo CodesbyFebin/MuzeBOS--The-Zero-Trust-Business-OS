@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.inference
-    image: muzebos-inference:local
+    image: metabos-inference:local
     env_file: .env.inference
     environment:
       GLADOS_HOST: 0.0.0.0
@@ -21,7 +21,7 @@ services:
     mem_limit: 3g
     cpus: 2
   worker:
-    image: muzebos-inference:local
+    image: metabos-inference:local
     depends_on: [app]
     env_file: .env.inference
     environment:

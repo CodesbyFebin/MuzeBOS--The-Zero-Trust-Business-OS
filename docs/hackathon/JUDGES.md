@@ -1,6 +1,6 @@
 # Judge guide
 
-MuzeBOS is an existing self-hostable business workspace. **This entry demonstrates
+MeTaBos is an existing self-hostable business workspace. **This entry demonstrates
 a new, bounded model-to-business handoff**, not a newly built entire Business OS.
 Read [`HACKATHON.md`](../../HACKATHON.md) before evaluating the event contribution.
 
@@ -25,7 +25,7 @@ flowchart TD
    the fixture adapters. Both outputs and scripted approvals are labeled fixtures.
 3. Inspect the report path printed by the runner. Check provider/model, task and
    output hashes, action hash and audit validity. Missing usage stays unknown.
-4. Run `npm test -- tests/muzebos-hackathon.test.ts` for the refusal/tampering/replay
+4. Run `npm test -- tests/metabos-hackathon.test.ts` for the refusal/tampering/replay
    cases. Run the full test/type/build commands in `VERIFICATION.md` for regression.
 5. For the interface, run `npm run dev`, open `/workspace/brain/inference`, choose
    Meta or Baseten, create a draft, review its hash, and separately review a valid
@@ -38,7 +38,7 @@ The new Baseten lane targets the guide's Muse Spark Open model; Meta Spark is an
 explicit, allowlisted choice for the existing Meta Model API adapter. Model text
 is not policy: the client validates the exact JSON shape and passes it to Jev.
 The model API is not an authorization service and neither provider attests to our
-local action. Existing FounderOS and MuzeBOS work is credited separately.
+local action. Existing FounderOS and MeTaBos work is credited separately.
 
 ## Verification boundary
 

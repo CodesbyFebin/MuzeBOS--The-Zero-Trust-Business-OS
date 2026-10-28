@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import './muzebos.css';
+import './metabos.css';
 import { Sidebar } from '@/components/Sidebar';
 import { BRAND } from '@/lib/brand';
 import { Topbar } from '@/components/Topbar';

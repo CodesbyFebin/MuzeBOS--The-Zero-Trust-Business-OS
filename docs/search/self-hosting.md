@@ -1,6 +1,6 @@
-# How to self-host MuzeBOS
+# How to self-host MeTaBos
 
-MuzeBOS runs as a Node.js application with local SQLite storage. Use Node.js 22,
+MeTaBos runs as a Node.js application with local SQLite storage. Use Node.js 22,
 install the locked dependencies, and start the private local workspace. Hosting
 and inference hardware are supplied by the operator.
 
@@ -35,8 +35,8 @@ A responsive layout is not a native Android/iOS release or an offline-sync guara
 The preview has a single-operator authentication model. Production TLS,
 monitoring, multi-user isolation, independent security review and host recovery
 must be qualified before a real deployment. No free cloud or 24-hour uptime is
-promised. Prepared [deployment instructions](../MUZEBOS-OPERATIONS.md) and
-[inference hosting](../MUZEBOS-INFERENCE.md) list their separate limits.
+promised. Prepared [deployment instructions](../METABOS-OPERATIONS.md) and
+[inference hosting](../METABOS-INFERENCE.md) list their separate limits.
 
 Next: [invoice approvals](invoice-approvals.md), [security and data](security-and-data.md).
 Return to the [documentation hub](README.md).

@@ -1,8 +1,8 @@
-import { memberRead } from '@/lib/muzebos/member-read';
+import { memberRead } from '@/lib/metabos/member-read';
 import { NextResponse } from 'next/server';
-import { businessAccess } from '@/lib/muzebos/http';
-import { businessStore, BusinessError } from '@/lib/muzebos/store';
-import { missionSnapshot } from '@/lib/muzebos/mission';
+import { businessAccess } from '@/lib/metabos/http';
+import { businessStore, BusinessError } from '@/lib/metabos/store';
+import { missionSnapshot } from '@/lib/metabos/mission';
 import { getDb } from '@/lib/data';
 import { filmingMode } from '@/lib/paths';
 import { allConnectorStatuses } from '@/lib/connectors';

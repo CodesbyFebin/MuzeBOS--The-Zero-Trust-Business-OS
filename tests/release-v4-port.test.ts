@@ -3,8 +3,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, rmSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { BusinessStore } from '@/lib/muzebos/store';
-import { invoiceQrSvg, stockLedger, taxCsv, evidenceExport, backupAndVerify, csvCell } from '@/lib/muzebos/records';
+import { BusinessStore } from '@/lib/metabos/store';
+import { invoiceQrSvg, stockLedger, taxCsv, evidenceExport, backupAndVerify, csvCell } from '@/lib/metabos/records';
 const dirs: string[] = []; const stores: BusinessStore[] = [];
 const tmp = () => { const d = mkdtempSync(path.join(tmpdir(), 'mb-v4-')); dirs.push(d); return d; };
 const open = () => { const s = new BusinessStore(path.join(tmp(), 'b.sqlite')); stores.push(s); return s; };
@@ -13,14 +13,14 @@ const seed = (s: BusinessStore, name = 'Kaveri Traders', qty = 2) => {
   const c = s.customer({ name, email: 'kaveri@example.com' }); const p = s.product({ name: 'Rice 5kg', sku: `RICE${s.products().length}`, price: 45000, taxBps: 500, stock: 10 });
   const o = s.draft({ customerId: c.id, lines: [{ productId: p.id, quantity: qty }] }); s.approve(o.id, o.hash); return { inv: s.issue(o.id, o.hash), p };
 };
-const setUpi = (s: BusinessStore) => s.configure({ name: 'Muze Store', address: '', taxId: '', upi: 'muze@okbank' });
+const setUpi = (s: BusinessStore) => s.configure({ name: 'Meta Store', address: '', taxId: '', upi: 'metabos@okbank' });
 
 describe('v4 port', () => {
   it('QR encodes the stored invoice amount, needs a UPI ID, and is refused once reconciled', async () => {
     const s = open(); const { inv: noUpi } = seed(s);
     await expect(invoiceQrSvg(s, noUpi.id)).rejects.toMatchObject({ status: 409 });
     setUpi(s); const { inv } = seed(s, 'Second'); const a = await invoiceQrSvg(s, inv.id);
-    expect(a.uri).toContain('am=945.00'); expect(a.uri).toContain('pa=muze%40okbank'); expect(a.svg).toMatch(/^<svg/); expect(a.payment).toBe('pending');
+    expect(a.uri).toContain('am=945.00'); expect(a.uri).toContain('pa=metabos%40okbank'); expect(a.svg).toMatch(/^<svg/); expect(a.payment).toBe('pending');
     const { inv: inv2 } = seed(s, 'Other', 3); expect((await invoiceQrSvg(s, inv2.id)).uri).toContain('am=1417.50'); const b = await invoiceQrSvg(s, inv2.id); expect(b.svg).not.toBe(a.svg);
     s.reconcile(inv.id, 'UTR123456789'); await expect(invoiceQrSvg(s, inv.id)).rejects.toMatchObject({ status: 409 });
   });

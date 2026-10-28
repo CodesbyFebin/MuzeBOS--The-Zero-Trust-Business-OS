@@ -1,2 +1,2 @@
-import { CommandCenter } from '@/components/muzebos/CommandCenter';
+import { CommandCenter } from '@/components/metabos/CommandCenter';
 export default function Page() { return <CommandCenter/>; }

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
-import { CategoryWorkspace } from '@/components/muzebos/CategoryWorkspace';
-import { MENUS } from '@/lib/muzebos/registry';
+import { CategoryWorkspace } from '@/components/metabos/CategoryWorkspace';
+import { MENUS } from '@/lib/metabos/registry';
 export const dynamic='force-dynamic';
 export default async function WorkspacePage(props:{params: Promise<{section:string}>}) {
  const params = await props.params;

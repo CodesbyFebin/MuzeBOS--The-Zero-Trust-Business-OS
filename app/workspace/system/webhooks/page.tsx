@@ -1,5 +1,5 @@
-import { businessStore } from '@/lib/muzebos/store';
-import { WebhookDeliveries, WebhookHeader, WebhookLimits } from '@/components/muzebos/WebhookDeliveries';
+import { businessStore } from '@/lib/metabos/store';
+import { WebhookDeliveries, WebhookHeader, WebhookLimits } from '@/components/metabos/WebhookDeliveries';
 export const dynamic = 'force-dynamic';
 export default function WebhookListenerPage() {
   return <div className="mb-console mb-category">

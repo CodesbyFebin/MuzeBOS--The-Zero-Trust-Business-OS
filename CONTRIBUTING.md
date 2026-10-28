@@ -1,9 +1,9 @@
-# Contributing to MuzeBOS
+# Contributing to MeTaBos
 
-MuzeBOS is a self-hostable business workspace in single-operator preview.
+MeTaBos is a self-hostable business workspace in single-operator preview.
 Contributions should improve real behavior, explain limits and preserve the
 approval boundary. Start with [the docs hub](docs/search/README.md),
-[architecture](docs/MUZEBOS-ARCHITECTURE.md) and [project board](docs/PROJECTS.md).
+[architecture](docs/METABOS-ARCHITECTURE.md) and [project board](docs/PROJECTS.md).
 Coding agents must also read AGENTS.md and CLAUDE.md.
 
 ## Local development

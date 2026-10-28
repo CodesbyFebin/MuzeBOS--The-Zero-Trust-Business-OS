@@ -1,13 +1,13 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { randomUUID } from 'node:crypto';
-import { BusinessStore } from '../lib/muzebos/store';
-import { createDeal, moveDeal, pipelineSummary, winProbability, requestNextStep, readNextStep } from '../lib/muzebos/biz/pipeline';
-import { submitExpense, decideExpense, withdrawExpense, cannotDecide, MANAGER_LIMIT } from '../lib/muzebos/biz/expenses';
-import { addMember, listMembers } from '../lib/muzebos/biz/members';
-import { founderDashboard, setCash, requestFounderBrief, readFounderBrief } from '../lib/muzebos/biz/dashboard';
-import { InferenceStore } from '../lib/muzebos/inference/store';
-import { routes } from '../lib/muzebos/inference/routing';
-import { runServerOnce } from '../lib/muzebos/inference/providers';
+import { BusinessStore } from '../lib/metabos/store';
+import { createDeal, moveDeal, pipelineSummary, winProbability, requestNextStep, readNextStep } from '../lib/metabos/biz/pipeline';
+import { submitExpense, decideExpense, withdrawExpense, cannotDecide, MANAGER_LIMIT } from '../lib/metabos/biz/expenses';
+import { addMember, listMembers } from '../lib/metabos/biz/members';
+import { founderDashboard, setCash, requestFounderBrief, readFounderBrief } from '../lib/metabos/biz/dashboard';
+import { InferenceStore } from '../lib/metabos/inference/store';
+import { routes } from '../lib/metabos/inference/routing';
+import { runServerOnce } from '../lib/metabos/inference/providers';
 
 const env = { META_MODEL_API_KEY: 'fixture', MUZEBOS_INFERENCE_PAID: '1', MUZEBOS_META_MODEL: 'muse-spark-1.3' };
 const opened: BusinessStore[] = [];

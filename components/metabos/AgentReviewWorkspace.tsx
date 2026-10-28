@@ -1,0 +1,9 @@
+'use client';
+import { useState } from 'react';
+import { reviewAgentPermissions, type AgentFinding } from '@/lib/metabos/agent-review';
+export function AgentReviewWorkspace() {
+  const [input, setInput] = useState('');
+  const [findings, setFindings] = useState<AgentFinding[] | null>(null);
+  const [error, setError] = useState('');
+  return <div className="mb-console mb-category"><span className="mb-eyebrow">AI / STATIC CONFIGURATION REVIEW</span><h1>Agent permission review</h1><p className="mb-muted">Uses AgentShield’s MIT permission normalizer with a limited set of MeTaBos checks. This is not the full AgentShield scanner, runtime enforcement or a security certification. Input stays in this browser; do not paste credentials.</p><form className="mb-panel mb-source-form" onSubmit={e => { e.preventDefault(); setError(''); setFindings(null); try { if (input.length > 64000) throw new Error('Configuration is too large'); setFindings(reviewAgentPermissions(JSON.parse(input))); } catch { setError('Supply JSON with permissions.allow and optional permissions.deny arrays, within 64,000 characters.'); } }}><label>Agent permission JSON<textarea maxLength={64000} rows={12} required value={input} onChange={e => setInput(e.target.value)} placeholder={'{"permissions":{"allow":["Read(./src/*)"],"deny":["Bash(sudo *)"]}}'}/></label><button className="mb-primary mb-button">Review configuration</button></form>{error && <p role="alert" className="mb-alert">{error}</p>}{findings && <section className="mb-panel"><h2>{findings.length} findings in this limited review</h2>{!findings.length && <p>No matching rules found. Unchecked syntax and runtime risks may remain.</p>}{findings.map((f, i) => <article className="mb-booking-row" key={`${f.rule}-${i}`}><div><strong>{f.severity} · {f.rule}</strong><p>{f.message}</p><span className="mb-muted">{f.index < 0 ? 'Configuration' : `Allow rule ${f.index + 1}`}</span></div></article>)}</section>}</div>;
+}

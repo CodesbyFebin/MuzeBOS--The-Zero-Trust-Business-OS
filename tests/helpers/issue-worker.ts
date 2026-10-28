@@ -1,5 +1,5 @@
 /** Child process for the concurrent-issuance test: waits for a shared start time, then issues. */
-import { BusinessStore, BusinessError } from '@/lib/muzebos/store';
+import { BusinessStore, BusinessError } from '@/lib/metabos/store';
 const [file, startAt, ...pairs] = process.argv.slice(2);
 const store = new BusinessStore(file);
 while (Date.now() < Number(startAt)) { /* spin to a common start */ }

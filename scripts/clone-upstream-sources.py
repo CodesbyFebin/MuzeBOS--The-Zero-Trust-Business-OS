@@ -14,7 +14,7 @@ destination = Path(args.destination).expanduser().resolve()
 if destination == project or project in destination.parents:
     parser.error('Choose a destination outside the application repository.')
 destination.mkdir(parents=True, exist_ok=True)
-catalog = json.loads((project / 'lib/muzebos/source-catalog.json').read_text())
+catalog = json.loads((project / 'lib/metabos/source-catalog.json').read_text())
 environment = {**os.environ, 'GIT_TERMINAL_PROMPT': '0', 'GIT_LFS_SKIP_SMUDGE': '1'}
 for source in catalog:
     repo, revision = source['repo'], source['sha']
