@@ -9,6 +9,7 @@ import { z } from 'zod';
 import type { BusinessStore } from '../store';
 import { propose } from '../ai/jev';
 import { WorkflowEngine } from '../workflows';
+import { assertSafeOutput } from './safe-outputs';
 
 export const SOCIAL_CHANNELS = {
   bluesky: ['MUZEBOS_BLUESKY_HANDLE', 'MUZEBOS_BLUESKY_APP_PASSWORD'],
@@ -37,6 +38,7 @@ export function channelStatus(env: Record<string, string | undefined> = process.
 export function queuePosts(s: BusinessStore, actor: string, raw: unknown[]): SocialPost[] {
   ensure(s);
   const posts = raw.map((r) => PostInput.parse(r));
+  assertSafeOutput(s, 'writer', 'social_post', 'social');
   return posts.map((p) => {
     const id = `post_${randomUUID().slice(0, 12)}`;
     const run = propose(s, { taskId: `social-${id}`, role: 'writer', tool: 'reminders.create', args: { title: `Approve ${p.channel} post ${id} for ${p.scheduledFor.slice(0, 16)}: ${p.body.slice(0, 80)}` }, rationale: 'Social post draft; per-post Jev approval', source: 'rule', model: null });
