@@ -5,6 +5,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { BusinessError, type BusinessStore } from '../store';
 import { assertNotOptedOut, onDispatchSent } from '../talk/core';
+import { meterDispatch } from '../brain/metering';
 import { CHANNELS, NotConnected, missingEnv, runAdapter, type Channel, type Deps } from './adapters';
 
 export type Dispatch = { id: string; channel: Channel; payload: unknown; payloadHash: string; status: 'pending' | 'approved' | 'sent' | 'failed' | 'rejected'; proposedBy: string; approvedBy: string | null; idempotencyKey: string | null; providerStatus: number | null; providerRef: string | null; providerResponse: string | null; createdAt: string; updatedAt: string };
@@ -70,6 +71,7 @@ export async function dispatch(s: BusinessStore, id: string, hash: string, idemp
     s.db.prepare('UPDATE mb_dispatches SET status=?, providerStatus=?, providerRef=?, providerResponse=?, updatedAt=? WHERE id=?').run(r.ok ? 'sent' : 'failed', r.status, r.providerRef, r.evidence, new Date().toISOString(), id);
     s.appendEvidence(r.ok ? 'dispatch.provider-accepted' : 'dispatch.provider-failed', id, `${d.channel} HTTP ${r.status}${r.providerRef ? ` ref ${r.providerRef}` : ''}; key ${idempotencyKey}`);
     if (r.ok) onDispatchSent(s, { id, channel: d.channel, payload: d.payload, providerRef: r.providerRef });
+    if (r.usage) meterDispatch(s, id, r.usage);
   });
   return row(s, id);
 }

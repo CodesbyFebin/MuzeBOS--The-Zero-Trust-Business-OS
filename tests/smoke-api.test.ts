@@ -142,6 +142,7 @@ const ROUTES: RouteEntry[] = [
   { route: 'life/map', load: () => import('@/app/api/life/map/route'), url: 'http://localhost/api/life/map' },
   { route: 'dispatch', load: () => import('@/app/api/dispatch/route'), url: 'http://localhost/api/dispatch' },
   { route: 'talk', load: () => import('@/app/api/talk/route'), url: 'http://localhost/api/talk' },
+  { route: 'brain-ops', load: () => import('@/app/api/brain-ops/route'), url: 'http://localhost/api/brain-ops' },
   { route: 'passkeys', load: () => import('@/app/api/passkeys/route'), url: 'http://localhost/api/passkeys' },
   { route: 'metrics', load: () => import('@/app/api/metrics/route'), url: 'http://localhost/api/metrics' },
   { route: 'roadmap', load: () => import('@/app/api/roadmap/route'), url: 'http://localhost/api/roadmap' },
@@ -180,7 +181,7 @@ function discoverGetRoutes(dir: string, base = ''): string[] {
 }
 
 /** Routes that hold business records: a signed-out GET must be refused (401), never 200. */
-const MEMBER_ONLY = new Set(['metabos/hubs/[hub]', 'metabos/command-center', 'metabos/overdue', 'ai', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk']);
+const MEMBER_ONLY = new Set(['metabos/hubs/[hub]', 'metabos/command-center', 'metabos/overdue', 'ai', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops']);
 describe('platform smoke — every GET API route answers 200 with JSON', () => {
   test.each(ROUTES)('GET /api/$route', async ({ route, load, url, params }) => {
     const mod = await load();

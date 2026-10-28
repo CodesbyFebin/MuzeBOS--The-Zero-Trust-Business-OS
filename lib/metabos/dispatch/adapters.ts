@@ -15,7 +15,8 @@ export type Env = Record<string, string | undefined>;
 export type Fetch = (url: string, init: { method: string; headers: Record<string, string>; body: string; signal?: AbortSignal }) => Promise<{ status: number; ok: boolean; text(): Promise<string> }>;
 export type MailTransport = { sendMail(m: { from: string; to: string; subject: string; text: string; headers: Record<string, string> }): Promise<{ messageId?: string; response?: string; accepted?: unknown[]; rejected?: unknown[] }> };
 export type Deps = { env: Env; fetch: Fetch; mail?: (opts: { host: string; port: number; secure: boolean; auth: { user: string; pass: string } }) => MailTransport };
-export type AdapterResult = { ok: boolean; status: number; providerRef: string | null; evidence: string };
+export type Usage = { model: string; promptTokens: number; completionTokens: number; costMicroUsd: number | null };
+export type AdapterResult = { ok: boolean; status: number; providerRef: string | null; evidence: string; usage?: Usage };
 export class NotConnected extends Error { constructor(public missing: string[]) { super(`Not connected — add ${missing.join(', ')}`); } }
 
 export const CHANNELS = {
@@ -73,7 +74,9 @@ async function completion(p: Payload<'completion'>, key: string, d: Deps): Promi
     body: JSON.stringify({ model: decision.chosen.model, messages: [{ role: 'user', content: p.prompt }], max_tokens: p.maxTokens, user: key }),
   });
   const t = await r.text(); const j = json(t);
-  return { ok: r.ok, status: r.status, providerRef: j?.id ?? null, evidence: clip(JSON.stringify({ model: decision.chosen.model, reasons: decision.reasons, response: j ?? t })) };
+  const u = j?.usage; const cost = typeof u?.cost === 'number' ? Math.round(u.cost * 1_000_000) : null;
+  const usage = u ? { model: String(j?.model ?? decision.chosen.model), promptTokens: Number(u.prompt_tokens) || 0, completionTokens: Number(u.completion_tokens) || 0, costMicroUsd: cost } : undefined;
+  return { ok: r.ok, status: r.status, providerRef: j?.id ?? null, evidence: clip(JSON.stringify({ model: decision.chosen.model, reasons: decision.reasons, response: j ?? t })), usage };
 }
 async function email(p: Payload<'email'>, key: string, d: Deps): Promise<AdapterResult> {
   const port = Number(d.env.MUZEBOS_SMTP_PORT);
