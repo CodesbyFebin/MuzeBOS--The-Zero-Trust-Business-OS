@@ -13,6 +13,8 @@ export function WorkspaceNavigation() {
   const [panelOpen, setPanelOpen] = useState(true);
   // close the mobile drawer whenever the route changes
   useEffect(() => { document.documentElement.removeAttribute('data-mb-drawer'); }, [pathname]);
+  const brain = menuById('brain');
+  const brainPages = brain ? brain.clusters.map((c) => c.pages[0]).filter(Boolean) : [];
   const shown: MenuDefinition | undefined = active ?? menuById('mission');
   const rail = (m: MenuDefinition) => (
     <Link key={m.id} href={m.route} title={`${String(m.number).padStart(2, '0')} ${m.label}`} aria-label={m.label}
@@ -34,6 +36,14 @@ export function WorkspaceNavigation() {
             <button type="button" className="mb-icon-btn" onClick={() => setPanelOpen(false)} aria-label="Collapse secondary panel" title="Collapse panel"><PanelLeftClose size={14} aria-hidden /></button>
           </div>
           <p className="mb-secondary-summary">{shown.summary}</p>
+          {shown.id !== 'brain' && brain && (
+            <details open className="mb-cluster mb-brain-pin" data-testid="brain-pinned">
+              <summary><Link href={brain.route} className="mb-brain-pin-title">{brain.label}</Link> <span className="mb-count">{brainPages.length}</span></summary>
+              <ul>{brainPages.map((p) => (
+                <li key={p.id}><Link href={p.route} aria-current={p.route === pathname ? 'page' : undefined} className="mb-secondary-link"><StatusDot status={p.status} /><span>{p.label}</span></Link></li>
+              ))}</ul>
+            </details>
+          )}
           {shown.clusters.map((c, i) => {
             const here = c.pages.some((p) => p.route === pathname);
             return (
