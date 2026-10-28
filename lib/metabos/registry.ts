@@ -279,7 +279,7 @@ const categoryMenu = (id: string, section: MenuSection): Omit<MenuDefinition, 'n
   const clusters = categoryClusters(id);
   if (B3_PAGES[id]) clusters[0].pages.push(...B3_PAGES[id].map((f) => ({ ...f, clusterId: clusters[0].id })));
   if (id === 'money') clusters[0].pages.push(...MONEY_HACK.map((f) => ({ ...f, clusterId: clusters[0].id })));
-  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME, BRAIN_MISSIONS, BRAIN_GOALS, BRAIN_VOICE, BRAIN_CHIEF, ...BRAIN_HACK.map((f) => ({ ...f, clusterId: clusters[0].id }))); clusters[2].pages.push(BRAIN_EXTRA); }
+  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME, BRAIN_MISSIONS, BRAIN_GOALS, BRAIN_VOICE, BRAIN_CHIEF, ...BRAIN_HACK.map((f) => ({ ...f, clusterId: clusters[0].id }))); clusters[2].pages.push(BRAIN_EXTRA); clusters[1].pages.push({ ...mk('writing', 'Writing library', 'Your Substack, Medium or RSS posts cached with source URL and date, keyword search (FTS5) and cited "In your voice" passages. Read-only.', 'brain'), clusterId: clusters[1].id }); }
   return { id, label: MENU_LABELS[id], route: `/workspace/${id}`, icon: cat(id).icon, section, summary: cat(id).summary, aliases: LEGACY_ALIASES[id] ?? [], clusters };
 };
 
