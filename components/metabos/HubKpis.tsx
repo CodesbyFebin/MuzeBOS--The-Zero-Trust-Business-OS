@@ -2,11 +2,14 @@
 import { useEffect, useState } from 'react';
 import { Inbox, MessageSquare, ShieldCheck, Users, Wallet, Check, Phone, Package } from 'lucide-react';
 import { KpiCard } from './KpiCard';
+import { langFromCookie, t, type Lang } from '@/lib/metabos/b3/i18n';
 const amount = (n: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(n / 100);
 type Counters = Record<string, number | null>;
 /** v3 KPI strip for the Orders, Money and Talk hubs. Every value comes from /api/mission-control or /api/talk (real SQLite); nothing is sampled. */
 export function HubKpis({ hub }: { hub: 'orders' | 'money' | 'talk' }) {
   const [c, setC] = useState<Counters | null>(null); const [talk, setTalk] = useState<{ conversations: unknown[]; handoffs: { status?: string }[]; optOuts: unknown[] } | null>(null); const [err, setErr] = useState('');
+  const [lang, setLang] = useState<Lang>('en');
+  useEffect(() => { setLang(langFromCookie(document.cookie)); }, []);
   useEffect(() => {
     const ac = new AbortController();
     const url = hub === 'talk' ? '/api/talk' : `/api/mission-control?tz=${new Date().getTimezoneOffset()}`;
@@ -17,9 +20,9 @@ export function HubKpis({ hub }: { hub: 'orders' | 'money' | 'talk' }) {
   if (!c && !talk) return <p className="mb-muted" role="status">Reading business records…</p>;
   const n = (k: string) => (c?.[k] ?? 0) as number;
   const cards = hub === 'orders' ? [
-    { label: 'Awaiting approval', value: n('awaitingApproval'), sub: `${n('expiredApprovals')} expired drafts`, href: '/business?view=orders', icon: ShieldCheck, tone: n('awaitingApproval') ? 'amber' : 'neutral' },
-    { label: 'Customers', value: n('customers') || null, sub: 'Records in this workspace', href: '/business?view=customers', icon: Users, tone: 'neutral' },
-    { label: 'Products', value: n('products') || null, sub: `${n('outOfStock')} out of stock`, href: '/business?view=inventory', icon: Package, tone: n('outOfStock') ? 'red' : 'neutral' },
+    { label: t(lang, 'awaiting'), value: n('awaitingApproval'), sub: `${n('expiredApprovals')} expired drafts`, href: '/business?view=orders', icon: ShieldCheck, tone: n('awaitingApproval') ? 'amber' : 'neutral' },
+    { label: t(lang, 'customers'), value: n('customers') || null, sub: 'Records in this workspace', href: '/business?view=customers', icon: Users, tone: 'neutral' },
+    { label: t(lang, 'products'), value: n('products') || null, sub: `${n('outOfStock')} out of stock`, href: '/business?view=inventory', icon: Package, tone: n('outOfStock') ? 'red' : 'neutral' },
   ] : hub === 'money' ? [
     { label: 'Outstanding invoices', value: n('paymentPending') ? amount(n('paymentPendingMinor')) : null, sub: `${n('paymentPending')} issued, unpaid`, href: '/business?view=invoices', icon: Wallet, tone: n('paymentPending') ? 'amber' : 'neutral' },
     { label: 'Settled (manual)', value: n('settled') ? amount(n('settledMinor')) : null, sub: 'Operator-reconciled, not provider-verified', href: '/business?view=invoices', icon: Check, tone: n('settled') ? 'green' : 'neutral' },
@@ -29,5 +32,5 @@ export function HubKpis({ hub }: { hub: 'orders' | 'money' | 'talk' }) {
     { label: 'Open handoffs', value: talk!.handoffs.filter((h) => h.status !== 'closed' && h.status !== 'resolved').length || null, sub: 'Waiting for a person', href: '/workspace/talk', icon: Phone, tone: 'amber' },
     { label: 'Opt-outs', value: talk!.optOuts.length || null, sub: 'Contacts who asked not to be messaged', href: '/workspace/talk', icon: Users, tone: 'neutral' },
   ];
-  return <div className="mb-kpi-grid" data-testid={`hub-kpis-${hub}`}>{cards.map((k) => <KpiCard key={k.label} {...k} tone={k.tone as 'neutral'}/>)}</div>;
+  return <div className="mb-kpi-grid" data-testid={`hub-kpis-${hub}`}>{cards.map((k) => <KpiCard key={k.label} {...k} empty={t(lang, 'noRecords')} tone={k.tone as 'neutral'}/>)}</div>;
 }

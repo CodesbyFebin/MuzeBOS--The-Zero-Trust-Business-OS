@@ -209,6 +209,7 @@ const BRAIN_VOICE: FeatureDefinition = {
 const B3_PAGES: Record<string, FeatureDefinition[]> = {
   growth: [mk('social', 'Social Post Queue', 'Owner or AI drafts posts; each one is proposed to Jev separately. Channel drivers (Bluesky, LinkedIn, X, webhook) show Not connected until keys exist; nothing is published from this page. Idea from Open-Post, rebuilt clean.', 'growth')],
   operations: [mk('pipelines', 'Pipelines', 'Research, draft, Llama Guard review, then a Jev stop; blocked if unanswered by the deadline. Never continues on its own.', 'operations')],
+  system: [mk('accessibility', 'Accessibility Self-Audit', 'Checks alt text, names, labels, 44px targets and page language on key pages; the same checks run in CI via scripts/a11y-check.mjs. Basic checks, not a full WCAG audit.', 'system')],
   brain: [mk('safe-outputs', 'Safe Outputs', 'Per-role allowed output types; anything else is refused with evidence before Jev. Pattern from gh-aw (MIT).', 'brain')],
 
 };
@@ -247,6 +248,7 @@ function utilityMenu(key: string): Omit<MenuDefinition, 'number'> {
     route: `/workspace/${key}/${slug(l.label)}`, target: l.href, status: 'existing', dependencies: [],
     summary: `Opens the existing screen at ${l.href}.`,
   }));
+  if (key === 'settings') pages.push({ ...mk('language', 'Language', 'English, हिन्दी, മലയാളം and தமிழ் interface strings (cookie mb_lang). Machine-drafted by local Sarvam via claw-local, hand-reviewed; native review pending; missing strings fall back to English.', 'settings'), clusterId: cid });
   if (key === 'developer') pages.push(META_WEBHOOK_STATUS, API_REFERENCE, { ...mk('mcp', 'GST MCP Server', 'Compute-only GST tools (invoice tax, GSTIN format, GSTR-1 B2C summary) over MCP JSON-RPC. GST math is pre-existing Open-Founder code, labelled.', 'developer'), clusterId: cid });
   if (key === 'account') pages.push(...OS_PAGES.account.map((f) => ({ ...f, clusterId: cid })));
   return { id: key, label: key === 'upgrade' ? 'Upgrade' : u.label, route: `/workspace/${key}`, icon: u.icon, section: 'pinned', summary: u.summary, aliases: LEGACY_ALIASES[key] ?? [], clusters: [{ id: cid, label: 'Current destinations', pages }] };
