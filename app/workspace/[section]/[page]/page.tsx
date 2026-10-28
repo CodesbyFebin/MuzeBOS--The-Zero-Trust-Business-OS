@@ -6,6 +6,7 @@ import { moduleById } from '@/lib/metabos/modules';
 import { isInfraPage } from '@/lib/metabos/infra-pages';
 import { TalkConsole, type TalkPanel } from '@/components/metabos/TalkConsole';
 import { BrainConsole, type BrainPanel } from '@/components/metabos/BrainConsole';
+import { DataConsole } from '@/components/metabos/DataConsole';
 import { InfraWorkspace } from '@/components/metabos/InfraWorkspace';
 export const dynamic='force-dynamic';
 /** Live Talk copilot panels shown above the module workspace on the canonical Talk pages. */
@@ -24,6 +25,7 @@ export default async function FeaturePage(props:{params: Promise<{section:string
  if(talk&&(feature.status==='available'||feature.status==='needs-credentials')&&moduleById(feature.id))return <><ModuleWorkspace feature={feature}/><div className="mb-console mb-talk-wrap"><TalkConsole {...talk}/></div></>;
  if(talk)return <><FeatureStub feature={feature}/><div className="mb-console mb-talk-wrap"><TalkConsole {...talk}/></div></>;
  const brain=BRAIN_PANELS[feature.id];
+ if(feature.id==='foundation.terms-and-privacy-versions'){const base=moduleById(feature.id)?<ModuleWorkspace feature={feature}/>:<FeatureStub feature={feature}/>;return <>{base}<div className="mb-console mb-talk-wrap"><DataConsole panel="privacy"/></div></>;}
  if(brain){const live=(feature.status==='available'||feature.status==='needs-credentials');const base=live&&moduleById(feature.id)?<ModuleWorkspace feature={feature}/>:live&&isInfraPage(feature.id)?<InfraWorkspace feature={feature}/>:<FeatureStub feature={feature}/>;return <>{base}<div className="mb-console mb-talk-wrap"><BrainConsole panel={brain}/></div></>;}
  if((feature.status==='available'||feature.status==='needs-credentials')&&moduleById(feature.id))return <ModuleWorkspace feature={feature}/>;
  if(feature.status==='available'&&isInfraPage(feature.id))return <InfraWorkspace feature={feature}/>;

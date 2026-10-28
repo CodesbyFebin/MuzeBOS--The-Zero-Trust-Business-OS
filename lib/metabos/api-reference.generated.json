@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 216,
+ "count": 217,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1188,6 +1188,19 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/data",
+   "file": "app/api/data/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Ask your data (read-only), DPDP export/redact, sales goals vs actuals.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
    "access": "session"
   },
   {
