@@ -48,6 +48,7 @@ const PAGES: PageEntry[] = [
   { file: 'workspace/brain/security/page.tsx', load: () => import('@/app/workspace/brain/security/page') },
   { file: 'workspace/brain/templates/page.tsx', load: () => import('@/app/workspace/brain/templates/page') },
   { file: 'workspace/brain/runtime/page.tsx', load: () => import('@/app/workspace/brain/runtime/page') },
+  { file: 'help/page.tsx', load: () => import('@/app/help/page') },
   { file: 'workspace/system/ai-settings/page.tsx', load: () => import('@/app/workspace/system/ai-settings/page') },
   { file: 'privacy/page.tsx', load: () => import('@/app/privacy/page') },
   { file: 'workspace/brain/missions/page.tsx', load: () => import('@/app/workspace/brain/missions/page') },
