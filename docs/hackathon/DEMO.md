@@ -69,7 +69,7 @@ only the new controls and pipeline delta are part of this entry.
 
 | Time | Screen | Narration |
 | --- | --- | --- |
-| 0:00–0:20 | Provenance table and baseline SHA | “MuzeBOS already existed on FounderOS. This event contribution is the new Meta/Baseten-to-Jev handoff, its controls and reproducible demo. The existing Business OS and approval engine are credited as pre-event work.” |
+| 0:00–0:20 | Provenance table and baseline SHA | “MeTaBos already existed on FounderOS. This event contribution is the new Meta/Baseten-to-Jev handoff, its controls and reproducible demo. The existing Business OS and approval engine are credited as pre-event work.” |
 | 0:20–0:45 | New route selector and model identities | “A founder can request help without giving a model write access. This change adds Baseten Muse Spark Open and selects Meta Spark through the existing API adapter.” |
 | 0:45–1:15 | First exact task hash, model and token limit | “Jev requires review before the model call. This is [a live API call / a clearly labeled offline fixture]. The task authorizes one draft, with no tool access or automatic paid fallback.” |
 | 1:15–1:45 | Returned JSON and Send proposal to Jev | “The client validates a narrow reminder schema. It rejects extra permissions, invoice tools, tool calls and incomplete responses. A completed draft can propose an action but cannot approve it.” |

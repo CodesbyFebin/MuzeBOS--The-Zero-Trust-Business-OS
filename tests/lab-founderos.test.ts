@@ -57,7 +57,7 @@ describe('AC-08-20: the FounderOS publish set', () => {
 
 describe('AC-09-26 and AC-08-20: Setup > Schedule on FounderOS', () => {
   test('the cron line, client rows, no GladOS wording and no agent label', () => {
-    expect(BRAND.id).toBe('muzebos');
+    expect(BRAND.id).toBe('metabos');
     const v = setupView(fresh(), { now: new Date('2026-10-12T03:00:00Z'), dry: false, section: 'schedule' });
     expect(v.focus).toBe('schedule');
     expect(v.schedule.label).toBe('Runs when lab-sync tick is called. Call it every 15 minutes from cron or launchd.');

@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { BusinessStore } from '@/lib/muzebos/store';
-import { HUBS, hubView } from '@/lib/muzebos/hubs';
+import { BusinessStore } from '@/lib/metabos/store';
+import { HUBS, hubView } from '@/lib/metabos/hubs';
 const fresh = () => new BusinessStore(path.join(mkdtempSync(path.join(tmpdir(), 'mb-hubs-')), 'h.sqlite'));
 const fact = (v: ReturnType<typeof hubView>, label: string) => v.facts.find((f) => f.label === label)?.value;
 describe('hub overviews', () => {

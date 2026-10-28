@@ -1,2 +1,2 @@
-import { ChiefOfStaff } from '@/components/muzebos/ChiefOfStaff';
+import { ChiefOfStaff } from '@/components/metabos/ChiefOfStaff';
 export default function ChiefOfStaffPage() { return <ChiefOfStaff/>; }

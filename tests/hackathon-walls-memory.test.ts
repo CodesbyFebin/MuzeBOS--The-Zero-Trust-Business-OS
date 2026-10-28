@@ -1,12 +1,12 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { BusinessStore } from '../lib/muzebos/store';
-import { readScope, canRead } from '../lib/muzebos/biz/departments';
-import { addMember } from '../lib/muzebos/biz/members';
-import { submitExpense } from '../lib/muzebos/biz/expenses';
-import { remember, agentDraft, promote, contextFor, requestCompaction, readCompaction, listMemory } from '../lib/muzebos/biz/memory';
-import { InferenceStore } from '../lib/muzebos/inference/store';
-import { routes } from '../lib/muzebos/inference/routing';
-import { runServerOnce } from '../lib/muzebos/inference/providers';
+import { BusinessStore } from '../lib/metabos/store';
+import { readScope, canRead } from '../lib/metabos/biz/departments';
+import { addMember } from '../lib/metabos/biz/members';
+import { submitExpense } from '../lib/metabos/biz/expenses';
+import { remember, agentDraft, promote, contextFor, requestCompaction, readCompaction, listMemory } from '../lib/metabos/biz/memory';
+import { InferenceStore } from '../lib/metabos/inference/store';
+import { routes } from '../lib/metabos/inference/routing';
+import { runServerOnce } from '../lib/metabos/inference/providers';
 
 const env = { META_MODEL_API_KEY: 'fixture', MUZEBOS_INFERENCE_PAID: '1', MUZEBOS_META_MODEL: 'muse-spark-1.3' };
 const opened: BusinessStore[] = [];

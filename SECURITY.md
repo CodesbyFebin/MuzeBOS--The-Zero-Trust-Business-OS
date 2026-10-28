@@ -1,8 +1,8 @@
 # Security policy
 
-MuzeBOS is a single-operator preview. No production security certification or
+MeTaBos is a single-operator preview. No production security certification or
 independent assessment is claimed. Read [security/data boundaries](docs/search/security-and-data.md)
-and [the threat model](docs/MUZEBOS-ARCHITECTURE.md) before deployment.
+and [the threat model](docs/METABOS-ARCHITECTURE.md) before deployment.
 
 ## Report a vulnerability
 

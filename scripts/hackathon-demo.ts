@@ -3,12 +3,12 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createInterface } from 'node:readline/promises';
-import { BusinessStore } from '../lib/muzebos/store';
-import { InferenceStore } from '../lib/muzebos/inference/store';
-import { routes } from '../lib/muzebos/inference/routing';
-import { runServerOnce } from '../lib/muzebos/inference/providers';
-import { proposeInferenceAction } from '../lib/muzebos/inference/jev-bridge';
-import { WorkflowEngine } from '../lib/muzebos/workflows';
+import { BusinessStore } from '../lib/metabos/store';
+import { InferenceStore } from '../lib/metabos/inference/store';
+import { routes } from '../lib/metabos/inference/routing';
+import { runServerOnce } from '../lib/metabos/inference/providers';
+import { proposeInferenceAction } from '../lib/metabos/inference/jev-bridge';
+import { WorkflowEngine } from '../lib/metabos/workflows';
 import { runtimeEnv } from '../lib/creds';
 async function main() {
   const args = process.argv.slice(2);
@@ -21,7 +21,7 @@ async function main() {
   const providers = selected === 'both' ? ['meta', 'baseten'] : [selected];
   // Check configuration before creating any task; never silently switch to fixtures or another model.
   for (const provider of providers) if (!routes(env).find(r => r.provider === provider)?.configured) throw new Error(`${provider} needs its server credential and MUZEBOS_INFERENCE_PAID=1; no requests sent`);
-  const dir = mkdtempSync(path.join(tmpdir(), 'muzebos-hackathon-'));
+  const dir = mkdtempSync(path.join(tmpdir(), 'metabos-hackathon-'));
   const db = new BusinessStore(path.join(dir, 'demo.sqlite'));
   const store = new InferenceStore(db, () => routes(env));
   const engine = new WorkflowEngine(db);

@@ -1,6 +1,6 @@
-import { businessStore } from '@/lib/muzebos/store';
-import { metaWebhookConfig, WEBHOOK_SOURCES } from '@/lib/muzebos/webhooks';
-import { WebhookDeliveries, WebhookHeader, WebhookLimits } from '@/components/muzebos/WebhookDeliveries';
+import { businessStore } from '@/lib/metabos/store';
+import { metaWebhookConfig, WEBHOOK_SOURCES } from '@/lib/metabos/webhooks';
+import { WebhookDeliveries, WebhookHeader, WebhookLimits } from '@/components/metabos/WebhookDeliveries';
 export const dynamic = 'force-dynamic';
 /** Integration status: booleans for each variable, never its value. */
 export default function MetaWebhookStatusPage() {

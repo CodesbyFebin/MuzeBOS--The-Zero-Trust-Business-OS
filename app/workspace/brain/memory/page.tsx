@@ -1,2 +1,2 @@
-import { MemoryBoard } from '@/components/muzebos/MemoryBoard';
+import { MemoryBoard } from '@/components/metabos/MemoryBoard';
 export default function Page() { return <MemoryBoard/>; }

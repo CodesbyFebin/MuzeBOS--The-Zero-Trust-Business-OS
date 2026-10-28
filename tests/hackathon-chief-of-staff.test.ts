@@ -1,9 +1,9 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { BusinessStore } from '../lib/muzebos/store';
-import { recordDecision, lookupDecision, listDecisions, observe, tierOf, brief } from '../lib/muzebos/chief-of-staff';
-import { propose } from '../lib/muzebos/ai/jev';
-import { createGoal } from '../lib/muzebos/goals';
-import { WorkflowEngine } from '../lib/muzebos/workflows';
+import { BusinessStore } from '../lib/metabos/store';
+import { recordDecision, lookupDecision, listDecisions, observe, tierOf, brief } from '../lib/metabos/chief-of-staff';
+import { propose } from '../lib/metabos/ai/jev';
+import { createGoal } from '../lib/metabos/goals';
+import { WorkflowEngine } from '../lib/metabos/workflows';
 
 const opened: BusinessStore[] = [];
 const fresh = () => { const b = new BusinessStore(':memory:'); opened.push(b); return b; };

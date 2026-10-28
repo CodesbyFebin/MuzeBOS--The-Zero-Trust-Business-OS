@@ -1,4 +1,4 @@
-# MuzeBOS verification and feature status
+# MeTaBos verification and feature status
 
 Feature availability describes a bounded implementation, not a production
 readiness score. A page, model adapter or credential field does not establish
@@ -19,9 +19,9 @@ tests. Desktop/mobile browser checks use disposable records. Local protocol
 fixtures verify software behavior; they do not establish actual model inference,
 provider settlement or production uptime.
 
-See the [integration/search release record](../MUZEBOS-SEARCH-RELEASE.md),
-[commerce verification](../MUZEBOS-VERIFICATION.md),
-[inference verification](../MUZEBOS-INFERENCE-VERIFICATION.md) and
+See the [integration/search release record](../METABOS-SEARCH-RELEASE.md),
+[commerce verification](../METABOS-VERIFICATION.md),
+[inference verification](../METABOS-INFERENCE-VERIFICATION.md) and
 [project board](../PROJECTS.md). Reports apply to their named source revision and
 environment; older counts must not be presented as current test execution.
 

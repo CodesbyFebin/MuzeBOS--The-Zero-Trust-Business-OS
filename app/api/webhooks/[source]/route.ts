@@ -1,5 +1,5 @@
-import { businessStore } from '@/lib/muzebos/store';
-import { BodyTooLarge, isWebhookSource, readBodyCapped, receiveWebhook, verifyChallenge } from '@/lib/muzebos/webhooks';
+import { businessStore } from '@/lib/metabos/store';
+import { BodyTooLarge, isWebhookSource, readBodyCapped, receiveWebhook, verifyChallenge } from '@/lib/metabos/webhooks';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

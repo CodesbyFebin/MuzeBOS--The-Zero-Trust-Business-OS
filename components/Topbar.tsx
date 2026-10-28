@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { BRAND } from '@/lib/brand';
-import { workspaceTitle } from '@/lib/muzebos/navigation';
-import { MuzeTopbar } from '@/components/muzebos/MuzeTopbar';
+import { workspaceTitle } from '@/lib/metabos/navigation';
+import { MetaTopbar } from '@/components/metabos/MetaTopbar';
 import { WizardIcon } from '@/lib/nav';
 import { GButton } from '@/components/g';
 import type { UiStyle } from '@/lib/appearance';
@@ -39,7 +39,7 @@ export function Topbar({ ui = 'classic' }: { ui?: UiStyle } = {}) {
   const legacy = useUiStyle(ui) === 'legacy';
   const pathname = usePathname();
   const segment = pathname.split('/')[1] ?? '';
-  const here = BRAND.id === 'muzebos' ? (workspaceTitle(pathname) || SEGMENT_LABELS[segment] || segment) : (SEGMENT_LABELS[segment] ?? segment);
+  const here = BRAND.id === 'metabos' ? (workspaceTitle(pathname) || SEGMENT_LABELS[segment] || segment) : (SEGMENT_LABELS[segment] ?? segment);
   // the Wizard dock reports open/closed so the wand can toggle it and say so
   const [dockOpen, setDockOpen] = useState(false);
   useEffect(() => {
@@ -58,7 +58,7 @@ export function Topbar({ ui = 'classic' }: { ui?: UiStyle } = {}) {
   }, [g]);
   const toggleDock = () => window.dispatchEvent(new CustomEvent(CONDUCTOR_TOGGLE_EVENT));
 
-  if (BRAND.id === 'muzebos') return <MuzeTopbar onSearch={openPalette} />;
+  if (BRAND.id === 'metabos') return <MetaTopbar onSearch={openPalette} />;
 
   if (g) {
     // GTopbar (S00 §5.5): sans breadcrumb, kit icon buttons, no AdPilot accent override (C30)

@@ -1,7 +1,7 @@
-import { memberRead } from '@/lib/muzebos/member-read';
+import { memberRead } from '@/lib/metabos/member-read';
 import { NextResponse } from 'next/server';
-import { businessAccess } from '@/lib/muzebos/http';
-import { businessStore, BusinessError } from '@/lib/muzebos/store';
+import { businessAccess } from '@/lib/metabos/http';
+import { businessStore, BusinessError } from '@/lib/metabos/store';
 export const dynamic = 'force-dynamic';
 export function GET(req: Request) {
   try {

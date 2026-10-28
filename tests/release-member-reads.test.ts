@@ -3,15 +3,15 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { BusinessStore, businessStore } from '@/lib/muzebos/store';
-import { member, DEPARTMENTS } from '@/lib/muzebos/biz/members';
-import { setupWorkspace, invite, outbox, redeemMagicLink, memberForToken, USER_COOKIE } from '@/lib/muzebos/biz/accounts';
+import { BusinessStore, businessStore } from '@/lib/metabos/store';
+import { member, DEPARTMENTS } from '@/lib/metabos/biz/members';
+import { setupWorkspace, invite, outbox, redeemMagicLink, memberForToken, USER_COOKIE } from '@/lib/metabos/biz/accounts';
 const dir = mkdtempSync(path.join(tmpdir(), 'mb-reads-'));
 let ownerT = ''; let staffT = '';
 type Mod = { GET: (r: Request, c?: unknown) => Response | Promise<Response> };
 const ROUTES: { route: string; perm: string | null; url: string; params: Record<string, string>; load: () => Promise<unknown> }[] = [
-  { route: 'muzebos/command-center', perm: 'finance.read', url: 'muzebos/command-center', params: {}, load: () => import('@/app/api/muzebos/command-center/route') },
-  { route: 'muzebos/overdue', perm: 'finance.read', url: 'muzebos/overdue', params: {}, load: () => import('@/app/api/muzebos/overdue/route') },
+  { route: 'metabos/command-center', perm: 'finance.read', url: 'metabos/command-center', params: {}, load: () => import('@/app/api/metabos/command-center/route') },
+  { route: 'metabos/overdue', perm: 'finance.read', url: 'metabos/overdue', params: {}, load: () => import('@/app/api/metabos/overdue/route') },
   { route: 'ai', perm: 'finance.read', url: 'ai', params: {}, load: () => import('@/app/api/ai/route') },
   { route: 'analytics', perm: 'finance.read', url: 'analytics', params: {}, load: () => import('@/app/api/analytics/route') },
   { route: 'business', perm: 'finance.read', url: 'business', params: {}, load: () => import('@/app/api/business/route') },
@@ -20,22 +20,22 @@ const ROUTES: { route: string; perm: string | null; url: string; params: Record<
   { route: 'infra/[page]', perm: 'finance.read', url: 'infra/system.telemetry-and-logs', params: { page: 'system.telemetry-and-logs' }, load: () => import('@/app/api/infra/[page]/route') },
   { route: 'mission-control', perm: 'finance.read', url: 'mission-control', params: {}, load: () => import('@/app/api/mission-control/route') },
   { route: 'modules/[module]', perm: 'finance.read', url: 'modules/stock.low-stock-alert', params: { module: 'stock.low-stock-alert' }, load: () => import('@/app/api/modules/[module]/route') },
-  { route: 'muzebos/chief-of-staff', perm: 'finance.read', url: 'muzebos/chief-of-staff', params: {}, load: () => import('@/app/api/muzebos/chief-of-staff/route') },
-  { route: 'muzebos/founder', perm: 'finance.read', url: 'muzebos/founder', params: {}, load: () => import('@/app/api/muzebos/founder/route') },
-  { route: 'muzebos/walls', perm: 'finance.read', url: 'muzebos/walls', params: {}, load: () => import('@/app/api/muzebos/walls/route') },
+  { route: 'metabos/chief-of-staff', perm: 'finance.read', url: 'metabos/chief-of-staff', params: {}, load: () => import('@/app/api/metabos/chief-of-staff/route') },
+  { route: 'metabos/founder', perm: 'finance.read', url: 'metabos/founder', params: {}, load: () => import('@/app/api/metabos/founder/route') },
+  { route: 'metabos/walls', perm: 'finance.read', url: 'metabos/walls', params: {}, load: () => import('@/app/api/metabos/walls/route') },
   { route: 'providers/[module]', perm: 'finance.read', url: 'providers/talk.whatsapp-hub', params: { module: 'talk.whatsapp-hub' }, load: () => import('@/app/api/providers/[module]/route') },
   { route: 'workflow-runs', perm: 'finance.read', url: 'workflow-runs', params: {}, load: () => import('@/app/api/workflow-runs/route') },
-  { route: 'muzebos/hubs/money', perm: 'finance.read', url: 'muzebos/hubs/money', params: { hub: 'money' }, load: () => import('@/app/api/muzebos/hubs/[hub]/route') },
-  { route: 'muzebos/hubs/brain', perm: 'finance.read', url: 'muzebos/hubs/brain', params: { hub: 'brain' }, load: () => import('@/app/api/muzebos/hubs/[hub]/route') },
-  { route: 'muzebos/hubs/growth', perm: 'finance.read', url: 'muzebos/hubs/growth', params: { hub: 'growth' }, load: () => import('@/app/api/muzebos/hubs/[hub]/route') },
-  { route: 'muzebos/hubs/activity', perm: 'finance.read', url: 'muzebos/hubs/activity', params: { hub: 'activity' }, load: () => import('@/app/api/muzebos/hubs/[hub]/route') },
-  { route: 'muzebos/hubs/agents', perm: 'finance.read', url: 'muzebos/hubs/agents', params: { hub: 'agents' }, load: () => import('@/app/api/muzebos/hubs/[hub]/route') },
+  { route: 'metabos/hubs/money', perm: 'finance.read', url: 'metabos/hubs/money', params: { hub: 'money' }, load: () => import('@/app/api/metabos/hubs/[hub]/route') },
+  { route: 'metabos/hubs/brain', perm: 'finance.read', url: 'metabos/hubs/brain', params: { hub: 'brain' }, load: () => import('@/app/api/metabos/hubs/[hub]/route') },
+  { route: 'metabos/hubs/growth', perm: 'finance.read', url: 'metabos/hubs/growth', params: { hub: 'growth' }, load: () => import('@/app/api/metabos/hubs/[hub]/route') },
+  { route: 'metabos/hubs/activity', perm: 'finance.read', url: 'metabos/hubs/activity', params: { hub: 'activity' }, load: () => import('@/app/api/metabos/hubs/[hub]/route') },
+  { route: 'metabos/hubs/agents', perm: 'finance.read', url: 'metabos/hubs/agents', params: { hub: 'agents' }, load: () => import('@/app/api/metabos/hubs/[hub]/route') },
   { route: 'bookings', perm: null, url: 'bookings', params: {}, load: () => import('@/app/api/bookings/route') },
-  { route: 'muzebos/pipeline', perm: null, url: 'muzebos/pipeline', params: {}, load: () => import('@/app/api/muzebos/pipeline/route') },
-  { route: 'muzebos/expenses', perm: null, url: 'muzebos/expenses', params: {}, load: () => import('@/app/api/muzebos/expenses/route') },
-  { route: 'muzebos/goals', perm: null, url: 'muzebos/goals', params: {}, load: () => import('@/app/api/muzebos/goals/route') },
-  { route: 'muzebos/memory', perm: null, url: 'muzebos/memory', params: {}, load: () => import('@/app/api/muzebos/memory/route') },
-  { route: 'muzebos/missions', perm: null, url: 'muzebos/missions', params: {}, load: () => import('@/app/api/muzebos/missions/route') },
+  { route: 'metabos/pipeline', perm: null, url: 'metabos/pipeline', params: {}, load: () => import('@/app/api/metabos/pipeline/route') },
+  { route: 'metabos/expenses', perm: null, url: 'metabos/expenses', params: {}, load: () => import('@/app/api/metabos/expenses/route') },
+  { route: 'metabos/goals', perm: null, url: 'metabos/goals', params: {}, load: () => import('@/app/api/metabos/goals/route') },
+  { route: 'metabos/memory', perm: null, url: 'metabos/memory', params: {}, load: () => import('@/app/api/metabos/memory/route') },
+  { route: 'metabos/missions', perm: null, url: 'metabos/missions', params: {}, load: () => import('@/app/api/metabos/missions/route') },
   { route: 'brain-templates', perm: null, url: 'brain-templates', params: {}, load: () => import('@/app/api/brain-templates/route') },
   { route: 'mission-control/layout', perm: null, url: 'mission-control/layout', params: {}, load: () => import('@/app/api/mission-control/layout/route') },
 ];

@@ -1,10 +1,10 @@
-import { memberRead } from '@/lib/muzebos/member-read';
+import { memberRead } from '@/lib/metabos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { businessStore, BusinessError } from '@/lib/muzebos/store';
-import { businessAccess } from '@/lib/muzebos/http';
-import { perform, view } from '@/lib/muzebos/modules/engine';
-import { moduleById } from '@/lib/muzebos/modules';
+import { businessStore, BusinessError } from '@/lib/metabos/store';
+import { businessAccess } from '@/lib/metabos/http';
+import { perform, view } from '@/lib/metabos/modules/engine';
+import { moduleById } from '@/lib/metabos/modules';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 function failure(error: unknown) {

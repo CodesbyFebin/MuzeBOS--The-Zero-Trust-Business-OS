@@ -39,8 +39,8 @@ describe('branding', () => {
 describe('brand per deployment', () => {
   test('unset shows the client product; glados shows the operator\'s own', async () => {
     const { brandFor } = await import('@/lib/brand');
-    expect(brandFor(undefined).name).toBe('MuzeBOS');
-    expect(brandFor('').mark).toBe('/brand/muzebos-mark.svg');
+    expect(brandFor(undefined).name).toBe('MeTaBos');
+    expect(brandFor('').mark).toBe('/brand/metabos-mark.svg');
     expect(brandFor(' GladOS ').name).toBe('GladOS');
     expect(brandFor('glados').mark).toBe('/brand/glados-mark.png');
   });

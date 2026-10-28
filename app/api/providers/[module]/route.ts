@@ -1,9 +1,9 @@
-import { memberRead } from '@/lib/muzebos/member-read';
+import { memberRead } from '@/lib/metabos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { businessStore, BusinessError } from '@/lib/muzebos/store';
-import { businessAccess } from '@/lib/muzebos/http';
-import { providerConfig, setRef, testConnection } from '@/lib/muzebos/providers';
+import { businessStore, BusinessError } from '@/lib/metabos/store';
+import { businessAccess } from '@/lib/metabos/http';
+import { providerConfig, setRef, testConnection } from '@/lib/metabos/providers';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const Body = z.discriminatedUnion('action', [z.object({ action: z.literal('setRef'), field: z.string().max(64), ref: z.string().max(64) }), z.object({ action: z.literal('test') })]);
