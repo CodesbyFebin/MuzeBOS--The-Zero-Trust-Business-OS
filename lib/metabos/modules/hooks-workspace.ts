@@ -19,7 +19,7 @@ export const WORKSPACE_HOOKS: Record<string, Hooks> = {
     validate: (_s, d) => { for (const k of ['background', 'surface', 'accent']) if (!HEX.test(String(d[k]))) throw new BusinessError(`${k} must be a #RRGGBB colour`, 422); },
     transition: (s, r, name) => { if (name === 'activate') retireOthers(s, r); },
   },
-  'brain.tool-registry': { unique: ['code'] },
+  'brain.tool-registry': { unique: ['code'], validate: (_s, d) => { if ((d.risk ?? 'high') === 'high' && d.requiresApproval === false) throw new BusinessError('High-risk tools (or tools with no risk tier) always require Jev approval', 422); } },
   'foundation.settings-and-sovereignty': {
     validate: (s, d, cur) => {
       if (d.key === 'retention_days' && !/^\d{1,5}$/.test(String(d.value))) throw new BusinessError('retention_days must be a whole number of days', 422);
