@@ -34,11 +34,11 @@ const view = (s: ReturnType<typeof businessStore>) => {
   };
 };
 export async function GET(req: Request) {
-  try { businessAccess(req); return NextResponse.json(view(businessStore())); } catch (e) { return fail(e); }
+  try { businessAccess(req); const s = businessStore(); requirePermission(requireMember(s, req), 'finance.read'); return NextResponse.json(view(s)); } catch (e) { return fail(e); }
 }
 export async function POST(req: Request) {
   try {
-    businessAccess(req); const c = cmd.parse(await readJsonBounded(req)); const s = businessStore(); const me = requireMember(s, req);
+    businessAccess(req); const c = cmd.parse(await readJsonBounded(req)); const s = businessStore(); const me = requireMember(s, req); requirePermission(me, 'finance.read');
     if (c.action === 'draft') return NextResponse.json({ draft: await draftReminder(s, c.invoiceId, { env: runtimeEnv() }) });
     if (c.action === 'propose') return NextResponse.json({ run: proposeReminder(s, c, Date.now(), engineFor(s)) });
     requirePermission(me, 'jev.decide');
