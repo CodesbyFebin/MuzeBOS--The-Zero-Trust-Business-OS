@@ -36,16 +36,16 @@ export const TIERS: Record<Tier, { label: string; purpose: string; candidates: M
   medium: {
     label: 'Medium', purpose: 'Multi-step reasoning over business records.',
     candidates: [
-      { provider: 'openrouter', model: 'meta/muse-spark-1.3', family: 'muse', note: 'Muse Spark via OpenRouter.' },
-      { provider: 'meta', model: 'muse-spark-1.3', family: 'muse', note: 'Muse Spark via the Meta Model API.' },
+      { provider: 'meta', model: 'muse-spark-1.3', family: 'muse', note: 'Muse Spark via the Meta Model API (preferred; contributor model by default).' },
+      { provider: 'openrouter', model: 'meta/muse-spark-1.3', family: 'muse', note: 'Muse Spark via OpenRouter (fallback).' },
       { provider: 'openrouter', model: 'meta-llama/llama-3.3-70b-instruct', family: 'llama', note: 'Llama fallback.' },
     ],
   },
   large: {
     label: 'Large', purpose: 'Long, open-ended planning and analysis.',
     candidates: [
-      { provider: 'openrouter', model: 'meta/muse-wonder', family: 'muse', note: 'Muse Wonder via OpenRouter (1M context).' },
-      { provider: 'meta', model: 'muse-wonder-1.0', family: 'muse', note: 'Muse Wonder via the Meta Model API (preview).' },
+      { provider: 'meta', model: 'muse-wonder-1.0', family: 'muse', note: 'Muse Wonder via the Meta Model API (preferred).' },
+      { provider: 'openrouter', model: 'meta/muse-wonder', family: 'muse', note: 'Muse Wonder via OpenRouter (fallback, 1M context).' },
       { provider: 'openrouter', model: 'meta-llama/llama-4-maverick', family: 'llama', note: 'Llama fallback.' },
     ],
   },
@@ -54,7 +54,7 @@ export const TIERS: Record<Tier, { label: string; purpose: string; candidates: M
 /** What we found about Muse, shown in the UI and PR. */
 export const MUSE_FINDINGS = [
   'Muse is reachable over the network: OpenRouter lists meta/muse-wonder, meta/muse-spark-1.3 and others, and the Meta Model API serves muse-wonder-1.0 and muse-spark-1.3.',
-  'Both need a key. Without OPENROUTER_API_KEY or META_MODEL_API_KEY the Muse adapters report "needs key" and the router falls back to Llama.',
+  'The Meta Model API is preferred and OpenRouter is the fallback. Without MODEL_API_KEY or OPENROUTER_API_KEY the Muse adapters report "needs key" and the router falls back to Llama.',
   'Muse is not in the WebLLM prebuilt list, so no Muse model runs in the browser. The open-weight Muse Glimmer needs your own server (use the local adapter).',
-  'Live Muse calls were not exercised in tests because no key was available.',
+  'Live check on 2026-10-28 (13:11 IST): with a real key, GET /v1/models answered 200 and listed muse-spark-1.3 and muse-wonder-1.0, but POST /v1/chat/completions and /v1/responses answered 402 billing_not_configured. The adapter shows this as "Billing not set up" and falls back; since 13:17 IST billing works and calls return 200. All Meta calls now go through metaCall: contributor models by default (muse-spark-1.3-contributor, fallback muse-spark-1.2-contributor; the owner can switch to standard), a USD 50 hard spend cap, and the token saver.',
 ];

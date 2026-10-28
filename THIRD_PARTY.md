@@ -29,3 +29,10 @@ These repositories were studied during the event. MeTaBos code inspired by them 
 
 ## Adapted files
 None yet.
+
+## Token saver ideas (pattern-only, no code copied; checked with gh api on 28 Oct 2026)
+- zilliztech/GPTCache (MIT, 8216 stars), exact-match response cache idea. Credit: Zilliz and GPTCache contributors.
+- lm-sys/RouteLLM (Apache-2.0, 5647 stars), cheap-model routing idea. Credit: LMSYS.
+- BerriAI/litellm (license reported as NOASSERTION), Retry-After backoff and per-model price table patterns. Credit: BerriAI.
+- tinyhumansai/openhuman (GPL-3.0, 42380 stars), shrinking tool results while keeping ids; clean-room re-implementation. Credit: tinyhumansai.
+- microsoft/LLMLingua (MIT, 6779 stars) was reviewed and not used.

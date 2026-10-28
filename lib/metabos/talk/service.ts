@@ -142,7 +142,7 @@ export async function ingest(s: BusinessStore, items: Inbound[], env: Env = proc
 
 // ---------- Voice notes via the existing Muse Voice adapter ----------
 export async function transcribeStatus(mediaId: string | null | undefined, env: Env = process.env): Promise<string> {
-  if (!metaKey(env)) return 'Not connected — add META_MODEL_API_KEY';
+  if (!metaKey(env)) return 'Not connected — add MODEL_API_KEY';
   try { await metaTranscribe({ mediaId }); return 'transcribed'; }
   catch (e) { return `Not transcribed: ${e instanceof Error ? e.message.slice(0, 160) : 'Muse Voice error'}`; }
 }

@@ -30,8 +30,8 @@ describe('Hackathon server proposals (injected protocol fixtures, not live infer
     expect(url).toBe(provider === 'meta' ? 'https://api.meta.ai/v1/chat/completions' : 'https://inference.baseten.co/v1/chat/completions');
     expect(init.redirect).toBe('error'); expect((init.headers as Record<string,string>).Authorization).toBe(`Bearer fixture-${provider}`);
     const body = JSON.parse(String(init.body));
-    expect(body.model).toBe(provider === 'meta' ? 'muse-spark-1.3' : 'meta-models/muse-spark-open-1026');
-    expect(body).not.toHaveProperty('response_format'); expect(body).not.toHaveProperty('reasoning_effort'); expect(body).not.toHaveProperty('tools');
+    expect(body.model).toBe(provider === 'meta' ? 'muse-spark-1.3-contributor' /* contributor mode maps every Meta call to contributor models */ : 'meta-models/muse-spark-open-1026');
+    expect(body).not.toHaveProperty('response_format'); if (provider === 'meta') { expect(['low', 'medium']).toContain(body.reasoning_effort); } else expect(body).not.toHaveProperty('reasoning_effort'); expect(body).not.toHaveProperty('tools');
     const run = proposeInferenceAction(s, t.id), engine = new WorkflowEngine(s.business);
     expect(run.status).toBe('awaiting_approval'); expect(run.input).toMatchObject({ taskId: t.id, source: 'model' });
     expect(JSON.stringify(run.input)).toContain(s.task(t.id).outputHash);

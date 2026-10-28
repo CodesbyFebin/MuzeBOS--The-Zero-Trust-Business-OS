@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/metabos/store';
 import { businessAccess } from '@/lib/metabos/http';
 import { MUSE_FINDINGS, PRICES, SOURCES, TIERS, VERIFIED_AT, WEBLLM_VERSION } from '@/lib/metabos/ai/models';
-import { serverProviders, type ChatMessage, type ProviderState } from '@/lib/metabos/ai/providers';
+import { serverProviders, ProviderError, type ChatMessage, type ProviderState } from '@/lib/metabos/ai/providers';
 import { route, type Availability, type RouteDecision } from '@/lib/metabos/ai/router';
 import { parseModelProposal, PROPOSAL_PROMPT, ruleProposal, sortTask } from '@/lib/metabos/ai/swarm';
 import { propose, queue } from '@/lib/metabos/ai/jev';
@@ -37,7 +37,7 @@ async function callWithFallback(text: string, t: z.infer<typeof tier>, a: Availa
     if (errors.length) d.reasons.unshift(...errors);
     if (!d.chosen || d.chosen.provider === 'webllm') return { decision: d, result: null };
     try { return { decision: d, result: await providers[d.chosen.provider].chat(d.chosen.model, messages, AbortSignal.timeout(60_000)) }; }
-    catch (e) { errors.push(`${d.chosen.provider}/${d.chosen.model} failed (${e instanceof Error ? e.message.slice(0, 120) : 'error'}); trying the next candidate.`); a = { ...a, states: { ...a.states, [d.chosen.provider]: 'unconfigured' } }; }
+    catch (e) { errors.push(`${d.chosen.provider}/${d.chosen.model} failed (${e instanceof Error ? e.message.slice(0, 120) : 'error'}); trying the next candidate.`); a = { ...a, states: { ...a.states, [d.chosen.provider]: e instanceof ProviderError && e.code === 'billing_not_configured' ? 'billing_required' : 'unconfigured' } }; }
   }
   const d = route(text, t, { webgpu: false, states: {} }); d.reasons.unshift(...errors); return { decision: d, result: null };
 }
