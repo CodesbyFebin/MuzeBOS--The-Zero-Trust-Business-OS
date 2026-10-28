@@ -6,7 +6,7 @@ export async function run({ page, post, base, vp, assert }) {
   const code = `L${vp.name.slice(0, 1).toUpperCase()}${Date.now() % 1000000}`;
   const r = await post('/api/modules/growth.referrals-and-loyalty', { action: 'create', data: { customerId: customer.id, code } });
   assert.ok(r.ok(), await r.text());
-  await page.goto(`${base}/workspace/growth/referrals-and-loyalty`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/workspace/growth/loyalty`, { waitUntil: 'networkidle' });
   const row = () => page.locator('tr', { hasText: code }).first();
   await row().getByLabel('Earn points: Points').fill('40');
   await row().getByRole('button', { name: 'Earn points' }).click();

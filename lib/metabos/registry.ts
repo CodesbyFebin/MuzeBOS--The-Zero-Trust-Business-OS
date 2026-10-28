@@ -35,6 +35,14 @@ export type FeatureDefinition = {
   summary: string;
   dependencies: string[]; // required before status can move to available
   keywords?: string;
+  // Master-prompt contract fields (filled in by withContract below).
+  slug?: string;
+  title?: string;
+  description?: string;
+  requiredPermissions?: string[];
+  verificationEvidence?: string[];
+  /** Earlier routes for this page; they redirect here. */
+  legacyRoutes?: string[];
 };
 export type FeatureCluster = { id: string; label: string; pages: FeatureDefinition[] };
 export type MenuSection = 'business' | 'core' | 'pinned';
@@ -60,6 +68,23 @@ const CLUSTER_NAMES: Record<string, [string, string, string, string]> = {
   foundation: ['Identity & records', 'Licences & compliance', 'Regulatory reporting', 'Data protection'],
   system: ['Connections & data', 'Queues & telemetry', 'Infrastructure', 'Resilience & delivery'],
 };
+
+/** Canonical page slugs from the master build prompt, in pillar order (20 per menu). */
+const CANONICAL_SLUGS: Record<string, string[]> = {
+  orders: 'pipeline pos bookings customers deals abandoned-carts returns subscriptions credits portal quotes enrichment scoring routing waitlists locations contracts attribution risk tax-jurisdictions'.split(' '),
+  money: 'invoices gst upi payments pricing links currencies splits idempotency disputes dunning terminals providers mandates payouts reconciliation credit-notes proformas delivery tax-collected'.split(' '),
+  talk: 'whatsapp meta-inbox shop-sync inbox notifications templates bots broadcasts responders voice calls email web-chat handover replies surveys contacts spam sentiment reviews'.split(' '),
+  stock: 'catalog movements scanner alerts locations barcodes purchase-orders variants bundles batches serials bom reorder transfers adjustments dropshipping consignment delivery-evidence quarantine digital-delivery'.split(' '),
+  growth: 'studio campaigns store website analytics seo loyalty email push sms calendar coupons utm pixels audiences landing-pages influencers trends experiments ab-tests'.split(' '),
+  operations: 'staff tasks projects attendance time meetings sops vendors shipping file-approvals incidents onboarding assets access automations reviews backup-drills compliance audit payroll'.split(' '),
+  builder: 'media blocks themes forms transforms cdn deep-links localization accessibility components performance moderation rendering fonts-icons token-export pwa domains builds tokens ugc'.split(' '),
+  brain: 'assistant voice evidence templates models tools memory decisions validation approvals executor runs evals system-cards translation vision recommendations forecasting anomalies chief-of-staff'.split(' '),
+  foundation: 'overview identity documents business-cards policies ip licenses kyc privacy-assessments aml resolutions tariffs grievances reporting residency privacy-controls encryption backups passkeys sovereignty'.split(' '),
+  system: 'adapters broker migrations gateway queues webhooks logs health self-host cache storage database services hardware-keys access-policies dead-letter crashes failover domains assets'.split(' '),
+};
+const CATEGORY_ORDER = ['orders','money','talk','stock','growth','operations','builder','brain','foundation','system'];
+/** Prompt slug for a pillar, or undefined. */
+export function canonicalSlug(pillar: number): string | undefined { const m = CATEGORY_ORDER[Math.floor((pillar - 1) / 20)]; return m ? CANONICAL_SLUGS[m]?.[(pillar - 1) % 20] : undefined; }
 
 /** Pages that already have a dedicated MeTaBos route keep it as their canonical route. */
 const DEDICATED_ROUTES: Record<number, string> = {
@@ -109,7 +134,8 @@ function toFeature(t: WorkspaceTool, clusterId: string): FeatureDefinition {
     menuId: t.category,
     clusterId,
     label: t.name,
-    route: DEDICATED_ROUTES[t.id] ?? `/workspace/${t.category}/${slug(t.name)}`,
+    route: DEDICATED_ROUTES[t.id] ?? `/workspace/${t.category}/${canonicalSlug(t.id) ?? slug(t.name)}`,
+    legacyRoutes: DEDICATED_ROUTES[t.id] || !canonicalSlug(t.id) || canonicalSlug(t.id) === slug(t.name) ? [] : [`/workspace/${t.category}/${slug(t.name)}`],
     target: verified ? undefined : t.href,
     status,
     summary: verified ? verified.summary : status === 'blocked' ? 'Requires an external provider integration that is not built or verified. No executable implementation is claimed.' : t.scope,
@@ -250,7 +276,38 @@ export const MENUS: MenuDefinition[] = MENU_LIST.map((m, i) => ({ ...m, number: 
 
 export const PINNED_MENUS = MENUS.filter((m) => m.section === 'pinned');
 export const SCROLL_MENUS = MENUS.filter((m) => m.section !== 'pinned');
+/** Permission a page needs to read, from the server-side role model (lib/metabos/biz). */
+const MENU_PERMISSION: Record<string, string> = { money: 'finance.read', brain: 'member', orders: 'member', stock: 'member' };
+/** Test files that back an "available" status; the feature status matrix in docs/ lists them per page. */
+const EVIDENCE_BY_MENU: Record<string, string[]> = {
+  orders: ['tests/metabos-modules-a.test.ts', 'tests/metabos-issuance.test.ts', 'scripts/metabos-crawl-routes.mjs'],
+  money: ['tests/metabos-issuance.test.ts', 'tests/release-gate1-approval.test.ts', 'scripts/metabos-crawl-routes.mjs'],
+  growth: ['tests/metabos-analytics.test.ts', 'scripts/metabos-crawl-routes.mjs'],
+  mission: ['tests/metabos-mission.test.ts', 'tests/metabos-mission-9d.test.ts', 'scripts/metabos-mission-browser.mjs'],
+  brain: ['tests/metabos-brain-templates.test.ts', 'scripts/metabos-crawl-routes.mjs'],
+};
+function withContract(f: FeatureDefinition): FeatureDefinition {
+  const s = f.route === '/' ? 'mission-control' : f.route.split('/').filter(Boolean).pop()!;
+  return {
+    ...f, slug: s, title: f.label, description: f.summary,
+    requiredPermissions: f.requiredPermissions ?? [MENU_PERMISSION[f.menuId] ?? 'member'],
+    verificationEvidence: f.status === 'available' ? (EVIDENCE_BY_MENU[f.menuId] ?? ['scripts/metabos-crawl-routes.mjs']) : [],
+    legacyRoutes: f.legacyRoutes ?? [],
+  };
+}
+for (const m of MENUS) for (const c of m.clusters) c.pages = c.pages.map(withContract);
+// A prompt slug that collides with a dedicated page in the same menu keeps the old slug.
+{
+  const seen = new Set<string>();
+  for (const m of MENUS) for (const c of m.clusters) for (const p of c.pages) if (!p.legacyRoutes?.length) seen.add(p.route);
+  for (const m of MENUS) for (const c of m.clusters) for (const p of c.pages) if (p.legacyRoutes?.length) {
+    if (seen.has(p.route)) { p.route = p.legacyRoutes[0]; p.slug = p.route.split('/').pop(); p.legacyRoutes = []; }
+    seen.add(p.route);
+  }
+}
 export const ALL_FEATURES: FeatureDefinition[] = MENUS.flatMap((m) => m.clusters.flatMap((c) => c.pages));
+/** A canonical feature reached through one of its legacy routes. */
+export function featureByLegacyRoute(route: string) { return ALL_FEATURES.find((f) => f.legacyRoutes?.includes(route)); }
 
 export function menuById(id: string) { return MENUS.find((m) => m.id === id); }
 export function featureByRoute(route: string) { return ALL_FEATURES.find((f) => f.route === route); }
