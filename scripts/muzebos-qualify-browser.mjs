@@ -22,7 +22,7 @@ try {
   let ready = false;
   for (let attempt = 0; attempt < 120; attempt++) {
     if (server.exitCode !== null) throw new Error('Production server exited before becoming ready');
-    try { const response = await fetch(base + '/api/bookings', { signal: AbortSignal.timeout(1000) }); if (response.ok) { ready = true; break; } } catch { /* wait for startup */ }
+    try { const response = await fetch(base + '/api/muzebos/auth', { signal: AbortSignal.timeout(1000) }); if (response.ok) { ready = true; break; } } catch { /* wait for startup */ }
     await new Promise(resolve => setTimeout(resolve, 250));
   }
   if (!ready) throw new Error('Production server startup timed out');

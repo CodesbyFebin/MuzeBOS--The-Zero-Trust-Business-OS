@@ -4,7 +4,8 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 const access = vi.hoisted(() => ({ configured: true, valid: true }));
-vi.mock('@/lib/auth', () => ({ readAuthState: () => ({ configured: access.configured }), sessionIsValid: () => access.valid, cookieFromHeader: () => undefined }));
+vi.mock('@/lib/auth', async (orig) => ({ ...(await orig<typeof import('@/lib/auth')>()), readAuthState: () => ({ configured: access.configured }), sessionIsValid: () => access.valid }));
+import { setupWorkspace, USER_COOKIE } from '@/lib/muzebos/biz/accounts';
 import { GET as bookings } from '@/app/api/bookings/route';
 import { GET as library } from '@/app/api/employee-library/route';
 import { POST } from '@/app/api/business/route';
@@ -14,9 +15,10 @@ import { routes } from '@/lib/muzebos/inference/routing';
 import { runServerOnce } from '@/lib/muzebos/inference/providers';
 import { businessStore } from '@/lib/muzebos/store';
 const dir = mkdtempSync(path.join(tmpdir(), 'mb-integration-api-'));
-const req = (route: string) => new Request(`http://localhost${route}`);
+let ownerToken = '';
+const req = (route: string, token = ownerToken) => new Request(`http://localhost${route}`, { headers: token ? { cookie: `${USER_COOKIE}=${token}` } : {} });
 const post = (payload: unknown, origin = 'http://localhost') => new Request('http://localhost/api/business', { method: 'POST', headers: { origin, 'content-type': 'application/json', 'idempotency-key': randomUUID() }, body: JSON.stringify(payload) });
-beforeEach(() => { vi.stubEnv('MUZEBOS_DB', path.join(dir, 'business.sqlite')); access.configured = true; access.valid = true; });
+beforeEach(() => { vi.stubEnv('MUZEBOS_DB', path.join(dir, 'business.sqlite')); access.configured = true; access.valid = true; const s = businessStore(); if (!ownerToken) ownerToken = setupWorkspace(s, { workspace: 'T', name: 'Owner', email: 'owner@example.com', password: 'long enough secret' }).token; });
 afterAll(() => { const s = businessStore(); if (s.db.open) s.close(); vi.unstubAllEnvs(); rmSync(dir, { recursive: true, force: true }); });
 describe('New integration API boundaries', () => {
   it('requires an operator session on both new data endpoints', async () => {
@@ -44,6 +46,7 @@ describe('New integration API boundaries', () => {
     expect((await POST(post(payload, 'https://other.example'))).status).toBe(403);
     const created = await POST(post(payload)); expect(created.status).toBe(200);
     expect((await POST(post(payload))).status).toBe(409);
+    expect((await bookings(req('/api/bookings', ''))).status).toBe(401);
     const response = await bookings(req('/api/bookings')); expect(response.headers.get('cache-control')).toBe('no-store');
     expect((await response.json()).bookings).toHaveLength(1);
     const booking = (await created.json()).result;

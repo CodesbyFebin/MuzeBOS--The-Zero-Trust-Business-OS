@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -16,7 +17,7 @@ function failure(error: unknown) {
 export async function GET(req: Request, props: { params: Promise<{ module: string }> }) {
   const params = await props.params;
   try {
-    businessAccess(req);
+    memberRead(req, 'finance.read');
     if (!moduleById(params.module)) throw new BusinessError('Unknown module', 404);
     return NextResponse.json(view(businessStore(), params.module), { headers: { 'Cache-Control': 'no-store' } });
   } catch (e) { return failure(e); }

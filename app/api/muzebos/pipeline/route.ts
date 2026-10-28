@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -19,7 +20,7 @@ const cmd = z.discriminatedUnion('action', [
   z.object({ action: z.literal('readNextStep'), taskId: z.string().max(64) }),
 ]);
 export async function GET(req: Request) {
-  try { businessAccess(req); const s = businessStore(); return NextResponse.json({ stages: STAGES, defaults: STAGE_PROBABILITY, summary: pipelineSummary(s), deals: listDeals(s).map((d) => ({ ...d, winProbability: winProbability(d), weighted: weighted(d), events: dealEvents(s, d.id) })), customers: s.customers() }); } catch (e) { return fail(e); }
+  try { memberRead(req, 'deals.write'); const s = businessStore(); return NextResponse.json({ stages: STAGES, defaults: STAGE_PROBABILITY, summary: pipelineSummary(s), deals: listDeals(s).map((d) => ({ ...d, winProbability: winProbability(d), weighted: weighted(d), events: dealEvents(s, d.id) })), customers: s.customers() }); } catch (e) { return fail(e); }
 }
 export async function POST(req: Request) {
   try {
