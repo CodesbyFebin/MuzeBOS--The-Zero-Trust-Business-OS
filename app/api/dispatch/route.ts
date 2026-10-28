@@ -6,7 +6,7 @@ import { decide, dispatch, listDispatches, propose, connection } from '@/lib/met
 import { requirePermission } from '@/lib/metabos/biz/accounts';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-const Channel = z.enum(['whatsapp', 'email', 'payment-link', 'completion']);
+const Channel = z.enum(['whatsapp', 'instagram', 'email', 'payment-link', 'completion']);
 const Body = z.discriminatedUnion('action', [
   z.object({ action: z.literal('propose'), channel: Channel, payload: z.record(z.string(), z.unknown()) }).strict(),
   z.object({ action: z.literal('decide'), id: z.string().uuid(), payloadHash: z.string().regex(/^[0-9a-f]{64}$/), approve: z.boolean() }).strict(),

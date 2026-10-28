@@ -4,6 +4,7 @@
  */
 import { createHash, randomUUID } from 'node:crypto';
 import { BusinessError, type BusinessStore } from '../store';
+import { assertNotOptedOut, onDispatchSent } from '../talk/core';
 import { CHANNELS, NotConnected, missingEnv, runAdapter, type Channel, type Deps } from './adapters';
 
 export type Dispatch = { id: string; channel: Channel; payload: unknown; payloadHash: string; status: 'pending' | 'approved' | 'sent' | 'failed' | 'rejected'; proposedBy: string; approvedBy: string | null; idempotencyKey: string | null; providerStatus: number | null; providerRef: string | null; providerResponse: string | null; createdAt: string; updatedAt: string };
@@ -29,6 +30,7 @@ export function propose(s: BusinessStore, actor: string, channel: Channel, paylo
   if (!CHANNELS[channel]) throw new BusinessError('Unknown channel', 422);
   const parsed = CHANNELS[channel].schema.safeParse(payload);
   if (!parsed.success) throw new BusinessError(parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '), 422);
+  assertNotOptedOut(s, channel, parsed.data);
   ensure(s); const now = new Date().toISOString(); const id = randomUUID(); const hash = payloadHash(channel, parsed.data);
   s.transact(() => {
     s.db.prepare('INSERT INTO mb_dispatches(id,channel,payload,payloadHash,status,proposedBy,createdAt,updatedAt) VALUES(?,?,?,?,?,?,?,?)').run(id, channel, JSON.stringify(parsed.data), hash, 'pending', actor, now, now);
@@ -55,6 +57,8 @@ export async function dispatch(s: BusinessStore, id: string, hash: string, idemp
   const d = row(s, id);
   if (d.status !== 'approved') throw new BusinessError(d.status === 'pending' ? 'Needs Jev approval first' : `Dispatch is ${d.status}`, 409);
   if (hash !== d.payloadHash || payloadHash(d.channel, d.payload) !== d.payloadHash) throw new BusinessError('Approved payload hash does not match', 409);
+  // Opt-out is re-checked at send time: a STOP that arrived after approval still blocks the send.
+  assertNotOptedOut(s, d.channel, d.payload);
   const missing = missingEnv(d.channel, deps.env);
   if (missing.length) throw new BusinessError(new NotConnected(missing).message, 424);
   // Claim the key before the network call so a concurrent retry cannot send twice.
@@ -65,6 +69,7 @@ export async function dispatch(s: BusinessStore, id: string, hash: string, idemp
   s.transact(() => {
     s.db.prepare('UPDATE mb_dispatches SET status=?, providerStatus=?, providerRef=?, providerResponse=?, updatedAt=? WHERE id=?').run(r.ok ? 'sent' : 'failed', r.status, r.providerRef, r.evidence, new Date().toISOString(), id);
     s.appendEvidence(r.ok ? 'dispatch.provider-accepted' : 'dispatch.provider-failed', id, `${d.channel} HTTP ${r.status}${r.providerRef ? ` ref ${r.providerRef}` : ''}; key ${idempotencyKey}`);
+    if (r.ok) onDispatchSent(s, { id, channel: d.channel, payload: d.payload, providerRef: r.providerRef });
   });
   return row(s, id);
 }

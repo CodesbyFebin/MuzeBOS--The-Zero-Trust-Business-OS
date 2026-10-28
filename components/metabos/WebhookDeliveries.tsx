@@ -19,7 +19,7 @@ export function WebhookHeader({ title, summary }: { title: string; summary: stri
 }
 
 export const WebhookLimits = () => <section className="mb-panel"><h2>Limits</h2><ul className="mb-help-list">
-  <li>Events are stored, not processed: nothing replies, routes or sends messages.</li>
+  <li>WhatsApp and Instagram messages are filed into <Link className="mb-link" href="/workspace/talk/whatsapp">Talk conversations</Link> (deduped by message id). Nothing replies on its own: every reply is a Jev-approved dispatch.</li>
   <li>Payloads are stored unredacted and there is no retention setting yet.</li>
   <li>Single workspace: every delivery is recorded in this instance&apos;s one business store.</li>
   <li><Link className="mb-link" href="/workspace/evidence/commerce-ledger">Each delivery writes an audit event</Link>.</li></ul></section>;
