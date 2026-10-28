@@ -169,7 +169,7 @@ const BRAIN_TEMPLATES: FeatureDefinition = {
 const BRAIN_RUNTIME: FeatureDefinition = {
   id: 'brain.ai-runtime', menuId: 'brain', clusterId: 'brain.assistants-and-employees', label: 'AI Runtime',
   route: '/workspace/brain/runtime', status: 'available', dependencies: [],
-  summary: 'Routed chat (small/medium/large tiers, explained decisions), swarm task board, and the Jev queue where every agent-proposed write waits for your payload-bound approval. Server models need OPENROUTER_API_KEY, META_MODEL_API_KEY or a local server; on-device Llama needs WebGPU.',
+  summary: 'Routed chat (small/medium/large tiers, explained decisions), swarm task board, and the Jev queue where every agent-proposed write waits for your payload-bound approval. Server models prefer the Meta Model API (MODEL_API_KEY; needs credentials, and shows Billing not set up on a 402) with OpenRouter (OPENROUTER_API_KEY) as fallback, or a local server; on-device Llama needs WebGPU.',
 };
 
 const BRAIN_MISSIONS: FeatureDefinition = {
@@ -286,7 +286,7 @@ export const EXISTING_BACKING: Record<string, string[]> = {
   'talk.email-inbox': ['Email connector credentials set on /integrations (IMAP/Gmail)'],
   'growth.social-media-studio': ['Meta publishing token (MUZEBOS_META_ACCESS_TOKEN); not a verified publishing adapter'],
   'growth.campaign-manager': ['Meta Marketing API token; external calls need separate verification'],
-  'brain.ai-assistant': ['Model provider key (OPENROUTER_API_KEY or configured provider)'],
+  'brain.ai-assistant': ['Meta Model API key (MODEL_API_KEY, preferred; billing must be set up) or OPENROUTER_API_KEY as fallback'],
   'support.customer-inbox': ['Meta inbox: META_APP_SECRET, META_VERIFY_TOKEN and a connected Page/WhatsApp token'],
   'account.sign-in-manage-session': [LOCAL],
 };

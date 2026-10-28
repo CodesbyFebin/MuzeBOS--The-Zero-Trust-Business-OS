@@ -27,7 +27,7 @@ function available(ref: ModelRef, a: Availability): string | null {
   if (ref.provider === 'webllm') return a.webgpu ? null : 'this browser has no WebGPU';
   const s = a.states[ref.provider];
   if (s === 'ready') return null;
-  return s === 'needs_key' ? 'provider needs a key' : s === 'unconfigured' ? 'provider not configured' : 'provider unavailable';
+  return s === 'needs_key' ? 'provider needs a key' : s === 'billing_required' ? 'billing not set up' : s === 'unconfigured' ? 'provider not configured' : 'provider unavailable';
 }
 
 /** Fallback policy: try the tier's candidates in order; if none is available step DOWN a tier

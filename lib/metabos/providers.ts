@@ -68,13 +68,14 @@ export async function testConnection(store: BusinessStore, module: string, opts:
           'meta-graph': () => [`https://graph.facebook.com/v25.0/me?fields=id`, { headers: { authorization: `Bearer ${v('access_token')}` } }],
           razorpay: () => ['https://api.razorpay.com/v1/payments?count=1', { headers: { authorization: `Basic ${Buffer.from(`${v('key_id')}:${v('key_secret')}`).toString('base64')}` } }],
           cloudflare: () => ['https://api.cloudflare.com/client/v4/user/tokens/verify', { headers: { authorization: `Bearer ${v('api_token')}` } }],
+          'meta-model': () => ['https://api.meta.ai/v1/models', { headers: { authorization: `Bearer ${v('api_key')}` } }],
           openrouter: () => ['https://openrouter.ai/api/v1/key', { headers: { authorization: `Bearer ${v('api_key')}` } }],
           http: () => [v('base_url'), { headers: { authorization: `Bearer ${v('api_key')}` } }],
         };
         const [url, init] = req[cfg.tester]();
         if (!/^https:\/\//.test(url)) throw new BusinessError('Base URL must be https', 422);
         code = (await doFetch(url, { ...init, method: 'GET', signal, redirect: 'manual' })).status;
-        result = code >= 200 && code < 300 ? { status: 'ok', message: `${cfg.name} answered HTTP ${code}`, at } : { status: 'failed', message: `${cfg.name} answered HTTP ${code}${code === 401 || code === 403 ? ' (credentials rejected)' : ''}`, at };
+        result = code >= 200 && code < 300 ? { status: 'ok', message: cfg.tester === 'meta-model' ? `Key accepted: GET /v1/models answered HTTP ${code}. This does not check billing; a 402 on completions shows as Billing not set up.` : `${cfg.name} answered HTTP ${code}`, at } : { status: 'failed', message: `${cfg.name} answered HTTP ${code}${code === 401 || code === 403 ? ' (credentials rejected)' : ''}`, at };
       }
     } catch (e) { result = { status: 'failed', message: e instanceof BusinessError ? e.message : `Connection failed (${e instanceof Error ? e.name : 'error'})`, at }; }
   }

@@ -11,6 +11,7 @@ const RZP = (n = 'Razorpay') => P(n, 'razorpay', [['key_id', 'Key id'], ['key_se
 const SMTP = (n = 'SMTP') => P(n, 'smtp', [['host', 'SMTP host'], ['port', 'SMTP port'], ['user', 'Username'], ['password', 'Password']]);
 const CF = () => P('Cloudflare', 'cloudflare', [['api_token', 'API token']]);
 const OR = () => ({ ...P('OpenRouter', 'openrouter', [['api_key', 'API key']]), secrets: [{ key: 'api_key', label: 'API key', ref: 'OPENROUTER_API_KEY' }] });
+const MUSE = () => ({ name: 'Meta Model API', tester: 'meta-model' as const, secrets: [{ key: 'api_key', label: 'API key', ref: 'MODEL_API_KEY' }], note: 'Preferred AI provider (muse-spark-1.3, optional muse-wonder-1.0). OpenRouter is the fallback.' });
 const HTTP = (n: string, note?: string) => P(n, 'http', [['base_url', 'API base URL'], ['api_key', 'API key']], note ?? 'The test is a reachability and authentication check (GET base URL with the key); it does not exercise the provider API.');
 const NONE = (n: string, note: string) => ({ ...P(n, 'none', [['config', 'Configuration reference']]), note });
 const OUTBOX = { initial: 'draft', states: ['draft', 'queued', 'cancelled'], editableIn: ['draft'], transitions: { queue: { label: 'Approve and queue', from: ['draft'], to: 'queued' }, cancel: { label: 'Cancel', from: ['draft', 'queued'], to: 'cancelled', danger: true } } } as const;
@@ -53,7 +54,7 @@ export const PROVIDER_MODULES: ModuleDef[] = [
   p('builder/cdn-controller', 126, 'CDN Controller', 'purge request', CF(), 'CDN cache purge requests by URL, queued for the CDN.', [f('*url:url:URL to purge')]),
   p('builder/domain-and-dns-manager', 137, 'Domain & DNS Manager', 'DNS record', CF(), 'DNS records (type, name, value, TTL) you manage, with changes queued for the DNS provider.', [f('*type:enum(A/AAAA/CNAME/TXT/MX):Type'), f('*name:text:Name'), f('*value:text:Value'), f('*ttl:int:TTL (s)', { min: 60, max: 86400 })]),
   p('brain/voice-hq', 142, 'Voice HQ', 'voice script', OR(), 'Voice assistant scripts with language, queued for a speech model.', [f('*name:text:Name'), f('*script:longtext:Script'), f('*language:enum(en/hi/ta/te/ml):Language')]),
-  p('brain/model-router', 145, 'Model Router', 'routing rule', OR(), 'Routing rules from a task kind to a model id; the AI Runtime has its own built-in routing.', [f('*task:enum(chat/summarise/classify/extract/code):Task'), f('*model:text:Model id')]),
+  p('brain/model-router', 145, 'Model Router', 'routing rule', MUSE(), 'Routing rules from a task kind to a model id; the AI Runtime has its own built-in routing.', [f('*task:enum(chat/summarise/classify/extract/code):Task'), f('*model:text:Model id')]),
   p('brain/translation-layer', 155, 'Translation Layer', 'translation job', OR(), 'Translation jobs (text and target locale) queued for a model.', [f('*text:longtext:Text'), f('*target:enum(hi/ta/te/ml/kn/bn/mr/gu/en):Target')]),
   p('brain/vision-service', 156, 'Vision Service', 'vision job', OR(), 'Image analysis jobs by URL and task, queued for a vision model.', [f('*imageUrl:url:Image URL'), f('*task:enum(caption/ocr/product_tags):Task')]),
   p('foundation/kyc-inbound-hub', 168, 'KYC Inbound Hub', 'KYC check', HTTP('KYC provider'), 'KYC checks per customer and document type, queued for the KYC provider. Document numbers are not stored.', [CUST, f('*docType:enum(pan/aadhaar/gstin/passport):Document type')]),

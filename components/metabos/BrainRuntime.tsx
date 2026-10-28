@@ -12,7 +12,7 @@ type Msg = { who: 'you' | 'model' | 'system'; text: string; decision?: Decision;
 type Sub = { id: string; text: string; role: string; tier: Tier; why: string; wantsWrite: boolean; note: string; runId: string | null; error: string | null; decision: Decision | null };
 type Engine = { chat: { completions: { create: (o: { messages: { role: string; content: string }[] }) => Promise<{ choices: { message: { content: string } }[]; usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number } }> } } };
 
-const STATE_LABEL: Record<string, string> = { ready: 'Ready', needs_key: 'Needs key', unconfigured: 'Not configured', browser_only: 'Browser only' };
+const STATE_LABEL: Record<string, string> = { ready: 'Ready', needs_key: 'Needs key', unconfigured: 'Not configured', browser_only: 'Browser only', billing_required: 'Billing not set up' };
 const WEBLLM_MODEL = 'Llama-3.2-1B-Instruct-q4f16_1-MLC';
 
 export function BrainRuntime() {
