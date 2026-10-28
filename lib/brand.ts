@@ -8,7 +8,7 @@
 export type Brand = { id: 'glados' | 'founderos' | 'metabos'; name: string; title: string; mark: string };
 
 const BRANDS: Record<Brand['id'], Brand> = {
-  metabos: { id: 'metabos', name: 'MeTaBos', title: 'MeTaBos — The Zero-Trust Business OS', mark: '/brand/metabos-mark.svg' },
+  metabos: { id: 'metabos', name: 'MeTaBos', title: 'MeTaBos — Cyber AI Business OS', mark: '/brand/metabos-mark.svg' },
   glados: { id: 'glados', name: 'GladOS', title: 'GLADOS', mark: '/brand/glados-mark.png' },
   founderos: { id: 'founderos', name: 'FounderOS', title: 'FOUNDEROS', mark: '/brand/founderos-mark.png' },
 };
