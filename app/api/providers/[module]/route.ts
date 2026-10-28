@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -15,7 +16,7 @@ function failure(error: unknown) {
 /** Provider configuration: env-var references and whether each is set. Values are never returned. */
 export async function GET(req: Request, props: { params: Promise<{ module: string }> }) {
   const params = await props.params;
-  try { businessAccess(req); return NextResponse.json(providerConfig(businessStore(), params.module), { headers: { 'Cache-Control': 'no-store' } }); } catch (e) { return failure(e); }
+  try { memberRead(req, 'finance.read'); return NextResponse.json(providerConfig(businessStore(), params.module), { headers: { 'Cache-Control': 'no-store' } }); } catch (e) { return failure(e); }
 }
 export async function POST(req: Request, props: { params: Promise<{ module: string }> }) {
   const params = await props.params;

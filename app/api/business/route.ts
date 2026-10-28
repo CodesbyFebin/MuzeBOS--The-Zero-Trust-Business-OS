@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -29,7 +30,7 @@ function failure(error: unknown) {
   return NextResponse.json({error:'Business operation failed'},{status:500});
 }
 export async function GET(req: Request) {
-  try { businessAccess(req); return NextResponse.json(businessStore().snapshot(),{headers:{'Cache-Control':'no-store'}}); } catch(e) { return failure(e); }
+  try { memberRead(req, 'finance.read'); return NextResponse.json(businessStore().snapshot(),{headers:{'Cache-Control':'no-store'}}); } catch(e) { return failure(e); }
 }
 export async function POST(req: Request) {
   try {

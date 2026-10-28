@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -12,7 +13,7 @@ function fail(e: unknown) {
   if (e instanceof z.ZodError || e instanceof SyntaxError) return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   return NextResponse.json({ error: 'Goals request failed' }, { status: 500 });
 }
-export async function GET(req: Request) { try { businessAccess(req); return NextResponse.json({ goals: listGoals(businessStore()) }); } catch (e) { return fail(e); } }
+export async function GET(req: Request) { try { memberRead(req); return NextResponse.json({ goals: listGoals(businessStore()) }); } catch (e) { return fail(e); } }
 export async function POST(req: Request) {
   try {
     businessAccess(req); const body = cmd.parse(await readJsonBounded(req)); const s = businessStore();

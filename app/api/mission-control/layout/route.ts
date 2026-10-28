@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessAccess } from '@/lib/muzebos/http';
@@ -9,7 +10,7 @@ const Body = z.discriminatedUnion('action', [z.object({ action: z.literal('save'
 const fail = (e: unknown) => e instanceof BusinessError ? NextResponse.json({ error: e.message }, { status: e.status }) : e instanceof z.ZodError || e instanceof SyntaxError ? NextResponse.json({ error: 'Invalid request' }, { status: 400 }) : NextResponse.json({ error: 'Layout operation failed' }, { status: 500 });
 /** Saved Mission Control widget layout (order and visibility). */
 export async function GET(req: Request) {
-  try { businessAccess(req); return NextResponse.json(getLayout(businessStore()), { headers: { 'Cache-Control': 'no-store' } }); } catch (e) { return fail(e); }
+  try { memberRead(req); return NextResponse.json(getLayout(businessStore()), { headers: { 'Cache-Control': 'no-store' } }); } catch (e) { return fail(e); }
 }
 export async function POST(req: Request) {
   try {
