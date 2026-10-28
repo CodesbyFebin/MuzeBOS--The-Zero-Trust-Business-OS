@@ -34,4 +34,4 @@ Built during the event. The assistant is on Mission Control (`/`) and talks to `
 ## Known limits
 - STT accuracy on short clips is imperfect, so the wake regex also accepts "Hey meta, boss".
 - Realtime `wss://api.meta.ai/v1/asr/realtime` is not wired; only batch push-to-talk is.
-- The voice registry entry is not added yet. The feature shows on Mission Control only.
+- Registry entry `brain.voice-assistant` (available) with its own page at `/workspace/brain/voice`.
