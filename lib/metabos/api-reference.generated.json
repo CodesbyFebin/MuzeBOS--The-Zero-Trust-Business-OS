@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 214,
+ "count": 215,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -2329,6 +2329,19 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/talk",
+   "file": "app/api/talk/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Talk copilot: conversations from signed webhooks, handoffs, opt-outs and follow-ups. Sends go through /api/dispatch.",
+   "idempotencyKey": true,
+   "originCheck": false,
+   "schemaValidated": true,
    "access": "session"
   },
   {

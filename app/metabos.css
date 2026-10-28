@@ -398,3 +398,11 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-intro .mb-button:focus-visible { outline:2px solid #fff;outline-offset:2px; }
 .mb-demo-banner { background:var(--mb-accent-dim);border-bottom:1px solid var(--mb-accent);color:var(--mb-text);font-size:12px;padding:8px 16px; }
 .mb-limit-form { display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:11px; } .mb-limit-form input { width:90px;min-height:36px; } .mb-widget .mb-link { background:none;border:0;padding:0;margin-top:6px;min-height:auto; }
+/* Talk copilot console */
+.mb-talk-wrap { padding:0 24px 24px; }
+.mb-talk button,.mb-talk input,.mb-talk select,.mb-talk textarea { min-height:44px; }
+.mb-talk :is(input,select,textarea) { width:100%;background:#111111;color:var(--mb-text);border:1px solid var(--mb-line);border-radius:4px;padding:10px;font:inherit; }
+.mb-talk :is(textarea):focus-visible { outline:2px solid var(--mb-accent);outline-offset:3px; }
+.mb-talk-card { border:1px solid var(--mb-line);border-left:2px solid var(--mb-accent);background:#161616;padding:14px;margin:12px 0;border-radius:4px; }
+.mb-talk-thread { margin-top:16px;border-top:1px solid var(--mb-line);padding-top:12px; }
+.mb-sr { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap; }
