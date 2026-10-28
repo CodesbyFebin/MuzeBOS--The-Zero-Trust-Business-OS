@@ -148,6 +148,9 @@ export function CommandPalette({ commands, ui = 'classic', off = [] }: { command
     >
       <div
         className="c-pop w-[560px] max-w-[calc(100vw-48px)] overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
         onClick={(e) => e.stopPropagation()}
       >
         <input
@@ -168,6 +171,7 @@ export function CommandPalette({ commands, ui = 'classic', off = [] }: { command
               go(hits[index]);
             }
           }}
+          aria-label="Search views, agents and tools"
           placeholder="Jump anywhere — views, agents, tools…"
           className="w-full border-b border-os-border bg-transparent px-[18px] py-4 font-mono text-sm text-os-text outline-none placeholder:text-os-dim"
         />

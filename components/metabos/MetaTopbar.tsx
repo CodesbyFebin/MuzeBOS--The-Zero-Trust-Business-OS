@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, Menu, Search, UserCircle } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
+import { NotificationsMenu, ProfileMenu, PageDetailDrawer, MobileTabBar } from '@/components/metabos/ShellExtras';
 import { breadcrumbs, resolveMenu, featureByRoute } from '@/lib/metabos/registry';
 import { StatusBadge } from '@/components/metabos/StatusBadge';
 
@@ -24,9 +25,11 @@ export function MetaTopbar({ onSearch }: { onSearch: () => void }) {
       </div>
       <div className="mb-topbar-actions">
         <button type="button" className="mb-search-btn" onClick={onSearch} aria-label="Search pages and commands (Ctrl+K)"><Search size={14} aria-hidden /><span>Search</span><kbd>⌘K</kbd></button>
-        <Link href="/" className="mb-icon-btn" aria-label="Notifications: attention items on Mission Control" title="Attention items on Mission Control"><Bell size={15} aria-hidden /></Link>
-        <Link href="/workspace/account" className="mb-icon-btn" aria-label="Founder profile and account" title="Account"><UserCircle size={16} aria-hidden /></Link>
+        <PageDetailDrawer />
+        <NotificationsMenu />
+        <ProfileMenu />
       </div>
+      <MobileTabBar />
     </header>
   );
 }

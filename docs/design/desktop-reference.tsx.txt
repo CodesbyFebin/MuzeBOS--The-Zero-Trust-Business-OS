@@ -1,0 +1,1618 @@
+import React, { useEffect, useRef, useState } from "react";
+
+const css = `
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0A0A0A;--panel:#111111;--raised:#161616;--border:#242424;--border2:#2a2a2a;
+--accent:#FF2A2A;--accent-dim:rgba(255,42,42,.12);--text:#E5E5E5;--text2:#B0B0B0;
+--muted:#777;--muted2:#555;--green:#22C55E;--green-dim:rgba(34,197,94,.12);
+--amber:#F59E0B;--amber-dim:rgba(245,158,11,.12);--red:#EF4444;--red-dim:rgba(239,68,68,.12);
+--blue:#3B82F6;--blue-dim:rgba(59,130,246,.12);--purple:#8B5CF6;--purple-dim:rgba(139,92,246,.12);
+--cyan:#06B6D4;--cyan-dim:rgba(6,182,212,.12);--pink:#EC4899;--pink-dim:rgba(236,72,153,.12);
+--rail-w:56px;--side-w:248px;--top-h:52px;
+--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+--mono:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;overflow:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit;background:var(--raised);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#555}
+
+.app{display:flex;height:100vh;overflow:hidden;overflow-x-clip:clip}
+
+/* NAV RAIL */
+.nav-rail{width:var(--rail-w);min-width:var(--rail-w);background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:6px 0;overflow-y:auto;z-index:20;position:relative}
+.nav-rail .logo{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#fff;margin-bottom:10px;cursor:pointer;position:relative;flex-shrink:0}
+.nav-rail .logo-sub{font-size:7px;color:var(--muted);text-align:center;margin-bottom:8px;line-height:1.2;white-space:nowrap}
+.nav-item{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin:1px 0;cursor:pointer;transition:all .12s;position:relative;color:var(--muted);flex-shrink:0}
+.nav-item:hover{background:var(--raised);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.nav-item svg{width:18px;height:18px;stroke-width:1.8}
+.nav-item .tip{display:none;position:absolute;left:48px;background:#222;border:1px solid var(--border);padding:4px 8px;border-radius:5px;font-size:11px;white-space:nowrap;z-index:100;pointer-events:none;color:var(--text)}
+.nav-item:hover .tip{display:block}
+.nav-divider{width:28px;height:1px;background:var(--border);margin:6px 0;flex-shrink:0}
+.nav-rail .bottom-section{margin-top:auto;display:flex;flex-direction:column;align-items:center;width:100%}
+
+/* SECONDARY PANEL */
+.secondary-panel{width:0;min-width:0;background:var(--panel);border-right:1px solid var(--border);overflow:hidden;transition:width .22s ease,min-width .22s ease;display:flex;flex-direction:column;flex-shrink:0}
+.secondary-panel.open{width:var(--side-w);min-width:var(--side-w)}
+.sp-header{padding:14px 14px 8px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sp-header h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.sp-search{width:100%;padding:6px 8px;font-size:12px;display:flex;align-items:center;gap:6px;background:var(--raised);border:1px solid var(--border);border-radius:6px;cursor:text}
+.sp-search input{border:none;background:none;padding:0;flex:1;font-size:12px}
+.sp-search input:focus{border:none}
+.sp-search .shortcut{font-size:10px;color:var(--muted);background:var(--border);padding:1px 5px;border-radius:3px}
+.sp-body{flex:1;overflow-y:auto;padding:4px 0}
+.sp-section{padding:6px 0}
+.sp-section-title{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);padding:6px 14px 4px;font-weight:600}
+.sp-item{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:12.5px;color:var(--text2);transition:all .1s}
+.sp-item:hover{background:var(--raised);color:var(--text)}
+.sp-item.active{color:var(--accent);background:var(--accent-dim)}
+.sp-item svg{width:15px;height:15px;flex-shrink:0;stroke-width:1.8}
+.sp-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600}
+.sp-footer{padding:10px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);flex-shrink:0}
+.sp-footer .usage-label{display:flex;justify-content:space-between;margin-bottom:4px}
+.sp-footer .usage-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.sp-footer .usage-fill{height:100%;background:var(--accent);border-radius:2px}
+.sp-footer .usage-detail{font-size:10px;margin-top:4px;display:flex;justify-content:space-between}
+
+/* MAIN AREA */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:var(--top-h);min-height:var(--top-h);background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;overflow-x-clip:clip}
+.ws-select{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--raised);border:1px solid var(--border);border-radius:7px;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.ws-select:hover{border-color:#444}
+.ws-select svg{width:14px;height:14px}
+.create-btn{background:var(--accent);color:#fff;padding:5px 14px;border-radius:7px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:5px}
+.create-btn:hover{opacity:.9}
+.top-search{flex:1;max-width:260px;position:relative}
+.top-search input{width:100%;padding:6px 10px 6px 30px;font-size:12.5px;border-radius:7px}
+.top-search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted)}
+.top-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
+.top-btn{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .12s;position:relative}
+.top-btn:hover{background:var(--raised);color:var(--text)}
+.top-btn svg{width:16px;height:16px}
+.top-btn .badge-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--accent);border:2px solid var(--panel)}
+.profile-btn{display:flex;align-items:center;gap:7px;padding:3px 8px 3px 3px;border-radius:7px;cursor:pointer}
+.profile-btn:hover{background:var(--raised)}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0}
+.profile-name{font-size:12.5px;font-weight:500}
+
+.metabos-badge{display:flex;align-items:center;gap:8px;padding:5px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.22);border-radius:999px;font-size:11px;white-space:nowrap;margin-left:8px}
+.metabos-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(34,197,94,.6);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.8}100%{transform:scale(1);opacity:1}}
+
+.content{flex:1;overflow-y:auto;padding:18px 22px;overflow-x-clip:clip}
+.tabs{display:flex;gap:2px;margin-bottom:18px;border-bottom:1px solid var(--border);overflow-x:auto;overflow-x-clip:clip}
+.tab{padding:7px 14px;font-size:12.5px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;font-weight:500;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap}
+.page-header .breadcrumb{font-size:11px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.page-header h1{font-size:22px;font-weight:700;letter-spacing:-.3px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.page-header .subtitle{font-size:12.5px;color:var(--muted);margin-top:2px}
+.page-header .header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.status-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);background:var(--green-dim);padding:4px 10px;border-radius:20px;font-weight:500}
+.status-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .15s;position:relative;display:flex;align-items:flex-start;gap:12px}
+.kpi-card:hover{border-color:#444;transform:translateY(-1px)}
+.kpi-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kpi-icon svg{width:18px;height:18px}
+.kpi-info{flex:1;min-width:0}
+.kpi-label{font-size:11px;color:var(--muted);margin-bottom:2px}
+.kpi-value{font-size:24px;font-weight:700;letter-spacing:-.5px}
+.kpi-sub{font-size:10.5px;color:var(--muted);margin-top:2px}
+.kpi-sub .kpi-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:3px}
+.kpi-arrow{color:var(--muted);flex-shrink:0;margin-top:4px}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
+.four-col{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;position:relative}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
+.card-header h3{font-size:14px;font-weight:600}
+.card-header .card-subtitle{font-size:11px;color:var(--muted);margin-top:1px}
+.card-action{font-size:11.5px;color:var(--accent);cursor:pointer;display:flex;align-items:center;gap:3px;font-weight:500}
+.card-action:hover{text-decoration:underline}
+
+.graph-container{position:relative;height:260px;overflow:hidden}
+
+.appr-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border2);flex-wrap:wrap}
+.appr-item:last-child{border-bottom:none}
+.appr-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.appr-icon svg{width:16px;height:16px}
+.appr-info{flex:1;min-width:120px}
+.appr-title{font-size:12.5px;font-weight:500}
+.appr-desc{font-size:11px;color:var(--muted);margin-top:1px}
+.appr-meta{font-size:10.5px;color:var(--muted);margin-top:1px}
+.appr-status{font-size:10.5px;padding:3px 9px;border-radius:12px;white-space:nowrap;font-weight:500}
+.appr-status.amber{background:var(--amber-dim);color:var(--amber)}
+.appr-status.purple{background:var(--purple-dim);color:var(--purple)}
+.appr-status.green{background:var(--green-dim);color:var(--green)}
+.appr-time{font-size:10.5px;color:var(--muted);text-align:right;min-width:60px}
+.review-btn{padding:4px 12px;border:1px solid var(--accent);color:var(--accent);border-radius:5px;font-size:11.5px;font-weight:500;transition:all .12s}
+.review-btn:hover{background:var(--accent);color:#fff}
+
+.chart-wrap{position:relative;height:180px}
+.chart-legend{display:flex;gap:14px;justify-content:center;margin-top:6px;flex-wrap:wrap}
+.chart-legend-item{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--muted)}
+.chart-legend-dot{width:7px;height:7px;border-radius:50%}
+
+.task-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(36,36,36,.4)}
+.task-item:last-child{border-bottom:none}
+.task-cb{width:16px;height:16px;border:1.5px solid var(--border);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.task-cb:hover{border-color:var(--accent)}
+.task-cb.checked{background:var(--accent);border-color:var(--accent)}
+.task-cb.checked::after{content:'✓';font-size:10px;color:#fff;font-weight:700}
+.task-text{font-size:12.5px;flex:1}
+.task-text.done{text-decoration:line-through;color:var(--muted)}
+.task-due{font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:3px}
+.task-due.today{color:var(--amber)}
+.task-due.overdue{color:var(--red)}
+
+.appt-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(36,36,36,.4)}
+.appt-item:last-child{border-bottom:none}
+.appt-icon{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.appt-icon svg{width:16px;height:16px}
+.appt-time{font-size:11px;color:var(--muted)}
+.appt-title{font-size:12.5px;font-weight:500;margin-top:1px}
+.appt-desc{font-size:10.5px;color:var(--muted);margin-top:1px}
+
+.act-item{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid rgba(36,36,36,.3)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.act-info{flex:1}
+.act-title{font-size:12.5px;font-weight:500}
+.act-desc{font-size:10.5px;color:var(--muted);margin-top:1px}
+.act-time{font-size:10.5px;color:var(--muted);white-space:nowrap}
+
+.ch-item{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid rgba(36,36,36,.4)}
+.ch-item:last-child{border-bottom:none}
+.ch-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.ch-icon svg{width:14px;height:14px}
+.ch-name{font-size:12.5px;font-weight:500}
+.ch-status{font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.ch-status .dot{width:5px;height:5px;border-radius:50%}
+.ch-btn{padding:3px 10px;border:1px solid var(--border);border-radius:5px;font-size:10.5px;transition:all .12s;margin-left:auto}
+.ch-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+.brief-item{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid rgba(36,36,36,.3)}
+.brief-item:last-child{border-bottom:none}
+.brief-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brief-icon svg{width:13px;height:13px}
+.br-title{font-size:12px;font-weight:500}
+.br-desc{font-size:10.5px;color:var(--muted);margin-top:1px}
+
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--border);font-weight:600}
+.data-table td{padding:9px 10px;border-bottom:1px solid rgba(36,36,36,.4);font-size:12.5px}
+.data-table tr:hover td{background:rgba(255,255,255,.015)}
+.status-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:500}
+.status-pill.draft{background:rgba(119,119,119,.15);color:var(--muted)}
+.status-pill.pending{background:var(--amber-dim);color:var(--amber)}
+.status-pill.approved{background:var(--green-dim);color:var(--green)}
+.status-pill.issued{background:var(--blue-dim);color:var(--blue)}
+.status-pill.failed{background:var(--red-dim);color:var(--red)}
+.status-pill.processed{background:var(--green-dim);color:var(--green)}
+.status-pill.rejected{background:var(--red-dim);color:var(--red)}
+.status-pill.retry{background:var(--amber-dim);color:var(--amber)}
+.status-pill.duplicate{background:rgba(119,119,119,.15);color:var(--muted)}
+
+.btn{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:5px;transition:all .12s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-secondary{background:var(--raised);border:1px solid var(--border);color:var(--text)}
+.btn-secondary:hover{border-color:#444}
+.btn-ghost{color:var(--muted)}
+.btn-ghost:hover{color:var(--text);background:var(--raised)}
+.btn-sm{padding:4px 9px;font-size:11px}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-danger:hover{background:var(--red);color:#fff}
+
+.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-bar select,.filter-bar input{padding:5px 9px;font-size:11.5px}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:22px;max-width:480px;width:92%;max-height:80vh;overflow-y:auto}
+.modal h2{font-size:17px;font-weight:600;margin-bottom:14px}
+.modal .fg{margin-bottom:12px}
+.modal .fg label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:4px}
+.modal .fg input,.modal .fg select,.modal .fg textarea{width:100%}
+.modal .fa{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:90}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;right:-400px;top:0;bottom:0;width:400px;max-width:92vw;background:var(--panel);border-left:1px solid var(--border);z-index:95;transition:right .22s ease;overflow-y:auto;padding:20px}
+.drawer.open{right:0}
+.drawer .dr-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.drawer .dr-header h2{font-size:17px;font-weight:600}
+.drawer .dr-close{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;font-size:16px}
+.drawer .dr-close:hover{background:var(--raised);color:var(--text)}
+
+.toast-container{position:fixed;bottom:16px;right:16px;z-index:200;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:10px 14px;font-size:12.5px;display:flex;align-items:center;gap:8px;animation:slideIn .25s ease;min-width:260px;box-shadow:0 4px 20px rgba(0,0,0,.3);pointer-events:auto}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--blue)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.cmd-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:150;align-items:flex-start;justify-content:center;padding-top:100px;backdrop-filter:blur(2px)}
+.cmd-overlay.open{display:flex}
+.cmd-palette{background:var(--panel);border:1px solid var(--border);border-radius:10px;width:540px;max-width:92vw;max-height:380px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.cmd-palette input{width:100%;padding:12px 14px;font-size:13px;border:none;border-bottom:1px solid var(--border);border-radius:10px 10px 0 0;background:transparent}
+.cmd-results{overflow-y:auto;max-height:320px}
+.cmd-result{padding:9px 14px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:12.5px}
+.cmd-result:hover,.cmd-result.selected{background:var(--raised)}
+.cmd-type{font-size:9.5px;color:var(--muted);background:var(--border);padding:1px 5px;border-radius:3px;margin-left:auto}
+
+.pipeline{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.pipeline-col{min-width:200px;flex:1;background:var(--raised);border-radius:8px;padding:10px}
+.pipeline-col h4{font-size:11.5px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.pipeline-col h4 .cnt{background:var(--border);padding:1px 6px;border-radius:8px;font-size:10px;font-weight:500}
+.pipeline-card{background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:9px;margin-bottom:6px;cursor:pointer;transition:all .12s}
+.pipeline-card:hover{border-color:#444}
+.pipeline-card .pc-title{font-size:12px;font-weight:500}
+.pipeline-card .pc-meta{font-size:10.5px;color:var(--muted);margin-top:3px}
+
+.feature-card{background:var(--raised);border:1px solid var(--border);border-radius:9px;padding:12px;cursor:pointer;transition:all .15s}
+.feature-card:hover{border-color:#444;transform:translateY(-1px)}
+.fc-icon{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.fc-icon svg{width:16px;height:16px}
+.fc-title{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.fc-desc{font-size:10.5px;color:var(--muted);line-height:1.4}
+.fc-status{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;padding:2px 7px;border-radius:8px;margin-top:6px}
+
+.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:8px;font-size:10.5px;font-weight:500}
+.tag.red{background:var(--red-dim);color:var(--red)}
+.tag.green{background:var(--green-dim);color:var(--green)}
+.tag.amber{background:var(--amber-dim);color:var(--amber)}
+.tag.blue{background:var(--blue-dim);color:var(--blue)}
+.tag.purple{background:var(--purple-dim);color:var(--purple)}
+
+.progress{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .3s ease}
+
+.empty-state{text-align:center;padding:30px 16px;color:var(--muted)}
+.empty-state svg{width:40px;height:40px;margin-bottom:10px;opacity:.35}
+.empty-state h4{font-size:14px;color:var(--text);margin-bottom:5px}
+.empty-state p{font-size:11.5px}
+
+.json-viewer{background:#0d0d0d;border:1px solid var(--border);border-radius:7px;padding:12px;font-family:var(--mono);font-size:11.5px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+.json-key{color:var(--blue)}
+.json-string{color:var(--green)}
+.json-number{color:var(--amber)}
+
+.timeline{display:flex;align-items:center;gap:0;padding:12px 0;overflow-x:auto}
+.tl-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;min-width:80px}
+.tl-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;z-index:2}
+.tl-dot.done{background:var(--green);color:#fff}
+.tl-dot.pending{background:var(--border);color:var(--muted)}
+.tl-line{position:absolute;top:12px;left:50%;width:100%;height:2px;background:var(--border)}
+.tl-line.done{background:var(--green)}
+.tl-label{font-size:10px;color:var(--muted);margin-top:6px;text-align:center}
+.tl-time{font-size:9.5px;color:var(--muted2)}
+
+.health-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border2);flex-wrap:wrap}
+.health-row:last-child{border-bottom:none}
+.health-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.health-dot.green{background:var(--green)}
+.health-dot.amber{background:var(--amber)}
+.health-dot.red{background:var(--red)}
+.health-name{flex:1;font-size:12.5px;font-weight:500;display:flex;align-items:center;gap:6px;min-width:120px}
+.health-name svg{width:16px;height:16px;color:var(--muted)}
+.health-status{font-size:11.5px;font-weight:500}
+.health-status.green{color:var(--green)}
+.health-status.amber{color:var(--amber)}
+.health-detail{font-size:11px;color:var(--muted);min-width:80px;text-align:right}
+.health-latency{font-size:11px;color:var(--muted);min-width:60px;text-align:right}
+
+.notif-dd{display:none;position:absolute;right:0;top:38px;width:300px;background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:10px;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.notif-dd.open{display:block}
+.notif-item{padding:9px;border-radius:7px;cursor:pointer;transition:background .12s}
+.notif-item:hover{background:var(--raised)}
+.notif-item .ni-title{font-size:12.5px;font-weight:500}
+.notif-item .ni-desc{font-size:11px;color:var(--muted);margin-top:1px}
+.notif-item .ni-time{font-size:10px;color:var(--muted2);margin-top:3px}
+
+.page-content{display:none}
+.page-content.active{display:block}
+
+.footer{padding:10px 20px;border-top:1px solid var(--border);font-size:10.5px;color:var(--muted);display:flex;justify-content:space-between;flex-shrink:0;gap:10px;flex-wrap:wrap;overflow-x-clip:clip}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .25s ease}
+
+@media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.two-col,.three-col,.four-col{grid-template-columns:1fr}}
+@media(max-width:900px){.metabos-badge{display:none}}
+@media(max-width:768px){
+.nav-rail{width:48px;min-width:48px}
+.secondary-panel.open{position:fixed;left:48px;top:0;bottom:0;z-index:30;width:260px!important;min-width:260px!important}
+.kpi-grid{grid-template-columns:1fr}
+.content{padding:10px}
+.top-search{display:none}
+.footer{flex-direction:column}
+}
+.code-block{background:#0d0d0d;border:1px solid var(--border);border-radius:7px;padding:10px 12px;font-family:var(--mono);font-size:11.5px;color:var(--green);overflow-x:auto}
+.info-box{background:var(--blue-dim);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:10px 12px;font-size:11.5px;color:var(--blue);display:flex;align-items:flex-start;gap:8px;margin-top:8px}
+.sandbox-badge{background:var(--purple-dim);color:var(--purple);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-left:8px}
+.metric-row{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border2);gap:8px;flex-wrap:wrap}
+.metric-row:last-child{border-bottom:none}
+.metric-label{font-size:12px;color:var(--muted);flex:1;min-width:100px}
+.metric-value{font-size:12.5px;font-weight:500}
+.metakey-card{border:1px solid rgba(34,197,94,.25);background:linear-gradient(180deg, rgba(34,197,94,.08), rgba(0,0,0,0));}
+`;
+
+type TaskRecord = { id: string; value: { title: string; done: boolean; due?: string; notes?: string; created_at: number }; created_at: string };
+
+function useToast() {
+  const [toasts, setToasts] = useState<{ id: number; msg: string; type: string }[]>([]);
+  const show = (msg: string, type: string = "info") => {
+    const id = Date.now() + Math.random();
+    setToasts((p) => [...p, { id, msg, type }]);
+    setTimeout(() => setToasts((p) => p.filter((t) => t.id !== id)), 3000);
+  };
+  return { toasts, show };
+}
+
+async function apiCall(action: string, args: any) {
+  const r = await fetch("actions", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ action, args }),
+  });
+  const j = await r.json();
+  if (!r.ok || j.error) throw new Error(j.error || "API error");
+  return j.data;
+}
+
+export default function App() {
+  const { toasts, show: showToast } = useToast();
+  const [currentView, setCurrentView] = useState<"business" | "admin">("business");
+  const [currentPage, setCurrentPage] = useState("mission");
+  const [secondaryOpen, setSecondaryOpen] = useState(true);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [cmdOpen, setCmdOpen] = useState(false);
+  const [cmdQuery, setCmdQuery] = useState("");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [addTaskOpen, setAddTaskOpen] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskDue, setNewTaskDue] = useState("");
+  const [newTaskNotes, setNewTaskNotes] = useState("");
+  const [tasks, setTasks] = useState<TaskRecord[]>([]);
+  const [brainSearch, setBrainSearch] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const salesRef = useRef<HTMLCanvasElement>(null);
+  const growthRef = useRef<HTMLCanvasElement>(null);
+  const apiRef = useRef<HTMLCanvasElement>(null);
+
+  // Load tasks
+  const reloadTasks = async () => {
+    try {
+      const data = await apiCall("records.list", { collection: "tasks" });
+      const recs = (data?.records || []) as TaskRecord[];
+      recs.sort((a, b) => b.value.created_at - a.value.created_at);
+      setTasks(recs);
+    } catch (e) {
+      // API may be unavailable in preview
+    }
+  };
+  useEffect(() => {
+    reloadTasks();
+  }, []);
+
+  const createTask = async () => {
+    if (!newTaskTitle.trim()) {
+      showToast("Please enter a task title", "error");
+      return;
+    }
+    setBusy(true);
+    try {
+      const idempotency_key = `task-${Date.now()}-${newTaskTitle.slice(0, 10)}`;
+      await apiCall("records.create", {
+        collection: "tasks",
+        value: { title: newTaskTitle.trim(), done: false, due: newTaskDue, notes: newTaskNotes, created_at: Date.now() },
+        idempotency_key,
+      });
+      await reloadTasks();
+      showToast("Task added successfully", "success");
+      setNewTaskTitle("");
+      setNewTaskDue("");
+      setNewTaskNotes("");
+      setAddTaskOpen(false);
+    } catch (e: any) {
+      showToast(e.message || "Failed to add task", "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const toggleTask = async (t: TaskRecord) => {
+    try {
+      await apiCall("records.replace", {
+        collection: "tasks",
+        id: t.id,
+        value: { ...t.value, done: !t.value.done },
+      });
+      await reloadTasks();
+      showToast(t.value.done ? "Task reopened" : "Task completed", "success");
+    } catch (e: any) {
+      showToast("Failed to update task", "error");
+    }
+  };
+
+  const deleteTask = async (t: TaskRecord) => {
+    try {
+      await apiCall("records.delete", { collection: "tasks", id: t.id });
+      await reloadTasks();
+      showToast("Task deleted", "info");
+    } catch {}
+  };
+
+  // Charts
+  const renderSalesChart = () => {
+    const canvas = salesRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const W = (canvas.width = canvas.offsetWidth * 2);
+    const H = (canvas.height = 320);
+    ctx.clearRect(0, 0, W, H);
+    const data = [
+      { d: "Oct 1", i: 8, o: 5 },
+      { d: "Oct 5", i: 12, o: 8 },
+      { d: "Oct 10", i: 15, o: 10 },
+      { d: "Oct 15", i: 10, o: 7 },
+      { d: "Oct 20", i: 18, o: 12 },
+      { d: "Oct 25", i: 22, o: 15 },
+      { d: "Oct 30", i: 20, o: 14 },
+    ];
+    const maxVal = 30;
+    const chartH = H - 40;
+    const barW = W / data.length;
+    const gap = barW * 0.15;
+    ctx.strokeStyle = "#242424";
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      const y = 20 + chartH * (1 - i / 5);
+      ctx.beginPath();
+      ctx.moveTo(30, y);
+      ctx.lineTo(W - 10, y);
+      ctx.stroke();
+      ctx.fillStyle = "#777";
+      ctx.font = "18px sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText(Math.round((maxVal * i) / 5).toString(), 26, y + 5);
+    }
+    data.forEach((d, idx) => {
+      const x = 30 + idx * barW + gap;
+      const bw = (barW - gap * 2) / 2;
+      const ih = (d.i / maxVal) * chartH;
+      const oh = (d.o / maxVal) * chartH;
+      ctx.fillStyle = "#555";
+      ctx.fillRect(x, 20 + chartH - oh, bw, oh);
+      ctx.fillStyle = "#FF2A2A";
+      ctx.fillRect(x + bw + 2, 20 + chartH - ih, bw, ih);
+      ctx.fillStyle = "#777";
+      ctx.font = "16px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(d.d, x + bw + 1, H - 5);
+    });
+  };
+
+  const renderGrowthChart = () => {
+    const canvas = growthRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const W = (canvas.width = canvas.offsetWidth * 2);
+    const H = (canvas.height = 320);
+    ctx.clearRect(0, 0, W, H);
+    const data = [
+      { d: "Wk1", v: 12 },
+      { d: "Wk2", v: 18 },
+      { d: "Wk3", v: 15 },
+      { d: "Wk4", v: 22 },
+      { d: "Wk5", v: 28 },
+      { d: "Wk6", v: 25 },
+      { d: "Wk7", v: 30 },
+      { d: "Wk8", v: 27 },
+    ];
+    const maxVal = 35;
+    const chartH = H - 40;
+    const barW = W / data.length;
+    const gap = barW * 0.2;
+    ctx.strokeStyle = "#242424";
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      const y = 20 + chartH * (1 - i / 5);
+      ctx.beginPath();
+      ctx.moveTo(30, y);
+      ctx.lineTo(W - 10, y);
+      ctx.stroke();
+      ctx.fillStyle = "#777";
+      ctx.font = "18px sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText("₹" + Math.round((maxVal * i) / 5) + "k", 26, y + 5);
+    }
+    data.forEach((d, idx) => {
+      const x = 30 + idx * barW + gap;
+      const bw = barW - gap * 2;
+      const bh = (d.v / maxVal) * chartH;
+      ctx.fillStyle = "#FF2A2A";
+      ctx.fillRect(x, 20 + chartH - bh, bw, bh);
+      ctx.fillStyle = "#777";
+      ctx.font = "16px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(d.d, x + bw / 2, H - 5);
+    });
+  };
+
+  const renderApiChart = () => {
+    const canvas = apiRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const W = (canvas.width = canvas.offsetWidth * 2);
+    const H = (canvas.height = 300);
+    ctx.clearRect(0, 0, W, H);
+    const hours = 24;
+    const data: { rps: number; lat: number }[] = [];
+    for (let i = 0; i < hours; i++) data.push({ rps: 40 + Math.random() * 60, lat: 100 + Math.random() * 200 });
+    const maxRps = 150;
+    const maxLat = 600;
+    const chartH = H - 50;
+    const stepW = (W - 60) / hours;
+    ctx.strokeStyle = "#242424";
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      const y = 20 + chartH * (1 - i / 5);
+      ctx.beginPath();
+      ctx.moveTo(40, y);
+      ctx.lineTo(W - 10, y);
+      ctx.stroke();
+      ctx.fillStyle = "#777";
+      ctx.font = "16px sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText(Math.round((maxRps * i) / 5).toString(), 36, y + 5);
+    }
+    for (let i = 0; i <= 5; i++) {
+      const y = 20 + chartH * (1 - i / 5);
+      ctx.fillStyle = "#777";
+      ctx.textAlign = "left";
+      ctx.fillText(Math.round((maxLat * i) / 5).toString(), W - 18, y + 5);
+    }
+    data.forEach((d, i) => {
+      const x = 40 + i * stepW + 2;
+      const bw = stepW - 4;
+      const bh = (d.rps / maxRps) * chartH;
+      ctx.fillStyle = "#555";
+      ctx.fillRect(x, 20 + chartH - bh, bw, bh);
+    });
+    ctx.strokeStyle = "#FF2A2A";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    data.forEach((d, i) => {
+      const x = 40 + i * stepW + stepW / 2;
+      const y = 20 + chartH - (d.lat / maxLat) * chartH;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    data.forEach((d, i) => {
+      const x = 40 + i * stepW + stepW / 2;
+      const y = 20 + chartH - (d.lat / maxLat) * chartH;
+      ctx.fillStyle = "#FF2A2A";
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.fillStyle = "#777";
+    ctx.font = "14px sans-serif";
+    ctx.textAlign = "center";
+    for (let i = 0; i < hours; i += 3) {
+      const x = 40 + i * stepW + stepW / 2;
+      ctx.fillText(String(i).padStart(2, "0") + ":00", x, H - 5);
+    }
+  };
+
+  useEffect(() => {
+    renderSalesChart();
+    renderGrowthChart();
+    renderApiChart();
+    const h = () => {
+      renderSalesChart();
+      renderGrowthChart();
+      renderApiChart();
+    };
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, [currentPage]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setCmdOpen(true);
+      }
+      if (e.key === "Escape") {
+        setCmdOpen(false);
+        setAddTaskOpen(false);
+        setDrawerOpen(false);
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  const navigateTo = (page: string, view?: "business" | "admin") => {
+    if (view && view !== currentView) {
+      switchView(view, page);
+      return;
+    }
+    setCurrentPage(page);
+    setSecondaryOpen(true);
+    setNotifOpen(false);
+    const el = document.getElementById("mainContent");
+    if (el) el.scrollTop = 0;
+    setTimeout(() => {
+      renderSalesChart();
+      renderGrowthChart();
+      renderApiChart();
+    }, 60);
+  };
+
+  const switchView = (view: "business" | "admin", targetPage?: string) => {
+    setCurrentView(view);
+    setSecondaryOpen(true);
+    if (view === "business") {
+      setCurrentPage(targetPage || "mission");
+    } else {
+      setCurrentPage(targetPage || "admin-overview");
+    }
+    setNotifOpen(false);
+  };
+
+  const filteredBrainItems = (text: string) => {
+    if (!brainSearch) return true;
+    return text.toLowerCase().includes(brainSearch.toLowerCase());
+  };
+
+  const cmdItems = [
+    { label: "Mission Control", page: "mission", view: "business" as const, type: "Page" },
+    { label: "Orders", page: "orders", view: "business" as const, type: "Page" },
+    { label: "Money", page: "money", view: "business" as const, type: "Page" },
+    { label: "Brain", page: "brain", view: "business" as const, type: "Page" },
+    { label: "Backend Command Center", page: "admin-overview", view: "admin" as const, type: "Admin" },
+    { label: "API & Webhooks", page: "webhooks", view: "admin" as const, type: "Admin" },
+    { label: "Evidence", page: "evidence", view: "business" as const, type: "Page" },
+    { label: "Add Task", action: () => { setAddTaskOpen(true); setCmdOpen(false); }, type: "Action" },
+    { label: "New Invoice", action: () => { showToast("New invoice draft created", "success"); setCmdOpen(false); }, type: "Action" },
+    { label: "New Chat", action: () => { showToast("New chat started in Brain", "info"); setCmdOpen(false); }, type: "Brain" },
+  ];
+
+  const filteredCmd = cmdItems.filter((i) => i.label.toLowerCase().includes(cmdQuery.toLowerCase()));
+
+  const tasksPending = tasks.filter((t) => !t.value.done).length;
+  const tasksDisplay = tasks.length > 0 ? tasks : [
+    { id: "sample1", value: { title: "Review invoice draft", done: false, created_at: Date.now() }, created_at: "" } as any,
+    { id: "sample2", value: { title: "Reorder coffee stock", done: false, created_at: Date.now() }, created_at: "" } as any,
+    { id: "sample3", value: { title: "Send customer update", done: false, created_at: Date.now() }, created_at: "" } as any,
+    { id: "sample4", value: { title: "Supplier call · 4:30 PM", done: false, due: "Due today", created_at: Date.now() }, created_at: "" } as any,
+  ];
+
+  return (
+    <div
+      data-safe-area-inset-root
+      style={{
+        boxSizing: "border-box",
+        paddingTop: "var(--safe-area-inset-top)",
+        background: "var(--bg)",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <style>{css}</style>
+      <div className="app" style={{ flex: 1, minHeight: 0 }}>
+        {/* NAV RAIL */}
+        <nav className="nav-rail" id="navRail">
+          <div className="logo" onClick={() => switchView("business", "mission")}>M</div>
+          <div className="logo-sub">{currentView === "business" ? <>Cyber AI<br />Business OS</> : <>Backend<br />Administration</>}</div>
+
+          {currentView === "business" ? (
+            <div id="navBusiness">
+              <div className={`nav-item ${currentPage === "mission" ? "active" : ""}`} data-menu="mission" onClick={() => navigateTo("mission", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg><span className="tip">Mission Control</span>
+              </div>
+              <div className={`nav-item ${currentPage === "orders" ? "active" : ""}`} data-menu="orders" onClick={() => navigateTo("orders", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 01-8 0" /></svg><span className="tip">Orders</span>
+              </div>
+              <div className={`nav-item ${currentPage === "money" ? "active" : ""}`} data-menu="money" onClick={() => navigateTo("money", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg><span className="tip">Money</span>
+              </div>
+              <div className={`nav-item ${currentPage === "talk" ? "active" : ""}`} data-menu="talk" onClick={() => navigateTo("talk", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg><span className="tip">Talk</span>
+              </div>
+              <div className={`nav-item ${currentPage === "stock" ? "active" : ""}`} data-menu="stock" onClick={() => navigateTo("stock", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg><span className="tip">Stock</span>
+              </div>
+              <div className={`nav-item ${currentPage === "growth" ? "active" : ""}`} data-menu="growth" onClick={() => navigateTo("growth", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg><span className="tip">Growth</span>
+              </div>
+              <div className="nav-divider"></div>
+              <div className={`nav-item ${currentPage === "operations" ? "active" : ""}`} data-menu="operations" onClick={() => navigateTo("operations", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" /></svg><span className="tip">Operations</span>
+              </div>
+              <div className={`nav-item ${currentPage === "builder" ? "active" : ""}`} data-menu="builder" onClick={() => navigateTo("builder", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg><span className="tip">Builder</span>
+              </div>
+              <div className={`nav-item ${currentPage === "brain" ? "active" : ""}`} data-menu="brain" onClick={() => navigateTo("brain", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a7 7 0 017 7c0 3-2 5.5-4 7.5L12 22l-3-5.5C7 14.5 5 12 5 9a7 7 0 017-7z" /><circle cx="12" cy="9" r="2" /></svg><span className="tip">Brain</span>
+              </div>
+              <div className={`nav-item ${currentPage === "foundation" ? "active" : ""}`} data-menu="foundation" onClick={() => navigateTo("foundation", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg><span className="tip">Foundation</span>
+              </div>
+              <div className={`nav-item ${currentPage === "system" ? "active" : ""}`} data-menu="system" onClick={() => navigateTo("system", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" /></svg><span className="tip">System</span>
+              </div>
+              <div className="nav-divider"></div>
+              <div className={`nav-item ${currentPage === "workflows" ? "active" : ""}`} data-menu="workflows" onClick={() => navigateTo("workflows", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg><span className="tip">Workflows</span>
+              </div>
+              <div className={`nav-item ${currentPage === "evidence" ? "active" : ""}`} data-menu="evidence" onClick={() => navigateTo("evidence", "business")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg><span className="tip">Evidence</span>
+              </div>
+              <div className="nav-divider"></div>
+            </div>
+          ) : (
+            <div id="navAdmin">
+              <div className={`nav-item ${currentPage === "admin-overview" ? "active" : ""}`} data-menu="admin-overview" onClick={() => navigateTo("admin-overview", "admin")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg><span className="tip">Admin Overview</span>
+              </div>
+              <div className={`nav-item ${currentPage === "businesses" ? "active" : ""}`} data-menu="businesses" onClick={() => navigateTo("businesses", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" /></svg><span className="tip">Businesses</span></div>
+              <div className={`nav-item ${currentPage === "users" ? "active" : ""}`} data-menu="users" onClick={() => navigateTo("users", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" /></svg><span className="tip">Users & Roles</span></div>
+              <div className={`nav-item ${currentPage === "approvals" ? "active" : ""}`} data-menu="approvals" onClick={() => navigateTo("approvals", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg><span className="tip">Approvals</span></div>
+              <div className={`nav-item ${currentPage === "database" ? "active" : ""}`} data-menu="database" onClick={() => navigateTo("database", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /></svg><span className="tip">Database</span></div>
+              <div className={`nav-item ${currentPage === "api-gateway" ? "active" : ""}`} data-menu="api-gateway" onClick={() => navigateTo("api-gateway", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg><span className="tip">API Gateway</span></div>
+              <div className={`nav-item ${currentPage === "webhooks" ? "active" : ""}`} data-menu="webhooks" onClick={() => navigateTo("webhooks", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" /></svg><span className="tip">Webhooks</span></div>
+              <div className={`nav-item ${currentPage === "queues" ? "active" : ""}`} data-menu="queues" onClick={() => navigateTo("queues", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg><span className="tip">Queues & Workers</span></div>
+              <div className={`nav-item ${currentPage === "ai-providers" ? "active" : ""}`} data-menu="ai-providers" onClick={() => navigateTo("ai-providers", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a7 7 0 017 7c0 3-2 5.5-4 7.5L12 22l-3-5.5C7 14.5 5 12 5 9a7 7 0 017-7z" /></svg><span className="tip">AI Providers</span></div>
+              <div className={`nav-item ${currentPage === "integrations" ? "active" : ""}`} data-menu="integrations" onClick={() => navigateTo("integrations", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="20" height="8" rx="2" /><rect x="2" y="14" width="20" height="8" rx="2" /><line x1="6" y1="6" x2="6.01" y2="6" /><line x1="6" y1="18" x2="6.01" y2="18" /></svg><span className="tip">Integrations</span></div>
+              <div className={`nav-item ${currentPage === "storage" ? "active" : ""}`} data-menu="storage" onClick={() => navigateTo("storage", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg><span className="tip">Storage</span></div>
+              <div className={`nav-item ${currentPage === "audit-logs" ? "active" : ""}`} data-menu="audit-logs" onClick={() => navigateTo("audit-logs", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg><span className="tip">Audit Logs</span></div>
+              <div className={`nav-item ${currentPage === "backups" ? "active" : ""}`} data-menu="backups" onClick={() => navigateTo("backups", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" /></svg><span className="tip">Backups</span></div>
+              <div className={`nav-item ${currentPage === "monitoring" ? "active" : ""}`} data-menu="monitoring" onClick={() => navigateTo("monitoring", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg><span className="tip">Monitoring</span></div>
+              <div className={`nav-item ${currentPage === "deployments" ? "active" : ""}`} data-menu="deployments" onClick={() => navigateTo("deployments", "admin")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /><polyline points="7.5 10.5 12 15 16.5 10.5" /></svg><span className="tip">Deployments</span></div>
+              <div className="nav-divider"></div>
+            </div>
+          )}
+
+          <div className="bottom-section">
+            <div className={`nav-item ${currentPage === "settings" ? "active" : ""}`} data-menu="settings" onClick={() => navigateTo("settings", "business")}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></svg><span className="tip">Settings</span>
+            </div>
+            <div className={`nav-item ${currentPage === "help" ? "active" : ""}`} data-menu="help" onClick={() => navigateTo("help", "business")}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg><span className="tip">Help</span>
+            </div>
+            <div className={`nav-item ${currentPage === "account" ? "active" : ""}`} data-menu="account" onClick={() => navigateTo("account", "business")}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg><span className="tip">Account</span>
+            </div>
+          </div>
+        </nav>
+
+        {/* SECONDARY PANEL */}
+        <aside className={`secondary-panel ${secondaryOpen ? "open" : ""}`} id="secondaryPanel">
+          {currentView === "business" && (
+            <div id="spBrain">
+              <div className="sp-header">
+                <h3>Brain workspace</h3>
+                <div className="sp-search">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                  <input placeholder="Search templates, chats..." value={brainSearch} onChange={(e) => setBrainSearch(e.target.value)} />
+                  <span className="shortcut">⌘K</span>
+                </div>
+              </div>
+              <div className="sp-body">
+                <div className="sp-section">
+                  <div className="sp-section-title">Personal</div>
+                  {["New Chat","My Assistant","My Role","My Chats","Templates","Favorites","Shared with Me","Shared by Me"].filter(filteredBrainItems).map((t) => (
+                    <div key={t} className="sp-item" onClick={() => showToast(`Navigating to: ${t}`, "info")}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>{t}
+                    </div>
+                  ))}
+                </div>
+                <div className="sp-section">
+                  <div className="sp-section-title">AI Workspace</div>
+                  {["AI Employees","Chief of Staff","AI Work","Automations","Knowledge","AI Admin","Archive","Trash"].filter(filteredBrainItems).map((t) => (
+                    <div key={t} className="sp-item" onClick={() => showToast(`Navigating to: ${t}`, "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a7 7 0 017 7c0 3-2 5.5-4 7.5L12 22l-3-5.5C7 14.5 5 12 5 9a7 7 0 017-7z" /></svg>{t}</div>
+                  ))}
+                </div>
+                <div className="sp-section">
+                  <div className="sp-section-title">Folders</div>
+                  <div className="sp-item" onClick={() => showToast("Marketing Campaigns", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" /></svg>Marketing Campaigns<span className="sp-badge">3</span></div>
+                  <div className="sp-item" onClick={() => showToast("Legal Documents", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" /></svg>Legal Documents<span className="sp-badge">2</span></div>
+                  <div className="sp-item" onClick={() => showToast("Finance & GST", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" /></svg>Finance & GST<span className="sp-badge">5</span></div>
+                </div>
+                <div className="sp-section">
+                  <div className="sp-section-title">Chats</div>
+                  <div className="sp-item" onClick={() => showToast("Business plan draft", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" /></svg>Business plan draft</div>
+                  <div className="sp-item" onClick={() => showToast("Review coffee invoice", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" /></svg>Review coffee invoice</div>
+                </div>
+              </div>
+              <div className="sp-footer">
+                <div className="usage-label"><span>AI usage</span><span>35%</span></div>
+                <div className="usage-bar"><div className="usage-fill" style={{ width: "35%" }}></div></div>
+                <div className="usage-detail"><span>Sample usage</span><span>3,482 / 10,000 credits</span></div>
+              </div>
+            </div>
+          )}
+
+          {currentView === "admin" && currentPage !== "webhooks" && currentPage !== "api-gateway" && (
+            <div id="spSystem">
+              <div className="sp-header">
+                <h3>System Workspace</h3>
+                <div className="sp-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg><input placeholder="Search services..." /><span className="shortcut">⌘K</span></div>
+              </div>
+              <div className="sp-body">
+                <div className="sp-section">
+                  <div className="sp-section-title">Instance</div>
+                  <div className="sp-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>Service health</div>
+                  <div className="sp-item" onClick={() => showToast("Resource usage", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>Resource usage</div>
+                  <div className="sp-item" onClick={() => showToast("Configuration", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3" /></svg>Configuration</div>
+                  <div className="sp-item" onClick={() => showToast("Migrations", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3" /></svg>Migrations</div>
+                </div>
+                <div className="sp-section">
+                  <div className="sp-section-title">Security</div>
+                  <div className="sp-item" onClick={() => showToast("Access policies", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>Access policies</div>
+                  <div className="sp-item" onClick={() => showToast("Sessions", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>Sessions</div>
+                  <div className="sp-item" onClick={() => showToast("Passkey registry", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5" /></svg>Passkey registry</div>
+                  <div className="sp-item" onClick={() => showToast("Secrets vault", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg>Secrets vault</div>
+                </div>
+                <div className="sp-section">
+                  <div className="sp-section-title">Operations</div>
+                  <div className="sp-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6" /></svg>Queue inspector</div>
+                  <div className="sp-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" /></svg>Dead-letter jobs</div>
+                </div>
+                <div className="sp-section">
+                  <div className="sp-section-title">Evidence</div>
+                  <div className="sp-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /></svg>Audit events</div>
+                </div>
+              </div>
+              <div className="sp-footer">
+                <div className="usage-label"><span>Storage usage · Sample</span><span>58%</span></div>
+                <div className="usage-bar"><div className="usage-fill" style={{ width: "58%", background: "var(--amber)" }}></div></div>
+                <div className="usage-detail"><span>5.8 GB / 10.0 GB</span><span>ⓘ</span></div>
+                <div style={{ fontSize: "9.5px", marginTop: "4px", color: "var(--muted2)" }}>Secrets never displayed</div>
+              </div>
+            </div>
+          )}
+
+          {currentView === "admin" && (currentPage === "webhooks" || currentPage === "api-gateway") && (
+            <div id="spDeveloper">
+              <div className="sp-header">
+                <h3>Developer Workspace</h3>
+                <div className="sp-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg><input placeholder="Search endpoints..." /><span className="shortcut">⌘K</span></div>
+              </div>
+              <div className="sp-body">
+                <div className="sp-section">
+                  <div className="sp-section-title">API</div>
+                  <div className="sp-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6" /></svg>API overview</div>
+                  <div className="sp-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /></svg>Endpoints</div>
+                </div>
+                <div className="sp-section">
+                  <div className="sp-section-title">Webhooks</div>
+                  <div className="sp-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>Subscriptions</div>
+                  <div className="sp-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg>Delivery logs</div>
+                </div>
+              </div>
+              <div className="sp-footer">
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}><div className="health-dot green"></div><span style={{ fontSize: "11px" }}>Development mode</span></div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg><span style={{ fontSize: "11px" }}>Secrets stay masked</span></div>
+              </div>
+            </div>
+          )}
+        </aside>
+
+        {/* MAIN AREA */}
+        <div className="main-area">
+          <header className="topbar" data-safe-area-sticky-top style={{ top: "var(--safe-area-inset-top)" }}>
+            <div className="ws-select" onClick={() => switchView(currentView === "business" ? "admin" : "business")}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" /></svg>
+              <span>{currentView === "business" ? "Kochi Studio" : "Local instance"}</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
+            </div>
+            <button className="create-btn" onClick={() => showToast("Create: Order, Invoice, Task, Customer, Chat", "info")}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>Create<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
+            </button>
+
+            {/* MetaGuard Integration Badge */}
+            <div className="metabos-badge">
+              <div className="dot"></div>
+              <span style={{ fontWeight: 600, color: "var(--green)" }}>MetaGuard Secured</span>
+              <span style={{ color: "var(--muted)" }}>·</span>
+              <span>MetaKeys</span>
+              <span style={{ color: "var(--muted)" }}>·</span>
+              <span>Metabolic M1</span>
+            </div>
+
+            <div className="top-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <input placeholder="Search MeTaBos... ⌘K" onFocus={() => setCmdOpen(true)} readOnly />
+            </div>
+            <div className="top-actions">
+              <div style={{ position: "relative" }}>
+                <button className="top-btn" onClick={() => setNotifOpen(!notifOpen)}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></svg><span className="badge-dot"></span>
+                </button>
+                <div className={`notif-dd ${notifOpen ? "open" : ""}`} id="notifDd">
+                  <div style={{ fontSize: "12px", fontWeight: 600, marginBottom: "8px" }}>Notifications</div>
+                  <div className="notif-item"><div className="ni-title">Invoice draft created</div><div className="ni-desc">INV-2024-1032 for BrewBeans Co.</div><div className="ni-time">2 hours ago</div></div>
+                  <div className="notif-item"><div className="ni-title">Stock update</div><div className="ni-desc">Coffee beans — quantity adjusted</div><div className="ni-time">5 hours ago</div></div>
+                  <div className="notif-item"><div className="ni-title">MetaKey attestation verified</div><div className="ni-desc">SE050 · Counter 48291 · Gate2 OK</div><div className="ni-time">6 hours ago</div></div>
+                </div>
+              </div>
+              <button className="top-btn" title="Help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg></button>
+              <div className="profile-btn" onClick={() => navigateTo("account", "business")}>
+                <div className="avatar">F</div>
+                <span className="profile-name">Febin</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
+              </div>
+            </div>
+          </header>
+
+          <main className="content" id="mainContent">
+            {/* MISSION CONTROL */}
+            <div className={`page-content ${currentPage === "mission" ? "active" : ""}`} id="page-mission">
+              <div className="tabs">
+                <div className="tab active">Overview</div>
+                <div className="tab">Performance</div>
+                <div className="tab">Insights</div>
+                <div className="tab">Analytics</div>
+                <div style={{ marginLeft: "auto", display: "flex", gap: "6px", alignItems: "center" }}>
+                  <button className="btn btn-secondary btn-sm" onClick={() => { reloadTasks(); showToast("Data refreshed", "success"); renderSalesChart(); }}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" /></svg>Refresh</button>
+                  <button className="btn btn-primary btn-sm" onClick={() => showToast("Widget gallery opened", "info")}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>Add widget</button>
+                </div>
+              </div>
+              <div className="page-header">
+                <div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Overview</div><h1>Mission Control</h1><div className="subtitle">Your company, in one clear view. · Zero-Trust verified.</div></div>
+                <div className="header-actions"><div className="status-badge"><div className="dot"></div>LOCAL WORKSPACE · MetaGuard GUARD</div></div>
+              </div>
+
+              <div className="kpi-grid fade-in">
+                <div className="kpi-card" onClick={() => navigateTo("orders", "business")}>
+                  <div className="kpi-icon" style={{ background: "var(--amber-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg></div>
+                  <div className="kpi-info"><div className="kpi-label">Awaiting approval</div><div className="kpi-value">3</div><div className="kpi-sub">Sample business records</div></div>
+                  <svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                </div>
+                <div className="kpi-card" onClick={() => navigateTo("money", "business")}>
+                  <div className="kpi-icon" style={{ background: "var(--green-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2" /><circle cx="12" cy="12" r="3" /></svg></div>
+                  <div className="kpi-info"><div className="kpi-label">Outstanding invoices</div><div className="kpi-value">₹18,420</div><div className="kpi-sub">Sample invoice data</div></div>
+                  <svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                </div>
+                <div className="kpi-card" onClick={() => navigateTo("operations", "business")}>
+                  <div className="kpi-icon" style={{ background: "var(--blue-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg></div>
+                  <div className="kpi-info"><div className="kpi-label">Open tasks</div><div className="kpi-value">{tasksPending || 12}</div><div className="kpi-sub">Durable records via API</div></div>
+                  <svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                </div>
+                <div className="kpi-card" onClick={() => navigateTo("stock", "business")}>
+                  <div className="kpi-icon" style={{ background: "var(--red-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg></div>
+                  <div className="kpi-info"><div className="kpi-label">Stock alerts</div><div className="kpi-value">2</div><div className="kpi-sub">Sample inventory data</div></div>
+                  <svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                </div>
+              </div>
+
+              <div className="two-col fade-in">
+                <div className="card">
+                  <div className="card-header"><div><h3>Connected Business</h3><div className="card-subtitle">People, data and operations, working together.</div></div></div>
+                  <div className="graph-container">
+                    <svg width="100%" height="100%" style={{ position: "absolute", top: 0, left: 0 }}>
+                      <line x1="50%" y1="50%" x2="22%" y2="22%" stroke="#2a2a2a" strokeWidth="1" strokeDasharray="3" />
+                      <line x1="50%" y1="50%" x2="78%" y2="22%" stroke="#2a2a2a" strokeWidth="1" strokeDasharray="3" />
+                      <line x1="50%" y1="50%" x2="12%" y2="50%" stroke="#2a2a2a" strokeWidth="1" strokeDasharray="3" />
+                      <line x1="50%" y1="50%" x2="88%" y2="50%" stroke="#2a2a2a" strokeWidth="1" strokeDasharray="3" />
+                      <line x1="50%" y1="50%" x2="22%" y2="78%" stroke="#2a2a2a" strokeWidth="1" strokeDasharray="3" />
+                      <line x1="50%" y1="50%" x2="78%" y2="78%" stroke="#2a2a2a" strokeWidth="1" strokeDasharray="3" />
+                      <line x1="50%" y1="50%" x2="50%" y2="12%" stroke="#2a2a2a" strokeWidth="1" strokeDasharray="3" />
+                      <line x1="50%" y1="50%" x2="50%" y2="88%" stroke="#2a2a2a" strokeWidth="1" strokeDasharray="3" />
+                    </svg>
+                    <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: "56px", height: "56px", borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "22px", color: "#fff", zIndex: 2, boxShadow: "0 0 24px rgba(255,42,42,.35)" }}><span style={{ marginTop: "2px" }}>M</span></div>
+                    <div style={{ position: "absolute", left: "50%", top: "calc(50% + 34px)", transform: "translateX(-50%)", fontSize: "11px", fontWeight: 600, zIndex: 2 }}>MeTaBos</div>
+                    <div className="graph-node" style={{ position: "absolute", left: "18%", top: "16%", width: "38px", height: "38px", borderRadius: "50%", background: "var(--purple-dim)", border: "2px solid var(--purple)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }} onClick={() => navigateTo("orders", "business")}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /></svg></div>
+                    <div style={{ position: "absolute", left: "calc(18% + 44px)", top: "calc(16% + 8px)", fontSize: "10.5px", color: "var(--muted)" }}>Customers</div>
+                    <div className="graph-node" style={{ position: "absolute", left: "74%", top: "16%", width: "38px", height: "38px", borderRadius: "50%", background: "var(--green-dim)", border: "2px solid var(--green)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }} onClick={() => navigateTo("orders", "business")}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" /></svg></div>
+                    <div style={{ position: "absolute", left: "calc(74% + 44px)", top: "calc(16% + 8px)", fontSize: "10.5px", color: "var(--muted)" }}>Orders</div>
+                    <div className="graph-node" style={{ position: "absolute", left: "8%", top: "44%", width: "38px", height: "38px", borderRadius: "50%", background: "var(--amber-dim)", border: "2px solid var(--amber)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }} onClick={() => navigateTo("stock", "business")}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2"><path d="M18 8h1a4 4 0 010 8h-1" /><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" /><line x1="6" y1="1" x2="6" y2="4" /><line x1="10" y1="1" x2="10" y2="4" /><line x1="14" y1="1" x2="14" y2="4" /></svg></div>
+                    <div style={{ position: "absolute", left: "calc(8% + 44px)", top: "calc(44% + 8px)", fontSize: "10.5px", color: "var(--muted)" }}>Coffee</div>
+                    <div className="graph-node" style={{ position: "absolute", left: "84%", top: "44%", width: "38px", height: "38px", borderRadius: "50%", background: "var(--blue-dim)", border: "2px solid var(--blue)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }} onClick={() => navigateTo("money", "business")}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg></div>
+                    <div style={{ position: "absolute", left: "calc(84% + 44px)", top: "calc(44% + 8px)", fontSize: "10.5px", color: "var(--muted)" }}>Invoices</div>
+                    <div className="graph-node" style={{ position: "absolute", left: "18%", top: "72%", width: "38px", height: "38px", borderRadius: "50%", background: "var(--amber-dim)", border: "2px solid var(--amber)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }} onClick={() => navigateTo("stock", "business")}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg></div>
+                    <div style={{ position: "absolute", left: "calc(18% + 44px)", top: "calc(72% + 8px)", fontSize: "10.5px", color: "var(--muted)" }}>Inventory</div>
+                    <div className="graph-node" style={{ position: "absolute", left: "74%", top: "72%", width: "38px", height: "38px", borderRadius: "50%", background: "var(--cyan-dim)", border: "2px solid var(--cyan)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }} onClick={() => navigateTo("operations", "business")}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg></div>
+                    <div style={{ position: "absolute", left: "calc(74% + 44px)", top: "calc(72% + 8px)", fontSize: "10.5px", color: "var(--muted)" }}>Tasks</div>
+                    <div className="graph-node" style={{ position: "absolute", left: "50%", top: "6%", transform: "translateX(-50%)", width: "38px", height: "38px", borderRadius: "50%", background: "var(--red-dim)", border: "2px solid var(--red)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }} onClick={() => navigateTo("account", "business")}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></div>
+                    <div style={{ position: "absolute", left: "50%", top: "calc(6% + 42px)", transform: "translateX(-50%)", fontSize: "10.5px", color: "var(--muted)" }}>Founder</div>
+                    <div className="graph-node" style={{ position: "absolute", left: "50%", top: "84%", transform: "translateX(-50%)", width: "38px", height: "38px", borderRadius: "50%", background: "var(--purple-dim)", border: "2px solid var(--purple)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }} onClick={() => navigateTo("evidence", "business")}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg></div>
+                    <div style={{ position: "absolute", left: "50%", top: "calc(84% + 42px)", transform: "translateX(-50%)", fontSize: "10.5px", color: "var(--muted)" }}>Evidence</div>
+                  </div>
+                </div>
+
+                <div className="card">
+                  <div className="card-header"><div><h3>Attention & approvals</h3><div className="card-subtitle">3 items need your attention.</div></div><a className="card-action" onClick={() => navigateTo("orders", "business")}>View all <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></a></div>
+                  <div className="appr-item">
+                    <div className="appr-icon" style={{ background: "var(--amber-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2"><path d="M18 8h1a4 4 0 010 8h-1" /><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" /><line x1="6" y1="1" x2="6" y2="4" /><line x1="10" y1="1" x2="10" y2="4" /><line x1="14" y1="1" x2="14" y2="4" /></svg></div>
+                    <div className="appr-info"><div className="appr-title">Coffee order · ₹471.98</div><div className="appr-desc">Exact payload review</div><div className="appr-meta">From BrewBeans Co.</div></div>
+                    <span className="appr-status amber">● Review required</span>
+                    <div className="appr-time">2 hours ago</div>
+                    <button className="review-btn" onClick={() => showToast("Opening review...", "info")}>Review</button>
+                  </div>
+                  <div className="appr-item">
+                    <div className="appr-icon" style={{ background: "var(--amber-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg></div>
+                    <div className="appr-info"><div className="appr-title">Inventory adjustment</div><div className="appr-desc">Stock count variance</div><div className="appr-meta">Main warehouse</div></div>
+                    <span className="appr-status amber">● Approval pending</span>
+                    <div className="appr-time">5 hours ago</div>
+                    <button className="review-btn" onClick={() => showToast("Opening review...", "info")}>Review</button>
+                  </div>
+                  <div className="appr-item">
+                    <div className="appr-icon" style={{ background: "var(--purple-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2" /><circle cx="12" cy="12" r="3" /></svg></div>
+                    <div className="appr-info"><div className="appr-title">Payment request</div><div className="appr-desc">Vendor payment · ₹2,380</div><div className="appr-meta">To Roaster Supplies</div></div>
+                    <span className="appr-status purple">● Awaiting settlement</span>
+                    <div className="appr-time">1 day ago</div>
+                    <button className="review-btn" onClick={() => showToast("Opening review...", "info")}>Review</button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="three-col fade-in">
+                <div className="card">
+                  <div className="card-header"><div><h3>Sales & order activity</h3></div><div style={{ display: "flex", alignItems: "center", gap: "10px" }}><div className="chart-legend"><div className="chart-legend-item"><div className="chart-legend-dot" style={{ background: "var(--accent)" }}></div>Invoices</div><div className="chart-legend-item"><div className="chart-legend-dot" style={{ background: "#555" }}></div>Orders</div></div><select style={{ fontSize: "10.5px", padding: "3px 7px" }} onChange={() => { showToast("Chart updated", "info"); renderSalesChart(); }}><option>Last 30 days</option><option>Last 7 days</option></select></div></div>
+                  <canvas ref={salesRef} width={400} height={160} style={{ width: "100%", height: "160px" }}></canvas>
+                  <div style={{ fontSize: "10.5px", color: "var(--muted)", marginTop: "6px" }}>Sample invoice activity (not actual revenue data).</div>
+                </div>
+
+                <div className="card">
+                  <div className="card-header"><div><h3>Today's tasks</h3><div className="card-subtitle">{tasks.length} tasks · {tasksPending} due today</div></div><a className="card-action" onClick={() => navigateTo("operations", "business")}>View all <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></a></div>
+                  <div id="taskList">
+                    {tasksDisplay.slice(0, 6).map((t: any) => (
+                      <div key={t.id} className="task-item">
+                        <div className={`task-cb ${t.value.done ? "checked" : ""}`} onClick={() => toggleTask(t)}></div>
+                        <span className={`task-text ${t.value.done ? "done" : ""}`} style={t.value.title.includes("Supplier") ? { color: "var(--amber)" } : {}}>{t.value.title}</span>
+                        {t.value.due && <span className="task-due today">{t.value.due}</span>}
+                        {tasks.length > 0 && <button className="btn btn-ghost btn-sm" onClick={() => deleteTask(t)} style={{ marginLeft: "auto", padding: "2px 6px" }}>✕</button>}
+                      </div>
+                    ))}
+                  </div>
+                  <button className="btn btn-secondary btn-sm" style={{ marginTop: "10px", width: "100%", justifyContent: "center" }} onClick={() => setAddTaskOpen(true)}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>Add task</button>
+                </div>
+
+                <div className="card">
+                  <div className="card-header"><div><h3>Appointments</h3></div><a className="card-action" onClick={() => navigateTo("operations", "business")}>Upcoming <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></a></div>
+                  <div className="appt-item"><div className="appt-icon" style={{ background: "var(--accent-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></div><div><div className="appt-time">10:00 AM – 10:30 AM</div><div className="appt-title">Founder sync</div><div className="appt-desc">Discuss Q4 marketing plan</div></div></div>
+                  <div className="appt-item"><div className="appt-icon" style={{ background: "var(--purple-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></div><div><div className="appt-time">2:00 PM – 2:30 PM</div><div className="appt-title">Vendor onboarding</div><div className="appt-desc">Roaster Supplies (Google Meet)</div></div></div>
+                </div>
+              </div>
+
+              <div className="three-col fade-in">
+                <div className="card">
+                  <div className="card-header"><div><h3>Business activity</h3><div className="card-subtitle">Latest updates from your workspace.</div></div><a className="card-action" onClick={() => navigateTo("evidence", "business")}>View all <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></a></div>
+                  <div className="act-item"><div className="act-dot" style={{ background: "var(--accent)" }}></div><div className="act-info"><div className="act-title">Invoice draft created</div><div className="act-desc">INV-2024-1032 for BrewBeans Co.</div></div><div className="act-time">2 hours ago</div></div>
+                  <div className="act-item"><div className="act-dot" style={{ background: "var(--green)" }}></div><div className="act-info"><div className="act-title">Stock update</div><div className="act-desc">Coffee beans — quantity adjusted</div></div><div className="act-time">5 hours ago</div></div>
+                  <div className="act-item"><div className="act-dot" style={{ background: "var(--purple)" }}></div><div className="act-info"><div className="act-title">Reminder created</div><div className="act-desc">Supplier call scheduled for 4:30 PM</div></div><div className="act-time">6 hours ago</div></div>
+                </div>
+                <div className="card">
+                  <div className="card-header"><div><h3>Channel connections</h3><div className="card-subtitle">Connect your communication channels.</div></div><a className="card-action" onClick={() => navigateTo("settings", "business")}>Manage <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></a></div>
+                  <div className="ch-item"><div className="ch-icon" style={{ background: "var(--green-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" /></svg></div><div><div className="ch-name">WhatsApp</div><div className="ch-status"><div className="dot" style={{ background: "var(--muted)" }}></div>Not connected</div></div><button className="ch-btn" onClick={() => showToast("WhatsApp connection requires provider setup", "info")}>Connect</button></div>
+                  <div className="ch-item"><div className="ch-icon" style={{ background: "var(--pink-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5" /><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg></div><div><div className="ch-name">Instagram</div><div className="ch-status"><div className="dot" style={{ background: "var(--muted)" }}></div>Not connected</div></div><button className="ch-btn" onClick={() => showToast("Instagram connection requires provider setup", "info")}>Connect</button></div>
+                  <div className="ch-item"><div className="ch-icon" style={{ background: "var(--blue-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg></div><div><div className="ch-name">Email</div><div className="ch-status"><div className="dot" style={{ background: "var(--amber)" }}></div>Setup required</div></div><button className="ch-btn" onClick={() => showToast("Email setup requires SMTP configuration", "info")}>Setup</button></div>
+                </div>
+                <div className="card">
+                  <div className="card-header"><div><h3>Founder brief</h3><div className="card-subtitle">Key updates for today.</div></div><a className="card-action" onClick={() => navigateTo("brain", "business")}>Open Brain <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></a></div>
+                  <div className="brief-item"><div className="brief-icon" style={{ background: "var(--amber-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg></div><div><div className="br-title">3 approvals pending</div><div className="br-desc">Coffee order, inventory adjustment, payment request</div></div></div>
+                  <div className="brief-item"><div className="brief-icon" style={{ background: "var(--red-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg></div><div><div className="br-title">2 stock items low</div><div className="br-desc">Arabica beans, paper cups</div></div></div>
+                  <div className="brief-item"><div className="brief-icon" style={{ background: "var(--green-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /></svg></div><div><div className="br-title">Orders steady</div><div className="br-desc">12 orders in the last 7 days (sample data)</div></div></div>
+                </div>
+              </div>
+            </div>
+
+            {/* ORDERS */}
+            <div className={`page-content ${currentPage === "orders" ? "active" : ""}`} id="page-orders">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Orders</div><h1>Orders</h1><div className="subtitle">Manage your sales pipeline, POS, bookings and customer relationships.</div></div><div className="header-actions"><button className="btn btn-primary" onClick={() => showToast("New order draft created", "success")}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>New Order</button></div></div>
+              <div className="filter-bar"><select><option>All statuses</option><option>Draft</option><option>Pending</option></select><select><option>All customers</option></select><input placeholder="Search orders..." style={{ width: "180px" }} /><select><option>Sort: Newest</option></select></div>
+              <div className="pipeline">
+                <div className="pipeline-col"><h4>Draft <span className="cnt">3</span></h4><div className="pipeline-card" onClick={() => setDrawerOpen(true)}><div className="pc-title">BrewBeans Co. — Coffee Order</div><div className="pc-meta">₹471.98 · Updated 2h ago</div></div><div className="pipeline-card"><div className="pc-title">Walk-in Customer #42</div><div className="pc-meta">₹185.00 · Updated 5h ago</div></div></div>
+                <div className="pipeline-col"><h4>Pending Approval <span className="cnt">2</span></h4><div className="pipeline-card"><div className="pc-title">Bulk Order — CafeChain</div><div className="pc-meta">₹8,500.00 · Awaiting review</div></div></div>
+                <div className="pipeline-col"><h4>Confirmed <span className="cnt">4</span></h4><div className="pipeline-card"><div className="pc-title">Morning Brew — Daily Order</div><div className="pc-meta">₹320.00 · Confirmed today</div></div></div>
+                <div className="pipeline-col"><h4>Completed <span className="cnt">7</span></h4><div className="pipeline-card"><div className="pc-title">Weekly Restock — BrewBeans</div><div className="pc-meta">3,200.00 · Completed</div></div></div>
+              </div>
+            </div>
+
+            {/* MONEY */}
+            <div className={`page-content ${currentPage === "money" ? "active" : ""}`} id="page-money">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Money</div><h1>Money</h1><div className="subtitle">Invoices, payments, settlements and financial controls.</div></div><div className="header-actions"><button className="btn btn-primary" onClick={() => showToast("New invoice draft created", "success")}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>New Invoice</button></div></div>
+              <div className="kpi-grid">
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--green-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg></div><div className="kpi-info"><div className="kpi-label">Collected this month</div><div className="kpi-value" style={{ fontSize: "20px" }}>₹45,280</div><div className="kpi-sub">12 invoices settled</div></div></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--amber-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg></div><div className="kpi-info"><div className="kpi-label">Pending</div><div className="kpi-value" style={{ fontSize: "20px" }}>₹18,420</div><div className="kpi-sub">3 invoices awaiting</div></div></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--red-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg></div><div className="kpi-info"><div className="kpi-label">Overdue</div><div className="kpi-value" style={{ fontSize: "20px" }}>₹3,200</div><div className="kpi-sub">1 invoice overdue 5 days</div></div></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--blue-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2" /></svg></div><div className="kpi-info"><div className="kpi-label">Payment requests</div><div className="kpi-value" style={{ fontSize: "20px" }}>₹2,380</div><div className="kpi-sub">1 awaiting settlement</div></div></div>
+              </div>
+              <div className="card"><div className="card-header"><h3>Recent Invoices</h3><button className="btn btn-secondary btn-sm">Export</button></div>
+                <table className="data-table"><thead><tr><th>Invoice</th><th>Customer</th><th>Amount</th><th>Status</th><th>Issued</th><th>Due</th></tr></thead><tbody>
+                  <tr><td>INV-2024-1032</td><td>BrewBeans Co.</td><td>₹471.98</td><td><span className="status-pill pending">Pending</span></td><td>Dec 10</td><td>Dec 25</td></tr>
+                  <tr><td>INV-2024-1031</td><td>TechCorp</td><td>₹2,400.00</td><td><span className="status-pill issued">Issued</span></td><td>Dec 9</td><td>Dec 24</td></tr>
+                  <tr><td>INV-2024-1030</td><td>CafeChain</td><td>₹8,500.00</td><td><span className="status-pill approved">Approved</span></td><td>Dec 8</td><td>Dec 23</td></tr>
+                </tbody></table>
+              </div>
+            </div>
+
+            {/* TALK */}
+            <div className={`page-content ${currentPage === "talk" ? "active" : ""}`} id="page-talk">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Talk</div><h1>Talk</h1><div className="subtitle">Communication channels, inbox and customer support.</div></div></div>
+              <div className="two-col">
+                <div className="card"><div className="card-header"><h3>Channel Status</h3></div>
+                  <div className="ch-item"><div className="ch-icon" style={{ background: "var(--green-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" /></svg></div><div><div className="ch-name">WhatsApp</div><div className="ch-status"><div className="dot" style={{ background: "var(--muted)" }}></div>Not connected</div></div><button className="ch-btn">Connect</button></div>
+                  <div className="ch-item"><div className="ch-icon" style={{ background: "var(--purple-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg></div><div><div className="ch-name">Web Chat</div><div className="ch-status"><div className="dot" style={{ background: "var(--green)" }}></div>Active</div></div><button className="ch-btn">Manage</button></div>
+                </div>
+                <div className="card"><div className="card-header"><h3>Business Inbox</h3><div className="card-subtitle">Unified triage across channels</div></div><div className="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg><h4>No active conversations</h4><p>Connect a channel to start receiving messages.</p></div></div>
+              </div>
+            </div>
+
+            {/* STOCK */}
+            <div className={`page-content ${currentPage === "stock" ? "active" : ""}`} id="page-stock">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Stock</div><h1>Stock</h1><div className="subtitle">Product catalog, inventory ledger and supply chain.</div></div><div className="header-actions"><button className="btn btn-primary" onClick={() => showToast("New product form opened", "success")}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>Add Product</button></div></div>
+              <div className="kpi-grid">
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--blue-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg></div><div className="kpi-info"><div className="kpi-label">Total SKUs</div><div className="kpi-value" style={{ fontSize: "20px" }}>24</div><div className="kpi-sub">Across 2 locations</div></div></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--red-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg></div><div className="kpi-info"><div className="kpi-label">Low Stock Alerts</div><div className="kpi-value" style={{ fontSize: "20px" }}>2</div><div className="kpi-sub">Arabica beans, paper cups</div></div></div>
+              </div>
+              <div className="card"><div className="card-header"><h3>Inventory</h3><div style={{ display: "flex", gap: "8px" }}><input placeholder="Search products..." style={{ width: "180px" }} /><select><option>All locations</option></select></div></div>
+                <table className="data-table"><thead><tr><th>SKU</th><th>Product</th><th>Location</th><th>Qty</th><th>Min</th><th>Status</th></tr></thead><tbody>
+                  <tr><td>COF-001</td><td>Arabica Beans (1kg)</td><td>Main warehouse</td><td style={{ color: "var(--red)", fontWeight: 600 }}>12</td><td>20</td><td><span className="status-pill failed">Low stock</span></td></tr>
+                  <tr><td>COF-002</td><td>Robusta Beans (1kg)</td><td>Main warehouse</td><td>45</td><td>20</td><td><span className="status-pill approved">OK</span></td></tr>
+                  <tr><td>CUP-001</td><td>Paper Cups (500pc)</td><td>Store front</td><td style={{ color: "var(--red)", fontWeight: 600 }}>80</td><td>200</td><td><span className="status-pill failed">Low stock</span></td></tr>
+                </tbody></table>
+              </div>
+            </div>
+
+            {/* GROWTH */}
+            <div className={`page-content ${currentPage === "growth" ? "active" : ""}`} id="page-growth">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Growth</div><h1>Growth</h1><div className="subtitle">Marketing, analytics, campaigns and customer acquisition.</div></div></div>
+              <div className="kpi-grid">
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--green-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /></svg></div><div className="kpi-info"><div className="kpi-label">Revenue (30d)</div><div className="kpi-value" style={{ fontSize: "20px" }}>₹67,080</div><div className="kpi-sub"><span className="kpi-dot" style={{ background: "var(--green)" }}></span>+12% vs previous</div></div></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--blue-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /></svg></div><div className="kpi-info"><div className="kpi-label">Orders (30d)</div><div className="kpi-value" style={{ fontSize: "20px" }}>142</div></div></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--purple-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2"><line x1="12" y1="20" x2="12" y2="10" /><line x1="18" y1="20" x2="18" y2="4" /><line x1="6" y1="20" x2="6" y2="16" /></svg></div><div className="kpi-info"><div className="kpi-label">Avg Order Value</div><div className="kpi-value" style={{ fontSize: "20px" }}>₹472</div></div></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--amber-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /></svg></div><div className="kpi-info"><div className="kpi-label">New Customers</div><div className="kpi-value" style={{ fontSize: "20px" }}>18</div></div></div>
+              </div>
+              <div className="card" style={{ marginBottom: "16px" }}><div className="card-header"><h3>Revenue Trend</h3><select style={{ fontSize: "10.5px", padding: "3px 7px" }}><option>Last 30 days</option></select></div><canvas ref={growthRef} width={400} height={160} style={{ width: "100%", height: "160px" }}></canvas></div>
+            </div>
+
+            {/* OPERATIONS */}
+            <div className={`page-content ${currentPage === "operations" ? "active" : ""}`} id="page-operations">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Operations</div><h1>Operations</h1><div className="subtitle">Team, tasks, projects and internal controls. · Persistent via trusted CRUD API.</div></div></div>
+              <div className="two-col">
+                <div className="card"><div className="card-header"><h3>Open Tasks</h3><span className="tag red">{tasks.length} open</span></div>
+                  {tasksDisplay.map((t: any) => (
+                    <div key={t.id} className="task-item">
+                      <div className={`task-cb ${t.value.done ? "checked" : ""}`} onClick={() => toggleTask(t)}></div>
+                      <span className={`task-text ${t.value.done ? "done" : ""}`}>{t.value.title}</span>
+                      <button className="btn btn-ghost btn-sm" onClick={() => deleteTask(t)} style={{ marginLeft: "auto" }}>✕</button>
+                    </div>
+                  ))}
+                  <button className="btn btn-primary btn-sm" style={{ marginTop: "10px", width: "100%", justifyContent: "center" }} onClick={() => setAddTaskOpen(true)}>+ Add Task</button>
+                </div>
+                <div className="card"><div className="card-header"><h3>Team</h3><button className="btn btn-secondary btn-sm" onClick={() => showToast("Invite team member", "info")}>Invite</button></div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 0", borderBottom: "1px solid var(--border2)" }}><div className="avatar" style={{ width: "30px", height: "30px", fontSize: "11px" }}>F</div><div style={{ flex: 1 }}><div style={{ fontSize: "12.5px", fontWeight: 500 }}>Febin (Founder)</div><div style={{ fontSize: "10.5px", color: "var(--muted)" }}>Owner · Full access · MetaKey Enrolled</div></div><span className="tag green">Active</span></div>
+                  <div className="empty-state" style={{ padding: "16px" }}><p style={{ fontSize: "11.5px" }}>No additional team members yet.</p></div>
+                </div>
+              </div>
+            </div>
+
+            {/* BRAIN */}
+            <div className={`page-content ${currentPage === "brain" ? "active" : ""}`} id="page-brain">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Brain</div><h1>Brain</h1><div className="subtitle">AI assistant, templates, knowledge and intelligent automation.</div></div><div className="header-actions"><button className="btn btn-primary" onClick={() => showToast("New chat started", "success")}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>New Chat</button></div></div>
+              <div className="card" style={{ marginBottom: "16px" }}><div className="card-header"><h3>Founder Templates</h3><div className="card-subtitle">Editable templates for common business operations</div></div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "10px" }}>
+                  {[
+                    { n: "Business Plan", d: "Development framework", c: "var(--accent)" },
+                    { n: "Market Analysis", d: "Report template", c: "var(--blue)" },
+                    { n: "Financial Forecast", d: "Projection model", c: "var(--green)" },
+                    { n: "Funding Scenario", d: "Simulation template", c: "var(--purple)" },
+                    { n: "Brand Identity", d: "Creation framework", c: "var(--amber)" },
+                    { n: "Legal Checklist", d: "Requirements template", c: "var(--cyan)" },
+                    { n: "Website Content", d: "Planning template", c: "var(--pink)" },
+                    { n: "Sales Pitch", d: "Script template", c: "var(--accent)" },
+                  ].map((t) => (
+                    <div key={t.n} className="feature-card" onClick={() => showToast(`Template "${t.n}" opened — draft created`, "success")}>
+                      <div className="fc-icon" style={{ background: "var(--accent-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke={t.c} strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg></div><div className="fc-title">{t.n}</div><div className="fc-desc">{t.d}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* EVIDENCE */}
+            <div className={`page-content ${currentPage === "evidence" ? "active" : ""}`} id="page-evidence">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Evidence</div><h1>Evidence</h1><div className="subtitle">Approval records, payload hashes, audit trail and verification reports.</div></div></div>
+              <div className="filter-bar"><select><option>All actors</option></select><select><option>All entities</option></select><select><option>All actions</option></select><input type="date" style={{ width: "140px" }} /></div>
+              <div className="card"><table className="data-table"><thead><tr><th>Timestamp</th><th>Actor</th><th>Entity</th><th>Action</th><th>Hash</th><th>Result</th></tr></thead><tbody>
+                <tr><td>2024-12-10 14:32</td><td>Febin</td><td>INV-2024-1032</td><td>Draft created</td><td style={{ fontFamily: "var(--mono)", fontSize: "10.5px" }}>a3f2...8c1d</td><td><span className="status-pill approved">Success</span></td></tr>
+                <tr><td>2024-12-10 14:30</td><td>System</td><td>COF-001</td><td>Stock adjusted</td><td style={{ fontFamily: "var(--mono)", fontSize: "10.5px" }}>b7e1...4f2a</td><td><span className="status-pill approved">Success</span></td></tr>
+                <tr><td>2024-12-10 10:15</td><td>MetaKey</td><td>SE050</td><td>Attestation verified</td><td style={{ fontFamily: "var(--mono)", fontSize: "10.5px" }}>m1k3...9a2b</td><td><span className="status-pill approved">Verified</span></td></tr>
+              </tbody></table></div>
+            </div>
+
+            {/* BUILDER */}
+            <div className={`page-content ${currentPage === "builder" ? "active" : ""}`} id="page-builder">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Builder</div><h1>Builder</h1><div className="subtitle">Content authoring, themes, forms and delivery controls.</div></div></div>
+              <div className="four-col">
+                {[
+                  { t: "Media Gallery", d: "Uploads, metadata, access and usage references." },
+                  { t: "Theme Customizer", d: "Tokens, preview and reversible application." },
+                  { t: "Forms", d: "Fields, validation, consent and submission destinations." },
+                  { t: "Website Builder", d: "Editable page blueprint, preview and publish review." },
+                ].map((f) => (
+                  <div key={f.t} className="feature-card" onClick={() => showToast(`${f.t} — planned`, "info")}><div className="fc-icon" style={{ background: "var(--blue-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg></div><div className="fc-title">{f.t}</div><div className="fc-desc">{f.d}</div><div className="fc-status tag amber">Planned</div></div>
+                ))}
+              </div>
+            </div>
+
+            {/* FOUNDATION */}
+            <div className={`page-content ${currentPage === "foundation" ? "active" : ""}`} id="page-foundation">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Foundation</div><h1>Foundation</h1><div className="subtitle">Business identity, legal records, governance and data protection.</div></div></div>
+              <div className="four-col">
+                {[
+                  { t: "Business Profile", d: "Legal name, identifiers, currency, timezone and addresses." },
+                  { t: "Documents Vault", d: "File versions, hashes, access and retention." },
+                  { t: "Terms & Privacy", d: "Version history and recorded assent." },
+                  { t: "Backups", d: "Snapshots, restore history and retention." },
+                ].map((f) => (
+                  <div key={f.t} className="feature-card" onClick={() => showToast(`${f.t} — planned`, "info")}><div className="fc-icon" style={{ background: "var(--purple-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" /></svg></div><div className="fc-title">{f.t}</div><div className="fc-desc">{f.d}</div><div className="fc-status tag amber">Planned</div></div>
+                ))}
+              </div>
+            </div>
+
+            {/* SYSTEM - Business view + Admin overlap */}
+            <div className={`page-content ${currentPage === "system" ? "active" : ""}`} id="page-system">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / System</div><h1>System</h1><div className="subtitle">Integration infrastructure, observability, storage and recovery. · MetaGuard Secured</div></div></div>
+              <div className="two-col">
+                <div className="card"><div className="card-header"><h3>System Health</h3><span className="tag green">Guard Active</span></div>
+                  <div className="health-row"><div className="health-dot green"></div><div className="health-name" style={{ fontSize: "12.5px" }}>Application</div><div style={{ flex: 1, fontSize: "11px", color: "var(--muted)" }}>All services operational</div><span className="tag green">Healthy</span></div>
+                  <div className="health-row"><div className="health-dot green"></div><div className="health-name" style={{ fontSize: "12.5px" }}>Database</div><div style={{ flex: 1, fontSize: "11px", color: "var(--muted)" }}>Connected · 12ms latency</div><span className="tag green">Healthy</span></div>
+                  <div className="health-row"><div className="health-dot amber"></div><div className="health-name" style={{ fontSize: "12.5px" }}>Task Queue</div><div style={{ flex: 1, fontSize: "11px", color: "var(--muted)" }}>3 pending jobs</div><span className="tag amber">Warning</span></div>
+                  <div className="card" style={{ marginTop: "12px", padding: "12px" }}>
+                    <div style={{ fontSize: "12px", fontWeight: 600, marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}><div className="health-dot green"></div>Security · MetaKey Device Status</div>
+                    <div className="metakey-card" style={{ padding: "10px", borderRadius: "8px", fontFamily: "var(--mono)", fontSize: "11.5px", lineHeight: 1.6 }}>
+                      <div style={{ color: "var(--green)", fontWeight: 600 }}>● SE050 Enrolled</div>
+                      <div>Monotonic Counter: <span style={{ color: "var(--text)" }}>48291</span></div>
+                      <div>Gate2 Attested · Metabolic M1 Verified</div>
+                      <div style={{ color: "var(--muted)", fontSize: "10.5px", marginTop: "4px" }}>MetaGuard Gateway signature validated · vLLM inference gated</div>
+                    </div>
+                    <div className="info-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg><span>Zero-Trust enforcement active. All privileged actions require MetaKey attestation.</span></div>
+                  </div>
+                </div>
+                <div className="card"><div className="card-header"><h3>Resource Usage</h3></div>
+                  <div style={{ marginBottom: "12px" }}><div style={{ display: "flex", justifyContent: "space-between", fontSize: "11.5px", marginBottom: "3px" }}><span>CPU</span><span>23%</span></div><div className="progress"><div className="progress-fill" style={{ width: "23%", background: "var(--green)" }}></div></div></div>
+                  <div style={{ marginBottom: "12px" }}><div style={{ display: "flex", justifyContent: "space-between", fontSize: "11.5px", marginBottom: "3px" }}><span>Memory</span><span>58%</span></div><div className="progress"><div className="progress-fill" style={{ width: "58%", background: "var(--amber)" }}></div></div></div>
+                  <div style={{ marginBottom: "12px" }}><div style={{ display: "flex", justifyContent: "space-between", fontSize: "11.5px", marginBottom: "3px" }}><span>Disk</span><span>34%</span></div><div className="progress"><div className="progress-fill" style={{ width: "34%", background: "var(--blue)" }}></div></div></div>
+                  <div><div style={{ display: "flex", justifyContent: "space-between", fontSize: "11.5px", marginBottom: "3px" }}><span>Network I/O</span><span>12 MB/s</span></div><div className="progress"><div className="progress-fill" style={{ width: "12%", background: "var(--purple)" }}></div></div></div>
+                  <div style={{ marginTop: "14px", paddingTop: "12px", borderTop: "1px solid var(--border2)" }}>
+                    <div style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "6px" }}>MetaGuard Stack</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "11px" }}>
+                      <div className="tag green">Gateway :8000 ✓</div><div className="tag green">Proxy :8443 ✓</div><div className="tag green">Guard :8001 ✓</div><div className="tag green">Redis ✓</div><div className="tag blue">vLLM ✓</div><div className="tag purple">SE050 ✓</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* WORKFLOWS */}
+            <div className={`page-content ${currentPage === "workflows" ? "active" : ""}`} id="page-workflows">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Workflows</div><h1>Workflows</h1><div className="subtitle">Automated business processes with approval gates and evidence.</div></div><div className="header-actions"><button className="btn btn-primary" onClick={() => showToast("Workflow builder opened", "success")}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>New Workflow</button></div></div>
+              <div className="card"><div className="card-header"><h3>Workflow Library</h3></div><div className="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg><h4>No workflows configured</h4><p>Create your first workflow to automate business processes.</p><button className="btn btn-primary" style={{ marginTop: "10px" }} onClick={() => showToast("Workflow builder opened", "success")}>Create Workflow</button></div></div>
+            </div>
+
+            {/* SETTINGS */}
+            <div className={`page-content ${currentPage === "settings" ? "active" : ""}`} id="page-settings">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Settings & Control</div><h1>Settings & Control</h1><div className="subtitle">Business preferences, providers, security and data management.</div></div></div>
+              <div className="two-col">
+                <div className="card"><div className="card-header"><h3>Business Preferences</h3></div>
+                  <div className="fg" style={{ marginBottom: "12px" }}><label style={{ display: "block", fontSize: "11px", color: "var(--muted)", marginBottom: "3px" }}>Business Name</label><input defaultValue="Kochi Studio" style={{ width: "100%" }} /></div>
+                  <div className="fg" style={{ marginBottom: "12px" }}><label style={{ display: "block", fontSize: "11px", color: "var(--muted)", marginBottom: "3px" }}>Currency</label><select style={{ width: "100%" }}><option>INR (₹)</option><option>USD ($)</option></select></div>
+                  <button className="btn btn-primary" style={{ marginTop: "12px" }} onClick={() => showToast("Settings saved", "success")}>Save Changes</button>
+                </div>
+                <div className="card"><div className="card-header"><h3>Provider Connections</h3></div>
+                  <div className="ch-item"><div className="ch-icon" style={{ background: "var(--green-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" /></svg></div><div><div className="ch-name">WhatsApp Business</div><div className="ch-status"><div className="dot" style={{ background: "var(--muted)" }}></div>Not connected</div></div><button className="ch-btn">Connect</button></div>
+                </div>
+              </div>
+            </div>
+
+            {/* ACCOUNT */}
+            <div className={`page-content ${currentPage === "account" ? "active" : ""}`} id="page-account">
+              <div className="page-header"><div><div className="breadcrumb"><a href="#" onClick={(e) => { e.preventDefault(); navigateTo("mission", "business"); }}>Home</a> / Account</div><h1>Account</h1><div className="subtitle">Founder profile, security, sessions and personal data.</div></div></div>
+              <div className="two-col">
+                <div className="card"><div className="card-header"><h3>Founder Profile</h3></div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", borderBottom: "1px solid var(--border2)" }}><div className="avatar" style={{ width: "50px", height: "50px", fontSize: "20px" }}>F</div><div><div style={{ fontSize: "15px", fontWeight: 600 }}>Febin</div><div style={{ fontSize: "11.5px", color: "var(--muted)" }}>Founder · Owner · MetaKey SE050</div><div style={{ fontSize: "11.5px", color: "var(--muted)" }}>febin@kochistudio.com</div></div></div>
+                  <div className="fg" style={{ marginTop: "12px", marginBottom: "12px" }}><label style={{ display: "block", fontSize: "11px", color: "var(--muted)", marginBottom: "3px" }}>Display Name</label><input defaultValue="Febin" style={{ width: "100%" }} /></div>
+                  <button className="btn btn-primary" onClick={() => showToast("Profile updated", "success")}>Save</button>
+                </div>
+                <div className="card"><div className="card-header"><h3>Security</h3></div>
+                  <div className="sp-item" style={{ padding: "9px 0", borderBottom: "1px solid var(--border2)" }} onClick={() => showToast("Login methods management", "info")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: "15px", height: "15px" }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg><span style={{ flex: 1, fontSize: "12.5px" }}>Login Methods</span><span className="tag green">Password + MetaKey</span></div>
+                  <div className="sp-item" style={{ padding: "9px 0", borderBottom: "1px solid var(--border2)" }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: "15px", height: "15px" }}><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5" /></svg><span style={{ flex: 1, fontSize: "12.5px" }}>MetaKey</span><span className="tag green">SE050 Enrolled</span></div>
+                  <div className="sp-item" style={{ padding: "9px 0" }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: "15px", height: "15px" }}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg><span style={{ flex: 1, fontSize: "12.5px" }}>Monotonic Counter</span><span className="tag blue">48291</span></div>
+                </div>
+              </div>
+            </div>
+
+            {/* ADMIN OVERVIEW */}
+            <div className={`page-content ${currentPage === "admin-overview" ? "active" : ""}`} id="page-admin-overview">
+              <div className="tabs">
+                <div className="tab active">Overview</div><div className="tab">Infrastructure</div><div className="tab">Security</div><div className="tab">Jobs</div><div className="tab">Logs</div>
+                <div style={{ marginLeft: "auto", display: "flex", gap: "6px", alignItems: "center" }}>
+                  <select style={{ fontSize: "11px", padding: "4px 8px" }}><option>Last 24 hours</option></select>
+                  <button className="btn btn-secondary btn-sm" onClick={() => { showToast("Data refreshed", "success"); renderApiChart(); }}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" /></svg>Refresh</button>
+                  <button className="btn btn-primary btn-sm" onClick={() => showToast("Exporting report...", "info")}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>Export report</button>
+                </div>
+              </div>
+              <div className="page-header"><div><div className="breadcrumb">Admin / Overview</div><h1>Backend Command Center</h1><div className="subtitle">Monitor services, access, jobs and evidence. · MetaGuard stack</div></div><div className="header-actions"><div className="status-badge"><div className="dot"></div>LOCAL INSTANCE · Secured</div></div></div>
+
+              <div className="kpi-grid fade-in">
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--green-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><rect x="2" y="2" width="20" height="8" rx="2" /><rect x="2" y="14" width="20" height="8" rx="2" /><line x1="6" y1="6" x2="6.01" y2="6" /><line x1="6" y1="18" x2="6.01" y2="18" /></svg></div><div className="kpi-info"><div className="kpi-label">Services</div><div className="kpi-value">6 / 7</div><div className="kpi-sub"><span className="kpi-dot" style={{ background: "var(--red)" }}></span>1 degraded</div></div><svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--blue-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg></div><div className="kpi-info"><div className="kpi-label">API requests</div><div className="kpi-value">24,810</div><div className="kpi-sub"><span className="kpi-dot" style={{ background: "var(--muted)" }}></span>Sample · last 24h</div></div><svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--amber-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg></div><div className="kpi-info"><div className="kpi-label">Queue backlog</div><div className="kpi-value">18</div><div className="kpi-sub"><span className="kpi-dot" style={{ background: "var(--red)" }}></span>3 need review</div></div><svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--purple-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /></svg></div><div className="kpi-info"><div className="kpi-label">Last backup</div><div className="kpi-value" style={{ fontSize: "20px" }}>2 hours ago</div><div className="kpi-sub"><span className="kpi-dot" style={{ background: "var(--amber)" }}></span>Restore test pending</div></div><svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></div>
+              </div>
+
+              <div className="two-col fade-in">
+                <div className="card"><div className="card-header"><div><h3>Infrastructure health</h3><div className="card-subtitle">Core services and their current status.</div></div></div>
+                  <div className="health-row"><div className="health-dot green"></div><div className="health-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>Application API</div><div className="health-status green">Healthy</div><div className="health-detail">v0.1.1</div><div className="health-latency">42 ms</div><button className="btn btn-danger btn-sm" onClick={() => showToast("Inspecting Application API...", "info")}>Inspect</button></div>
+                  <div className="health-row"><div className="health-dot green"></div><div className="health-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /></svg>Business database</div><div className="health-status green">Healthy</div><div className="health-detail">SQLite</div><div className="health-latency">18 ms</div><button className="btn btn-danger btn-sm">Inspect</button></div>
+                  <div className="health-row"><div className="health-dot amber"></div><div className="health-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4" /></svg>Background worker</div><div className="health-status amber">Degraded</div><div className="health-detail">v0.1.1</div><div className="health-latency">320 ms</div><button className="btn btn-danger btn-sm">Inspect</button></div>
+                  <div className="health-row"><div className="health-dot green"></div><div className="health-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg>Object storage</div><div className="health-status green">Healthy</div><div className="health-detail">S3 (local)</div><div className="health-latency">36 ms</div><button className="btn btn-danger btn-sm">Inspect</button></div>
+                  <div className="health-row"><div className="health-dot green"></div><div className="health-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" /></svg>Message broker</div><div className="health-status green">Healthy</div><div className="health-detail">Redis</div><div className="health-latency">28 ms</div><button className="btn btn-danger btn-sm">Inspect</button></div>
+                </div>
+
+                <div className="card"><div className="card-header"><div><h3>Security & access</h3><div className="card-subtitle">Access activity and pending items.</div></div><button className="btn btn-danger btn-sm" onClick={() => showToast("Reviewing access policies...", "info")}>Review access policies</button></div>
+                  <div className="metric-row"><div className="health-name" style={{ fontSize: "12px" }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: "15px", height: "15px" }}><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" /></svg>Privileged sessions</div><div className="metric-value">2</div><div style={{ fontSize: "11px", color: "var(--muted)", marginLeft: "8px" }}>Active with elevated access</div><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: "var(--muted)" }}><polyline points="9 18 15 12 9 6" /></svg></div>
+                  <div className="metric-row"><div className="health-name" style={{ fontSize: "12px" }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: "15px", height: "15px" }}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>Pending approvals</div><div className="metric-value">3</div><div style={{ fontSize: "11px", color: "var(--muted)", marginLeft: "8px" }}>Require review</div><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: "var(--muted)" }}><polyline points="9 18 15 12 9 6" /></svg></div>
+                  <div className="metakey-card" style={{ marginTop: "12px", padding: "10px", borderRadius: "8px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 600, marginBottom: "6px", color: "var(--green)" }}>MetaKey Device Status · MetaGuard</div>
+                    <div style={{ fontFamily: "var(--mono)", fontSize: "11px", lineHeight: 1.6 }}>
+                      <div>SE050 Enrolled · Monotonic Counter: 48291 · Gate2 Attested</div>
+                      <div style={{ color: "var(--muted)" }}>Secure Enclave bound · Anti-clone counter active · vLLM gated inference</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="three-col fade-in">
+                <div className="card">
+                  <div className="card-header"><div><h3>API traffic & latency</h3></div><div style={{ display: "flex", alignItems: "center", gap: "10px" }}><div className="chart-legend"><div className="chart-legend-item"><div className="chart-legend-dot" style={{ background: "var(--accent)" }}></div>Requests (rps)</div><div className="chart-legend-item"><div className="chart-legend-dot" style={{ background: "#555" }}></div>Latency (ms)</div></div><select style={{ fontSize: "10px", padding: "2px 6px" }}><option>Last 24 hours</option></select></div></div>
+                  <canvas ref={apiRef} width={380} height={150} style={{ width: "100%", height: "150px" }}></canvas>
+                  <div style={{ fontSize: "10px", color: "var(--muted)", marginTop: "4px" }}>Sample telemetry data (not actual production metrics).</div>
+                </div>
+                <div className="card">
+                  <div className="card-header"><div><h3>Queue inspector</h3></div><a className="card-action" onClick={() => showToast("View all queues", "info")}>View all <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></a></div>
+                  <table className="data-table" style={{ fontSize: "12px" }}><thead><tr><th>Queue</th><th>Pending</th><th>Failed</th></tr></thead><tbody>
+                    <tr><td>webhooks</td><td style={{ color: "var(--amber)", fontWeight: 600 }}>8</td><td style={{ color: "var(--red)", fontWeight: 600 }}>1</td></tr>
+                    <tr><td>messaging</td><td style={{ color: "var(--amber)", fontWeight: 600 }}>6</td><td style={{ color: "var(--red)", fontWeight: 600 }}>2</td></tr>
+                    <tr><td>exports</td><td style={{ color: "var(--amber)", fontWeight: 600 }}>4</td><td>0</td></tr>
+                  </tbody></table>
+                  <button className="btn btn-secondary btn-sm" style={{ marginTop: "10px", width: "100%", justifyContent: "center" }} onClick={() => showToast("Opening dead-letter queue...", "info")}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>Open dead-letter queue</button>
+                </div>
+                <div className="card">
+                  <div className="card-header"><div><h3>Webhook deliveries</h3></div><a className="card-action" onClick={() => navigateTo("webhooks", "admin")}>Manage <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></a></div>
+                  <div className="ch-item"><div className="ch-icon" style={{ background: "var(--green-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" /></svg></div><div style={{ flex: 1 }}><div className="ch-name">WhatsApp</div></div><div className="ch-status"><div className="dot" style={{ background: "var(--red)" }}></div>Not configured</div></div>
+                  <div className="ch-item"><div className="ch-icon" style={{ background: "var(--blue-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2" /></svg></div><div style={{ flex: 1 }}><div className="ch-name">Payments</div></div><div className="ch-status"><div className="dot" style={{ background: "var(--red)" }}></div>Not configured</div></div>
+                  <div className="ch-item"><div className="ch-icon" style={{ background: "var(--purple-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" /></svg></div><div style={{ flex: 1 }}><div className="ch-name">Internal events</div></div><div className="ch-status"><div className="dot" style={{ background: "var(--green)" }}></div>Accepted</div></div>
+                </div>
+              </div>
+            </div>
+
+            {/* WEBHOOKS */}
+            <div className={`page-content ${currentPage === "webhooks" ? "active" : ""}`} id="page-webhooks">
+              <div className="tabs">
+                <div className="tab">Overview</div><div className="tab">Endpoints</div><div className="tab active">Webhooks</div><div className="tab">Delivery logs</div><div className="tab">Documentation</div>
+                <div style={{ marginLeft: "auto", display: "flex", gap: "6px", alignItems: "center" }}>
+                  <select style={{ fontSize: "11px", padding: "4px 8px" }}><option>Last 24 hours</option></select>
+                  <button className="btn btn-secondary btn-sm" onClick={() => showToast("Data refreshed", "success")}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" /></svg>Refresh</button>
+                  <button className="btn btn-primary btn-sm" onClick={() => showToast("Add endpoint dialog opened", "info")}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>Add endpoint</button>
+                </div>
+              </div>
+              <div className="page-header"><div><div className="breadcrumb">Admin / Developer</div><h1>API & Webhooks <span className="sandbox-badge">Sandbox</span></h1><div className="subtitle">Inspect requests, verify signatures and trace event delivery.</div></div></div>
+
+              <div className="kpi-grid fade-in">
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--green-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" /></svg></div><div className="kpi-info"><div className="kpi-label">Accepted events</div><div className="kpi-value">1,248</div><div className="kpi-sub"><span className="kpi-dot" style={{ background: "var(--green)" }}></span>+12% from previous period</div></div><svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--amber-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg></div><div className="kpi-info"><div className="kpi-label">Pending retries</div><div className="kpi-value">8</div><div className="kpi-sub"><span className="kpi-dot" style={{ background: "var(--amber)" }}></span>3 require review</div></div><svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--red-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg></div><div className="kpi-info"><div className="kpi-label">Rejected signatures</div><div className="kpi-value">3</div><div className="kpi-sub"><span className="kpi-dot" style={{ background: "var(--red)" }}></span>+0 from previous period</div></div><svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></div>
+                <div className="kpi-card"><div className="kpi-icon" style={{ background: "var(--purple-dim)" }}><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg></div><div className="kpi-info"><div className="kpi-label">Median processing</div><div className="kpi-value">42 ms</div><div className="kpi-sub"><span className="kpi-dot" style={{ background: "var(--green)" }}></span>-18% from previous period</div></div><svg className="kpi-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></div>
+              </div>
+              <div style={{ fontSize: "10.5px", color: "var(--muted)", marginBottom: "14px" }}>Sample telemetry — design preview · MetaGuard Gateway :8000 proxying</div>
+
+              <div className="two-col fade-in" style={{ gridTemplateColumns: "1.2fr 0.8fr" }}>
+                <div className="card">
+                  <div className="card-header"><div><h3>Webhook delivery log</h3></div><div style={{ display: "flex", gap: "6px" }}><input placeholder="Search event ID..." style={{ width: "140px", fontSize: "11px" }} /><select style={{ fontSize: "11px" }}><option>All sources</option></select><select style={{ fontSize: "11px" }}><option>All statuses</option></select></div></div>
+                  <table className="data-table" style={{ fontSize: "11.5px" }}><thead><tr><th>Event</th><th>Source</th><th>Received ↓</th><th>State</th><th>Attempts</th><th></th></tr></thead><tbody>
+                    <tr style={{ background: "var(--accent-dim)" }}><td style={{ fontWeight: 600 }}>evt_demo_1048</td><td>Internal</td><td>14:32:08</td><td><span className="status-pill processed">● Processed</span></td><td>1</td><td><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: "var(--muted)", cursor: "pointer" }}><polyline points="9 18 15 12 9 6" /></svg></td></tr>
+                    <tr><td>evt_demo_1047</td><td>Sandbox PSP</td><td>14:31:44</td><td><span className="status-pill retry">● Retry queued</span></td><td>2</td><td><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: "var(--muted)", cursor: "pointer" }}><polyline points="9 18 15 12 9 6" /></svg></td></tr>
+                    <tr><td>evt_demo_1046</td><td>Sandbox Meta</td><td>14:31:11</td><td><span className="status-pill rejected">● Rejected</span></td><td>1</td><td><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: "var(--muted)", cursor: "pointer" }}><polyline points="9 18 15 12 9 6" /></svg></td></tr>
+                    <tr><td>evt_demo_1045</td><td>Internal</td><td>14:30:52</td><td><span className="status-pill duplicate">● Duplicate</span></td><td>1</td><td><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: "var(--muted)", cursor: "pointer" }}><polyline points="9 18 15 12 9 6" /></svg></td></tr>
+                  </tbody></table>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "10px" }}><div style={{ fontSize: "10.5px", color: "var(--muted)" }}>6 sample events</div><div style={{ display: "flex", gap: "4px" }}><button className="btn btn-secondary btn-sm" style={{ padding: "3px 8px" }}>&lt;</button><button className="btn btn-primary btn-sm" style={{ padding: "3px 8px" }}>1</button><button className="btn btn-secondary btn-sm" style={{ padding: "3px 8px" }}>&gt;</button></div></div>
+
+                  <div style={{ marginTop: "16px", paddingTop: "14px", borderTop: "1px solid var(--border2)" }}>
+                    <div style={{ fontSize: "12px", fontWeight: 600, marginBottom: "10px" }}>Event processing timeline — evt_demo_1048</div>
+                    <div className="timeline">
+                      <div className="tl-step"><div className="tl-dot done">✓</div><div className="tl-label">Received</div><div className="tl-time">14:32:08</div><div className="tl-line done" style={{ left: "50%" }}></div></div>
+                      <div className="tl-step"><div className="tl-dot done">✓</div><div className="tl-label">Signature checked</div><div className="tl-time">14:32:08</div><div className="tl-line done" style={{ left: "50%" }}></div></div>
+                      <div className="tl-step"><div className="tl-dot done">✓</div><div className="tl-label">Stored</div><div className="tl-time">14:32:09</div><div className="tl-line done" style={{ left: "50%" }}></div></div>
+                      <div className="tl-step"><div className="tl-dot done">✓</div><div className="tl-label">Processed</div><div className="tl-time">14:32:10</div></div>
+                    </div>
+                    <div className="info-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg><span>Acknowledge after verified durable acceptance. MetaGuard Guard validates.</span></div>
+                  </div>
+                </div>
+
+                <div className="card" id="eventInspector">
+                  <div className="card-header"><div><h3>Event inspector <span style={{ color: "var(--green)", fontSize: "11px" }}>●</span></h3></div><button className="btn btn-ghost btn-sm" onClick={() => showToast("Event inspector closed", "info")} style={{ fontSize: "16px" }}>✕</button></div>
+                  <div style={{ marginBottom: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg><span style={{ fontSize: "14px", fontWeight: 600 }}>evt_demo_1048</span><span className="status-pill processed" style={{ marginLeft: "auto" }}>● Processed</span></div>
+                    <div style={{ fontSize: "10.5px", color: "var(--muted)" }}>Internal · invoice.draft.created · 14:32:08 · 1 attempt</div>
+                  </div>
+                  <div style={{ display: "flex", gap: "4px", marginBottom: "12px", borderBottom: "1px solid var(--border2)" }}>
+                    <div style={{ padding: "6px 12px", fontSize: "11.5px", fontWeight: 600, color: "var(--accent)", borderBottom: "2px solid var(--accent)", cursor: "pointer" }}>Payload</div>
+                    <div style={{ padding: "6px 12px", fontSize: "11.5px", color: "var(--muted)", cursor: "pointer" }}>Headers</div>
+                    <div style={{ padding: "6px 12px", fontSize: "11.5px", color: "var(--muted)", cursor: "pointer" }}>Attempts</div>
+                  </div>
+                  <div className="json-viewer">{`{
+  "event_id": "evt_demo_1048",
+  "type": "invoice.draft.created",
+  "invoice_id": "inv_demo_021",
+  "currency": "INR",
+  "total_minor": 47198,
+  "metakey": "SE050",
+  "counter": 48291,
+  "attestation": "Gate2"
+}`}</div>
+                  <div style={{ marginTop: "12px" }}>
+                    <div className="metric-row"><div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "var(--muted)" }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>Signature</div><div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11.5px" }}><span className="health-dot green"></span><span style={{ color: "var(--green)" }}>Valid · sample</span></div></div>
+                    <div className="metric-row"><div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "var(--muted)" }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /></svg>Idempotency key</div><div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11.5px" }}><span className="health-dot green"></span><span style={{ color: "var(--green)" }}>Matched</span></div></div>
+                    <div className="metric-row"><div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "var(--muted)" }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /></svg>Payload hash</div><div style={{ fontSize: "11px", fontFamily: "var(--mono)", color: "var(--text2)" }}>sha256:8c21...a94f</div><button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto" }} onClick={() => showToast("Hash copied", "success")}>📋</button></div>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px", marginTop: "14px" }}>
+                    <button className="btn btn-secondary" style={{ flex: 1, justifyContent: "center" }} onClick={() => showToast("JSON copied to clipboard", "success")}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>Copy JSON</button>
+                    <button className="btn btn-danger" style={{ flex: 1, justifyContent: "center" }} onClick={() => showToast("Viewing evidence...", "info")}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>View evidence</button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="three-col fade-in">
+                <div className="card"><div className="card-header"><div><h3>Registered endpoints</h3></div><a className="card-action" onClick={() => showToast("Manage endpoints", "info")}>Manage <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></a></div>
+                  <table className="data-table" style={{ fontSize: "11.5px" }}><thead><tr><th>Endpoint</th><th>Source</th><th>Status</th></tr></thead><tbody>
+                    <tr><td style={{ fontFamily: "var(--mono)", fontSize: "10.5px" }}>/api/webhooks/internal</td><td>Sandbox</td><td><span className="status-pill approved">● Active</span></td></tr>
+                    <tr><td style={{ fontFamily: "var(--mono)", fontSize: "10.5px" }}>/api/webhooks/whatsapp</td><td>Internal</td><td><span className="status-pill draft">● Not configured</span></td></tr>
+                    <tr><td style={{ fontFamily: "var(--mono)", fontSize: "10.5px" }}>/api/webhooks/payment</td><td>Sandbox</td><td><span className="status-pill draft">● Not configured</span></td></tr>
+                  </tbody></table>
+                </div>
+                <div className="card"><div className="card-header"><div><h3>Retry policy</h3></div><a className="card-action" onClick={() => showToast("Edit retry policy", "info")}>Edit policy <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg></a></div>
+                  <div className="metric-row"><div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "var(--muted)" }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>Backoff</div><div className="metric-value">Exponential</div></div>
+                  <div className="metric-row"><div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "var(--muted)" }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>Max attempts</div><div className="metric-value">5</div></div>
+                  <div className="metric-row"><div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "var(--muted)" }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>Next retry</div><div className="metric-value">30 seconds</div></div>
+                  <div style={{ marginTop: "8px", display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}><span className="health-dot red"></span><span style={{ color: "var(--red)" }}>Failed jobs require review</span></div>
+                </div>
+                <div className="card"><div className="card-header"><div><h3>Request tester</h3></div></div>
+                  <div style={{ display: "flex", gap: "6px", marginBottom: "10px" }}><select style={{ fontSize: "11px", padding: "4px 6px" }}><option>POST</option></select><select style={{ fontSize: "11px", padding: "4px 6px", flex: 1 }}><option>/api/webhooks/internal</option></select></div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px", fontSize: "11.5px" }}><input type="checkbox" defaultChecked style={{ width: "14px", height: "14px", accentColor: "var(--accent)" }} /><span>Use sample event</span></div>
+                  <div style={{ display: "flex", gap: "6px", marginBottom: "10px" }}>
+                    <button className="btn btn-secondary" style={{ flex: 1, justifyContent: "center", fontSize: "11px" }} onClick={() => showToast("Payload validated", "success")}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>Validate payload</button>
+                    <button className="btn btn-primary" style={{ flex: 1, justifyContent: "center", fontSize: "11px" }} onClick={() => showToast("Sandbox event sent", "success")}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>Send sandbox event</button>
+                  </div>
+                  <div className="info-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg><span>Payment events require provider verification. A request is not settlement.</span></div>
+                </div>
+              </div>
+            </div>
+
+            {/* ADMIN GENERIC PAGES */}
+            {[
+              { id: "businesses", title: "Businesses", sub: "Manage registered business workspaces." },
+              { id: "users", title: "Users & Roles", sub: "User accounts, roles and permissions." },
+              { id: "approvals", title: "Approvals", sub: "Review and authorize pending operations." },
+              { id: "database", title: "Database", sub: "Database connections, performance and migrations." },
+              { id: "api-gateway", title: "API Gateway", sub: "Routes, rate policies and rejection metrics." },
+              { id: "queues", title: "Queues & Workers", sub: "Job queues, workers and dead-letter management." },
+              { id: "ai-providers", title: "AI Providers", sub: "Model providers, budgets and permissions." },
+              { id: "integrations", title: "Integrations", sub: "Third-party integrations and adapter status." },
+              { id: "storage", title: "Storage", sub: "Object storage, quotas and access policy." },
+              { id: "audit-logs", title: "Audit Logs", sub: "Filtered view of canonical evidence records." },
+              { id: "backups", title: "Backups", sub: "Snapshots, restore history and retention." },
+              { id: "monitoring", title: "Monitoring", sub: "System metrics, alerts and health checks." },
+              { id: "deployments", title: "Deployments", sub: "Deployment history, release checks and service management." },
+              { id: "help", title: "Help & Support", sub: "Documentation, guides, troubleshooting and support." },
+            ].map((p) => (
+              <div key={p.id} className={`page-content ${currentPage === p.id ? "active" : ""}`} id={`page-${p.id}`}>
+                <div className="page-header"><div><div className="breadcrumb">{currentView === "admin" ? `Admin / ${p.title}` : `Home / ${p.title}`}</div><h1>{p.title}</h1><div className="subtitle">{p.sub}</div></div></div>
+                <div className="card"><div className="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg><h4>{p.title} module</h4><p>Zero-Trust verified · MetaGuard stack · Production concept view.</p><button className="btn btn-secondary" style={{ marginTop: "10px" }} onClick={() => showToast(`${p.title} — coming soon`, "info")}>View details</button></div></div>
+              </div>
+            ))}
+          </main>
+
+          <div className="footer">
+            <span>MeTaBos · Built by CodesbyFebin · Cyber AI Business OS x MetaGuard</span>
+            <span>MetaGuard Gateway :8000 · Proxy :8443 · Guard :8001 · Redis · vLLM · MetaKey SE050 · Counter 48291</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Command Palette */}
+      <div className={`cmd-overlay ${cmdOpen ? "open" : ""}`} id="cmdOverlay" onClick={(e) => { if ((e.target as HTMLElement).id === "cmdOverlay") { setCmdOpen(false); setCmdQuery(""); } }}>
+        <div className="cmd-palette" onClick={(e) => e.stopPropagation()}>
+          <input placeholder="Type a command or search... ⌘K" value={cmdQuery} onChange={(e) => setCmdQuery(e.target.value)} autoFocus={cmdOpen} />
+          <div className="cmd-results">
+            {filteredCmd.map((item, idx) => (
+              <div
+                key={idx}
+                className="cmd-result"
+                onClick={() => {
+                  if ((item as any).page) {
+                    navigateTo((item as any).page, (item as any).view);
+                  } else if ((item as any).action) {
+                    (item as any).action();
+                  }
+                  setCmdOpen(false);
+                  setCmdQuery("");
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                <span style={{ flex: 1 }}>{item.label}</span>
+                <span className="cmd-type">{item.type}</span>
+              </div>
+            ))}
+            {filteredCmd.length === 0 && <div style={{ padding: "12px", fontSize: "12px", color: "var(--muted)", textAlign: "center" }}>No results</div>}
+          </div>
+        </div>
+      </div>
+
+      {/* Add Task Modal */}
+      <div className={`modal-overlay ${addTaskOpen ? "open" : ""}`} id="addTaskModal" onClick={(e) => { if ((e.target as HTMLElement).id === "addTaskModal") setAddTaskOpen(false); }}>
+        <div className="modal">
+          <h2>Add Task · Durable Record</h2>
+          <div className="fg"><label>Task title</label><input value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} placeholder="Enter task title..." autoFocus /></div>
+          <div className="fg"><label>Due date (optional)</label><input type="text" value={newTaskDue} onChange={(e) => setNewTaskDue(e.target.value)} placeholder="e.g. Due today or 2024-12-15" /></div>
+          <div className="fg"><label>Notes (optional)</label><textarea value={newTaskNotes} onChange={(e) => setNewTaskNotes(e.target.value)} rows={3} placeholder="Additional details..."></textarea></div>
+          <div className="fg" style={{ fontSize: "10.5px", color: "var(--muted)" }}>Saves via records.create · idempotency_key enforced · MetaGuard Guard attested</div>
+          <div className="fa"><button className="btn btn-secondary" onClick={() => setAddTaskOpen(false)}>Cancel</button><button className="btn btn-primary" onClick={createTask} disabled={busy}>{busy ? "Saving..." : "Add Task"}</button></div>
+        </div>
+      </div>
+
+      {/* Drawer */}
+      <div className={`drawer-overlay ${drawerOpen ? "open" : ""}`} id="drawerOverlay" onClick={() => setDrawerOpen(false)}></div>
+      <div className={`drawer ${drawerOpen ? "open" : ""}`} id="detailDrawer">
+        <div className="dr-header"><h2>Order Detail</h2><div className="dr-close" onClick={() => setDrawerOpen(false)}>✕</div></div>
+        <div id="drawerContent">
+          <div style={{ marginBottom: "14px" }}><div style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "3px" }}>Order ID</div><div style={{ fontSize: "15px", fontWeight: 600 }}>ORD-2024-089</div></div>
+          <div style={{ marginBottom: "14px" }}><div style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "3px" }}>Customer</div><div style={{ fontSize: "13px" }}>BrewBeans Co.</div></div>
+          <div style={{ marginBottom: "14px" }}><div style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "3px" }}>Amount</div><div style={{ fontSize: "17px", fontWeight: 600, color: "var(--green)" }}>₹471.98</div></div>
+          <div style={{ marginBottom: "14px" }}><div style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "3px" }}>Status</div><span className="status-pill pending">Pending Approval</span></div>
+          <div style={{ marginBottom: "14px" }}><div style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "3px" }}>MetaKey Attestation</div><div className="metakey-card" style={{ padding: "8px", borderRadius: "6px", fontFamily: "var(--mono)", fontSize: "11px" }}>SE050 Enrolled · Counter 48291 · Gate2 Attested</div></div>
+          <div style={{ display: "flex", gap: "8px", marginTop: "18px" }}><button className="btn btn-primary" onClick={() => { showToast("Order approved", "success"); setDrawerOpen(false); }}>Approve</button><button className="btn btn-secondary" onClick={() => { showToast("Order rejected", "error"); setDrawerOpen(false); }}>Reject</button></div>
+        </div>
+      </div>
+
+      {/* Toast Container */}
+      <div className="toast-container" id="toastContainer">
+        {toasts.map((t) => (
+          <div key={t.id} className={`toast ${t.type}`}>
+            <span>{t.type === "success" ? "✓" : t.type === "error" ? "✕" : "ℹ"}</span>
+            <span>{t.msg}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
