@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 211,
+ "count": 212,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -2005,6 +2005,18 @@
    "idempotencyKey": false,
    "originCheck": true,
    "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/muzebos/hubs/{hub}",
+   "file": "app/api/muzebos/hubs/[hub]/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
    "access": "session"
   },
   {

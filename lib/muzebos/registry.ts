@@ -174,6 +174,8 @@ const MONEY_HACK: FeatureDefinition[] = [
 const BRAIN_HACK: FeatureDefinition[] = [
   mk('department-walls', 'Department Walls', 'Each department agent reads only its own data; refused reads are logged as evidence.', 'brain'),
   mk('memory', 'Layered Memory', 'Session, department, company and owner memory; agent and Muse notes stay drafts until a person promotes them.', 'brain'),
+  mk('activity', 'Jev Approvals & Activity', 'Runs waiting for approval, overdue approvals and the latest hash-chained evidence events.', 'brain'),
+  mk('agents', 'Agents', 'Per-agent task states and write requests from stored missions and workflow runs.', 'brain'),
 ];
 
 /** Business OS pages added during the hackathon, by menu. */
