@@ -4,7 +4,7 @@ export async function run({ page, base, vp, assert }) {
   const sfx = `${vp.name}-${Date.now() % 100000}`;
   const text = `Lease ${sfx}: rent 25000 per month`;
   const h = createHash('sha256').update(text, 'utf8').digest('hex');
-  await page.goto(`${base}/workspace/foundation/documents-vault`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/workspace/foundation/documents`, { waitUntil: 'networkidle' });
   const f = page.locator('form.mb-form');
   await f.getByLabel('Title *').fill(`Lease ${sfx}`);
   await f.getByLabel('Category *').selectOption('contract');

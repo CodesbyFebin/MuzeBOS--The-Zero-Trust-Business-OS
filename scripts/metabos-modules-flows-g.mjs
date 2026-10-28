@@ -6,7 +6,7 @@ export async function run({ page, post, base, vp, assert }) {
   const body = `Hello ${vp.name} ${Date.now()}`;
   const r = await post('/api/modules/talk.whatsapp-hub', { action: 'create', data: { customerId: customer.id, phone: '+919800000000', body } });
   assert.ok(r.ok(), await r.text());
-  await page.goto(`${base}/workspace/talk/whatsapp-hub`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/workspace/talk/whatsapp`, { waitUntil: 'networkidle' });
   const row = () => page.locator('tr', { hasText: body }).first();
   if (vp.name === 'desktop') {
     await row().getByRole('button', { name: 'Approve and queue' }).click();
