@@ -482,3 +482,9 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
  .mb-arena-floor canvas{width:760px!important;max-width:none!important}
 }
 .mb-arena-floor:focus-visible{outline:2px solid var(--mb-accent);outline-offset:2px}
+
+/* Arena 3D: responsive canvas, independently of the horizontally scrollable 2D floor. */
+.mb-arena-3d{width:100%;height:480px;min-width:0;overflow:hidden;background:var(--mb-bg);border:1px solid var(--mb-line);border-radius:8px;margin:12px 0}
+.mb-arena-3d canvas{display:block;width:100%;height:100%;touch-action:none}
+.mb-arena-toolbar button[aria-pressed=true]{border-color:var(--mb-accent);color:var(--mb-accent)}
+@media(max-width:760px){.mb-arena-3d{height:340px}}

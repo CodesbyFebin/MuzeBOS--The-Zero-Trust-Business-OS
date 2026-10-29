@@ -132,3 +132,12 @@ Submission remains blocked; a 100/100 readiness claim is unsupported.
 - Reviewed Munder Difflin, Nakama, Omarchy, OpenBot and Refly at pinned revisions; source and asset licenses recorded in `docs/arena/UPSTREAM-REVIEW.md`.
 - Implementing an original Pixi.js office bound to existing inference rows, versioned declarative skills and draft-only Jev proposals. No arbitrary CLI execution, computer provisioning or model call is enabled by the Arena.
 - Typecheck, production build and authenticated desktop/mobile browser checks completed; full suite: 5,358 passed, 2 previously reported Lab timeouts, 9 skipped. Production dependency audit: zero reported advisories. See `docs/arena/VERIFICATION.md`. Based on isolated PR #58; no default-branch merge or external sandbox deployment.
+
+## Arena 3D agents — 2026-10-29
+
+- Added a default Three.js office with original procedural robot models, camera controls and raycast selection linked to stored task details. The existing Pixi office and accessible task list remain selectable fallbacks.
+- Preserved persisted-task projection, Jev approval, the 18-menu shell and all server execution boundaries. No model call, worker provisioning or autonomous action added.
+- Added bounded layout coverage and expanded production browser checks for 3D selection, camera/view switching, context loss and mobile sizing. AdPilot's old global Three.js ban is now scoped to keep every non-Arena renderer free of that import.
+- Qualification and known inherited failures are recorded in `docs/arena/VERIFICATION.md`. Prepared on an isolated branch above PR #59, without a default-branch merge or deployment.
+
+- Final 3D qualification: types/build/43 focused tests and production desktop/mobile browser checks passed. Full suite: 5,361 passed, 2 inherited Lab timeouts, 9 skipped. Muse Code SDK integration is documented as planned, not executed.
