@@ -25,3 +25,18 @@ Optional `TEST_CHROMIUM_PATH` selects a local Chromium binary; `SHOTS_DIR` saves
 ## Limits
 
 No computer fleet, DID identity broker, zkVM proof system, automatic self-healing, cross-agent mailbox or public skill marketplace exists in this patch. The Arena is an observer plus an authenticated, versioned draft-plan editor. Existing authorization gaps in other routes and partial approval-bundle behavior from the earlier audit remain outside this patch. Kept as a separate draft PR; no existing PR merged.
+
+## 3D follow-up — 2026-10-29
+
+Base: PR #59 head `f3c8d8aee4b6a07402f067db83c3deef3777926f`. The API, persisted skills and Jev logic are unchanged.
+
+- Added Three.js 0.186.1 and development types 0.186.0; existing dependency versions remain unchanged. Production dependency audit: zero reported advisories.
+- Standalone typecheck passed. Initial production build exceeded Node's default 2GB heap; repeated with `NODE_OPTIONS=--max-old-space-size=4096`, without relaxing type checks or build validation.
+- Focused Arena/layout/registry/AdPilot suites: **43 tests passed**. AdPilot's old global package ban was updated to permit Three.js only in the lazy Arena renderer; other application renderers remain checked for imports.
+- The first complete suite reached 5,360 passed, 3 failed, 9 skipped. One failure was that superseded global dependency assertion, corrected and verified in the focused run above. The other two were the previously documented Lab retention/network timeouts; their code and timeout limits remain unchanged.
+- Production browser coverage includes saved skills/drafts, the real Three.js canvas, robot raycast selection into task details, camera controls, 2D switching, simulated context loss with usable fallback, desktop/mobile sizing, refresh-failure retention and sign-out clearing. Fixture leases/completion/delegation are recorded QA operations, without any provider/model call.
+- During the camera-adjustment rebuild, one generated route manifest was empty on a subsequent server start. Build artifacts were requalified by validating that manifest and starting the production browser check in sequence; no source-level route workaround or disabled check was added.
+
+Final qualification: the production build and route-manifest validation passed; the repeated authenticated desktop/mobile browser check passed without runtime errors after the camera adjustment. Final full-suite rerun (four workers): **5,361 passed, 2 known Lab timeouts, 9 skipped**, across 417 files (415 passed, 2 failed). No new failing test remains, and no all-green suite or production deployment claim is made.
+
+The operator subsequently supplied Muse Code product documentation. Official API/CLI/SDK, authentication, platform and permission boundaries were reviewed and recorded in `MUSE-CODE-ADAPTER.md`; that document is an integration plan, not a live SDK or worker implementation.
