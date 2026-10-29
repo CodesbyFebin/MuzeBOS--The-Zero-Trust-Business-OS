@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "customer-reply",
+  "name": "Customer reply draft",
+  "description": "Draft a reply from the context supplied by the merchant. Never sends a message.",
+  "tags": [
+    "talk"
+  ],
+  "approval": "jev-exact-hash",
+  "tools": [
+    "inference.draft"
+  ],
+  "steps": [
+    {
+      "name": "Draft reply",
+      "kind": "draft",
+      "lane": "browser",
+      "maxTokens": 256,
+      "instructions": "Draft a concise customer reply using supplied facts only. Flag any missing delivery, pricing or stock information. Never claim a message was sent."
+    }
+  ]
+}

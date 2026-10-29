@@ -126,3 +126,9 @@ Submission remains blocked; a 100/100 readiness claim is unsupported.
 - Keep all 18 destinations, Brain pinned above category clusters, command search, real notifications, details drawer and mobile tabs.
 - Remove later shell CSS overrides and the automatic opening intro; preserve page-level v3 design and newer backend functionality.
 - Typecheck, production build, 12 shell tests and desktop/mobile browser checks passed. Full suite: 5,350 passed, 2 Lab timeouts, 9 skipped; see `docs/PR46-SHELL-RESTORATION.md`. Prepared as a draft restoration PR; no stacked PRs merged by this work.
+
+## Arena workspace — 2026-10-29
+
+- Reviewed Munder Difflin, Nakama, Omarchy, OpenBot and Refly at pinned revisions; source and asset licenses recorded in `docs/arena/UPSTREAM-REVIEW.md`.
+- Implementing an original Pixi.js office bound to existing inference rows, versioned declarative skills and draft-only Jev proposals. No arbitrary CLI execution, computer provisioning or model call is enabled by the Arena.
+- Typecheck, production build and authenticated desktop/mobile browser checks completed; full suite: 5,358 passed, 2 previously reported Lab timeouts, 9 skipped. Production dependency audit: zero reported advisories. See `docs/arena/VERIFICATION.md`. Based on isolated PR #58; no default-branch merge or external sandbox deployment.

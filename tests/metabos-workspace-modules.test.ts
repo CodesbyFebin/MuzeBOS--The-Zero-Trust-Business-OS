@@ -28,7 +28,7 @@ describe('registry flip', () => {
       expect(pageForSegments(section, page)?.id).toBe(m.id);
     }
     expect(ALL_FEATURES.find((f) => f.id === 'workflows.canvas')!.route).toBe('/workspace/workflows/canvas');
-    expect(statusCounts()).toMatchObject({ available: 185, existing: 7, 'needs-credentials': 43 });
+    expect(statusCounts()).toMatchObject({ available: 186, existing: 7, 'needs-credentials': 43 });
   });
 });
 

@@ -457,3 +457,28 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
  * No additional shell overrides: the original keyboard, focus, safe-area and
  * reduced-motion rules stay authoritative.
  */
+
+/* Arena: procedural office view and accessible record controls. */
+.mb-arena-floor{width:100%;overflow:hidden;min-height:180px;background:var(--mb-bg);border:1px solid var(--mb-line);border-radius:8px;margin:12px 0}
+.mb-arena-floor canvas{display:block;width:100%!important;height:auto!important}
+.mb-arena-list{list-style:none;padding:0;margin:10px 0;display:grid;gap:10px}
+.mb-arena-list li{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-bottom:1px solid var(--mb-line);padding:8px 0}
+.mb-arena-list li>div{min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.mb-arena-list small{display:block;overflow-wrap:anywhere;color:var(--mb-muted);width:100%}
+.mb-arena label{display:flex;flex-direction:column;gap:6px;margin:10px 0;color:var(--mb-text2)}
+.mb-arena textarea{width:100%;min-width:0;font:12px var(--mb-mono);background:var(--mb-bg);color:var(--mb-text);border:1px solid var(--mb-line);border-radius:6px;padding:12px}
+.mb-arena input{background:var(--mb-bg);color:var(--mb-text);border:1px solid var(--mb-line);padding:8px}
+.mb-arena button{min-height:44px;white-space:normal;border:1px solid var(--mb-line);background:var(--mb-raised);color:var(--mb-text);border-radius:5px;padding:6px 12px}
+.mb-arena button:disabled{opacity:.5;cursor:not-allowed}.mb-arena a{color:var(--mb-accent)}
+.mb-arena button:focus-visible,.mb-arena textarea:focus-visible,.mb-arena input:focus-visible{outline:2px solid var(--mb-accent);outline-offset:2px}
+.mb-arena-toolbar{display:flex;flex-wrap:wrap;gap:8px}.mb-arena dd{overflow-wrap:anywhere}
+@media(max-width:760px){.mb-arena-floor{min-height:130px}.mb-arena .mb-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+@media(max-width:760px){
+ html:has(.mb-arena) .mb-topbar-title{min-width:0;flex:1}
+ html:has(.mb-arena) .mb-crumbs{flex-wrap:nowrap;white-space:nowrap;overflow:hidden;max-height:16px}
+ html:has(.mb-arena) .mb-crumbs li{min-width:0;overflow:hidden;text-overflow:ellipsis}
+ .mb-arena-floor{overflow-x:auto;overscroll-behavior-inline:contain}
+ .mb-arena-floor canvas{width:760px!important;max-width:none!important}
+}
+.mb-arena-floor:focus-visible{outline:2px solid var(--mb-accent);outline-offset:2px}

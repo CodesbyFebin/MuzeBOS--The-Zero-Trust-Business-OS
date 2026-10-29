@@ -206,6 +206,7 @@ const BRAIN_VOICE: FeatureDefinition = {
 };
 
 const BRAIN_HACK: FeatureDefinition[] = [
+  { ...mk('arena', 'Arena & Skill Forge', 'Observed inference task office, leased-state avatars, immutable skill versions, JSON/YAML/Markdown exports and Jev draft proposals. No computer fleet or zkVM provisioning.', 'brain'), requiredPermissions: ['finance.read'], verificationEvidence: ['tests/metabos-arena.test.ts', 'scripts/verify-arena-browser.mjs'] },
   mk('department-walls', 'Department Walls', 'Each department agent reads only its own data; refused reads are logged as evidence.', 'brain'),
   mk('memory', 'Layered Memory', 'Session, department, company and owner memory; agent and Muse notes stay drafts until a person promotes them.', 'brain'),
   mk('activity', 'Jev Approvals & Activity', 'Runs waiting for approval, overdue approvals and the latest hash-chained evidence events.', 'brain'),
@@ -325,7 +326,7 @@ function withContract(f: FeatureDefinition): FeatureDefinition {
   return {
     ...f, slug: s, title: f.label, description: f.summary,
     requiredPermissions: f.requiredPermissions ?? [MENU_PERMISSION[f.menuId] ?? 'member'],
-    verificationEvidence: f.status === 'available' ? (EVIDENCE_BY_MENU[f.menuId] ?? ['scripts/metabos-crawl-routes.mjs']) : [],
+    verificationEvidence: f.verificationEvidence ?? (f.status === 'available' ? (EVIDENCE_BY_MENU[f.menuId] ?? ['scripts/metabos-crawl-routes.mjs']) : []),
     legacyRoutes: f.legacyRoutes ?? [],
   };
 }

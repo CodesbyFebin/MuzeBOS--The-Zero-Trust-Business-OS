@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "invoice-review",
+  "name": "Invoice review draft",
+  "description": "Review merchant-supplied invoice context and list discrepancies. Does not issue invoices or verify payments.",
+  "tags": [
+    "finance",
+    "review"
+  ],
+  "approval": "jev-exact-hash",
+  "tools": [
+    "inference.draft"
+  ],
+  "steps": [
+    {
+      "name": "Review supplied invoice",
+      "kind": "analysis",
+      "lane": "browser",
+      "maxTokens": 256,
+      "instructions": "Review only the supplied invoice text. Check quantities, arithmetic and missing fields. List uncertainties. Do not claim tax compliance or bank verification. Return a review draft for the merchant."
+    }
+  ]
+}
