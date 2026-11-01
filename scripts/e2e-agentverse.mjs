@@ -17,7 +17,7 @@ const audit = async (name) => { if (!axeSrc) return; await p.addScriptTag({ cont
     for (const el of root.querySelectorAll('*')) { const cs = getComputedStyle(el); for (const prop of ['color', 'backgroundColor', 'borderTopColor']) { const h = hue(cs[prop]); if (h !== null && h > 170 && h < 320) bad.push(`${el.tagName} ${prop}=${cs[prop]}`); }
       if (el.matches('button, a, input, select, textarea, [role=tab]') && el.offsetParent) { const rc = el.getBoundingClientRect(); if (rc.height < 44 && !(el.tagName === 'INPUT' && el.type === 'checkbox')) small.push(`${el.tagName} "${(el.innerText || el.getAttribute('aria-label') || '').slice(0, 25)}" ${Math.round(rc.height)}px`); } }
     return { axe: ax, blueOrPurple: [...new Set(bad)].slice(0, 8), under44: [...new Set(small)].slice(0, 8) }; }); };
-const chan = (n) => p.locator('.mb-av-side').getByRole('button', { name: new RegExp(`^#\\s*${n}`) }).click();
+const chan = (n) => p.locator('.mb-av-side').getByRole('button', { name: new RegExp(`^${n}`) }).click();
 await p.goto(base + '/workspace/builder/agentverse'); const root = p.getByTestId('agentverse'); await root.waitFor({ timeout: 30000 });
 await p.getByText('No records yet').first().waitFor({ timeout: 15000 });
 assert.equal(await p.locator('.mb-av-srv').count(), 2, 'only Home + create; nothing seeded');

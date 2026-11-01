@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 227,
+ "count": 228,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -161,6 +161,19 @@
     "DELETE"
    ],
    "summary": "Tasks + cron jobs for one agent (or all agents when no id given).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/agentverse",
+   "file": "app/api/agentverse/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "AgentVerse OS V3. GET is a read for any member (Viewer). Writes need Agent (jev.decide) or Admin (members.manage) and only create drafts or Jev items.",
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": true,
