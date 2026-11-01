@@ -178,3 +178,17 @@ Tests: tests/hackathon-walls-memory.test.ts (3 tests, injected fixtures only).
 
 ## MUSE fur simulator (feat/muse-fur)
 - Built clean-room on three.js (MIT); see THIRD_PARTY.md. Shell and strand fur, GPGPU Verlet with a CPU fallback, 4 environments, the Fur Lab, and 6 coats (Ember is the default).
+
+## Built during the event: AgentVerse OS V3 commit console (Nov 2, stacked on feat/muse-fur)
+
+Route: `/workspace/builder/agentverse`. The layout follows two owner-supplied references: a commit-log screenshot and a "Meta AI Command Center" App.tsx. It uses the MeTaBos red/black palette and our own code; neither reference was copied.
+
+- Home server overview HUD. **Live Activity** reads only `mb_audit` evidence and Jev. **Active Campaigns** lists real ad drafts. **Queue Status** probes only infrastructure that exists: the Jev queue, claw-local, Yao, the local llama-server and Ollama. Kafka, Redis and Qdrant show "Not configured" unless their env is set and the port answers. Nothing reports lag or key metrics.
+- Numbered workspace rail. Workspaces are created by the owner only and are never seeded. Codes By Febin, Ewaste Kochi, XFree.app and Spider Kids are only offered as suggestions.
+- Channel groups: Git for agents, Meta Suite, Ads command center (business mode only) and Agent swarm.
+- Commit list with Logs, Diffs and Preview tabs. The diff is shown in red and green with a co-authored-by line. **SHIPPED** appears only for a dispatch that is `sent`, which means a Jev decision plus a provider receipt. Revert and cherry-pick each create a new Jev item.
+- Unified Inbox (WhatsApp and IG adapters). Approve only proposes a dispatch, and every send still goes through Jev and `/api/dispatch`. The other platforms show "Not connected".
+- 5-step ads wizard that saves a draft and creates one Jev item. No Marketing API call is made. ROAS is shown only when real insights exist. A ROAS < x rule only proposes a pause in Jev.
+- Cmd/Ctrl+K search. Roles: Admin (owner), Agent (manager) and Viewer (member). Onboarding shows whether each env var is present, never its value. Knowledge graph built from real records. WhatsApp sends carry `appsecret_proof` when `META_APP_SECRET` is set.
+- Footnote: "Built by codesbyfebin — Kochi".
+- Tests: `tests/agentverse.test.ts`. Browser check: `scripts/e2e-agentverse.mjs`, which includes axe and a 44px audit.
