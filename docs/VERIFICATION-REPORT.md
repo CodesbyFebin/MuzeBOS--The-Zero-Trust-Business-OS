@@ -39,3 +39,16 @@ Checked 2 Nov 2026, between 1:30 and 2:00 AM IST, on branch `feat/agent-hub` (dr
 - `tests/smoke-api.test.ts`: union the route lists and `MEMBER_ONLY`.
 
 `lib/metabos/registry.ts` and `tests/smoke.test.ts` merged cleanly. Suggested order: merge #58–#60 first, then rebase #61 onto #60 and fix the 5 files above, then re-run the crawl. The registry count rises by the number of pages Arena adds.
+
+## MeTa Server (feat/meta-server, stacked on #66)
+
+| Check | Result |
+|---|---|
+| tsc | pass |
+| vitest | meta-server 7/7; full suite only pre-existing lab-* failures (globSync, timeouts) also failing on base |
+| build | pass |
+| crawl | desktop 245/245 200, mobile 245/245 200, 0 stubs, 184 legacy redirects |
+| e2e-meta-server | OK (HQ, channel preview, ads draft, commits, connections, suite personal/business, swarm embed, mobile toggles) |
+| a11y audit | 0 axe violations, 0 targets <44px, no off-palette colours on meta-server, agent-hub, voice |
+
+Verdict: ready for review as a draft. Meta Suite products without adapters (Facebook, Threads, Messenger, Ads) show "Not connected"; all sends are drafts through Jev + /api/dispatch. Screenshots: /tmp/shots/meta-server-*.png, /tmp/shots/meta-suite-*.png.

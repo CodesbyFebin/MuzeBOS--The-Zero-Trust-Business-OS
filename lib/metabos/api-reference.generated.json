@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 226,
+ "count": 227,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -2285,6 +2285,19 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/server",
+   "file": "app/api/server/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "MeTa Server: commit log (\"git for agents\"), Meta connector status and swarm servers. Read-only except ad drafts, which only queue for Jev.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
    "access": "session"
   },
   {

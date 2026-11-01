@@ -10,3 +10,10 @@ Before you start: `npm run build && MUZEBOS_DB=/tmp/demo.db MUZEBOS_CLAW_DIR=/wo
 6. **Evidence** (`/workspace/evidence`): every step above is in the hash chain.
 
 Say aloud: Yao runs are wired and the engine works, but the in-app Yao run needs a Yao access token (BLOCKED on this machine). Do not claim production readiness.
+
+## MeTa Server (2 min)
+1. Open Builder → MeTa Server. HQ #commits shows "No records yet" on a fresh workspace.
+2. Sales & CRM → pick any channel → Open page / Preview here (the real page).
+3. Marketing & Ads → #ads-manager: status reads "Not connected — no Marketing API adapter". Save a ₹500/day draft; it appears in #commits with diff `dailyBudgetMinor: 50000 INR`, pending, plus evidence hashes.
+4. Meta Suite → Threads → Personal → save a draft → waiting in Jev, nothing sent. Personal mode hides #ads-manager.
+5. Click a swarm icon: the Agent Hub opens inside the shell. On a phone, use the Servers / Channels toggles.

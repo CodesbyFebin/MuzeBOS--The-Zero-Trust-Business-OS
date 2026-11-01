@@ -36,7 +36,7 @@ describe('agent hub', () => {
   it('build agent writes a definition card; external tools force Jev; unknown tools refused', () => {
     const s = new BusinessStore(':memory:'); const sw = swarmNames(s)[0]; const v = hubView(s, sw);
     const tools = [...new Set(v.members.flatMap((m) => m.tools))]; const ext = tools.find((t) => /^(dispatch|connector|planned):/.test(t)); const safeTool = tools.find((t) => !/^(dispatch|connector|planned):/.test(t))!;
-    const sub = v.channels.find((c) => 'subcluster' in c && c.subcluster !== 'Swarm lead') as { subcluster: string };
+    const sub = v.channels.find((c) => 'subcluster' in c && c.subcluster !== 'Swarm lead') as unknown as { subcluster: string };
     const a = buildAgent(s, 'owner', { swarm: sw, subcluster: sub.subcluster, name: 'Festive Caption Helper', role: 'Caption Writer', responsibility: 'Drafts festive captions for review.', tools: [safeTool], risk: 'low' });
     expect(a.status).toBe('definition'); expect(a.jev_required).toBe(false); expect(hubView(s, sw).members.length).toBe(101);
     if (ext) expect(buildAgent(s, 'owner', { swarm: sw, subcluster: null, name: 'Sender', role: 'Sender', responsibility: 'Drafts outbound messages.', tools: [ext], risk: 'low' }).jev_required).toBe(true);

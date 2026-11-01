@@ -17,9 +17,9 @@ async function post(body: unknown) {
   const j = await r.json(); if (!r.ok) throw new Error(j.issues?.join('; ') || j.error || 'Request failed'); return j;
 }
 
-export function AgentHub() {
+export function AgentHub({ swarm: fixed, embedded = false }: { swarm?: string; embedded?: boolean } = {}) {
   const [v, setV] = useState<View | null>(null); const [err, setErr] = useState(''); const [note, setNote] = useState('');
-  const [swarm, setSwarm] = useState(''); const [channel, setChannel] = useState('');
+  const [swarm, setSwarm] = useState(fixed ?? ''); const [channel, setChannel] = useState('');
   const [text, setText] = useState(''); const [platform, setPlatform] = useState('none');
   const [dlg, setDlg] = useState<'' | 'channel' | 'agent'>(''); const [pick, setPick] = useState<Member | null>(null); const [task, setTask] = useState(''); const [busy, setBusy] = useState('');
   const feed = useRef<HTMLOListElement>(null);
@@ -28,6 +28,7 @@ export function AgentHub() {
     fetch(`/api/hub?${q}`).then(async (r) => { const j = await r.json(); if (!r.ok) throw new Error(j.error); setV(j); setErr(''); }).catch((e) => setErr(String(e.message ?? e)));
   }, [swarm, channel]);
   useEffect(load, [load]);
+  useEffect(() => { if (fixed) { setSwarm(fixed); setChannel(''); } }, [fixed]);
   useEffect(() => { feed.current?.scrollTo({ top: feed.current.scrollHeight }); }, [v?.messages.length]);
 
   async function send(e: FormEvent) {
@@ -42,12 +43,12 @@ export function AgentHub() {
   }
 
   const groups = v ? [...new Set(v.channels.map((c) => c.group))] : [];
-  return <div className="mb-hub mb-v3" data-testid="agent-hub">
-    <nav className="mb-hub-rail" aria-label="Swarms">
+  return <div className={`mb-hub mb-v3${embedded ? ' is-embedded' : ''}`} data-testid="agent-hub">
+    {!embedded && <nav className="mb-hub-rail" aria-label="Swarms">
       {v?.servers.map((s) => <button key={s.name} type="button" className="mb-hub-server" aria-current={v.swarm === s.name ? 'true' : undefined} aria-label={`${s.name}: ${s.agents} agents, ${s.pending} waiting in Jev`} title={s.name} onClick={() => { setSwarm(s.name); setChannel(''); }}>
         {acr(s.name)}{s.pending > 0 && <span className="mb-hub-badge" aria-hidden="true">{s.pending}</span>}
       </button>)}
-    </nav>
+    </nav>}
     <aside className="mb-hub-side" aria-label="Channels">
       <header className="mb-hub-side-head"><strong>{v?.swarm ?? 'Loading…'}</strong><span className="mb-muted">{v ? `${v.servers.find((s) => s.name === v.swarm)?.agents ?? 0} agent cards` : ''}</span></header>
       {groups.map((g) => <div key={g}><p className="mb-hub-group">{g}</p><ul>
