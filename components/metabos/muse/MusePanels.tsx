@@ -34,7 +34,7 @@ export function MusePanels() {
       {tab === 'ledger' && <><Err e={ev.error} />{ev.data && <>
         <p className="mb-muted">{ev.data.total ? `${ev.data.total} evidence events · chain ${ev.data.valid ? 'verified' : 'BROKEN'} · head ${ev.data.headHash.slice(0, 12)}…` : 'No records yet'}</p>
         <ol>{ev.data.rows.slice(0, 8).map((r) => <li key={r.seq}><code>#{r.seq}</code> {r.action} <span className="mb-muted">{r.target}</span></li>)}</ol></>}
-        <a href="/business?view=evidence">Open evidence chain</a></>}
+        <a href="/workspace/evidence">Open evidence chain</a></>}
       {tab === 'fleet' && <><Err e={fl.error} />{fl.data && <>
         <p className="mb-muted">{fl.data.totals.total} agent definitions in {fl.data.swarmList.length} swarms · {fl.data.totals.jev} need Jev. Definitions only; nothing runs until you start it.</p>
         <p className="mb-muted">Yao: {fl.data.yao.label} · Local swarm: {fl.data.claw.label}</p>

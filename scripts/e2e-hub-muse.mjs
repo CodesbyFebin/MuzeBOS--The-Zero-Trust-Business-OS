@@ -1,0 +1,33 @@
+// Browser e2e: Agent Hub (create channel, build agent, composer → Jev draft) and MUSE voice companion. Usage: node scripts/e2e-hub-muse.mjs <baseUrl> <outDir>
+import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
+const [base, out = '/tmp/shots'] = process.argv.slice(2);
+const b = await chromium.launch({ args: ['--no-sandbox'] }); const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage();
+const errs = []; p.on('pageerror', (e) => errs.push(String(e))); p.on('dialog', (d) => { errs.push('dialog ' + d.message()); d.dismiss(); });
+const r = await p.request.post(`${base}/api/metabos/auth`, { headers: { origin: base }, data: { action: 'setup', setup: { workspace: 'E2E Bakery', name: 'Owner', email: 'owner@example.com', password: 'e2e-only-Passw0rd!' } } });
+console.log('setup', r.status());
+await p.goto(base + '/workspace/builder/agent-hub'); await p.getByTestId('agent-hub').waitFor({ timeout: 30000 });
+await p.getByTestId('hub-create-channel').click(); await p.getByTestId('hub-dlg-name').fill('diwali-launch'); await p.getByTestId('hub-dlg-save').click();
+await p.getByText('#diwali-launch').first().waitFor({ timeout: 15000 });
+await p.getByTestId('hub-build-agent').click(); await p.getByTestId('hub-dlg-name').fill('Festive Caption Helper');
+await p.getByTestId('hub-dlg-role').fill('Caption Writer'); await p.getByTestId('hub-dlg-resp').fill('Drafts festive captions for owner review.');
+await p.getByTestId('hub-dlg-save').click(); await p.getByText('Festive Caption Helper').first().waitFor({ timeout: 15000 });
+await p.getByTestId('hub-text').fill('Diwali boxes are back. Pre-order by Friday.'); await p.getByTestId('hub-send').click();
+const msg = p.getByTestId('hub-msg').filter({ hasText: 'Diwali boxes are back' }); await msg.waitFor({ timeout: 15000 });
+const t = await msg.innerText(); assert.match(t, /pending|Jev/i);
+await p.screenshot({ path: `${out}/agent-hub.png` });
+await ctx.newPage().then(async (m) => { await m.setViewportSize({ width: 390, height: 844 }); await m.goto(base + '/workspace/builder/agent-hub'); await m.getByTestId('agent-hub').waitFor(); await m.screenshot({ path: `${out}/agent-hub-mobile.png` }); await m.close(); });
+await p.goto(base + '/workspace/brain/voice'); const av = p.getByTestId('muse-avatar'); await av.waitFor({ timeout: 20000 });
+assert.equal(await av.getAttribute('data-coat'), 'ember');
+for (const tab of ['memory', 'ledger', 'fleet', 'tools']) { await p.locator(`#muse-tab-${tab}`).click(); await p.getByTestId(`muse-pane-${tab}`).waitFor(); await p.waitForTimeout(700); }
+const ledger = async () => { await p.locator('#muse-tab-ledger').click(); await p.waitForTimeout(900); return p.getByTestId('muse-pane-ledger').innerText(); };
+const lt = await ledger(); assert.match(lt, /evidence events|No records yet|Unavailable/);
+await p.getByTestId('voice-typed').fill('create a task to call the flour supplier'); await p.getByTestId('voice-send').click();
+await p.getByTestId('voice-card').waitFor({ timeout: 20000 });
+await p.screenshot({ path: `${out}/muse-voice.png` });
+await p.getByTestId('muse-coat').selectOption('violet'); assert.equal(await av.getAttribute('data-coat'), 'violet');
+await p.screenshot({ path: `${out}/muse-violet.png` });
+const rm = await b.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce', storageState: await ctx.storageState() }); const q = await rm.newPage();
+await q.goto(base + '/workspace/brain/voice'); await q.getByTestId('muse-avatar').waitFor(); await q.screenshot({ path: `${out}/muse-reduced-motion.png` });
+console.log(JSON.stringify({ hubMsg: t.replace(/\s+/g, ' ').slice(0, 200), ledger: lt.replace(/\s+/g, ' ').slice(0, 200), errors: errs }, null, 1));
+assert.equal(errs.length, 0); await b.close();
