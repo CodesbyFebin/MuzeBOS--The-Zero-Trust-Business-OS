@@ -4,6 +4,8 @@
  *  Every write is a draft or a Jev item. Sends go through Jev and /api/dispatch only. */
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { GitCommit, Plus, Search, X } from 'lucide-react';
+import { MuzeSanctum } from '@/components/metabos/muze/MuzeSanctum';
+import { filterActivities, PRODUCT_TITLE, roasMetrics } from '@/lib/metabos/muze/pure';
 
 type Ev = { seq: number; action: string; hash: string };
 type Commit = { sha: string; id: string; kind: string; server: string; author: string; title: string; diff: string[]; status: string; jevRunId: string | null; dispatchId: string | null; dispatch: string; createdAt: string; evidence: Ev[] };
@@ -20,12 +22,12 @@ const post = async (action: string, input: unknown) => { const r = await fetch('
 export function AgentVerse() {
   const [d, setD] = useState<Data | null>(null); const [err, setErr] = useState(''); const [note, setNote] = useState('');
   const [mode, setMode] = useState<'personal' | 'business'>('business'); const [ws, setWs] = useState<string>('home');
-  const [chan, setChan] = useState('home-overview'); const [sel, setSel] = useState<string | null>(null); const [tab, setTab] = useState<'logs' | 'diffs' | 'preview'>('diffs');
+  const [chan, setChan] = useState('sanctum'); const [sel, setSel] = useState<string | null>(null); const [tab, setTab] = useState<'logs' | 'diffs' | 'preview'>('diffs');
   const [k, setK] = useState(false); const [q, setQ] = useState(''); const [hits, setHits] = useState<{ type: string; id: string; label: string }[]>([]);
   const [newWs, setNewWs] = useState(''); const [creating, setCreating] = useState(false); const [busy, setBusy] = useState(false);
   const [drafts, setDrafts] = useState<Record<string, string>>({}); const [editing, setEditing] = useState<string | null>(null);
   const [step, setStep] = useState(0); const [w, setW] = useState({ objective: 'leads', audience: '', placements: ['instagram_feed'] as string[], name: '', text: '', budget: '' });
-  const [pickTarget, setPickTarget] = useState(''); const qRef = useRef<HTMLInputElement>(null);
+  const [pickTarget, setPickTarget] = useState(''); const [actKind, setActKind] = useState('ALL'); const [actQ, setActQ] = useState(''); const qRef = useRef<HTMLInputElement>(null);
   const load = useCallback(() => { fetch('/api/agentverse').then(async (r) => { const j = await r.json(); if (!r.ok) throw new Error(j.error); setD(j); setErr(''); }).catch((e) => setErr(String(e.message ?? e))); }, []);
   useEffect(() => { load(); }, [load]);
   useEffect(() => { const h = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setK(true); } if (e.key === 'Escape') setK(false); }; window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, []);
@@ -45,7 +47,7 @@ export function AgentVerse() {
 
   return <div className="mb-av" data-testid="agentverse" data-mode={mode}>
     <div className="mb-av-top">
-      <strong>MeTa Server · AgentVerse OS</strong>
+      <strong>{PRODUCT_TITLE}</strong>
       <span className="mb-muted">{d ? `Role: ${d.role}` : ''}</span>
       <button type="button" className="mb-av-search" onClick={() => setK(true)} aria-label="Search commits, inbox, ads and agents (Ctrl or Cmd K)"><Search size={16} aria-hidden /> Search <kbd>⌘K</kbd></button>
       <div className="mb-av-toggle" role="group" aria-label="Mode">{(['personal', 'business'] as const).map((m) => <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}>{m}</button>)}</div>
@@ -61,17 +63,25 @@ export function AgentVerse() {
         <label>Workspace name<input required maxLength={80} value={newWs} onChange={(e) => setNewWs(e.target.value)} list="mb-av-sugg" /></label>
         <datalist id="mb-av-sugg">{d?.suggested.map((n) => <option key={n} value={n} />)}</datalist>
         <button type="submit" disabled={busy}>Create workspace</button></form>}
-      <ul><li><button type="button" className="mb-hub-chan" aria-current={chan === 'home-overview' ? 'true' : undefined} onClick={() => setChan('home-overview')}><span aria-hidden>#</span><span>home-overview</span></button></li></ul>
+      <ul>{['sanctum', 'home-overview'].map((c) => <li key={c}><button type="button" className="mb-hub-chan" aria-current={chan === c ? 'true' : undefined} onClick={() => setChan(c)}><span aria-hidden>#</span><span>{c}</span></button></li>)}</ul>
       {groups.map((g) => <div key={g.id}><p className="mb-hub-group">{g.label}</p><ul>{g.channels.map((c) => <li key={c}><button type="button" className="mb-hub-chan" aria-current={chan === c ? 'true' : undefined} onClick={() => { setChan(c); setSel(null); }}><span aria-hidden>#</span><span>{c}</span>{c === 'pending-approvals' && pending > 0 && <span className="mb-hub-badge" aria-label={`${pending} pending`}>{pending}</span>}</button></li>)}</ul></div>)}
       <p className="mb-av-foot">{d?.footnote ?? 'Built by codesbyfebin — Kochi'}</p>
     </aside>
     <section className="mb-av-main" aria-label="Channel">
       {err && <p className="mb-bad" role="alert">{err}</p>}{note && <p className="mb-hub-note" role="status">{note}</p>}
       {!d ? <p className="mb-muted mb-hub-empty">Loading…</p> : <>
+      {chan === 'sanctum' && <MuzeSanctum pending={pending} commits={d.commits.length} workspaces={d.workspaces.length} onOpen={(c) => { setChan(c); setSel(null); }} />}
+      {chan === 'fleet-console' && <>{header('fleet-console', 'Runners and agent activity from real records')}
+        <ul className="mb-av-cards">{d.home.queues.filter((q) => ['claw', 'yao', 'llm', 'ollama'].includes(q.id)).map((q) => <li key={q.id}><span><span className="mb-av-tag" data-tone={q.state === 'ready' ? 'ok' : q.state === 'not_connected' ? 'warn' : 'idle'}>{q.state.replace('_', ' ')}</span> <strong>{q.label}</strong></span><span className="mb-muted">{q.detail}</span></li>)}</ul>
+        {(() => { const ag = d.home.activity.filter((a) => /agent|claw|yao|swarm|jev|workflow/i.test(a.action)); return ag.length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <pre className="mb-av-log" aria-label="Agent log">{ag.map((a) => `#${a.seq} ${a.at} ${a.action} ${a.target} ${a.hash.slice(0, 8)}`).join('\n')}</pre>; })()}</>}
+      {chan === 'sparring-pit' && <>{header('sparring-pit', 'Arena')}<div className="mb-av-cards"><p>The Arena office (observed agents and the Skill Forge) is in its own draft PRs, #59 and #60, which aren&apos;t in this stack. Once they&apos;re merged it opens at <code>/workspace/brain/arena</code>.</p>
+        <div className="mb-av-actions"><a className="mb-av-link" href="https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/59" rel="noopener noreferrer" target="_blank">Arena PR #59</a><a className="mb-av-link" href="https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/60" rel="noopener noreferrer" target="_blank">Arena PR #60</a></div>
+        <p className="mb-muted">A sparring winner becomes a commit only through Jev. No matches yet: No records yet</p></div></>}
       {chan === 'home-overview' && <div data-testid="av-home">{header('home-overview', 'Command center · real records only')}
         <div className="mb-av-hud">
           <section className="mb-av-panel" aria-labelledby="av-live"><h2 id="av-live">Live Activity</h2><p className="mb-muted">From the evidence chain and Jev. {d.home.jevWaiting} waiting in Jev.</p>
-            {d.home.activity.length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <ol className="mb-av-feed" tabIndex={0} aria-label="Live activity">{d.home.activity.map((a) => <li key={a.seq}><span className="mb-av-tag">{a.kind}</span> <code>{a.action}</code><span className="mb-muted"> #{a.seq} · {ago(a.at)} · {a.hash.slice(0, 8)}</span>{a.detail && <p className="mb-hub-text">{a.detail}</p>}</li>)}</ol>}</section>
+            <div className="mb-av-actions"><label>Type<select value={actKind} onChange={(e) => setActKind(e.target.value)}>{['ALL', ...new Set(d.home.activity.map((a) => a.kind))].map((k) => <option key={k}>{k}</option>)}</select></label><label>Filter<input value={actQ} onChange={(e) => setActQ(e.target.value)} placeholder="action, target or hash" /></label></div>
+            {filterActivities(d.home.activity, actKind, actQ).length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <ol className="mb-av-feed" tabIndex={0} aria-label="Live activity">{filterActivities(d.home.activity, actKind, actQ).map((a) => <li key={a.seq}><span className="mb-av-tag">{a.kind}</span> <code>{a.action}</code><span className="mb-muted"> #{a.seq} · {ago(a.at)} · {a.hash.slice(0, 8)}</span>{a.detail && <p className="mb-hub-text">{a.detail}</p>}</li>)}</ol>}</section>
           <section className="mb-av-panel" aria-labelledby="av-camp"><h2 id="av-camp">Active Campaigns</h2><p className="mb-muted">{d.adsConnection}</p>
             {d.home.campaigns.length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <ul className="mb-av-cards">{d.home.campaigns.map((c) => <li key={c.id}><strong>{c.name}</strong> <span className="mb-av-tag" data-tone={tone(c.status)}>{c.status}</span><span className="mb-muted">{c.objective} · ₹{(c.dailyBudgetMinor / 100).toFixed(2)}/day · {c.roas === null ? 'ROAS: Usage unavailable' : `ROAS ${c.roas}`}</span></li>)}</ul>}</section>
           <section className="mb-av-panel" aria-labelledby="av-q"><h2 id="av-q">Queue Status</h2><p className="mb-muted">Probed on load. Only infrastructure that exists is shown as ready.</p>
@@ -120,7 +130,7 @@ export function AgentVerse() {
           {a.rules.length > 0 && <span className="mb-muted">{a.rules.length} rule(s): propose pause below {a.rules.map((r) => r.roasBelowX100 / 100).join(', ')}</span>}</li>)}</ul>}</>}
       {chan === 'creatives-lab' && <>{header('creatives-lab')}{d.ads.length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <ul className="mb-av-cards">{d.ads.map((a) => <li key={a.id}><strong>{a.name}</strong><p className="mb-hub-text">{a.creative}</p></li>)}</ul>}</>}
       {chan === 'audiences' && <>{header('audiences')}{d.ads.length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <ul className="mb-av-cards">{d.ads.map((a) => <li key={a.id}><strong>{a.name}</strong><p className="mb-hub-text">{a.audience}</p></li>)}</ul>}</>}
-      {chan === 'roas-dashboard' && <>{header('roas-dashboard', 'ROAS appears only when real insights exist')}{d.ads.length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <><ul className="mb-av-cards">{d.ads.map((a) => <li key={a.id}><strong>{a.name}</strong><span>{a.roas === null ? 'Usage unavailable' : `ROAS ${a.roas}`}</span></li>)}</ul>{!viewer && <button type="button" disabled={busy} onClick={() => run(() => post('evaluateRules', {}), 'Rules checked against real insights. Any breach is proposed in Jev, never applied.')}>Check rules</button>}</>}</>}
+      {chan === 'roas-dashboard' && <>{header('roas-dashboard', 'ROAS appears only when real insights exist')}{(() => { const m = roasMetrics(d.home.campaigns); return <p className="mb-muted" data-testid="av-roas-sum">{m.drafts} drafts · planned ₹{(m.plannedDailyMinor / 100).toFixed(2)}/day · {m.shipped} shipped · average ROAS: {m.averageRoas === null ? 'Usage unavailable' : m.averageRoas}</p>; })()}{d.ads.length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <><ul className="mb-av-cards">{d.ads.map((a) => <li key={a.id}><strong>{a.name}</strong><span>{a.roas === null ? 'Usage unavailable' : `ROAS ${a.roas}`}</span></li>)}</ul>{!viewer && <button type="button" disabled={busy} onClick={() => run(() => post('evaluateRules', {}), 'Rules checked against real insights. Any breach is proposed in Jev, never applied.')}>Check rules</button>}</>}</>}
       {chan === 'agents-online' && <>{header('agents-online')}{d.swarms.length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <ul className="mb-av-cards">{d.swarms.map((s) => <li key={s.name}><strong>{s.name}</strong><span className="mb-muted">{s.agents} agent cards · {s.pending} waiting in Jev</span></li>)}</ul>}</>}
       {chan === 'blame' && <>{header('blame', 'Which agent wrote what')}{d.blame.length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <table className="mb-av-table"><thead><tr><th scope="col">Author</th><th scope="col">Commits</th><th scope="col">Diff lines</th><th scope="col">Kinds</th></tr></thead><tbody>{d.blame.map((b) => <tr key={b.author}><td>{b.author}</td><td>{b.commits}</td><td>{b.lines}</td><td>{b.kinds.join(', ')}</td></tr>)}</tbody></table>}</>}
       {chan === 'onboarding' && <>{header('onboarding', 'Real env status. Values are never shown.')}<ul className="mb-av-cards" data-testid="av-onboarding">{d.onboarding.map((o) => <li key={o.env}><span className="mb-av-tag" data-tone={o.present ? 'ok' : 'warn'}>{o.present ? 'set' : 'missing'}</span> <code>{o.env}</code><span className="mb-muted">{o.step}</span></li>)}</ul></>}

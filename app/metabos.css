@@ -669,3 +669,13 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-av .mb-hub-chan:hover{background:#181818}
 .mb-av code,.mb-av-feed li,.mb-hub-text{overflow-wrap:anywhere}
 .mb-av-feed code{font-size:12px}
+/* MuZe Sanctum home */
+.mb-av-sanctum{display:grid;gap:16px;padding-top:12px}
+.mb-av-sanctum-hero{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;background:#111111;border:1px solid #1d1d1d;border-top:2px solid #FF2A2A;border-radius:14px;padding:16px}
+.mb-av-eyebrow{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#FF6B6B;margin:0}
+.mb-av-title{font-size:26px;margin:4px 0 8px;line-height:1.2}
+.mb-av .mb-av-link{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border:1px solid #2a2a2a;border-radius:8px;color:#EDEDED;background:#161616;text-decoration:none}
+.mb-av .mb-av-link:hover{border-color:#FF2A2A}
+.mb-av-stats{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.mb-av-stats li{display:grid;background:#111111;border:1px solid #1d1d1d;border-radius:12px;padding:12px}.mb-av-stats strong{font-size:24px}
+@media (max-width:820px){.mb-av-sanctum-hero{grid-template-columns:1fr}}

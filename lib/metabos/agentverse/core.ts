@@ -26,7 +26,7 @@ export const CHANNEL_GROUPS = [
   { id: 'git', label: 'Git for agents', channels: ['commit-log', 'branches', 'pending-approvals', 'knowledge-graph'] },
   { id: 'suite', label: 'Meta Suite', channels: ['unified-inbox', 'facebook', 'instagram', 'whatsapp', 'messenger', 'threads', 'meta-ai'] },
   { id: 'ads', label: 'Ads command center', channels: ['campaigns', 'creatives-lab', 'audiences', 'roas-dashboard'], business: true },
-  { id: 'swarm', label: 'Agent swarm', channels: ['agents-online', 'blame', 'onboarding', 'roles'] },
+  { id: 'swarm', label: 'Agent swarm', channels: ['agents-online', 'fleet-console', 'sparring-pit', 'blame', 'onboarding', 'roles'] },
 ] as const;
 /** SHIPPED means a Jev approval and a dispatch receipt (provider accepted). Nothing else counts as shipped. */
 export const commitTag = (c: Pick<Commit, 'status' | 'dispatchId'>) => c.status === 'sent' && c.dispatchId ? 'SHIPPED' : c.status === 'pending' ? 'PENDING' : c.status.toUpperCase();
