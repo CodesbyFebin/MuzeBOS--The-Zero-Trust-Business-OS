@@ -48,7 +48,7 @@ await chan('pending-approvals'); const pend = await p.locator('.mb-av-commit').c
 // inbox not connected, onboarding, cmd+k
 await chan('unified-inbox'); await p.getByText(/Not connected/).first().waitFor(); await audit('inbox');
 await chan('onboarding'); await p.getByTestId('av-onboarding').waitFor(); await p.screenshot({ path: `${out}/agentverse-onboarding.png` }); await audit('onboarding');
-await p.keyboard.press('Control+k'); await p.getByRole('dialog', { name: 'Search' }).waitFor(); await p.keyboard.type('pickup'); await p.locator('.mb-av-kbox li button').first().waitFor();
+await p.keyboard.press('Control+k'); await p.getByRole('dialog', { name: 'Search' }).waitFor(); await p.getByRole('dialog').getByLabel('Search commits, inbox, ads and agents').fill('pickup'); await p.locator('.mb-av-kbox li button').first().waitFor();
 await p.screenshot({ path: `${out}/agentverse-cmdk.png` }); await audit('cmd+k'); await p.keyboard.press('Escape');
 await p.getByRole('button', { name: 'personal' }).click(); assert.equal(await p.locator('.mb-av-side').getByRole('button', { name: /campaigns/ }).count(), 0);
 await p.setViewportSize({ width: 390, height: 844 }); await p.getByRole('button', { name: 'business' }).click(); await chan('commit-log'); await p.screenshot({ path: `${out}/agentverse-mobile.png`, fullPage: true }); await audit('mobile');
