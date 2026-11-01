@@ -538,3 +538,4 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-muse-tabs button:focus-visible, .mb-muse-pane a:focus-visible, .mb-muse-avatar:focus-visible { outline: 2px solid #FF2A2A; outline-offset: 2px; }
 .mb-muse-pane { padding-top: 10px; display: grid; gap: 8px; } .mb-muse-pane ul, .mb-muse-pane ol { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
 .mb-muse-pane a { color: #FF6B6B; display: inline-flex; min-height: 44px; align-items: center; } .mb-muse-pane label { display: grid; gap: 4px; }
+.mb-hub-jevlink { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; color: #FF6B6B; }

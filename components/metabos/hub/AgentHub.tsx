@@ -70,7 +70,7 @@ export function AgentHub() {
           <span className="mb-hub-avatar" aria-hidden="true">{m.kind === 'agent_draft' ? <Bot size={18} /> : acr(m.author)}</span>
           <div><p className="mb-hub-meta"><strong>{m.author}</strong> <span className="mb-hub-chip">{m.source}</span>{m.platform && m.platform !== 'none' && <span className={`mb-hub-chip mb-hub-plat-${m.platform}`}>{m.platform}</span>} <time dateTime={m.createdAt}>{new Date(m.createdAt).toLocaleString()}</time></p>
             <p className="mb-hub-text">{m.text}</p>
-            <p className="mb-hub-meta"><span className="mb-kpi-icon" data-tone={tone(m.jev)}>Jev: {m.jev}</span>{m.guard && <span className="mb-hub-chip">Llama Guard: {m.guard}</span>}{m.jevRunId && <a href="/workspace/brain/runtime">Review in Jev</a>}</p></div>
+            <p className="mb-hub-meta"><span className="mb-kpi-icon" data-tone={tone(m.jev)}>Jev: {m.jev}</span>{m.guard && <span className="mb-hub-chip">Llama Guard: {m.guard}</span>}{m.jevRunId && <a className="mb-hub-jevlink" href="/workspace/brain/runtime">Review in Jev</a>}</p></div>
         </li>)}
       </ol>
       <form className="mb-hub-composer" onSubmit={send} aria-label="Write a draft">
