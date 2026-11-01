@@ -8,6 +8,7 @@
  *  - SMTP: nodemailer transport (host/port/user/password)
  * Each adapter is pure over an injected fetch / transport so it can be unit-tested without the network.
  */
+import { createHmac } from 'node:crypto';
 import { z } from 'zod';
 import nodemailer from 'nodemailer';
 import { route } from '../ai/router';
@@ -39,9 +40,11 @@ function need(channel: Channel, env: Env) { const m = missingEnv(channel, env); 
 const clip = (t: string) => t.slice(0, 4000);
 const json = (t: string) => { try { return JSON.parse(t); } catch { return null; } };
 const timeout = () => AbortSignal.timeout(15_000);
+/** Graph API appsecret_proof = HMAC-SHA256(access token, META_APP_SECRET). Computed server-side when the secret is set. */
+export const appsecretProof = (token: string, env: Env) => env.META_APP_SECRET?.trim() ? createHmac('sha256', env.META_APP_SECRET.trim()).update(token).digest('hex') : null;
 
 async function whatsapp(p: Payload<'whatsapp'>, key: string, d: Deps): Promise<AdapterResult> {
-  const r = await d.fetch(`https://graph.facebook.com/v25.0/${encodeURIComponent(d.env.MUZEBOS_WHATSAPP_PHONE_NUMBER_ID!)}/messages`, {
+  const r = await d.fetch(`https://graph.facebook.com/v25.0/${encodeURIComponent(d.env.MUZEBOS_WHATSAPP_PHONE_NUMBER_ID!)}/messages${appsecretProof(d.env.MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN!, d.env) ? `?appsecret_proof=${appsecretProof(d.env.MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN!, d.env)}` : ''}`, {
     method: 'POST', signal: timeout(),
     headers: { authorization: `Bearer ${d.env.MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN}`, 'content-type': 'application/json' },
     body: JSON.stringify({ messaging_product: 'whatsapp', recipient_type: 'individual', to: p.to, type: 'text', text: { preview_url: false, body: p.body }, biz_opaque_callback_data: key }),
