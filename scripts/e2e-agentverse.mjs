@@ -22,7 +22,9 @@ await p.goto(base + '/workspace/builder/agentverse'); const root = p.getByTestId
 await p.getByText('No records yet').first().waitFor({ timeout: 15000 });
 assert.equal(await p.locator('.mb-av-srv').count(), 2, 'only Home + create; nothing seeded');
 for (const t of ['Ramesh', 'ewaste-leads']) assert.equal(await p.getByText(t).count(), 0);
-await p.screenshot({ path: `${out}/agentverse-empty.png` }); await audit('empty commit-log');
+await p.getByTestId('av-queues').waitFor(); for (const q of ['Kafka', 'Redis', 'Qdrant']) { const t = await p.getByTestId('av-queues').locator('li', { hasText: q }).innerText(); console.log('queue', t.replace(/\n/g, ' ')); assert.match(t, /not configured|Not configured|not connected/); }
+await p.screenshot({ path: `${out}/agentverse-home-empty.png` }); await audit('home empty');
+await chan('commit-log'); await p.screenshot({ path: `${out}/agentverse-empty.png` }); await audit('empty commit-log');
 // owner creates a workspace
 await p.getByRole('button', { name: 'Create workspace' }).first().click(); await p.getByLabel('Workspace name').fill('Ewaste Kochi'); await p.locator('form[aria-label="Create workspace"] button[type=submit]').click();
 await p.getByRole('button', { name: 'Workspace Ewaste Kochi' }).waitFor(); await p.getByRole('button', { name: 'Workspace Ewaste Kochi' }).click();
@@ -41,6 +43,7 @@ await p.getByRole('tab', { name: 'Diffs' }).click(); await p.getByText(/co-autho
 await p.screenshot({ path: `${out}/agentverse-commit-log.png` }); await audit('commit-log diffs');
 await p.getByRole('button', { name: 'Revert (Jev)' }).click(); await p.getByText(/queued as a new Jev item/).waitFor();
 await p.getByRole('tab', { name: 'Logs' }).click(); await p.screenshot({ path: `${out}/agentverse-logs.png` });
+await chan('home-overview'); await p.getByText('Agent drafted').first().waitFor(); await p.screenshot({ path: `${out}/agentverse-home.png` }); await audit('home with records');
 await chan('pending-approvals'); const pend = await p.locator('.mb-av-commit').count(); console.log('pending commits', pend); assert.ok(pend >= 2);
 // inbox not connected, onboarding, cmd+k
 await chan('unified-inbox'); await p.getByText(/Not connected/).first().waitFor(); await audit('inbox');
