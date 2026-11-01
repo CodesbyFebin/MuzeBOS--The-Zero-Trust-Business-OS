@@ -57,4 +57,5 @@ None yet.
 
 ## three.js (MUSE fur simulator)
 - three@0.187.0, MIT License, Copyright © 2010-2026 three.js authors (github.com/mrdoob/three.js). Used via npm, including examples/jsm OrbitControls and GPUComputationRenderer (MIT). It is lazy-loaded on the voice page only.
-- The fur simulator in lib/metabos/fur-sim is a clean-room implementation. The referenced fur-sim source was not found in either GitHub account (CodesbyFebin, Cyberteckmaster). d.txt states no licence, so none of its code was copied. The shading is "Marschner-style", following the published Marschner et al. 2003 model; no code was taken from it.
+- The fur simulator code in lib/metabos/fur-sim is a clean-room implementation. The referenced fur-sim source was not found in either GitHub account (CodesbyFebin, Cyberteckmaster), and d.txt states no licence.
+- Preset data (the Sakura Mochi, Golden Fluff, Midnight Velvet and Matcha Puff base and tip colours and groom values, plus the environment light intensities and wind) is ported from the owner-supplied copy /workspace/designs/fur-src2/src/lib/fur-sim (ui-presets.js, environments.ts). No licence is stated in that copy. No shader or engine code was copied from it. The shading is "Marschner-style", following the published Marschner et al. 2003 model; no code was taken from it.

@@ -96,3 +96,17 @@ describe('adaptive downgrade', () => {
     expect(chooseTier(caps({ software: true }))).toBe('webgl');
   });
 });
+
+describe('ported preset data (owner-supplied fur-src2)', () => {
+  it('named coats use the source base/tip colours and in-range groom values; envs carry source light values', async () => {
+    const { COAT_PRESETS, FUR_SLIDERS } = await import('@/lib/metabos/fur-sim/presets');
+    const { ENVIRONMENTS } = await import('@/lib/metabos/fur-sim/environments');
+    const want: Record<string, [string, string]> = { 'sakura-mochi': ['#5e2bff', '#ff9ec7'], 'golden-fluff': ['#7c3f14', '#fde68a'], 'midnight-velvet': ['#131638', '#67e8f9'], 'matcha-puff': ['#1e4631', '#bbf7d0'] };
+    for (const [id, [root, tip]] of Object.entries(want)) {
+      const c = COAT_PRESETS.find((x) => x.id === id)!; expect([c.root, c.tip]).toEqual([root, tip]);
+      for (const s of FUR_SLIDERS) { const v = c.fur?.[s.key]; if (v !== undefined) { expect(v).toBeGreaterThanOrEqual(s.min); expect(v).toBeLessThanOrEqual(s.max); } }
+    }
+    expect(COAT_PRESETS[0].id).toBe('ember'); expect(COAT_PRESETS[0].fur).toBeUndefined();
+    expect(ENVIRONMENTS.map((e) => e.light.keyLight)).toEqual([1.35, 1.36, 1.38, 1.42]);
+  });
+});

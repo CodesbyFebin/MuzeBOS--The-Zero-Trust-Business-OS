@@ -47,11 +47,11 @@ export const MuseFurSimulator = forwardRef<MuseFurHandle, Props>(function MuseFu
     }).catch(() => { setTier('2d'); setReason('engine failed to load'); });
     return () => { alive = false; eng.current?.dispose(); eng.current = null; };
   }, []);
-  useEffect(() => { eng.current?.setCoatPreset(coat); }, [coat, stats === null]);
+  useEffect(() => { eng.current?.setCoatPreset(coat); const f = coatById(coat).fur; if (f) setParams((p) => { const n = { ...p, ...f }; eng.current?.setParams(n); return n; }); }, [coat, stats === null]);
   useEffect(() => { eng.current?.setSpeaking(state === 'speaking'); }, [state]);
   const stopCam = useCallback(() => { stream.current?.getTracks().forEach((t) => t.stop()); stream.current = null; if (video.current) video.current.srcObject = null; setCam('off'); }, []);
   useEffect(() => () => stopCam(), [stopCam]);
-  const pickEnv = useCallback((id: EnvId) => { setEnv(id); eng.current?.setEnvironment(id); if (id !== 'ar') stopCam(); }, [stopCam]);
+  const pickEnv = useCallback((id: EnvId) => { setEnv(id); eng.current?.setEnvironment(id); const l = envById(id).light; setParams((p) => { const n = { ...p, ...l }; eng.current?.setParams(n); return n; }); if (id !== 'ar') stopCam(); }, [stopCam]);
   async function startCam() { // only ever called from a click
     setCam('asking');
     try { const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }); stream.current = s; if (video.current) { video.current.srcObject = s; await video.current.play().catch(() => undefined); } setCam('on'); }
