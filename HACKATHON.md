@@ -165,3 +165,8 @@ Tests: tests/hackathon-pipeline-finance.test.ts (4 tests, injected fixtures only
 
 Tests: tests/hackathon-walls-memory.test.ts (3 tests, injected fixtures only).
 
+
+## Built during the event: Agent Hub and MUSE companion (Nov 2, stacked on feat/swarms)
+
+- **Agent Hub** (`/workspace/builder/agent-hub`): each of the 10 Claw swarms is a workspace. Its channels are its sub-clusters plus #approvals and #runs. Messages are real agent drafts and composer drafts, each showing its Jev state; members are agent definition cards. Create channel and Build agent write real records (`mb_hub_channels`, `mb_swarm_agents`) plus evidence. The composer saves a draft and one pending Jev item. It never posts.
+- **MUSE**: the voice assistant from #56 now shows MUSE, a clean-room Canvas2D avatar with idle, listening, thinking and speaking states. The default coat is red/black, with graphite and violet as options. The Memory, Evidence ledger, Fleet and Tool directory panels read real APIs and the registry. It honours reduced-motion, caps at 30 fps and pauses when off-screen. See THIRD_PARTY.md for how the prototype was reviewed.

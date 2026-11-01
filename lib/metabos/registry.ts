@@ -211,7 +211,7 @@ const B3_PAGES: Record<string, FeatureDefinition[]> = {
   operations: [mk('pipelines', 'Pipelines', 'Research, draft, Llama Guard review, then a Jev stop; blocked if unanswered by the deadline. Never continues on its own.', 'operations')],
   system: [mk('accessibility', 'Accessibility Self-Audit', 'Checks alt text, names, labels, 44px targets and page language on key pages; the same checks run in CI via scripts/a11y-check.mjs. Basic checks, not a full WCAG audit.', 'system')],
   brain: [mk('safe-outputs', 'Safe Outputs', 'Per-role allowed output types; anything else is refused with evidence before Jev. Pattern from gh-aw (MIT).', 'brain')],
-  builder: [mk('swarms', 'Claw swarms', '1000 agent definition cards by swarm, sub-cluster and agent with tier, risk and Jev filters; run one on Yao or the local swarm, result lands as a Brain draft waiting in Jev.', 'builder')],
+  builder: [mk('agent-hub', 'Agent Hub', 'Chat-style command center: swarms as workspaces, sub-clusters plus #approvals and #runs as channels, real agent drafts and Jev items as messages, agent cards as members. Create channel and Build agent write records; the composer only saves drafts for Jev.', 'builder'), mk('swarms', 'Claw swarms', '1000 agent definition cards by swarm, sub-cluster and agent with tier, risk and Jev filters; run one on Yao or the local swarm, result lands as a Brain draft waiting in Jev.', 'builder')],
 };
 
 const BRAIN_HACK: FeatureDefinition[] = [

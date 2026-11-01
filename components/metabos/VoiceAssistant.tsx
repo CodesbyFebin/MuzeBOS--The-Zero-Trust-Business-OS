@@ -1,6 +1,7 @@
 'use client';
 import React, { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
-import { BrandMark } from './BrandMark';
+import { MuseAvatar, COATS, type CoatId } from './muse/MuseAvatar';
+import { MusePanels } from './muse/MusePanels';
 
 type Reply = { heard: string; text: string; links: { label: string; href: string }[]; tool: string; via: string; stt?: { model: string; audioDurationMs: number } | null; error?: string };
 type SR = { start(): void; stop(): void; abort(): void; continuous: boolean; interimResults: boolean; lang: string; onresult: ((e: any) => void) | null; onend: (() => void) | null; onerror: ((e: any) => void) | null };
@@ -23,6 +24,9 @@ export function VoiceAssistant() {
   const [state, setState] = useState<'idle' | 'listening' | 'thinking' | 'speaking'>('idle');
   const [replies, setReplies] = useState<Reply[]>([]); const [typed, setTyped] = useState(''); const [wake, setWake] = useState(false);
   const [speak, setSpeak] = useState(true); const [note, setNote] = useState('');
+  const [coat, setCoat] = useState<CoatId>('ember');
+  useEffect(() => { const c = localStorage.getItem('muse.coat'); if (c && c in COATS) setCoat(c as CoatId); }, []);
+  const pickCoat = (c: CoatId) => { setCoat(c); try { localStorage.setItem('muse.coat', c); } catch { /* private mode */ } };
   const rec = useRef<{ ctx: AudioContext; stream: MediaStream; node: ScriptProcessorNode; chunks: Float32Array[] } | null>(null);
   const wakeRef = useRef<SR | null>(null);
 
@@ -80,11 +84,11 @@ export function VoiceAssistant() {
   }, [wake, sendText, say]);
 
   function submit(e: FormEvent) { e.preventDefault(); const t = typed.trim(); if (t) { setTyped(''); void sendText(t); } }
-  const active = state === 'listening' || state === 'speaking';
-  return <section className="mb-panel mb-voice" aria-labelledby="voice-h" data-testid="voice-assistant">
+  return <div className="mb-muse"><section className="mb-panel mb-voice" aria-labelledby="voice-h" data-testid="voice-assistant">
+    <div className="mb-muse-stage"><MuseAvatar state={state} coat={coat} size={200} />
+      <label className="mb-voice-opt">Coat <select value={coat} onChange={(e) => pickCoat(e.target.value as CoatId)} data-testid="muse-coat">{(Object.keys(COATS) as CoatId[]).map((k) => <option key={k} value={k}>{COATS[k].label}</option>)}</select></label></div>
     <div className="mb-voice-head">
-      <span className={`mb-voice-mark${active ? ' is-active' : ''}`} aria-hidden="true"><BrandMark size={28} /></span>
-      <h2 id="voice-h">MeTaBos voice</h2>
+      <h2 id="voice-h">MUSE <span className="mb-muted">· MeTaBos voice</span></h2>
       <span className="mb-voice-state" aria-live="polite" data-testid="voice-state">{state === 'idle' ? 'Ready' : state === 'listening' ? 'Listening…' : state === 'thinking' ? 'Working…' : 'Speaking…'}</span>
     </div>
     <p className="mb-voice-help">Hold the mic (or Alt+M) and speak. I can read status, explain an item, list tasks, and draft a task or message for your approval. I never approve or send.</p>
@@ -108,5 +112,5 @@ export function VoiceAssistant() {
         <p className="mb-voice-meta">{r.stt ? `Heard by ${r.stt.model}` : 'Typed or browser speech'} · intent by {r.via}{r.tool !== 'error' ? ` · ${r.tool}` : ''}</p>
       </li>)}
     </ol>
-  </section>;
+  </section><MusePanels /></div>;
 }
