@@ -18,7 +18,7 @@ const jevState = (st: string | undefined): CommitStatus => !st ? 'held' : st ===
 const plus = (text: string) => String(text).split('\n').slice(0, 40).map((l) => `+ ${l}`);
 const tableExists = (s: BusinessStore, t: string) => !!s.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?").get(t);
 
-const ensureAds = (s: BusinessStore) => s.db.exec('CREATE TABLE IF NOT EXISTS mb_ad_drafts(id TEXT PRIMARY KEY, name TEXT NOT NULL, objective TEXT NOT NULL, dailyBudgetMinor INTEGER NOT NULL, currency TEXT NOT NULL, audience TEXT NOT NULL, creative TEXT NOT NULL, jevRunId TEXT NOT NULL, createdBy TEXT NOT NULL, createdAt TEXT NOT NULL)');
+export const ensureAds = (s: BusinessStore) => s.db.exec('CREATE TABLE IF NOT EXISTS mb_ad_drafts(id TEXT PRIMARY KEY, name TEXT NOT NULL, objective TEXT NOT NULL, dailyBudgetMinor INTEGER NOT NULL, currency TEXT NOT NULL, audience TEXT NOT NULL, creative TEXT NOT NULL, jevRunId TEXT NOT NULL, createdBy TEXT NOT NULL, createdAt TEXT NOT NULL)');
 export const AdDraftInput = z.object({
   name: z.string().trim().min(1).max(120),
   objective: z.enum(['awareness', 'traffic', 'engagement', 'leads', 'sales']),

@@ -6,10 +6,13 @@
  *    only when real insights rows exist, and auto-rules can only propose a pause as a Jev item.
  *  - The Git console is built on commitLog and the evidence chain. Revert and cherry-pick are new Jev items. */
 import { randomUUID } from 'node:crypto';
+import net from 'node:net';
+import { clawStatus, yaoStatus } from '../b3/agent-run';
+import { localStatus } from '../ai/local-llm';
 import { z } from 'zod';
 import { BusinessError, type BusinessStore } from '../store';
-import { propose as jevPropose } from '../ai/jev';
-import { adDraft, commitLog, metaConnections, type Commit } from '../server/commits';
+import { propose as jevPropose, queue } from '../ai/jev';
+import { adDraft, commitLog, ensureAds, metaConnections, type Commit } from '../server/commits';
 import { propose as proposeDispatch } from '../dispatch/service';
 import { ensureTalk } from '../talk/core';
 import { missingEnv } from '../dispatch/adapters';
@@ -17,10 +20,16 @@ import type { Env } from '../dispatch/adapters';
 
 /** Names the owner asked for. These are suggestions for the create form only and are never inserted automatically. */
 export const SUGGESTED_WORKSPACES = ['Codes By Febin', 'Ewaste Kochi', 'XFree.app', 'Spider Kids'] as const;
+/** Channel groups follow the owner's commit-console reference. The earlier group names
+ *  (Unified Inbox, Content Studio, Business Suite, AgentVerse, Meta AI Lab) become the channels inside these groups. */
 export const CHANNEL_GROUPS = [
-  { id: 'inbox', label: 'Unified Inbox' }, { id: 'content', label: 'Content Studio' }, { id: 'business', label: 'Business Suite' },
-  { id: 'agentverse', label: 'AgentVerse' }, { id: 'lab', label: 'Meta AI Lab' },
+  { id: 'git', label: 'Git for agents', channels: ['commit-log', 'branches', 'pending-approvals', 'knowledge-graph'] },
+  { id: 'suite', label: 'Meta Suite', channels: ['unified-inbox', 'facebook', 'instagram', 'whatsapp', 'messenger', 'threads', 'meta-ai'] },
+  { id: 'ads', label: 'Ads command center', channels: ['campaigns', 'creatives-lab', 'audiences', 'roas-dashboard'], business: true },
+  { id: 'swarm', label: 'Agent swarm', channels: ['agents-online', 'blame', 'onboarding', 'roles'] },
 ] as const;
+/** SHIPPED means a Jev approval and a dispatch receipt (provider accepted). Nothing else counts as shipped. */
+export const commitTag = (c: Pick<Commit, 'status' | 'dispatchId'>) => c.status === 'sent' && c.dispatchId ? 'SHIPPED' : c.status === 'pending' ? 'PENDING' : c.status.toUpperCase();
 /** Admin, Agent and Viewer map onto the existing member roles, so no new auth path is added. */
 export const AV_ROLES = { owner: 'Admin', manager: 'Agent', member: 'Viewer' } as const;
 export const FOOTNOTE = 'Built by codesbyfebin — Kochi';
@@ -111,9 +120,10 @@ export function evaluateRules(s: BusinessStore) {
   return out;
 }
 export function adsView(s: BusinessStore) {
-  ensure(s);
+  ensure(s); ensureAds(s);
   const ads = s.db.prepare('SELECT a.*, m.placements, m.workspaceId FROM mb_ad_drafts a LEFT JOIN mb_av_ads m ON m.adId=a.id ORDER BY a.createdAt DESC').all() as Record<string, string | number | null>[];
-  return ads.map((a) => ({ ...a, placements: a.placements ? JSON.parse(String(a.placements)) : [], roas: roas(s, String(a.id)), rules: s.db.prepare('SELECT id, roasBelowX100 FROM mb_av_rules WHERE adId=?').all(a.id) }));
+  type AdRow = { id: string; name: string; objective: string; dailyBudgetMinor: number; currency: string; audience: string; creative: string; workspaceId: string | null };
+  return ads.map((a) => ({ ...(a as unknown as AdRow), placements: a.placements ? JSON.parse(String(a.placements)) : [], roas: roas(s, String(a.id)), rules: s.db.prepare('SELECT id, roasBelowX100 FROM mb_av_rules WHERE adId=?').all(a.id) as { id: string; roasBelowX100: number }[] }));
 }
 
 // Git console
@@ -166,7 +176,38 @@ export function graph(s: BusinessStore) {
   for (const c of inbox(s)) { const id = n(`conv:${c.id}`, 'conversation', c.name ?? c.address); for (const m of c.messages) if (m.dispatchId && nodes.has(`commit:${m.dispatchId}`)) edges.push({ from: id, to: `commit:${m.dispatchId}`, rel: 'reply' }); }
   return { nodes: [...nodes.values()], edges };
 }
-export function overview(s: BusinessStore, env: Env) {
+export function overview(s: BusinessStore, env: Env, swarms: { name: string; agents: number; pending: number }[] = []) {
   const commits = commitLog(s);
-  return { workspaces: listWorkspaces(s), suggested: SUGGESTED_WORKSPACES, groups: CHANNEL_GROUPS, inbox: inbox(s), inboxStatus: inboxStatus(env), ads: adsView(s), adsConnection: metaConnections(env).find((m) => m.id === 'ads')!.status, commits, blame: blame(commits), onboarding: onboarding(env), graph: graph(s), footnote: FOOTNOTE };
+  return { workspaces: listWorkspaces(s), suggested: SUGGESTED_WORKSPACES, groups: CHANNEL_GROUPS, inbox: inbox(s), inboxStatus: inboxStatus(env), ads: adsView(s), adsConnection: metaConnections(env).find((m) => m.id === 'ads')!.status, commits, blame: blame(commits), onboarding: onboarding(env), graph: graph(s), swarms, footnote: FOOTNOTE };
+}
+
+// Home Server overview (HUD). Live Activity comes only from the evidence chain and Jev. Queue Status probes only real infrastructure.
+const ACTIVITY: [RegExp, string][] = [[/lead/i, 'Lead captured'], [/inbound|webhook|talk\.message\.in/i, 'DM received'], [/escalat|handoff/i, 'Escalated to human'], [/schedul/i, 'Post scheduled'], [/jev|draft|propos/i, 'Agent drafted'], [/dispatch.*sent|sent/i, 'Sent via /api/dispatch']];
+export function liveActivity(s: BusinessStore, limit = 25) {
+  const ev = s.evidence().slice(-limit).reverse();
+  return ev.map((e) => ({ seq: e.seq, kind: ACTIVITY.find(([r]) => r.test(e.action))?.[1] ?? 'Recorded', action: e.action, target: e.target, detail: String(e.detail ?? '').slice(0, 160), at: e.createdAt, hash: e.hash }));
+}
+type Probe = { id: string; label: string; state: 'ready' | 'not_connected' | 'not_configured'; detail: string };
+const tcp = (url: string, port: number) => new Promise<boolean>((res) => { try { const u = new URL(url.includes('://') ? url : `tcp://${url}`); const sock = net.connect({ host: u.hostname, port: Number(u.port) || port, timeout: 1000 }); sock.once('connect', () => { sock.destroy(); res(true); }); sock.once('error', () => res(false)); sock.once('timeout', () => { sock.destroy(); res(false); }); } catch { res(false); } });
+export async function queueStatus(s: BusinessStore, env: Env, f: typeof fetch = fetch): Promise<Probe[]> {
+  const claw = clawStatus(env), yao = yaoStatus(env), llm = await localStatus(env, f);
+  const jevWaiting = queue(s).length;
+  const out: Probe[] = [
+    { id: 'jev', label: 'Jev approval queue', state: 'ready', detail: `${jevWaiting} waiting (mb_jev_runs)` },
+    { id: 'claw', label: 'claw-local queue', state: claw.connected ? 'ready' : 'not_configured', detail: claw.label },
+    { id: 'yao', label: 'Yao', state: yao.connected ? 'ready' : 'not_configured', detail: yao.connected ? 'Configured (env present; not a health check)' : yao.label },
+    { id: 'llm', label: 'Local LLM (llama-server)', state: llm.state, detail: llm.model ? `${llm.label}: ${llm.model}` : llm.label },
+  ];
+  const ollama = env.MUZEBOS_OLLAMA_URL?.trim();
+  out.push(ollama ? { id: 'ollama', label: 'Ollama', state: (await tcp(ollama, 11434)) ? 'ready' : 'not_connected', detail: ollama.replace(/\/\/[^@/]*@/, '//') } : { id: 'ollama', label: 'Ollama', state: 'not_configured', detail: 'Not configured — set MUZEBOS_OLLAMA_URL' });
+  for (const [id, label, key, port] of [['kafka', 'Kafka', 'KAFKA_BROKERS', 9092], ['redis', 'Redis', 'REDIS_URL', 6379], ['qdrant', 'Qdrant', 'QDRANT_URL', 6333]] as const) {
+    const v = env[key]?.trim().split(',')[0];
+    out.push(!v ? { id, label, state: 'not_configured', detail: 'Not configured' } : (await tcp(v, port)) ? { id, label, state: 'ready', detail: 'Reachable (port open; no lag or key metrics read)' } : { id, label, state: 'not_connected', detail: 'Not connected (configured but not reachable)' });
+  }
+  return out;
+}
+export async function home(s: BusinessStore, env: Env) {
+  const commits = commitLog(s);
+  const campaigns = adsView(s).map((a) => { const c = commits.find((x) => x.id === a.id); return { id: a.id, name: a.name, objective: a.objective, dailyBudgetMinor: a.dailyBudgetMinor, status: c ? commitTag(c) : 'DRAFT', roas: a.roas }; });
+  return { activity: liveActivity(s), campaigns, queues: await queueStatus(s, env), jevWaiting: queue(s).length };
 }
