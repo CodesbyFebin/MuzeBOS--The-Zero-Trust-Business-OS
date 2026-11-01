@@ -45,7 +45,7 @@ await p.getByRole('tab', { name: 'Diffs' }).click(); await p.getByText(/co-autho
 await p.screenshot({ path: `${out}/agentverse-commit-log.png` }); await audit('commit-log diffs');
 await p.getByRole('button', { name: 'Revert (Jev)' }).click(); await p.getByText(/queued as a new Jev item/).waitFor();
 await p.getByRole('tab', { name: 'Logs' }).click(); await p.screenshot({ path: `${out}/agentverse-logs.png` });
-await chan('home-overview'); await p.getByText('Agent drafted').first().waitFor(); await p.screenshot({ path: `${out}/agentverse-home.png` }); await audit('home with records');
+await chan('home-overview'); await p.locator('.mb-av-feed').getByText('Agent drafted').first().waitFor(); await p.screenshot({ path: `${out}/agentverse-home.png` }); await audit('home with records');
 await p.getByLabel('Filter').fill('zzz-no-match'); await p.getByText('No records yet').first().waitFor(); await p.getByLabel('Filter').fill('');
 await chan('fleet-console'); await p.getByText('Runners and agent activity from real records').waitFor(); await p.screenshot({ path: `${out}/muze-fleet.png` }); await audit('fleet-console');
 await chan('sparring-pit'); await p.getByRole('link', { name: 'Arena PR #59' }).waitFor(); await audit('sparring-pit');
