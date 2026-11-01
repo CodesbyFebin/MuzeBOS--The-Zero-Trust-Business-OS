@@ -33,3 +33,7 @@ The inference workspace additionally depends on the packaged
 installed package. Llama model weights are a separate, explicit device download
 under their upstream model terms. No Muse Code, Wonder Full or OpenClaw source
 or model weights are bundled or represented as running in this release.
+
+## vendor/muse-skills
+
+SKILL.md text from anthropics/skills (Apache-2.0), garrytan/gstack via CodesbyFebin/Agent-tools (MIT, Copyright (c) Garry Tan) and github/gh-aw via CodesbyFebin/Agentic-Workflow (MIT, Copyright (c) GitHub, Inc.). Full licence and attribution in each folder. See vendor/muse-skills/README.md.
