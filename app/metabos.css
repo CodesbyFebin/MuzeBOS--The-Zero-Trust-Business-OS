@@ -664,3 +664,8 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-av-panel h2{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 4px;color:#FF6B6B}
 .mb-av-feed{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px;max-height:460px;overflow:auto}
 .mb-av-feed li{padding:8px;border-left:2px solid #2a2a2a;background:#161616;border-radius:6px}
+.mb-av .mb-hub-chan{display:flex;align-items:center;gap:6px;width:100%;border:0;background:transparent;text-align:left;font-family:ui-monospace,monospace;font-size:13px;color:#B8B8B8;border-radius:6px}
+.mb-av .mb-hub-chan[aria-current=true]{background:#1f1f1f;color:#fff;box-shadow:inset 2px 0 0 #FF2A2A}
+.mb-av .mb-hub-chan:hover{background:#181818}
+.mb-av code,.mb-av-feed li,.mb-hub-text{overflow-wrap:anywhere}
+.mb-av-feed code{font-size:12px}
