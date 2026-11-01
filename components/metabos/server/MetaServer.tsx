@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import { GitCommit, Hash, Megaphone, Plug, Menu, PanelLeft, ExternalLink, X } from 'lucide-react';
 import { businessServers, type ServerChannel } from '@/lib/metabos/server/servers';
 import { AgentHub } from '@/components/metabos/hub/AgentHub';
+import { coatById, isCoatId } from '@/lib/metabos/fur-sim/presets';
 import { MuseAvatar, type CoatId } from '@/components/metabos/muse/MuseAvatar';
 
 type Commit = { sha: string; id: string; kind: string; server: string; author: string; title: string; diff: string[]; status: string; jevRunId: string | null; dispatchId: string | null; dispatch: string; createdAt: string; evidence: { seq: number; action: string; hash: string }[] };
@@ -27,7 +28,7 @@ export function MetaServer() {
   const load = useCallback(() => { fetch('/api/server').then(async (r) => { const j = await r.json(); if (!r.ok) throw new Error(j.error); setD(j); setErr(''); }).catch((e) => setErr(String(e.message ?? e))); }, []);
   useEffect(load, [load]);
   useEffect(() => { const m = localStorage.getItem('metaserver.mode'); if (m === 'personal' || m === 'business') setMode(m); }, []);
-  useEffect(() => { const c = localStorage.getItem('muse.coat'); if (c === 'ember' || c === 'graphite' || c === 'violet') setCoat(c); }, []);
+  useEffect(() => { const c = localStorage.getItem('muse.coat'); if (c === 'ember' || c === 'graphite' || c === 'violet') setCoat(c); else if (isCoatId(c)) setCoat(coatById(c).legacy2d); }, []);
   const biz = SERVERS.find((s) => s.id === server); const suite = server === 'suite'; const swarm = server.startsWith('swarm:') ? server.slice(6) : null;
   const page: ServerChannel | undefined = useMemo(() => biz?.categories.flatMap((c) => c.channels).find((c) => c.id === chan), [biz, chan]);
   const commits = (d?.commits ?? []).filter((c) => server === 'hq' || c.server === server);

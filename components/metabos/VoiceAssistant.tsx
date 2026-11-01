@@ -1,6 +1,8 @@
 'use client';
 import React, { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
-import { MuseAvatar, COATS, type CoatId } from './muse/MuseAvatar';
+import { MuseFurSimulator, type MuseFurHandle } from './muse/MuseFurSimulator';
+import { DEFAULT_COAT, coatById, isCoatId, type CoatPresetId } from '@/lib/metabos/fur-sim/presets';
+import { parseMuseCommand } from '@/lib/metabos/fur-sim/voiceCommands';
 import { MusePanels } from './muse/MusePanels';
 
 type Reply = { heard: string; text: string; links: { label: string; href: string }[]; tool: string; via: string; stt?: { model: string; audioDurationMs: number } | null; error?: string };
@@ -24,9 +26,10 @@ export function VoiceAssistant() {
   const [state, setState] = useState<'idle' | 'listening' | 'thinking' | 'speaking'>('idle');
   const [replies, setReplies] = useState<Reply[]>([]); const [typed, setTyped] = useState(''); const [wake, setWake] = useState(false);
   const [speak, setSpeak] = useState(true); const [note, setNote] = useState('');
-  const [coat, setCoat] = useState<CoatId>('ember');
-  useEffect(() => { const c = localStorage.getItem('muse.coat'); if (c && c in COATS) setCoat(c as CoatId); }, []);
-  const pickCoat = (c: CoatId) => { setCoat(c); try { localStorage.setItem('muse.coat', c); } catch { /* private mode */ } };
+  const [coat, setCoat] = useState<CoatPresetId>(DEFAULT_COAT);
+  useEffect(() => { const c = localStorage.getItem('muse.coat'); if (isCoatId(c)) setCoat(c); }, []);
+  const pickCoat = useCallback((c: CoatPresetId) => { setCoat(c); try { localStorage.setItem('muse.coat', c); } catch { /* private mode */ } }, []);
+  const fur = useRef<MuseFurHandle>(null);
   const rec = useRef<{ ctx: AudioContext; stream: MediaStream; node: ScriptProcessorNode; chunks: Float32Array[] } | null>(null);
   const wakeRef = useRef<SR | null>(null);
 
@@ -35,16 +38,26 @@ export function VoiceAssistant() {
     const u = new SpeechSynthesisUtterance(text); u.onend = () => setState('idle'); u.onerror = () => setState('idle');
     window.speechSynthesis.cancel(); setState('speaking'); window.speechSynthesis.speak(u);
   }, [speak]);
+  /** MUSE-only commands ("boop", "flip my coat", "show cloud sky") run locally; nothing leaves the browser. */
+  const local = useCallback((text: string): boolean => {
+    const cmd = parseMuseCommand(text); const f = fur.current; if (!cmd || !f) return false;
+    let msg = '';
+    if (cmd.kind === 'boop') { f.triggerBoop(); msg = 'Boop!'; }
+    else if (cmd.kind === 'coat') { const id = cmd.preset === 'next' ? f.flipCoat() : (f.setCoatPreset(cmd.preset), cmd.preset); msg = `Coat changed to ${coatById(id).label}.`; }
+    else { f.setEnvironment(cmd.env); msg = 'Scene changed.'; }
+    setReplies((x) => [{ heard: text, text: msg, links: [], tool: 'muse.local', via: 'browser' }, ...x].slice(0, 20)); say(msg); return true;
+  }, [say]);
   const send = useCallback(async (body: BodyInit, json: boolean) => {
     setState('thinking');
     try {
       const r = await fetch('/api/voice', { method: 'POST', body, headers: json ? { 'Content-Type': 'application/json' } : undefined });
       const j = await r.json();
+      if (r.ok && typeof j.heard === 'string' && local(j.heard)) return; // spoken "boop" / "flip my coat" (audio path)
       const reply: Reply = r.ok ? j : { heard: '', text: j.error ?? 'Voice assistant unavailable', links: [], tool: 'error', via: 'none', error: j.error };
       setReplies((x) => [reply, ...x].slice(0, 20)); say(reply.text);
     } catch { setReplies((x) => [{ heard: '', text: 'Voice assistant unavailable', links: [], tool: 'error', via: 'none' }, ...x]); setState('idle'); }
-  }, [say]);
-  const sendText = useCallback((text: string) => send(JSON.stringify({ text, tz: -new Date().getTimezoneOffset() }), true), [send]);
+  }, [say, local]);
+  const sendText = useCallback((text: string) => { if (local(text)) return; return send(JSON.stringify({ text, tz: -new Date().getTimezoneOffset() }), true); }, [send, local]);
 
   const start = useCallback(async () => {
     if (rec.current || state === 'thinking') return;
@@ -85,8 +98,7 @@ export function VoiceAssistant() {
 
   function submit(e: FormEvent) { e.preventDefault(); const t = typed.trim(); if (t) { setTyped(''); void sendText(t); } }
   return <div className="mb-muse"><section className="mb-panel mb-voice" aria-labelledby="voice-h" data-testid="voice-assistant">
-    <div className="mb-muse-stage"><MuseAvatar state={state} coat={coat} size={200} />
-      <label className="mb-voice-opt">Coat <select value={coat} onChange={(e) => pickCoat(e.target.value as CoatId)} data-testid="muse-coat">{(Object.keys(COATS) as CoatId[]).map((k) => <option key={k} value={k}>{COATS[k].label}</option>)}</select></label></div>
+    <div className="mb-muse-stage"><MuseFurSimulator ref={fur} state={state} coat={coat} onCoatChange={pickCoat} /></div>
     <div className="mb-voice-head">
       <h2 id="voice-h">MUSE <span className="mb-muted">· MeTaBos voice</span></h2>
       <span className="mb-voice-state" aria-live="polite" data-testid="voice-state">{state === 'idle' ? 'Ready' : state === 'listening' ? 'Listening…' : state === 'thinking' ? 'Working…' : 'Speaking…'}</span>

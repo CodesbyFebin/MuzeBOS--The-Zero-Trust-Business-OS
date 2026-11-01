@@ -54,3 +54,7 @@ None yet.
 ### MeTa Server design inputs (t59: a.txt, b.html, c.txt, d.txt) — reviewed, no code copied
 - a.txt / c.txt (owner codesbyfebin, stated "License MIT") and b.html ("Meta AgentVerse OS — Discord for Meta × Git for Agents"): layout ideas only (server rail, channels, commit-style log). Their CDN assets (jsdelivr Geist/JetBrains fonts, cdnjs three.js r128, pixi.js 7.3.2), mock data, ui-avatars.com images and "fully wired"/"auto-setup"/OAuth claims were not used or adopted.
 - d.txt ("Meta Agentverse Unified Suite" chat transcript): no licence stated, so no code was reused. Ideas used: one channel per Meta product, personal vs business mode. Its env names (META_APP_ID, META_APP_SECRET, META_VERIFY_TOKEN) appear only as setup notes; no adapter reads them and no OAuth or auto-setup runs.
+
+## three.js (MUSE fur simulator)
+- three@0.187.0, MIT License, Copyright © 2010-2026 three.js authors (github.com/mrdoob/three.js). Used via npm, including examples/jsm OrbitControls and GPUComputationRenderer (MIT). It is lazy-loaded on the voice page only.
+- The fur simulator in lib/metabos/fur-sim is a clean-room implementation. The referenced fur-sim source was not found in either GitHub account (CodesbyFebin, Cyberteckmaster). d.txt states no licence, so none of its code was copied. The shading is "Marschner-style", following the published Marschner et al. 2003 model; no code was taken from it.

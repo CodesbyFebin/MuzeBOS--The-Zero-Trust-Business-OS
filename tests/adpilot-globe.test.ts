@@ -204,16 +204,14 @@ describe('cityBreakdown (City card)', () => {
 describe('globe source rules (S11 §9)', () => {
   const globe = read('components/adpilot/Globe.tsx');
 
-  it('three.js is gone (AC11.1)', () => {
-    const pkg = JSON.parse(read('package.json'));
-    expect(pkg.dependencies?.three).toBeUndefined();
-    expect(pkg.devDependencies?.['@types/three']).toBeUndefined();
+  it('three.js is gone from the globe (AC11.1); only the MUSE fur sim may import it', () => {
+    // three was re-added by the owner for the MUSE fur simulator (lib/metabos/fur-sim), lazy-loaded.
     for (const dir of ['app', 'components', 'lib']) {
       const walk = (d: string): string[] =>
         fs.readdirSync(path.join(root, d), { withFileTypes: true }).flatMap((e) =>
           e.isDirectory() ? walk(path.join(d, e.name)) : /\.(tsx?|mjs|js)$/.test(e.name) ? [path.join(d, e.name)] : [],
         );
-      for (const f of walk(dir)) expect(read(f), f).not.toMatch(/from ['"]three['"]/);
+      for (const f of walk(dir).filter((f) => !f.includes(path.join('lib', 'metabos', 'fur-sim')))) expect(read(f), f).not.toMatch(/from ['"]three['"]/);
     }
   });
 

@@ -578,3 +578,23 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 }
 .mb-srv .mb-srv-link { display: inline-flex; align-items: center; min-height: 44px; }
 .mb-srv-mode { display: flex; gap: 6px; margin: 8px 0; } .mb-srv .mb-srv-mode button[aria-pressed=true] { background: #FF2A2A; color: #0A0A0A; border-color: #FF2A2A; }
+
+/* MUSE fur simulator */
+.mb-fur { display: grid; gap: 8px; width: 100%; max-width: 520px; }
+.mb-fur-envs, .mb-fur-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.mb-fur button { min-height: 44px; min-width: 44px; padding: 0 12px; background: #161616; color: #f2f2f2; border: 1px solid #2a2a2a; border-radius: 22px; cursor: pointer; }
+.mb-fur button[aria-pressed="true"] { border-color: #FF2A2A; background: #2a0a0a; }
+.mb-fur button:focus-visible, .mb-fur input:focus-visible { outline: 2px solid #FF2A2A; outline-offset: 2px; }
+.mb-fur-stage { position: relative; border: 1px solid #222; border-radius: 12px; overflow: hidden; }
+.mb-fur-canvas, .mb-fur-video { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+.mb-fur-video { object-fit: cover; }
+.mb-fur .mb-fur-2d { position: absolute; inset: 0; display: grid; place-items: center; background: transparent; border: 0; border-radius: 0; }
+.mb-fur-ar { position: absolute; inset: auto 8px 8px 8px; background: rgba(10,10,10,.9); border: 1px solid #2a2a2a; border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+.mb-fur .mb-fur-ar-stop { position: absolute; right: 8px; bottom: 8px; }
+.mb-fur-stats { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; font-size: 12px; }
+.mb-fur-stats li { background: #111111; border: 1px solid #222; border-radius: 12px; padding: 4px 10px; color: #cfcfcf; }
+.mb-fur-lab { background: #111111; border: 1px solid #222; border-radius: 12px; padding: 10px; display: grid; gap: 6px; }
+.mb-fur-lab fieldset { border: 0; padding: 0; margin: 0; }
+.mb-fur-slider { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font-size: 13px; }
+.mb-fur-slider input { grid-column: 1 / -1; min-height: 44px; accent-color: #FF2A2A; }
+.mb-fur-swatch { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 6px; vertical-align: -2px; }
