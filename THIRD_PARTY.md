@@ -23,6 +23,9 @@ These repositories were studied during the event. MeTaBos code inspired by them 
 | lib/metabos/brain/metering.ts | per-agent spend metering and monthly caps | oc8 (pattern only) |
 | lib/metabos/brain/ops.ts | tool risk tiers; high risk always gated | open-agents-builder |
 | lib/metabos/brain/ops.ts | counterparty risk memory with graded outcomes | crawlhive-brain (pattern only) |
+| lib/metabos/data/service.ts | question to read-only SQL analyst that shows the query it ran | google/adk-samples data-science agent (Apache-2.0, pattern only) |
+| lib/metabos/data/service.ts | customer data export and redaction | DeskcommCRM (MIT, pattern only) |
+| lib/metabos/data/service.ts | monthly sales goals against actuals | DeskcommCRM (MIT, pattern only) |
 
 ## Adapted files
 None yet.

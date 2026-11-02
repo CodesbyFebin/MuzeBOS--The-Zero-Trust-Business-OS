@@ -1,10 +1,11 @@
 'use client';
+import type React from 'react';
 import { useEffect, useState } from 'react';
 import { inr, toPaise, postTo, InferenceNote } from './bizClient';
 type Deal = { id: string; title: string; amount: number; stage: string; probability: number | null; winProbability: number; weighted: number; expectedClose: string | null; events: { toStage: string; note: string }[] };
 type Data = { stages: string[]; defaults: Record<string, number>; summary: { open: number; openAmount: number; weightedAmount: number; winRate: number | null }; deals: Deal[]; customers: { id: string; name: string }[] };
 const post = postTo('/api/metabos/pipeline');
-export function PipelineBoard() {
+export function PipelineBoard({ children }: { children?: React.ReactNode } = {}) {
   const [d, setD] = useState<Data | null>(null); const [error, setError] = useState<string | null>(null);
   const [f, setF] = useState({ title: '', amount: '', customerId: '', expectedClose: '' }); const [tasks, setTasks] = useState<Record<string, string>>({}); const [advice, setAdvice] = useState<Record<string, { nextStep: string; probability: number; source: string }>>({});
   const load = async () => { try { const r = await fetch('/api/metabos/pipeline'); const j = await r.json(); if (!r.ok) throw new Error(j.error); setD(j); } catch (e) { setError((e as Error).message); } };
@@ -35,5 +36,6 @@ export function PipelineBoard() {
           </article>)}
         </section>)}
       </div></>}
+    {children}
   </div>;
 }
