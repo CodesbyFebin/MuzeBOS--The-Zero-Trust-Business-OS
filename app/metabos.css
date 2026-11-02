@@ -381,14 +381,6 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 @media (prefers-reduced-motion: reduce) {
   .mb-intro-mark .mb-mark-path, .mb-intro-word, .mb-intro-accent { animation:none;stroke-dashoffset:0;fill-opacity:1;opacity:1;width:120px; }
 }
-/* Side panel upgrades (from the neural-recruitment reference, recoloured to black/red) */
-.mb-secondary-link { position:relative;border:1px solid transparent;transition:background .15s,color .15s; }
-.mb-secondary-link:hover { background:rgba(255,255,255,.03);color:var(--mb-text); }
-.mb-secondary-link[aria-current="page"] { background:var(--mb-accent-dim);color:var(--mb-text);border-color:rgba(255,42,42,.25); }
-.mb-secondary-link[aria-current="page"]::before { content:'';position:absolute;left:-1px;top:4px;bottom:4px;width:2px;background:var(--mb-accent); }
-.mb-cluster summary .mb-count { font-family:var(--mb-mono);font-size:8px;padding:1px 6px;border-radius:4px;background:var(--mb-raised);color:var(--mb-muted); }
-.mb-rail-link[aria-current="page"] { box-shadow:inset 2px 0 0 var(--mb-accent); }
-@media (prefers-reduced-motion: reduce) { .mb-secondary-link { transition:none; } }
 .mb-widgets { display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px; }
 .mb-widget { margin:0; }
 .mb-widget-label { font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mb-muted); }
@@ -459,19 +451,43 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-kpi-arrow{color:#777;flex-shrink:0;margin-top:4px}
 @media (prefers-reduced-motion:reduce){.mb-kpi-card{transition:none}.mb-kpi-card:hover{transform:none}}
 
-/* Mission Control v3 shell layer: neutral status tokens (no blue/purple), v3 rail/sidebar/topbar */
-:root { --mb-blue:#8a8a8a; --mb-purple:#8a8a8a; }
-.mb-status-dot.mb-status-existing { background:#6b6b6b; }
-.mb-rail { background:#0A0A0A; border-right:1px solid #1c1c1c; }
-.mb-rail-link, .mb-side-link { min-height:44px; border-radius:8px; color:var(--mb-text2); transition:background .15s,color .15s; }
-.mb-rail-link:hover, .mb-side-link:hover { background:#161616; color:var(--mb-text); }
-.mb-rail-link[aria-current="page"], .mb-side-link[aria-current="page"] { background:var(--mb-accent-dim); color:#fff; box-shadow:inset 2px 0 0 var(--mb-accent); }
-.mb-rail-link:focus-visible, .mb-side-link:focus-visible { outline:2px solid var(--mb-accent); outline-offset:2px; }
-.mb-shell-nav, .mb-sidebar-menu { background:#111111; border-right:1px solid #1c1c1c; }
-.mb-topbar { background:rgba(10,10,10,.92); border-bottom:1px solid #1c1c1c; }
-.mb-topbar-title { font-weight:600; letter-spacing:-.01em; }
-.mb-meter > span { background:var(--mb-accent); }
-@media (prefers-reduced-motion: reduce) { .mb-rail-link, .mb-side-link { transition:none; } }
+/* Mission Control v3 shell layer: restored to PR #46 (fa9d32d).
+ * Keep the original 56px rail / 248px side panel / 52px topbar declarations above.
+ * Later page-level v3 styles and live-data widgets remain unchanged.
+ * No additional shell overrides: the original keyboard, focus, safe-area and
+ * reduced-motion rules stay authoritative.
+ */
+
+/* Arena: procedural office view and accessible record controls. */
+.mb-arena-floor{width:100%;overflow:hidden;min-height:180px;background:var(--mb-bg);border:1px solid var(--mb-line);border-radius:8px;margin:12px 0}
+.mb-arena-floor canvas{display:block;width:100%!important;height:auto!important}
+.mb-arena-list{list-style:none;padding:0;margin:10px 0;display:grid;gap:10px}
+.mb-arena-list li{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-bottom:1px solid var(--mb-line);padding:8px 0}
+.mb-arena-list li>div{min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.mb-arena-list small{display:block;overflow-wrap:anywhere;color:var(--mb-muted);width:100%}
+.mb-arena label{display:flex;flex-direction:column;gap:6px;margin:10px 0;color:var(--mb-text2)}
+.mb-arena textarea{width:100%;min-width:0;font:12px var(--mb-mono);background:var(--mb-bg);color:var(--mb-text);border:1px solid var(--mb-line);border-radius:6px;padding:12px}
+.mb-arena input{background:var(--mb-bg);color:var(--mb-text);border:1px solid var(--mb-line);padding:8px}
+.mb-arena button{min-height:44px;white-space:normal;border:1px solid var(--mb-line);background:var(--mb-raised);color:var(--mb-text);border-radius:5px;padding:6px 12px}
+.mb-arena button:disabled{opacity:.5;cursor:not-allowed}.mb-arena a{color:var(--mb-accent)}
+.mb-arena button:focus-visible,.mb-arena textarea:focus-visible,.mb-arena input:focus-visible{outline:2px solid var(--mb-accent);outline-offset:2px}
+.mb-arena-toolbar{display:flex;flex-wrap:wrap;gap:8px}.mb-arena dd{overflow-wrap:anywhere}
+@media(max-width:760px){.mb-arena-floor{min-height:130px}.mb-arena .mb-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+@media(max-width:760px){
+ html:has(.mb-arena) .mb-topbar-title{min-width:0;flex:1}
+ html:has(.mb-arena) .mb-crumbs{flex-wrap:nowrap;white-space:nowrap;overflow:hidden;max-height:16px}
+ html:has(.mb-arena) .mb-crumbs li{min-width:0;overflow:hidden;text-overflow:ellipsis}
+ .mb-arena-floor{overflow-x:auto;overscroll-behavior-inline:contain}
+ .mb-arena-floor canvas{width:760px!important;max-width:none!important}
+}
+.mb-arena-floor:focus-visible{outline:2px solid var(--mb-accent);outline-offset:2px}
+
+/* Arena 3D: responsive canvas, independently of the horizontally scrollable 2D floor. */
+.mb-arena-3d{width:100%;height:480px;min-width:0;overflow:hidden;background:var(--mb-bg);border:1px solid var(--mb-line);border-radius:8px;margin:12px 0}
+.mb-arena-3d canvas{display:block;width:100%;height:100%;touch-action:none}
+.mb-arena-toolbar button[aria-pressed=true]{border-color:var(--mb-accent);color:var(--mb-accent)}
+@media(max-width:760px){.mb-arena-3d{height:340px}}
 
 /* ---------- Agent Hub (chat-style command center; MeTaBos palette, no brand blue/purple) ---------- */
 .mb-hub { display: grid; grid-template-columns: 72px 240px minmax(0, 1fr) 240px; height: calc(100vh - 120px); min-height: 560px; background: #0A0A0A; border: 1px solid #1f1f1f; border-radius: 12px; overflow: hidden; color: #EDEDED; }
@@ -664,3 +680,8 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-av-panel h2{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 4px;color:#FF6B6B}
 .mb-av-feed{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px;max-height:460px;overflow:auto}
 .mb-av-feed li{padding:8px;border-left:2px solid #2a2a2a;background:#161616;border-radius:6px}
+.mb-av .mb-hub-chan{display:flex;align-items:center;gap:6px;width:100%;border:0;background:transparent;text-align:left;font-family:ui-monospace,monospace;font-size:13px;color:#B8B8B8;border-radius:6px}
+.mb-av .mb-hub-chan[aria-current=true]{background:#1f1f1f;color:#fff;box-shadow:inset 2px 0 0 #FF2A2A}
+.mb-av .mb-hub-chan:hover{background:#181818}
+.mb-av code,.mb-av-feed li,.mb-hub-text{overflow-wrap:anywhere}
+.mb-av-feed code{font-size:12px}
