@@ -115,7 +115,7 @@ npx vitest run tests/hackathon-meta.test.ts
   design goal: models are untrusted and every write needs a human-approved
   hash.
 
-## Built during the event: batch 2 (stacked PR #23)
+## Built during the event: batch 2 (stacked PR #25, superseding #24)
 
 These features were written clean-room during the hackathon. They are based on product behaviour we observed in public docs and sites. No code or assets were copied. See docs/hackathon/COMPETITORS.md.
 
@@ -125,3 +125,13 @@ These features were written clean-room during the hackathon. They are based on p
 | Goals with linked projects and check-ins. A rule check-in draft is computed from the numbers alone. A Muse Spark draft is filed as a gated inference task and parsed strictly. No draft is saved until a human posts it. | Operately (Apache-2.0 core) | lib/muzebos/goals.ts, app/api/muzebos/goals/route.ts, components/muzebos/GoalsBoard.tsx, /workspace/brain/goals |
 
 Tests: tests/hackathon-missions-goals.test.ts (8 tests). They use injected protocol fixtures only; no live Meta call has been made yet.
+
+## Built during the event: batch 3 (stacked PR on #25)
+
+| Feature | Inspired by (observed behaviour) | Files |
+|---|---|---|
+| Chief of Staff brief: one read-only rollup of Jev approvals waiting, mission task status, goals not on track and recent decisions. | Agent-Staff, hive (MIT): a chief of staff over departments | lib/muzebos/chief-of-staff.ts, app/api/muzebos/chief-of-staff/route.ts, components/muzebos/ChiefOfStaff.tsx, app/workspace/brain/chief-of-staff/page.tsx |
+| Observer review: deterministic flags on every waiting agent proposal (injection-style text, links, credentials, money, drift from the source task), plus an advisory T1/T2/T3 tier. Neither approves or blocks anything; Jev still needs a human. | cyber-ai-team observer agent; gquthier/company-os tiered autonomy (MIT) | same |
+| Decisions registry: append-only, lookup-first matching; a decided question cannot be silently re-decided. | gquthier/company-os (MIT) | same |
+
+Tests: tests/hackathon-chief-of-staff.test.ts (3 tests).

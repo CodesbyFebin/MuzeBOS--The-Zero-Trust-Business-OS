@@ -20,6 +20,11 @@ Each model's answer is treated as untrusted JSON and checked against a strict
 schema and a tool allow-list. Valid proposals wait at **Jev**, an approval gate
 bound to the hash of the exact payload. Nothing executes until you approve.
 
+Built during the event, on top of the gate:
+- **Missions**: a lead plans, workers draft, dependants wake. Each model step is its own Jev-approved inference task, and each resulting write is a second Jev approval.
+- **Goals and check-ins**: measurable goals with linked projects; drafts are never saved until you post them.
+- **Chief of Staff**: one brief over everything waiting for you, with an observer that flags injection-style text, links, credentials, money and drift on each agent proposal, and a decisions registry so a settled question is not asked again.
+
 ## How we built it
 - TypeScript/Next.js and SQLite. The app, workflow engine and Jev gate were
   inherited from before the event.

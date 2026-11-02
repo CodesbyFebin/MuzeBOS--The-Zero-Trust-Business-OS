@@ -50,6 +50,7 @@ const PAGES: PageEntry[] = [
   { file: 'workspace/brain/runtime/page.tsx', load: () => import('@/app/workspace/brain/runtime/page') },
   { file: 'workspace/brain/missions/page.tsx', load: () => import('@/app/workspace/brain/missions/page') },
   { file: 'workspace/brain/goals/page.tsx', load: () => import('@/app/workspace/brain/goals/page') },
+  { file: 'workspace/brain/chief-of-staff/page.tsx', load: () => import('@/app/workspace/brain/chief-of-staff/page') },
   { file: 'workspace/growth/analytics/page.tsx', load: () => import('@/app/workspace/growth/analytics/page') },
   { file: 'workspace/evidence/page.tsx', load: () => import('@/app/workspace/evidence/page') },
   { file: 'workspace/system/sources/page.tsx', load: () => import('@/app/workspace/system/sources/page') },

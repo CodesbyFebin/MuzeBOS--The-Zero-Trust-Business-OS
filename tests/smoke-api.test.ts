@@ -32,6 +32,7 @@ const ROUTES: RouteEntry[] = [
   { route: 'ai', load: () => import('@/app/api/ai/route'), url: 'http://localhost/api/ai' },
   { route: 'muzebos/missions', load: () => import('@/app/api/muzebos/missions/route'), url: 'http://localhost/api/muzebos/missions' },
   { route: 'muzebos/goals', load: () => import('@/app/api/muzebos/goals/route'), url: 'http://localhost/api/muzebos/goals' },
+  { route: 'muzebos/chief-of-staff', load: () => import('@/app/api/muzebos/chief-of-staff/route'), url: 'http://localhost/api/muzebos/chief-of-staff' },
   { route: 'analytics', load: () => import('@/app/api/analytics/route'), url: 'http://localhost/api/analytics' },
   { route: 'evidence', load: () => import('@/app/api/evidence/route'), url: 'http://localhost/api/evidence' },
   { route: 'workflow-runs', load: () => import('@/app/api/workflow-runs/route'), url: 'http://localhost/api/workflow-runs' },
