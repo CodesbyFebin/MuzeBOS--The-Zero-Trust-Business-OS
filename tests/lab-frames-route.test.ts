@@ -35,7 +35,7 @@ describe('AC-02-43 /lab-frames/<state>', () => {
     process.env.GLADOS_DB = join(ROOT, 'does-not-exist', 'never.db');
     try {
       const { default: Page } = await import('@/app/lab-frames/[state]/page');
-      const out = renderPage(Page({ params: { state } }) as ReactElement);
+      const out = renderPage((await Page({ params: Promise.resolve({ state }) })) as ReactElement);
       expect(out).toContain(`data-lab-frame="${state}"`);
       expect(out.match(/class="lab2-aurora"/g)?.length).toBe(1);
       if (state !== 'not-configured') expect(out).toContain('Sample data');
@@ -47,7 +47,7 @@ describe('AC-02-43 /lab-frames/<state>', () => {
 
   it('an unknown state calls notFound()', async () => {
     const { default: Page, generateStaticParams } = await import('@/app/lab-frames/[state]/page');
-    expect(() => Page({ params: { state: 'nope' } })).toThrow();
+    await expect(Page({ params: Promise.resolve({ state: 'nope' }) })).rejects.toThrow();
     expect(generateStaticParams().map((p) => p.state)).toEqual([...FRAME_STATES]);
   });
 

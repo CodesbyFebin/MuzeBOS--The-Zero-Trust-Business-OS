@@ -19,7 +19,10 @@ export const dynamic = 'force-dynamic';
  * view model feeds every tree. `?status=` filters; `?sample=1` previews on a
  * blank install; Filming shows the badged fixture.
  */
-export default async function LeadMagnetsPage({ searchParams = {} }: { searchParams?: Record<string, string | string[] | undefined> }) {
+export default async function LeadMagnetsPage(
+  props: { searchParams?: Promise<Record<string, string | string[] | undefined>> }
+) {
+  const searchParams = (await props.searchParams) ?? {};
   const all = getDb().leadMagnets.all();
   const sample = searchParams.sample === '1' ? '?sample=1' : '';
   const mode = foMode(`http://localhost/lead-magnets${sample}`, all.length === 0);

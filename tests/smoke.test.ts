@@ -70,48 +70,48 @@ const PAGES: PageEntry[] = [
   { file: 'business/page.tsx', load: () => import('@/app/business/page') },
   { file: 'brand-deals/page.tsx', load: () => import('@/app/brand-deals/page') },
   // fo/clients (founderos-ui pages/clients.md, lead-magnets.md)
-  { file: 'clients/page.tsx', load: () => import('@/app/clients/page'), props: { searchParams: {} } },
-  { file: 'lead-magnets/page.tsx', load: () => import('@/app/lead-magnets/page'), props: { searchParams: {} } },
-  { file: 'agents/setup/[id]/page.tsx', load: () => import('@/app/agents/setup/[id]/page'), props: { params: { id: 'crm-pulse' } } },
+  { file: 'clients/page.tsx', load: () => import('@/app/clients/page'), props: { searchParams: Promise.resolve({}) } },
+  { file: 'lead-magnets/page.tsx', load: () => import('@/app/lead-magnets/page'), props: { searchParams: Promise.resolve({}) } },
+  { file: 'agents/setup/[id]/page.tsx', load: () => import('@/app/agents/setup/[id]/page'), props: { params: Promise.resolve({ id: 'crm-pulse' }) } },
   { file: 'setup/page.tsx', load: () => import('@/app/setup/page') },
   { file: 'database/page.tsx', load: () => import('@/app/database/page') },
   { file: 'compute/page.tsx', load: () => import('@/app/compute/page') },
-  { file: 'usage/page.tsx', load: () => import('@/app/usage/page'), props: { searchParams: {} } },
+  { file: 'usage/page.tsx', load: () => import('@/app/usage/page'), props: { searchParams: Promise.resolve({}) } },
   { file: 'login/page.tsx', load: () => import('@/app/login/page'), clientOnly: true },
   { file: 'social/page.tsx', load: () => import('@/app/social/page') },
-  { file: 'social/[platform]/page.tsx', load: () => import('@/app/social/[platform]/page'), props: { params: { platform: 'instagram' } } },
+  { file: 'social/[platform]/page.tsx', load: () => import('@/app/social/[platform]/page'), props: { params: Promise.resolve({ platform: 'instagram' }) } },
   { file: 'social/beehiiv/page.tsx', load: () => import('@/app/social/beehiiv/page') },
-  { file: 'adpilot/page.tsx', load: () => import('@/app/adpilot/page'), props: { searchParams: {} } },
-  { file: 'creative-engine/page.tsx', load: () => import('@/app/creative-engine/page'), props: { searchParams: {} } },
+  { file: 'adpilot/page.tsx', load: () => import('@/app/adpilot/page'), props: { searchParams: Promise.resolve({}) } },
+  { file: 'creative-engine/page.tsx', load: () => import('@/app/creative-engine/page'), props: { searchParams: Promise.resolve({}) } },
   { file: 'blueprint/page.tsx', load: () => import('@/app/blueprint/page') },
   { file: 'wizard/page.tsx', load: () => import('@/app/wizard/page') },
-  { file: 'chats/page.tsx', load: () => import('@/app/chats/page'), props: { searchParams: {} } },
+  { file: 'chats/page.tsx', load: () => import('@/app/chats/page'), props: { searchParams: Promise.resolve({}) } },
   { file: 'agents/page.tsx', load: () => import('@/app/agents/page') },
   { file: 'tasks/page.tsx', load: () => import('@/app/tasks/page') },
   { file: 'skills/page.tsx', load: () => import('@/app/skills/page') },
-  { file: 'org/page.tsx', load: () => import('@/app/org/page'), props: { searchParams: {} } },
+  { file: 'org/page.tsx', load: () => import('@/app/org/page'), props: { searchParams: Promise.resolve({}) } },
   { file: 'brain/page.tsx', load: () => import('@/app/brain/page') },
   { file: 'knowledge/page.tsx', load: () => import('@/app/knowledge/page') },
   { file: 'drift/page.tsx', load: () => import('@/app/drift/page') },
   { file: 'finances/page.tsx', load: () => import('@/app/finances/page') },
-  { file: 'trading/page.tsx', load: () => import('@/app/trading/page'), props: { searchParams: {} } },
-  { file: 'funnel/page.tsx', load: () => import('@/app/funnel/page'), props: { searchParams: {} } },
+  { file: 'trading/page.tsx', load: () => import('@/app/trading/page'), props: { searchParams: Promise.resolve({}) } },
+  { file: 'funnel/page.tsx', load: () => import('@/app/funnel/page'), props: { searchParams: Promise.resolve({}) } },
   { file: 'inbox/page.tsx', load: () => import('@/app/inbox/page') },
   { file: 'workflows/page.tsx', load: () => import('@/app/workflows/page') },
   { file: 'integrations/page.tsx', load: () => import('@/app/integrations/page') },
   { file: 'integrations/whatsapp/page.tsx', load: () => import('@/app/integrations/whatsapp/page') },
   { file: 'roadmap/page.tsx', load: () => import('@/app/roadmap/page') },
   { file: 'analytics/page.tsx', load: () => import('@/app/analytics/page') },
-  { file: 'lab/page.tsx', load: () => import('@/app/lab/page'), props: { searchParams: {} } },
+  { file: 'lab/page.tsx', load: () => import('@/app/lab/page'), props: { searchParams: Promise.resolve({}) } },
   // Content Lab v2 route shells (S0); lane V replaces each with its page and keeps these entries.
-  { file: 'lab/radar/page.tsx', load: () => import('@/app/lab/radar/page'), props: { searchParams: {} } },
-  { file: 'lab/breakouts/page.tsx', load: () => import('@/app/lab/breakouts/page'), props: { searchParams: {} } },
-  { file: 'lab/playbook/page.tsx', load: () => import('@/app/lab/playbook/page'), props: { searchParams: {} } },
-  { file: 'lab/studio/page.tsx', load: () => import('@/app/lab/studio/page'), props: { searchParams: { sample: '1' } } },
-  { file: 'lab/ledger/page.tsx', load: () => import('@/app/lab/ledger/page'), props: { searchParams: {} } },
-  { file: 'lab/creatorverse/page.tsx', load: () => import('@/app/lab/creatorverse/page'), props: { searchParams: {} } },
+  { file: 'lab/radar/page.tsx', load: () => import('@/app/lab/radar/page'), props: { searchParams: Promise.resolve({}) } },
+  { file: 'lab/breakouts/page.tsx', load: () => import('@/app/lab/breakouts/page'), props: { searchParams: Promise.resolve({}) } },
+  { file: 'lab/playbook/page.tsx', load: () => import('@/app/lab/playbook/page'), props: { searchParams: Promise.resolve({}) } },
+  { file: 'lab/studio/page.tsx', load: () => import('@/app/lab/studio/page'), props: { searchParams: Promise.resolve({ sample: '1' }) } },
+  { file: 'lab/ledger/page.tsx', load: () => import('@/app/lab/ledger/page'), props: { searchParams: Promise.resolve({}) } },
+  { file: 'lab/creatorverse/page.tsx', load: () => import('@/app/lab/creatorverse/page'), props: { searchParams: Promise.resolve({}) } },
   // Content Lab v2 frames gate (02 §16): standalone, no DB. Every state renders in tests/lab-frames-route.test.ts.
-  { file: 'lab-frames/[state]/page.tsx', load: () => import('@/app/lab-frames/[state]/page'), props: { params: { state: 'default' } } },
+  { file: 'lab-frames/[state]/page.tsx', load: () => import('@/app/lab-frames/[state]/page'), props: { params: Promise.resolve({ state: 'default' }) } },
   // Dev-only G kit gallery (lane 1d); notFound() in production, out of the nav.
   { file: 'dev/g-kit/page.tsx', load: () => import('@/app/dev/g-kit/page') },
   { file: 'dev/l-kit/page.tsx', load: () => import('@/app/dev/l-kit/page') },
@@ -152,8 +152,8 @@ describe('platform smoke — every page renders without throwing', () => {
 
   // Content Lab v2 lane G (07 AC-07-57): Studio with a script sheet open and Ask with a query
   test.each([
-    { name: 'lab/studio?script=', load: () => import('@/app/lab/studio/page'), props: { searchParams: { sample: '1', script: 'fx-script-1' } } },
-    { name: 'lab?ask=', load: () => import('@/app/lab/page'), props: { searchParams: { sample: '1', ask: 'results-first hooks that broke out' } } },
+    { name: 'lab/studio?script=', load: () => import('@/app/lab/studio/page'), props: { searchParams: Promise.resolve({ sample: '1', script: 'fx-script-1' }) } },
+    { name: 'lab?ask=', load: () => import('@/app/lab/page'), props: { searchParams: Promise.resolve({ sample: '1', ask: 'results-first hooks that broke out' }) } },
   ])('$name renders', async ({ load, props }) => {
     const Page = (await load()).default as (p: unknown) => unknown;
     await expect(Promise.resolve(Page(props))).resolves.toBeTruthy();
@@ -180,7 +180,7 @@ describe('Content Lab v2 routes render', () => {
   test.each(ROUTES)('/lab %s: blank and sample', async (_id, load) => {
     const { default: Page } = await load();
     for (const searchParams of [{}, { sample: '1' }, { sample: '1', post: 'fx-p-0001' }]) {
-      const html = renderWithRouter((await Page({ searchParams })) as ReactElement);
+      const html = renderWithRouter((await Page({ searchParams: Promise.resolve(searchParams) })) as ReactElement);
       expect(html).toContain('data-lab-root');
       expect(html).toContain('Content Lab');
     }
@@ -199,7 +199,7 @@ describe('Creative Engine states render', () => {
   afterAll(() => spy.mockRestore());
   const render = async (searchParams: Record<string, string>) => {
     const { default: Page } = await import('@/app/creative-engine/page');
-    return renderToStaticMarkup((await Page({ searchParams })) as ReactElement);
+    return renderToStaticMarkup((await Page({ searchParams: Promise.resolve(searchParams) })) as ReactElement);
   };
   const withEmptyStores = async <T,>(fn: () => Promise<T>): Promise<T> => {
     const dir = mkdtempSync(path.join(tmpdir(), 'glados-smoke-ce-'));
@@ -231,7 +231,7 @@ describe('Creative Engine states render', () => {
 
   test('/adpilot?ad= with an id that is nowhere still renders (the toast is client-side)', async () => {
     const { default: Page } = await import('@/app/adpilot/page');
-    const html = await withEmptyStores(async () => renderToStaticMarkup(Page({ searchParams: { ad: 'not-stored' } }) as ReactElement));
+    const html = await withEmptyStores(async () => renderToStaticMarkup((await Page({ searchParams: Promise.resolve({ ad: 'not-stored' }) })) as ReactElement));
     // Classic renders the [data-adpilot] deck, the GladOS style its .ap-g page (lib/g-ready.ts)
     expect(html).toMatch(/data-adpilot|class="g-page ap-g"/);
   }, 20_000);

@@ -7,7 +7,7 @@
  * again through `getAppearance()` (React dedupes nothing here, but the cost is
  * one header parse).
  */
-import { cookies } from 'next/headers';
+import { cookies, type UnsafeUnwrappedCookies } from 'next/headers';
 import { APPEARANCE_COOKIE, parseAppearanceCookie, resolveAppearance, type Appearance, type AppliedAppearance } from './appearance';
 
 /**
@@ -26,7 +26,7 @@ export function getAppearance(): AppliedAppearance {
 export function getStoredAppearance(): Appearance {
   let raw: string | undefined;
   try {
-    raw = cookies().get(APPEARANCE_COOKIE)?.value;
+    raw = (cookies() as unknown as UnsafeUnwrappedCookies).get(APPEARANCE_COOKIE)?.value;
   } catch {
     raw = undefined; // outside a request (build-time tooling): defaults
   }

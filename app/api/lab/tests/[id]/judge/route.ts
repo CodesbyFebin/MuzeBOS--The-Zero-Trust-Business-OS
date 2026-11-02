@@ -6,7 +6,8 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 /** POST /api/lab/tests/[id]/judge -> { ok, test } (trial_reels only; 400 otherwise; 06 10.3). */
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const ctx = resolveLab({ sample: new URL(request.url).searchParams.get('sample') === '1' });
   const refusal = readOnlyRefusal(ctx);
   if (refusal) return refusal;

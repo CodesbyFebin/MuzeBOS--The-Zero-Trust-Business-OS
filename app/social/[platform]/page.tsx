@@ -22,7 +22,8 @@ const WINDOW_DAYS = 30;
  * from lib/social-volume's platformVolume, fed with this platform's own
  * snapshots and growth windows.
  */
-export default function SocialPlatformPage({ params }: { params: { platform: string } }) {
+export default async function SocialPlatformPage(props: { params: Promise<{ platform: string }> }) {
+  const params = await props.params;
   const db = getDb();
   syncFromZernioConfig(db);
   if (!SocialPlatformSchema.safeParse(params.platform).success) notFound();

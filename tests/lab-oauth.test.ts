@@ -97,7 +97,7 @@ describe('AC-08-4: state, writes, disconnect, smoke', () => {
     expect(env.UNRELATED).toBe('1');
     expect(calls[0].body).toContain('code_verifier=');
     const { POST } = await import('@/app/api/lab/oauth/[provider]/disconnect/route');
-    const res = await POST(new Request('http://localhost/api/lab/oauth/youtube/disconnect', { method: 'POST' }), { params: { provider: 'youtube' } });
+    const res = await POST(new Request('http://localhost/api/lab/oauth/youtube/disconnect', { method: 'POST' }), { params: Promise.resolve({ provider: 'youtube' }) });
     expect(res.status).toBe(200);
     expect(calls.some((c) => c.url.startsWith('https://oauth2.googleapis.com/revoke'))).toBe(true);
     expect(readEnvLocal().LAB_YT_REFRESH_TOKEN).toBeUndefined();
@@ -122,10 +122,10 @@ describe('AC-08-4: state, writes, disconnect, smoke', () => {
 
   test('GET callback with no params answers 200 "No sign-in in progress."; with params it 303s without echoing a value', async () => {
     const { GET } = await import('@/app/api/lab/oauth/[provider]/callback/route');
-    const none = await GET(new Request('http://localhost/api/lab/oauth/youtube/callback'), { params: { provider: 'youtube' } });
+    const none = await GET(new Request('http://localhost/api/lab/oauth/youtube/callback'), { params: Promise.resolve({ provider: 'youtube' }) });
     expect(none.status).toBe(200);
     expect(await none.text()).toBe('No sign-in in progress.');
-    const denied = await GET(new Request('http://localhost/api/lab/oauth/youtube/callback?error=access_denied&error_description=EVIL'), { params: { provider: 'youtube' } });
+    const denied = await GET(new Request('http://localhost/api/lab/oauth/youtube/callback?error=access_denied&error_description=EVIL'), { params: Promise.resolve({ provider: 'youtube' }) });
     expect(denied.status).toBe(303);
     expect(denied.headers.get('location')).toBe('/lab?setup=keys&oauth=youtube.denied');
     expect(await denied.text()).not.toContain('EVIL');

@@ -35,7 +35,7 @@ const OLD = '2000-01-01T00:00:00.000Z'; // a copy read before the run wrote anyt
 const RUNTIME = ['runId', 'outputAssetId', 'outputText', 'error', 'resolvedAt'] as const;
 const runtimeOf = (n: WorkflowNode) => Object.fromEntries(RUNTIME.map((k) => [k, n[k]]));
 
-const patch = (id: string, body: unknown) => PATCH(new Request(`http://x/api/creative-engine/workflows/${id}`, { method: 'PATCH', body: JSON.stringify(body) }), { params: { id } });
+const patch = (id: string, body: unknown) => PATCH(new Request(`http://x/api/creative-engine/workflows/${id}`, { method: 'PATCH', body: JSON.stringify(body) }), { params: Promise.resolve({ id }) });
 
 /** A text → image workflow on a campaign, with the image node already "submitted" (runtime fields set server side). */
 function submittedWorkflow() {
@@ -145,7 +145,7 @@ describe('PATCH /api/creative-engine/workflows/[id]', () => {
     const r = await patch(live.id, { reset: true });
     expect(r.status).toBe(200);
     expect(readWorkflow(live.id)!.nodes.every((n) => n.runId === null)).toBe(true);
-    const del = await DELETE(new Request('http://x', { method: 'DELETE' }), { params: { id: live.id } });
+    const del = await DELETE(new Request('http://x', { method: 'DELETE' }), { params: Promise.resolve({ id: live.id }) });
     expect(del.status).toBe(200);
     const late = await patch(live.id, { layout: toLayout(live) });
     expect(late.status).toBe(404);

@@ -247,7 +247,7 @@ describe('Content Lab v2 lane S smoke (AC-08-4, 09.7)', () => {
   }, 20_000);
   test('GET /api/lab/oauth/youtube/callback with no params answers 200 "No sign-in in progress."', async () => {
     const { GET } = await import('@/app/api/lab/oauth/[provider]/callback/route');
-    const res = await GET(new Request('http://localhost/api/lab/oauth/youtube/callback'), { params: { provider: 'youtube' } });
+    const res = await GET(new Request('http://localhost/api/lab/oauth/youtube/callback'), { params: Promise.resolve({ provider: "youtube" }) });
     expect(res.status).toBe(200);
     expect(await res.text()).toBe('No sign-in in progress.');
   });

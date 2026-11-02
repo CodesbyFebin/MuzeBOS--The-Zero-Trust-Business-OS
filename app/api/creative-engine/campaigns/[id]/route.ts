@@ -16,13 +16,15 @@ const PatchSchema = z.object({
   adsWanted: z.number().int().min(0).max(50).optional(),
 });
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const campaign = readCampaign(params.id);
   if (!campaign) return NextResponse.json({ ok: false, error: 'not found' }, { status: 404 });
   return NextResponse.json({ ok: true, campaign, runs: listRuns(campaign.id) });
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const parsed = PatchSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const patch = parsed.data;
@@ -57,7 +59,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   return NextResponse.json({ ok: true, campaign });
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   deleteCampaign(params.id);
   return NextResponse.json({ ok: true });
 }

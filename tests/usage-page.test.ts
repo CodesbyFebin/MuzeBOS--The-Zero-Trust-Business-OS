@@ -42,7 +42,7 @@ async function render(searchParams: Record<string, string>, ui: 'glados' | 'clas
   }));
   vi.resetModules();
   const { default: Page } = await import('@/app/usage/page');
-  const html = renderWithRouter((await Page({ searchParams })) as ReactElement);
+  const html = renderWithRouter((await Page({ searchParams: Promise.resolve(searchParams) })) as ReactElement);
   vi.doUnmock('@/lib/appearance-server');
   return html;
 }

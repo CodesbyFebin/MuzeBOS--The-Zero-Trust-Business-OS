@@ -107,10 +107,10 @@ describe('Registry-driven shell', () => {
     expect(html).toContain('aria-label="Brain pages"');
     expect(html.match(/<details[^>]*open/g)).toHaveLength(4);
   });
-  it('canonical page routes redirect working pages and stub the rest without controls', () => {
-    expect(() => FeaturePage({ params: { section: 'money', page: 'invoice-maker' } })).toThrow('REDIRECT /business?view=invoices');
-    expect(() => FeaturePage({ params: { section: 'money', page: 'nope' } })).toThrow('NEXT_NOT_FOUND');
-    const mod = renderToStaticMarkup(FeaturePage({ params: { section: 'stock', page: 'barcode-and-qr-generator' } }) as never);
+  it('canonical page routes redirect working pages and stub the rest without controls', async () => {
+    await expect(FeaturePage({ params: Promise.resolve({ section: 'money', page: 'invoice-maker' }) })).rejects.toThrow('REDIRECT /business?view=invoices');
+    await expect(FeaturePage({ params: Promise.resolve({ section: 'money', page: 'nope' }) })).rejects.toThrow('NEXT_NOT_FOUND');
+    const mod = renderToStaticMarkup(await FeaturePage({ params: Promise.resolve({ section: 'stock', page: 'barcode-and-qr-generator' }) }) as never);
     expect(mod).toContain('data-feature="stock.barcode-and-qr-generator"');
     expect(mod).toContain('Loading Barcode');
     const planned = { ...pageForSegments('builder', 'hydration-optimizer')!, status: 'planned' as const, dependencies: ['Schema migration'], target: undefined };

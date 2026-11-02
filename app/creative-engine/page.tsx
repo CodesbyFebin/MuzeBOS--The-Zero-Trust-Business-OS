@@ -26,7 +26,8 @@ export const dynamic = 'force-dynamic';
  */
 
 
-export default async function CreativeEnginePage({ searchParams }: { searchParams?: { sample?: string } }) {
+export default async function CreativeEnginePage(props: { searchParams?: Promise<{ sample?: string }> }) {
+  const searchParams = (await props.searchParams) ?? {};
   const sample = searchParams?.sample === '1';
   // S04 B25: the sample preview reads only the fictional sample world, never
   // the operator's saved ads, watchlist or signals.

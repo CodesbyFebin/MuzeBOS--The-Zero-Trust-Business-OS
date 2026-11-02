@@ -16,7 +16,7 @@ const STATUS_BADGE: Record<RoadmapStatus, { tone: BadgeTone; ghost: boolean; lab
   later: { tone: 'default', ghost: true, label: 'Later' },
 };
 
-export default function RoadmapPage(props: { searchParams?: { show?: string } }) {
+export default async function RoadmapPage(props: { searchParams?: Promise<{ show?: string }> }) {
   const db = getDb();
   const quarters = groupRoadmapByQuarter(db.roadmap.all());
   const phases = db.phases.all();
@@ -29,7 +29,7 @@ export default function RoadmapPage(props: { searchParams?: { show?: string } })
         phases={phases}
         quarters={quarters}
         departments={Object.fromEntries([...departments].map(([id, d]) => [id, d.name]))}
-        openOnly={props?.searchParams?.show === 'open'}
+        openOnly={(await props?.searchParams)?.show === 'open'}
       />
     );
   }

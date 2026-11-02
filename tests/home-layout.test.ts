@@ -119,7 +119,7 @@ describe('honest and functional (FR-8 to FR-22)', () => {
     expect(HOME).not.toContain('4100');
     expect(HOME).not.toContain("'sqlite · WAL'");
     expect(HOME).toContain('db.journalMode()');
-    expect(HOME).toContain("headers().get('host')");
+    expect(HOME).toContain("(headers() as unknown as UnsafeUnwrappedHeaders).get('host')");
     expect(read('lib/db.ts')).toMatch(/journalMode: \(\): string =>/);
   });
 

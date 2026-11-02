@@ -33,7 +33,8 @@ export const dynamic = 'force-dynamic';
  * Foreplay data.
  */
 
-export default function AdPilotPage({ searchParams }: { searchParams?: { ad?: string | string[] } }) {
+export default async function AdPilotPage(props: { searchParams?: Promise<{ ad?: string | string[] }> }) {
+  const searchParams = (await props.searchParams) ?? {};
   const { campaigns, syncedAt } = readAdpilotFile();
   const wall = storeWall(80);
   const watchlist = readWatchEntries();

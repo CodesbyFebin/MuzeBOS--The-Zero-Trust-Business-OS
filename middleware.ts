@@ -58,8 +58,15 @@ async function authStatus(req: NextRequest): Promise<{ configured: boolean; auth
   }
 }
 
+/** 2 MB: larger than any JSON command this app accepts. */
+const MAX_API_BODY_BYTES = 2_000_000;
+/** File-upload routes enforce their own size limits on multipart bodies. */
+const UPLOAD_ROUTES = ['/api/content/upload', '/api/social/upload', '/api/finances/statements', '/api/finances/bank-statement'];
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  // Bound request bodies before any parser runs (docs/SECURITY-TRIAGE.md: zod GHSA-mrhx-c7xc-m3w5 mitigation).
+  if (pathname.startsWith('/api/') && !UPLOAD_ROUTES.some((r) => pathname.startsWith(r)) && Number(req.headers.get('content-length') ?? 0) > MAX_API_BODY_BYTES) return NextResponse.json({ error: 'Request body too large' }, { status: 413 });
   if (isOpenPath(pathname)) return NextResponse.next();
 
   // Self-hosted Next puts its internal host on req.nextUrl, so both the

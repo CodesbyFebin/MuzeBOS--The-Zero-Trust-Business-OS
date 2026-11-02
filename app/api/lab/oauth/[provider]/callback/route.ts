@@ -10,7 +10,8 @@ export const runtime = 'nodejs';
  *   no params            -> 200 text/html "No sign-in in progress." (smoke-api)
  * Never echoes a query value into the page.
  */
-export async function GET(request: Request, { params }: { params: { provider: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ provider: string }> }) {
+  const params = await props.params;
   const url = new URL(request.url);
   const provider = params.provider;
   if (!isOAuthProvider(provider)) return new NextResponse('No sign-in in progress.', { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });

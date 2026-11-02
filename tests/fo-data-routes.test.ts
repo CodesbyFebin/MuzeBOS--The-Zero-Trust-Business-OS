@@ -147,7 +147,7 @@ describe('clients', () => {
     expect(getDb().clientWork.get(id)?.status).toBe('draft');
     expect(fetchSpy).not.toHaveBeenCalled();
 
-    const ctx = { params: { id } };
+    const ctx = { params: Promise.resolve({ id }) };
     expect((await launch(json(`/api/clients/work/${id}/launch`, 'POST', { confirm: true }), ctx)).status).toBe(403);
     envLocal('GLADOS_WRITES=1\n');
     expect((await launch(json(`/api/clients/work/${id}/launch`, 'POST', {}), ctx)).status).toBe(409);
@@ -156,7 +156,7 @@ describe('clients', () => {
 
     const done = await patch(json(`/api/clients/work/${id}`, 'PATCH', { status: 'done' }), ctx);
     expect((await done.json()).work.finishedAt).toBeTruthy();
-    expect((await patch(json('/api/clients/work/x', 'PATCH', { status: 'shipped' }), { params: { id: 'x' } })).status).toBe(400);
+    expect((await patch(json('/api/clients/work/x', 'PATCH', { status: 'shipped' }), { params: Promise.resolve({ id: 'x' }) })).status).toBe(400);
 
     const un = await confirm(json('/api/clients/confirm', 'POST', { clientId, confirmed: false }));
     expect(await un.json()).toEqual({ ok: true, clientId, confirmed: false });
@@ -181,7 +181,7 @@ describe('lead magnets', () => {
     expect(list.magnets.map((m: { id: string }) => m.id)).toEqual([id]);
     expect(list.view.captures).toMatchObject({ tracked: false, reason: 'trakyo_not_configured' });
     expect((await GET(new Request('http://localhost/api/lead-magnets?status=nope'))).status).toBe(400);
-    const ctx = { params: { id } };
+    const ctx = { params: Promise.resolve({ id }) };
     expect((await (await item.PATCH(json(`/api/lead-magnets/${id}`, 'PATCH', { status: 'paused' }), ctx)).json()).magnet.status).toBe('paused');
     expect((await item.PATCH(json(`/api/lead-magnets/${id}`, 'PATCH', { liveUrl: 'ftp://x' }), ctx)).status).toBe(400);
     expect((await item.DELETE(json(`/api/lead-magnets/${id}`, 'DELETE'), ctx)).status).toBe(200);
@@ -198,9 +198,9 @@ describe('chats', () => {
     expect(body.threads[0]).toMatchObject({ agentId: 'conductor', pinned: true });
     expect(body.threads[1]).toMatchObject({ agentId: 'daily-briefing', lastMessage: 'Summarise yesterday' });
     expect(body.model.state).toMatch(/configured/);
-    const t = await (await thread(new Request('http://localhost/api/chats/daily-briefing'), { params: { agentId: 'daily-briefing' } })).json();
+    const t = await (await thread(new Request('http://localhost/api/chats/daily-briefing'), { params: Promise.resolve({ agentId: 'daily-briefing' }) })).json();
     expect(t.messages.map((m: { id: string }) => m.id)).toEqual(['m1']);
-    expect((await thread(new Request('http://localhost/api/chats/nope'), { params: { agentId: 'nope' } })).status).toBe(404);
+    expect((await thread(new Request('http://localhost/api/chats/nope'), { params: Promise.resolve({ agentId: 'nope' }) })).status).toBe(404);
   });
 });
 
@@ -268,13 +268,13 @@ describe('agents: deliverables and failover', () => {
     const { PATCH } = await import('@/app/api/agents/[id]/failover/route');
     const db = getDb();
     db.agents.insert({ id: 'seat-1', departmentId: db.departments.all()[0].id, name: 'Seat', role: '', status: 'active', tier: 'worker', description: '', model: 'claude-opus', tools: [], parentId: null, instance: 'builtin' });
-    const ctx = { params: { id: 'seat-1' } };
+    const ctx = { params: Promise.resolve({ id: 'seat-1' }) };
     expect((await PATCH(json('/x', 'PATCH', { model: 'claude-sonnet' }), ctx)).status).toBe(409);
     expect(db.agents.get('seat-1')?.model).toBe('claude-opus');
     expect((await PATCH(json('/x', 'PATCH', { model: 'claude-sonnet', confirm: true }), ctx)).status).toBe(200);
     expect(db.agents.get('seat-1')?.model).toBe('claude-sonnet');
     expect(db.agentRuns.byAgent('seat-1')[0].summary).toMatch(/Failover: model claude-opus → claude-sonnet/);
-    expect((await PATCH(json('/x', 'PATCH', { model: 'x', confirm: true }), { params: { id: 'ghost' } })).status).toBe(404);
+    expect((await PATCH(json('/x', 'PATCH', { model: 'x', confirm: true }), { params: Promise.resolve({ id: 'ghost' }) })).status).toBe(404);
   });
 });
 

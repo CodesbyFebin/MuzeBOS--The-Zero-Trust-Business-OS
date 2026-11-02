@@ -13,14 +13,16 @@ function failure(error: unknown) {
   return NextResponse.json({ error: 'Module operation failed' }, { status: 500 });
 }
 /** Declarative workspace module records: list with computed fields, or create/update/transition. */
-export async function GET(req: Request, { params }: { params: { module: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ module: string }> }) {
+  const params = await props.params;
   try {
     businessAccess(req);
     if (!moduleById(params.module)) throw new BusinessError('Unknown module', 404);
     return NextResponse.json(view(businessStore(), params.module), { headers: { 'Cache-Control': 'no-store' } });
   } catch (e) { return failure(e); }
 }
-export async function POST(req: Request, { params }: { params: { module: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ module: string }> }) {
+  const params = await props.params;
   try {
     businessAccess(req);
     if (!moduleById(params.module)) throw new BusinessError('Unknown module', 404);

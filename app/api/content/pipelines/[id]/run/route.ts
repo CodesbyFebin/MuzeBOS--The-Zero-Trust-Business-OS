@@ -15,7 +15,8 @@ const RunRequestSchema = z.object({ campaignId: z.string().min(1) });
  * pipeline that goes stale after the catalog changes still fails honestly
  * instead of queuing a broken spec.
  */
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const pipeline = getPipeline(params.id);
   if (!pipeline) return NextResponse.json({ error: `unknown pipeline: ${params.id}` }, { status: 404 });
 

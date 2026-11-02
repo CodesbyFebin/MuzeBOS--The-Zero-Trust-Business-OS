@@ -12,7 +12,8 @@ const Body = z.object({
 });
 
 /** Status change on a work request (mark done or failed, re-queue). Local write only. */
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'status must be draft, queued, running, done or failed' }, { status: 400 });
   const work = getDb().clientWork.setStatus(params.id, parsed.data.status, { detail: parsed.data.detail });

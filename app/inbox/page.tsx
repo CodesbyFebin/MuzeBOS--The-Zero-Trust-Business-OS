@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
  * judged. Every channel in one list with the source in words, a triage state
  * derived from the message, and a reader that shows the whole exchange.
  */
-export default async function InboxPage(props: { searchParams?: { sample?: string } }) {
+export default async function InboxPage(props: { searchParams?: Promise<{ sample?: string }> }) {
   const now = new Date();
   const [rawFeed, email, slack, whatsapp, calendar, liveEvents, weekly] = await Promise.all([
     gatherCommsFeed(140),
@@ -50,7 +50,7 @@ export default async function InboxPage(props: { searchParams?: { sample?: strin
   // FounderOS additions (F3 digest, F4 recordings, F5 client board and week): one fetch, both trees.
   // `props?` because the smoke test renders every page with no arguments.
   const extras = await buildCommsExtras({
-    url: `/inbox${props?.searchParams?.sample === '1' ? '?sample=1' : ''}`,
+    url: `/inbox${(await props?.searchParams)?.sample === '1' ? '?sample=1' : ''}`,
     events: events.map((e) => ({ id: e.id, title: e.title, start: e.start, end: e.end, allDay: e.allDay })),
     slackConnected: connected.slack,
     calendarConnected: connected.calendar,

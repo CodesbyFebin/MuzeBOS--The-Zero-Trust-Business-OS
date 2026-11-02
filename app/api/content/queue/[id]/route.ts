@@ -15,7 +15,8 @@ export const dynamic = 'force-dynamic';
  * Cancels a queued task. Delivered tasks are refused — their output is a
  * real asset in the media library and the row is the provenance for it.
  */
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const tasks = readQueue();
   const task = tasks.find((t) => t.id === params.id);
   if (!task) {
@@ -37,7 +38,8 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
  * verb. The only field this route touches; everything else about the row
  * (spec, output, credits) is untouched.
  */
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const body = await request.json().catch(() => null);
   const parsed = PatchQueueTaskSchema.safeParse(body);
   if (!parsed.success) {
