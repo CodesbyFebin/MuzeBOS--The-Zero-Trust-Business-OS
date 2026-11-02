@@ -167,6 +167,7 @@ const MONEY_HACK: FeatureDefinition[] = [
   mk('pipeline', 'Sales Pipeline', 'Deals by stage with win probability and a weighted forecast; Muse Spark suggests a next step behind the Jev gate.'),
   mk('dashboard', 'Founder Dashboard', 'Runway, net burn and repeat-customer revenue computed only from your invoices, payments, approved expenses and cash.'),
   mk('expenses', 'Expense Approvals', 'Claims that nobody can approve themselves, with department and amount limits for managers.'),
+  mk('overdue', 'Overdue Reminders', 'Overdue invoices from stored records with cited fields; a fixture or capped Muse draft goes to Jev approval and is sent only via a connected integration.'),
 ];
 
 const BRAIN_HACK: FeatureDefinition[] = [

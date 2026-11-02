@@ -105,12 +105,20 @@ npx vitest run tests/hackathon-meta.test.ts
 
 - **No live Meta model call has been made from this repo yet.** The build box
   has no key. The demo video must be recorded after a live run.
-- Jev can only approve `reminders.create`. Invoices are still issued through
-  the pre-event human approval desk, not by agents.
+- Jev approves agent `reminders.create` proposals and, since Gate 3, one
+  overdue-invoice reminder per run (`overdue-invoice-reminder`, the only
+  workflow granted `messages.send`). Invoices are still issued through the
+  pre-event human approval desk, not by agents.
+- Overdue reminders: due dates are derived (createdAt + terms; 30 days is an
+  assumed default unless configured). With no key or no configured price the
+  draft is a labelled FIXTURE template. Sending happens only through a
+  connected inbox (gsend verified-sender draft); none is connected on the
+  build box, so approved reminders are recorded as "not sent". No real send
+  has been verified.
 - The Muse Image and Voice Transcribe adapters are not wired to the UI, and
   their request/response shapes are unverified. SAM 3.1 is not used.
-- Single-operator local preview: no rate limiter, unencrypted SQLite, nothing
-  sent to external messaging providers.
+- Single-operator local preview: no rate limiter, unencrypted SQLite. Nothing
+  is sent to external messaging providers unless an inbox is connected.
 - This is not certified as zero-trust or production-ready. "Zero-trust" is the
   design goal: models are untrusted and every write needs a human-approved
   hash.

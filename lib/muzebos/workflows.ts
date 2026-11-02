@@ -17,6 +17,7 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { BusinessError, payloadHash, type BusinessStore, type Product } from './store';
+import { OverdueReminderInput, overduePlan, performOverdueSend, senderConnectedFromEnv, type OverdueReminderInputT } from './overdue-core';
 
 export const PERMISSIONS = ['inventory.read', 'reminders.write', 'messages.send', 'invoices.issue'] as const;
 export type Permission = typeof PERMISSIONS[number];
@@ -26,7 +27,7 @@ export const TOOLS: Record<ToolName, { permission: Permission; idempotent: boole
   'inventory.lowStock': { permission: 'inventory.read', idempotent: true, description: 'Read products at or below a stock threshold.' },
   'reminders.create': { permission: 'reminders.write', idempotent: true, description: 'Create one open reminder linked to a product (skipped if this run already created it).' },
   'reminders.complete': { permission: 'reminders.write', idempotent: true, description: 'Close reminders this run created (compensation).' },
-  'messages.send': { permission: 'messages.send', idempotent: false, description: 'Send an outside message. No provider is connected; no workflow is granted this.' },
+  'messages.send': { permission: 'messages.send', idempotent: false, description: 'Send an outside message through a connected integration only. Granted only to the overdue-invoice reminder; without a connected sender it records that nothing was sent.' },
   'invoices.issue': { permission: 'invoices.issue', idempotent: false, description: 'Issue an invoice. Only the operator approval flow may do this; no workflow is granted it.' },
 };
 
@@ -103,7 +104,24 @@ export const JEV_AGENT_WRITE: WorkflowDefinition = {
   steps: [{ id: 'remind', label: 'Create the approved reminder', tool: 'reminders.create', run: () => undefined }],
 };
 
-export const WORKFLOWS: WorkflowDefinition[] = [LOW_STOCK_REMINDER, JEV_AGENT_WRITE];
+export const OVERDUE_INVOICE_REMINDER: WorkflowDefinition = {
+  id: 'overdue-invoice-reminder', version: 1, name: 'Overdue invoice reminder',
+  summary: 'A drafted payment reminder for one overdue invoice. Nothing is sent until a person approves the exact draft; then it goes only to a connected email integration.',
+  trigger: { kind: 'event', description: 'Created from the Overdue page after a draft (fixture or live Muse) passes validation.' },
+  input: OverdueReminderInput,
+  inputDescription: { invoiceId: 'Stored invoice id', to: 'Customer email on the invoice', subject: 'Validated subject', body: 'Validated body', mode: 'fixture or live', model: 'Model id when live', draftHash: 'sha256 of subject+body' },
+  permissions: ['messages.send'],
+  tools: ['messages.send'],
+  approval: { required: true, boundTo: 'payloadHash', description: 'A person approves the hash of the draft plus the invoice state. If the invoice is reconciled or edited before execution, the hash changes and sending is refused.' },
+  idempotency: { description: 'The same draft for the same invoice returns the same run; at most one outbound message per run.' },
+  retry: { maxAttempts: 1, description: 'messages.send is not idempotent, so it is never retried automatically.' },
+  timeoutMs: 72 * 60 * 60 * 1000,
+  compensation: { description: 'A message handed to the sender cannot be recalled; cancelling before execution sends nothing.', run: () => undefined },
+  plan: (store, input) => overduePlan(store, input as OverdueReminderInputT),
+  steps: [{ id: 'send', label: 'Send the approved reminder via the connected integration', tool: 'messages.send', run: () => undefined }],
+};
+
+export const WORKFLOWS: WorkflowDefinition[] = [LOW_STOCK_REMINDER, JEV_AGENT_WRITE, OVERDUE_INVOICE_REMINDER];
 export const workflowById = (id: string) => WORKFLOWS.find((w) => w.id === id);
 
 /** Serializable view of a definition for the UI/API (functions and schemas removed). */
@@ -136,7 +154,7 @@ const TERMINAL: RunStatus[] = ['succeeded', 'cancelled', 'compensated', 'timed_o
 
 export class WorkflowEngine {
   /** `fault` is a test hook to simulate a transient failure in a step attempt. */
-  constructor(private store: BusinessStore, private opts: { fault?: (stepId: string, attempt: number) => void; clock?: () => number } = {}) {}
+  constructor(private store: BusinessStore, private opts: { fault?: (stepId: string, attempt: number) => void; clock?: () => number; senderConnected?: () => boolean } = {}) {}
   private get db() { return this.store.db; }
   private time() { return this.opts.clock?.() ?? Date.now(); }
   private event(runId: string, stepId: string | null, type: string, detail: string) {
@@ -252,6 +270,9 @@ export class WorkflowEngine {
 
   /** Workflow-specific effects, dispatched by tool so a step can only do what its tool allows. */
   private perform(w: WorkflowDefinition, step: StepDefinition, ctx: StepContext) {
+    if (step.tool === 'messages.send' && w.id === OVERDUE_INVOICE_REMINDER.id) {
+      return performOverdueSend(this.store, ctx.runId, ctx.plan as ReturnType<typeof overduePlan>, (this.opts.senderConnected ?? senderConnectedFromEnv)());
+    }
     if (step.tool === 'reminders.create' && w.id === JEV_AGENT_WRITE.id) {
       const plan = ctx.plan as { args: { title: string }; role: string };
       const marker = `[run ${ctx.runId.slice(0, 8)}]`;
