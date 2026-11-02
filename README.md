@@ -1,4 +1,4 @@
-# MeTaBos — The Zero-Trust Business OS
+# MeTaBos — Cyber AI Business OS
 
 **A self-hostable business workspace for founders and small businesses, with
 SQLite invoicing, inventory, CRM, approval-gated AI tasks and audit evidence.**
@@ -15,6 +15,41 @@ Run your business. Approve what matters. Verify what happened.
 **Release posture: single-operator local preview (package 0.1.1).** The project
 name describes a security design goal; it is not an independent certification or
 production-readiness claim. MeTaBos extends the attributed FounderOS/GladOS source.
+
+## Why this exists
+
+More businesses are now run by one person with AI help. Alibaba.com's president
+told Business Insider that an estimated 30% to 40% of the platform's customers are
+solo entrepreneurs, with AI agents doing work such as listings, customer service
+and marketing ([Business Insider, 2026](https://www.businessinsider.com/ai-agents-one-person-companies-china-openclaw-alibaba-president-2026-3)).
+In PwC's May 2025 survey of 308 US executives, 79% said AI agents were already
+being adopted in their companies, and 66% of those adopters reported measurable
+productivity value ([PwC AI agent survey](https://www.pwc.com/us/en/tech-effect/ai-analytics/ai-agent-survey.html)).
+
+The problem: a solo founder wants AI to take on sales follow-ups, invoicing,
+stock and support, but giving a model write access to money and inventory is a
+risk. MeTaBos keeps the AI as a **copilot**: it drafts, classifies, summarizes
+and proposes structured actions; the owner reviews the exact payload and
+approves; deterministic code does the write and records evidence.
+
+**Who it's for:** solo founders, one-person companies and small teams who want
+their commerce, money, messaging and AI help in one self-hosted workspace.
+
+**Governance ideas, as built in this repo:**
+- **Jev approvals** bound to a hash of the exact payload; any change after
+  approval invalidates it.
+- **Atomic invoice issuance** with an in-transaction stock recheck,
+  idempotency keys and money in integer minor units.
+- **Spend limits** for model calls stored in the database (per-call and
+  per-day ceilings).
+- **Role checks on the server** for every business-record read and write.
+- **Hash-chained audit evidence** you can verify and export.
+- **Meta model adapters** behind a provider interface; nothing runs live
+  without a configured key and prices.
+
+**Real stack:** Next.js 15, TypeScript, SQLite (better-sqlite3), vitest and
+Playwright. No other database, queue, vector store or orchestration service is
+required.
 
 ## Hackathon reviewers
 

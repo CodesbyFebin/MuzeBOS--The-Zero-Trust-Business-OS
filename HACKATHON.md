@@ -1,11 +1,13 @@
-# MeTaBos at the Meta Global AI Developer Hackathon (Oct 26 to Nov 4, 2026)
+# MeTaBos — Cyber AI Business OS at the Meta Global AI Developer Hackathon (Oct 26 to Nov 4, 2026)
 
 **Theme:** Build for Your World. **Track:** Indie developer (solo).
-**One line:** a zero-trust business OS for solo founders. Meta models do the
+**One line:** MeTaBos, a Cyber AI Business OS for solo founders. Meta models do the
 thinking, and nothing they propose touches your books until you approve the
 exact payload.
 
 ## Problem
+
+Context (sources): [Business Insider](https://www.businessinsider.com/ai-agents-one-person-companies-china-openclaw-alibaba-president-2026-3) reports Alibaba.com estimates 30–40% of its customers are solo entrepreneurs; [PwC's 2025 AI agent survey](https://www.pwc.com/us/en/tech-effect/ai-analytics/ai-agent-survey.html) found 79% of surveyed US executives say AI agents are being adopted, and 66% of adopters report measurable productivity value.
 
 A solo founder runs sales, invoicing, stock, follow-ups and support alone.
 AI assistants can draft all of that, but handing an LLM write access to
