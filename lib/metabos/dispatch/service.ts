@@ -6,6 +6,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { BusinessError, type BusinessStore } from '../store';
 import { assertNotOptedOut, onDispatchSent } from '../talk/core';
 import { meterDispatch } from '../brain/metering';
+import { getEntry } from '../muse-catalog';
 import { CHANNELS, NotConnected, missingEnv, runAdapter, type Channel, type Deps } from './adapters';
 
 export type Dispatch = { id: string; channel: Channel; payload: unknown; payloadHash: string; status: 'pending' | 'approved' | 'sent' | 'failed' | 'rejected'; proposedBy: string; approvedBy: string | null; idempotencyKey: string | null; providerStatus: number | null; providerRef: string | null; providerResponse: string | null; createdAt: string; updatedAt: string };
@@ -31,6 +32,7 @@ export function propose(s: BusinessStore, actor: string, channel: Channel, paylo
   if (!CHANNELS[channel]) throw new BusinessError('Unknown channel', 422);
   const parsed = CHANNELS[channel].schema.safeParse(payload);
   if (!parsed.success) throw new BusinessError(parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '), 422);
+  if (channel === 'tool-call') { const e = getEntry((parsed.data as { catalogId: string }).catalogId); if (!e) throw new BusinessError('Unknown catalog entry', 404); if (e.status === 'blocked') throw new BusinessError(`${e.id} is blocked (${e.license})`, 403); }
   assertNotOptedOut(s, channel, parsed.data);
   ensure(s); const now = new Date().toISOString(); const id = randomUUID(); const hash = payloadHash(channel, parsed.data);
   s.transact(() => {

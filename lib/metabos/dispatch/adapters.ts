@@ -15,6 +15,7 @@ import { route } from '../ai/router';
 import { metaCall, MetaApiError } from '@/lib/metabos/ai/meta-call';
 import { taskClassFor } from '@/lib/metabos/ai/token-saver';
 import { businessStore, BusinessError, type BusinessStore } from '@/lib/metabos/store';
+import { getEntry, missingFor } from '@/lib/metabos/muse-catalog';
 
 export type Env = Record<string, string | undefined>;
 export type Fetch = (url: string, init: { method: string; headers: Record<string, string>; body: string; signal?: AbortSignal }) => Promise<{ status: number; ok: boolean; text(): Promise<string> }>;
@@ -30,6 +31,8 @@ export const CHANNELS = {
   email: { env: ['MUZEBOS_SMTP_HOST', 'MUZEBOS_SMTP_PORT', 'MUZEBOS_SMTP_USER', 'MUZEBOS_SMTP_PASSWORD', 'MUZEBOS_SMTP_FROM'], schema: z.object({ to: z.string().trim().email().max(200), subject: z.string().trim().min(1).max(200), body: z.string().trim().min(1).max(20000) }).strict() },
   'payment-link': { env: ['MUZEBOS_RAZORPAY_KEY_ID', 'MUZEBOS_RAZORPAY_KEY_SECRET'], schema: z.object({ amount: z.number().int().min(100).max(50_000_000_00), description: z.string().trim().min(1).max(2048), customerName: z.string().trim().min(1).max(120), customerEmail: z.string().trim().email().max(200).optional(), customerContact: z.string().regex(/^\+?\d{8,14}$/).optional() }).strict() },
   completion: { env: ['MODEL_API_KEY', 'OPENROUTER_API_KEY'], schema: z.object({ prompt: z.string().trim().min(1).max(8000), tier: z.enum(['auto', 'small', 'medium', 'large']).default('auto'), maxTokens: z.number().int().min(1).max(1000).default(400) }).strict() },
+  /** MUSE catalog skill/MCP use (writes or external-send risk). Jev approves a hand-off; MeTaBos never runs third-party code itself. */
+  'tool-call': { env: [], schema: z.object({ catalogId: z.string().trim().min(3).max(200).regex(/^(skill|mcp):/, 'catalog id'), action: z.string().trim().min(1).max(500), input: z.string().max(4000).default('') }).strict() },
 } as const;
 export type Channel = keyof typeof CHANNELS;
 export type Payload<C extends Channel> = z.infer<(typeof CHANNELS)[C]['schema']>;
@@ -117,6 +120,15 @@ async function email(p: Payload<'email'>, key: string, d: Deps): Promise<Adapter
   } catch (e) { return { ok: false, status: 0, providerRef: null, evidence: `SMTP error: ${e instanceof Error ? e.message.slice(0, 300) : 'unknown'}` }; }
 }
 
+/** Records the Jev-approved hand-off. Never executes a skill script or starts an MCP server. */
+async function toolCall(p: Payload<'tool-call'>, key: string, d: Deps): Promise<AdapterResult> {
+  const e = getEntry(p.catalogId);
+  if (!e) return { ok: false, status: 404, providerRef: null, evidence: `Unknown catalog entry ${p.catalogId}` };
+  if (e.status === 'blocked') return { ok: false, status: 403, providerRef: null, evidence: `${e.id} is blocked (${e.license}); nothing ran` };
+  const m = missingFor(e, d.env);
+  if (m.length) return { ok: false, status: 424, providerRef: null, evidence: `Not connected — add ${m.join(', ')}; nothing ran` };
+  return { ok: true, status: 202, providerRef: `handoff:${e.id}`, evidence: `Jev-approved hand-off for ${e.id} (${e.risk}); action "${p.action.slice(0, 120)}". MeTaBos did not execute it; an operator runs it. key ${key}` };
+}
 export async function runAdapter(channel: Channel, payload: unknown, key: string, d: Deps): Promise<AdapterResult> {
   need(channel, d.env);
   const p = CHANNELS[channel].schema.parse(payload);
@@ -126,5 +138,6 @@ export async function runAdapter(channel: Channel, payload: unknown, key: string
     case 'payment-link': return paymentLink(p as Payload<'payment-link'>, key, d);
     case 'instagram': return instagram(p as Payload<'instagram'>, key, d);
     case 'completion': return completion(p as Payload<'completion'>, key, d);
+    case 'tool-call': return toolCall(p as Payload<'tool-call'>, key, d);
   }
 }

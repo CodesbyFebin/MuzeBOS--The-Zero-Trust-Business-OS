@@ -3,6 +3,7 @@
  *  Fleet → Claw swarms and agent drafts, Tools → feature registry. No invented telemetry: every number comes from an API or the registry. */
 import { useEffect, useMemo, useState } from 'react';
 import { ALL_FEATURES, STATUS_LABEL, statusCounts } from '@/lib/metabos/registry';
+import { MuseCatalog } from './MuseCatalog';
 
 type Tab = 'memory' | 'ledger' | 'fleet' | 'tools';
 type Load<T> = { data?: T; error?: string };
@@ -43,7 +44,8 @@ export function MusePanels() {
       {tab === 'tools' && <>
         <p className="mb-muted">{ALL_FEATURES.length} registry entries: {Object.entries(counts).filter(([, n]) => n).map(([k, n]) => `${n} ${STATUS_LABEL[k as keyof typeof STATUS_LABEL].toLowerCase()}`).join(', ')}.</p>
         <label>Search tools <input value={q} onChange={(e) => setQ(e.target.value)} maxLength={60} /></label>
-        <ul>{tools.map((f) => <li key={f.id}><a href={f.route}>{f.label}</a> <span className="mb-hub-chip">{STATUS_LABEL[f.status]}</span></li>)}</ul></>}
+        <ul>{tools.map((f) => <li key={f.id}><a href={f.route}>{f.label}</a> <span className="mb-hub-chip">{STATUS_LABEL[f.status]}</span></li>)}</ul>
+        <h3 className="mb-heading">Skills and MCP servers</h3><MuseCatalog limit={10} /><a href="/workspace/developer/muse-catalog">Open full catalog</a></>}
     </div>
   </section>;
 }

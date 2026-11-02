@@ -250,7 +250,7 @@ function utilityMenu(key: string): Omit<MenuDefinition, 'number'> {
     summary: `Opens the existing screen at ${l.href}.`,
   }));
   if (key === 'settings') pages.push({ ...mk('language', 'Language', 'English, हिन्दी, മലയാളം and தமிழ் interface strings (cookie mb_lang). Machine-drafted by local Sarvam via claw-local, hand-reviewed; native review pending; missing strings fall back to English.', 'settings'), clusterId: cid });
-  if (key === 'developer') pages.push(META_WEBHOOK_STATUS, API_REFERENCE, { ...mk('mcp', 'GST MCP Server', 'Compute-only GST tools (invoice tax, GSTIN format, GSTR-1 B2C summary) over MCP JSON-RPC. GST math is pre-existing Open-Founder code, labelled.', 'developer'), clusterId: cid });
+  if (key === 'developer') pages.push(META_WEBHOOK_STATUS, API_REFERENCE, { ...mk('mcp', 'GST MCP Server', 'Compute-only GST tools (invoice tax, GSTIN format, GSTR-1 B2C summary) over MCP JSON-RPC. GST math is pre-existing Open-Founder code, labelled.', 'developer'), clusterId: cid }, { ...mk('muse-catalog', 'MUSE skills & MCP catalog', 'Searchable catalog of skills (anthropics/skills, Agent-tools, Agentic-Workflow) and MCP servers (reference servers, MCP registry, MeTaBos connectors) with real licences. Adoptable skills are vendored with LICENSE; MCP entries show Not connected until env is set; writes and sends go through Jev.', 'developer'), clusterId: cid });
   if (key === 'account') pages.push(...OS_PAGES.account.map((f) => ({ ...f, clusterId: cid })));
   return { id: key, label: key === 'upgrade' ? 'Upgrade' : u.label, route: `/workspace/${key}`, icon: u.icon, section: 'pinned', summary: u.summary, aliases: LEGACY_ALIASES[key] ?? [], clusters: [{ id: cid, label: 'Current destinations', pages }] };
 }

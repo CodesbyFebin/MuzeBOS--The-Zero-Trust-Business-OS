@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 229,
+ "count": 230,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -2260,6 +2260,18 @@
    "summary": "Declarative workspace module records: list with computed fields, or create/update/transition.",
    "idempotencyKey": true,
    "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/muse/catalog",
+   "file": "app/api/muse/catalog/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Read-only MUSE skill/MCP catalog search. Running anything goes through POST /api/dispatch (channel \"tool-call\") and Jev.",
+   "idempotencyKey": false,
+   "originCheck": false,
    "schemaValidated": true,
    "access": "session"
   },
