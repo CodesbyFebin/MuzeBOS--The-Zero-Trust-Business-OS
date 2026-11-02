@@ -104,3 +104,8 @@ Ideas taken: a full-viewport overlay with pointer-events off except the MuZe han
 `components/metabos/muse/MuZeRoam.tsx`, `components/metabos/muse/MuZeHome.tsx` and `lib/metabos/muse/roam.ts`, on the repo's own
 three.js 0.169 fur engine (`lib/metabos/fur-sim`). Not copied: the r128 renderer, the file's operator-mode rail/panels and every
 hard-coded status line, count, FPS figure or capability claim in it; guide text here comes only from the target element.
+
+## Board (feat/homarr-board)
+
+- **Homarr** (https://homarr.dev, Apache-2.0): used for ideas only (a dashboard of service tiles with live status and a drag-to-arrange layout). No Homarr code, assets or text are copied; `lib/metabos/board/*` and `components/metabos/bos/Board.tsx` are written for this repo.
+- **"METABOS × MuZe · Sovereign Business OS" HTML** (the owner's own pre-existing code, shared on 3 Nov 2026): used as a layout and feature reference for the Jev queue, receipts and contribution-ledger panels. Its inlined three.js r128 bundle and its fixed figures (MRR, orders, tok/s, fitness, pheromone trails) are not used; the board reads real records, and the fur renderer stays on the repo's own three.js dependency.

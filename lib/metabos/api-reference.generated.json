@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 234,
+ "count": 237,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -367,6 +367,19 @@
    "access": "session"
   },
   {
+   "path": "/api/board",
+   "file": "app/api/board/route.ts",
+   "methods": [
+    "GET",
+    "PUT"
+   ],
+   "summary": "Board layout (tiles, order, size, hidden) plus what each tile checks.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
    "path": "/api/board/agents/{id}/run",
    "file": "app/api/board/agents/[id]/run/route.ts",
    "methods": [
@@ -409,6 +422,18 @@
     "GET"
    ],
    "summary": "One aggregated snapshot of the live Paperclip board: seats (with status + model), the task queue, and recent heartbeat runs. The BoardLive strip on /agents polls this every few seconds. Unreachable board = honest `connected: false` with empty lists, still a 200, never fake data.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/board/status",
+   "file": "app/api/board/status/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Live health of every board tile. Each check is cached for CACHE_MS; no secrets are returned.",
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
