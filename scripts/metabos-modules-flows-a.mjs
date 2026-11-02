@@ -4,7 +4,7 @@ export async function run({ page, post, base, vp, assert }) {
   const prod = (await (await post('/api/business', { action: 'product', data: { name: `Tea ${sfx}`, sku: `TEA-${sfx}`, price: 5000, taxBps: 500, stock: 4 } })).json()).result;
   assert.ok(prod.id, JSON.stringify(prod));
   // Location via the form.
-  await page.goto(`${base}/workspace/stock/warehouse-and-location-matrix`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/workspace/stock/locations`, { waitUntil: 'networkidle' });
   const f = page.locator('form.mb-form');
   await f.getByLabel('Code *').fill(`W-${sfx}`); await f.getByLabel('Name *').fill(`Main ${sfx}`); await f.getByLabel('Kind *').selectOption('warehouse');
   await page.getByRole('button', { name: 'Create location' }).click();
@@ -15,7 +15,7 @@ export async function run({ page, post, base, vp, assert }) {
   await page.getByRole('button', { name: 'Create location' }).click();
   await page.getByRole('alert').filter({ hasText: 'already exists' }).waitFor();
   // Purchase order: create, order, receive -> stock rises.
-  await page.goto(`${base}/workspace/stock/supplier-purchase-orders`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/workspace/stock/purchase-orders`, { waitUntil: 'networkidle' });
   await f.getByLabel('Supplier *').fill(`Acme ${sfx}`); await f.getByLabel('Product *').selectOption(prod.id);
   await f.getByLabel('Quantity *').fill('6'); await f.getByLabel('Unit cost (paise) *').fill('3000');
   await f.getByLabel('Receive into *').selectOption({ label: `W-${sfx}` });
@@ -26,7 +26,7 @@ export async function run({ page, post, base, vp, assert }) {
   const snap = await (await page.request.get(`${base}/api/business`)).json();
   assert.equal(snap.products.find((p) => p.id === prod.id).stock, 10);
   // Stale: another writer edits the location while this tab shows the old version.
-  await page.goto(`${base}/workspace/stock/warehouse-and-location-matrix`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/workspace/stock/locations`, { waitUntil: 'networkidle' });
   const view = await (await page.request.get(`${base}/api/modules/stock.warehouse-and-location-matrix`)).json();
   const rec = view.records.find((r) => r.data.code === `W-${sfx}`);
   assert.equal((await post('/api/modules/stock.warehouse-and-location-matrix', { action: 'update', id: rec.id, version: rec.version, data: { code: `W-${sfx}`, name: 'Renamed', kind: 'store' } })).status(), 200);

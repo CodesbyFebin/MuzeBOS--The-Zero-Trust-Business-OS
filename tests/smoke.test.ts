@@ -70,7 +70,7 @@ const PAGES: PageEntry[] = [
   { file: 'workspace/system/webhooks/page.tsx', load: () => import('@/app/workspace/system/webhooks/page') },
   { file: 'workspace/developer/meta-webhooks/page.tsx', load: () => import('@/app/workspace/developer/meta-webhooks/page') },
   { file: 'workspace/developer/api-reference/page.tsx', load: () => import('@/app/workspace/developer/api-reference/page') },
-  { file: 'workspace/[section]/[page]/page.tsx', load: () => import('@/app/workspace/[section]/[page]/page'), props: {params:{section:'stock', page:'barcode-and-qr-generator'}} },
+  { file: 'workspace/[section]/[page]/page.tsx', load: () => import('@/app/workspace/[section]/[page]/page'), props: {params:{section:'stock', page:'barcodes'}} },
   { file: 'business/page.tsx', load: () => import('@/app/business/page') },
   { file: 'brand-deals/page.tsx', load: () => import('@/app/brand-deals/page') },
   // fo/clients (founderos-ui pages/clients.md, lead-magnets.md)

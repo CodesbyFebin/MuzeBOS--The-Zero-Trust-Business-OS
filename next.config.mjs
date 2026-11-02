@@ -2,9 +2,9 @@
 export const MUZEBOS_SHORT_PATHS = ['orders', 'money', 'talk', 'stock', 'growth', 'operations', 'builder', 'foundation', 'system', 'evidence', 'settings', 'upgrade', 'support', 'developer', 'account'];
 
 export const MUZEBOS_LEGACY_WORKSPACE = [
-  ['/workspace/customers', '/workspace/orders/crm-profiles'],
-  ['/workspace/inventory', '/workspace/stock/product-catalog-graph'],
-  ['/workspace/tasks', '/workspace/operations/tasks-and-goals'],
+  ['/workspace/customers', '/workspace/orders/customers'],
+  ['/workspace/inventory', '/workspace/stock/catalog'],
+  ['/workspace/tasks', '/workspace/operations/tasks'],
 ];
 
 /** @type {import('next').NextConfig} */

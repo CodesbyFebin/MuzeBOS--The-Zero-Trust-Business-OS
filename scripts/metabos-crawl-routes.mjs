@@ -6,6 +6,9 @@ import { signInOwner } from './browser-sign-in.mjs';
 const base = process.env.TEST_BASE_URL || 'http://127.0.0.1:4100';
 const routes = JSON.parse(execFileSync('npx', ['tsx', '-e', "import('./lib/metabos/registry.ts').then(m=>console.log(JSON.stringify((m.ALL_FEATURES??m.default.ALL_FEATURES).map(f=>f.route))))"], { encoding: 'utf8' }).trim().split('\n').pop());
 assert.equal(routes.length, 234);
+const legacyPairs = JSON.parse(execFileSync('npx', ['tsx', '-e', "import('./lib/metabos/registry.ts').then(m=>{const x=m.ALL_FEATURES?m:m.default;console.log(JSON.stringify(x.ALL_FEATURES.flatMap(f=>(f.legacyRoutes||[]).map(l=>[l,f.route]))))})"], { encoding: 'utf8' }).trim().split('\n').pop());
+// Canonical pages that themselves redirect on to an inherited screen; the legacy hop is still checked by status above.
+const featureTargets = new Set(JSON.parse(execFileSync('npx', ['tsx', '-e', "import('./lib/metabos/registry.ts').then(m=>{const x=m.ALL_FEATURES?m:m.default;console.log(JSON.stringify(x.ALL_FEATURES.filter(f=>f.target).map(f=>f.route)))})"], { encoding: 'utf8' }).trim().split('\n').pop()));
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 const summary = [];
 for (const vp of [{ name: 'desktop', width: 1440, height: 1000 }, { name: 'mobile', width: 390, height: 844, isMobile: true, hasTouch: true }]) {
@@ -25,6 +28,11 @@ for (const vp of [{ name: 'desktop', width: 1440, height: 1000 }, { name: 'mobil
     const status = res?.status(); const stubs = await page.locator('.mb-stub').count();
     if (status !== 200 || stubs) bad.push(`${r} -> ${status}${stubs ? ' STUB' : ''} (${page.url()})`);
   }
+  for (const [legacy, canonical] of legacyPairs) {
+    await page.goto(base + legacy, { waitUntil: 'domcontentloaded' });
+    if (!page.url().startsWith(base + canonical) && !featureTargets.has(canonical)) bad.push(`legacy ${legacy} -> ${page.url()} (want ${canonical})`);
+  }
+  summary.push(`${vp.name}: ${legacyPairs.length} legacy routes redirect`);
   assert.deepEqual(bad, [], `${vp.name}: ${bad.join('\n')}`);
   // Mission Control layout: remove, add, reorder, restore default; persisted across reload.
   await page.goto(base + '/', { waitUntil: 'networkidle' });

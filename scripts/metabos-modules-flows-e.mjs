@@ -4,7 +4,7 @@ export async function run({ page, post, base, vp, assert }) {
   const d = new Date().toISOString().slice(0, 10), to = new Date(Date.now() + 5 * 86_400_000).toISOString().slice(0, 10);
   const r = await post('/api/modules/growth.coupon-engine', { action: 'create', data: { code, kind: 'percent', percentBps: 1000, minOrder: 50000, validFrom: d, validTo: to, maxRedemptions: 3 } });
   assert.ok(r.ok(), await r.text());
-  await page.goto(`${base}/workspace/growth/coupon-engine`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/workspace/growth/coupons`, { waitUntil: 'networkidle' });
   const row = () => page.locator('tr', { hasText: code }).first();
   await row().getByLabel('Redeem: Order total (paise)').fill('100005');
   await row().getByRole('button', { name: 'Redeem' }).click();

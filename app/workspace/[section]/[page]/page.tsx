@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
-import { pageForSegments } from '@/lib/metabos/registry';
+import { pageForSegments, featureByLegacyRoute } from '@/lib/metabos/registry';
 import { FeatureStub } from '@/components/metabos/FeatureStub';
 import { ModuleWorkspace } from '@/components/metabos/ModuleWorkspace';
 import { moduleById } from '@/lib/metabos/modules';
@@ -10,7 +10,7 @@ export const dynamic='force-dynamic';
 export default async function FeaturePage(props:{params: Promise<{section:string;page:string}>}) {
  const params = await props.params;
  const feature=pageForSegments(params.section,params.page);
- if(!feature)notFound();
+ if(!feature){const legacy=featureByLegacyRoute(`/workspace/${params.section}/${params.page}`);if(legacy)redirect(legacy.route);notFound();}
  if((feature.status==='available'||feature.status==='needs-credentials')&&moduleById(feature.id))return <ModuleWorkspace feature={feature}/>;
  if(feature.status==='available'&&isInfraPage(feature.id))return <InfraWorkspace feature={feature}/>;
  if(feature.target&&(feature.status==='available'||feature.status==='existing'))redirect(feature.target);

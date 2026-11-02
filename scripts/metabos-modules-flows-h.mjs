@@ -3,7 +3,7 @@ export async function run({ page, post, base, vp, assert }) {
   const name = `Infra ${vp.name} ${Date.now()}`;
   const cs = await post('/api/business', { action: 'customer', data: { name, email: '' } });
   assert.ok(cs.ok(), await cs.text());
-  await page.goto(`${base}/workspace/operations/access-log`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/workspace/operations/access`, { waitUntil: 'networkidle' });
   await page.getByRole('cell', { name: 'customer.create' }).first().or(page.getByRole('cell', { name: /customer/ }).first()).waitFor();
   const j = await (await page.request.get(`${base}/api/infra/system.telemetry-and-logs`)).json();
   assert.ok(j.metrics.find((m) => m.label === 'Uptime').value.endsWith(' s'));

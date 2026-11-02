@@ -61,8 +61,8 @@ describe('MeTaBos feature registry', () => {
       else if (f.status === 'needs-credentials') { expect(f.dependencies.length, f.id).toBeGreaterThan(0); expect(f.target, f.id).toBeUndefined(); }
       else { expect(f.dependencies).toEqual([]); expect(f.target ?? (appRoute(f.route) ? f.route : undefined), f.id).toBeTruthy(); }
     }
-    expect(featureByRoute('/workspace/talk/whatsapp-hub')?.status).toBe('needs-credentials');
-    expect(featureByRoute('/workspace/builder/hydration-optimizer')?.status).toBe('available');
+    expect(featureByRoute('/workspace/talk/whatsapp')?.status).toBe('needs-credentials');
+    expect(featureByRoute('/workspace/builder/performance')?.status).toBe('available');
     expect(ALL_FEATURES.filter((f) => f.status === 'planned' || f.status === 'blocked')).toEqual([]);
   });
   it('maps legacy routes onto their menus', () => {
@@ -82,7 +82,7 @@ describe('MeTaBos feature registry', () => {
     const cmds = registryCommands();
     expect(new Set(cmds.map((c) => c.id)).size).toBe(cmds.length);
     expect(cmds.filter((c) => c.hint === 'menu')).toHaveLength(18);
-    expect(cmds.find((c) => c.href === '/workspace/talk/whatsapp-hub')?.hint).toBe('needs credentials');
+    expect(cmds.find((c) => c.href === '/workspace/talk/whatsapp')?.hint).toBe('needs credentials');
   });
   it('short-path redirects point at canonical menu routes', async () => {
     const rules = await nextConfig.redirects!();
@@ -108,12 +108,13 @@ describe('Registry-driven shell', () => {
     expect(html.match(/<details[^>]*open/g)).toHaveLength(4);
   });
   it('canonical page routes redirect working pages and stub the rest without controls', async () => {
-    await expect(FeaturePage({ params: Promise.resolve({ section: 'money', page: 'invoice-maker' }) })).rejects.toThrow('REDIRECT /business?view=invoices');
+    await expect(FeaturePage({ params: Promise.resolve({ section: 'money', page: 'invoice-maker' }) })).rejects.toThrow('REDIRECT /workspace/money/invoices');
+    await expect(FeaturePage({ params: Promise.resolve({ section: 'money', page: 'invoices' }) })).rejects.toThrow('REDIRECT /business?view=invoices');
     await expect(FeaturePage({ params: Promise.resolve({ section: 'money', page: 'nope' }) })).rejects.toThrow('NEXT_NOT_FOUND');
-    const mod = renderToStaticMarkup(await FeaturePage({ params: Promise.resolve({ section: 'stock', page: 'barcode-and-qr-generator' }) }) as never);
+    const mod = renderToStaticMarkup(await FeaturePage({ params: Promise.resolve({ section: 'stock', page: 'barcodes' }) }) as never);
     expect(mod).toContain('data-feature="stock.barcode-and-qr-generator"');
     expect(mod).toContain('Loading Barcode');
-    const planned = { ...pageForSegments('builder', 'hydration-optimizer')!, status: 'planned' as const, dependencies: ['Schema migration'], target: undefined };
+    const planned = { ...pageForSegments('builder', 'performance')!, status: 'planned' as const, dependencies: ['Schema migration'], target: undefined };
     const html = renderToStaticMarkup(createElement(FeatureStub, { feature: planned }));
     expect(html).toContain('Planned');
     expect(html).toContain('Dependencies');
