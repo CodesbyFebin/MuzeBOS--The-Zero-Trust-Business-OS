@@ -201,3 +201,11 @@ MeTaBos stays the platform name. The product shell at /workspace/builder/agentve
 - **#fleet-console**: claw, Yao and local LLM probes, plus agent evidence from the audit chain.
 - **#sparring-pit**: links to the Arena in PRs #59/#60, which aren't in this stack, so the Arena is linked, not wrapped.
 - No mock data ships. ROAS stays "Usage unavailable" without real insights. Every send still goes Jev → /api/dispatch.
+
+## Built during the event: Meta live wiring (feat/meta-live-wiring, stacked on feat/win-polish)
+Ported from code built by the owner's MeTaPen agent during the hackathon (2 Nov 2026, 05:43 and 05:59 IST; see THIRD_PARTY.md).
+- New Jev-gated dispatch channels: `messenger`, `page-post`, `ig-publish`. **DRY_RUN is on by default**: an approved Meta send writes `dispatch.dry-run` evidence and calls nothing until `MUZEBOS_META_DRY_RUN=0`.
+- The Meta integration page shows each channel as **Not configured** (with the missing env var names), **Configured · dry run**, or **Configured**. It also has Discover assets and Check token buttons, which are read-only and use the stored sealed token.
+- Webhooks: Messenger DMs now reach the Unified Inbox, and Lead Ads ids are recorded as evidence (lead fields are not fetched).
+- Demo step 2 offers "Use latest real WhatsApp message" when a signed webhook delivery exists. Otherwise it uses the labelled fixture.
+- Tests: `tests/meta-live-wiring.test.ts` uses mocked HTTP only. No live Meta send has been made or verified.

@@ -2,6 +2,7 @@
  * Outbound dispatch behind Jev approval. propose -> approve (jev.decide, exact payload hash) -> dispatch
  * (idempotency key; at most one provider call per key). Every step and the provider response are evidence.
  */
+import { isMetaChannel, metaDryRun } from '@/lib/metabos/meta/graph';
 import { assertChannelOpen } from '@/lib/metabos/meta/status';
 import { createHash, randomUUID } from 'node:crypto';
 import { BusinessError, type BusinessStore } from '../store';
@@ -66,6 +67,11 @@ export async function dispatch(s: BusinessStore, id: string, hash: string, idemp
   assertNotOptedOut(s, d.channel, d.payload);
   const missing = missingEnv(d.channel, deps.env);
   if (missing.length) throw new BusinessError(new NotConnected(missing).message, 424);
+  // DRY_RUN (default ON for Meta channels): nothing leaves the server; the dispatch stays approved so it can be sent once dry run is off.
+  if (isMetaChannel(d.channel) && metaDryRun(deps.env)) {
+    s.transact(() => s.appendEvidence('dispatch.dry-run', id, `${d.channel} not sent: DRY_RUN is on (set MUZEBOS_META_DRY_RUN=0 to send); payload ${d.payloadHash.slice(0, 12)}`));
+    throw new BusinessError('Dry run — not sent. DRY_RUN is on; set MUZEBOS_META_DRY_RUN=0 to send. The dispatch stays approved.', 424);
+  }
   // Claim the key before the network call so a concurrent retry cannot send twice.
   const claimed = s.db.prepare("UPDATE mb_dispatches SET idempotencyKey=?, updatedAt=? WHERE id=? AND idempotencyKey IS NULL AND status='approved'").run(idempotencyKey, new Date().toISOString(), id);
   if (claimed.changes !== 1) return row(s, id);

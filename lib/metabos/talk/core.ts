@@ -6,7 +6,7 @@
 import { randomUUID } from 'node:crypto';
 import { BusinessError, type BusinessStore } from '../store';
 
-export const TALK_CHANNELS = ['whatsapp', 'instagram', 'email'] as const;
+export const TALK_CHANNELS = ['whatsapp', 'instagram', 'messenger', 'email'] as const;
 export type TalkChannel = (typeof TALK_CHANNELS)[number];
 export type Author = 'customer' | 'human' | 'copilot' | 'system';
 export type Conversation = { id: string; channel: TalkChannel; address: string; name: string | null; status: 'open' | 'handover' | 'closed'; aiPaused: number; pausedReason: string | null; lastInboundAt: string | null; lastOutboundAt: string | null; sentiment: number; createdAt: string; updatedAt: string };

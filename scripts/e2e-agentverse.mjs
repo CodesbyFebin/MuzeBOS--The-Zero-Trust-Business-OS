@@ -72,7 +72,7 @@ await p.screenshot({ path: `${out}/agentverse-cmdk.png` }); await audit('cmd+k')
 await p.getByRole('button', { name: 'personal' }).click(); assert.equal(await p.locator('.mb-av-side').getByRole('button', { name: /campaigns/ }).count(), 0);
 await p.setViewportSize({ width: 390, height: 844 }); await p.getByRole('button', { name: 'business' }).click();
 assert.equal(await p.locator('.mb-av-side').isVisible(), false, 'mobile: channel drawer closed by default'); await p.getByRole('button', { name: 'Channels' }).click(); await p.screenshot({ path: `${out}/agentverse-mobile-drawer.png` }); await audit('mobile drawer');
-await chan('commit-log'); assert.equal(await p.locator('.mb-av-side').isVisible(), false, 'drawer closes after picking a channel');
+await chan('commit-log'); await p.locator('.mb-av-side').waitFor({ state: 'hidden', timeout: 5000 }); // drawer closes after picking a channel
 assert.equal(await p.evaluate(() => document.activeElement?.id), 'mb-av-main', 'focus moves to the channel'); await p.screenshot({ path: `${out}/agentverse-mobile.png`, fullPage: true }); await audit('mobile');
 // Meta integration page: honest status, empty states
 await p.setViewportSize({ width: 1440, height: 900 }); await p.goto(base + '/workspace/developer/meta-integration'); await p.getByTestId('meta-build-order').waitFor({ timeout: 30000 });

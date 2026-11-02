@@ -12,7 +12,7 @@ import { addOptOut, getConversation } from '@/lib/metabos/talk/core';
 import { draftFollowUp, followUpCandidates, ingest, listHandoffs, parseMetaWebhook, proposeReply, requestWhatsAppApproval, resume, scoreSentiment, setApproverPhone, closeHandoff, transcribeStatus } from '@/lib/metabos/talk/service';
 
 const SECRET = 'x'.repeat(40);
-const ENV = { MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN: 't', MUZEBOS_WHATSAPP_PHONE_NUMBER_ID: '1065', MUZEBOS_INSTAGRAM_ACCESS_TOKEN: 'ig', MUZEBOS_APPROVAL_SIGNING_SECRET: SECRET };
+const ENV = { MUZEBOS_META_DRY_RUN: '0', MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN: 't', MUZEBOS_WHATSAPP_PHONE_NUMBER_ID: '1065', MUZEBOS_INSTAGRAM_ACCESS_TOKEN: 'ig', MUZEBOS_APPROVAL_SIGNING_SECRET: SECRET };
 function fake() { const calls: { url: string; body: any }[] = []; const f: Fetch = async (url, init) => { calls.push({ url, body: JSON.parse(init.body) }); return { status: 200, ok: true, text: async () => JSON.stringify({ messages: [{ id: `wamid.${calls.length}` }], message_id: `mid.${calls.length}` }) }; }; return { calls, f }; }
 const wa = (from: string, text: string, id: string = randomUUID(), ts = Math.floor(Date.now() / 1000)) => ({ entry: [{ changes: [{ value: { contacts: [{ wa_id: from, profile: { name: 'Asha' } }], messages: [{ id, from, timestamp: String(ts), type: 'text', text: { body: text } }] } }] }] });
 const inbound = (s: BusinessStore, from: string, text: string, id?: string) => ingest(s, parseMetaWebhook('whatsapp', wa(from, text, id)), ENV);

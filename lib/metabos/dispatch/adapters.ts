@@ -5,6 +5,10 @@
  *  - Meta Model API (preferred): POST https://api.meta.ai/v1/chat/completions (Bearer MODEL_API_KEY); 402 billing_not_configured = "Billing not set up"
  *  - OpenRouter (fallback): POST https://openrouter.ai/api/v1/chat/completions (Bearer; model chosen by lib/metabos/ai/router)
  *  - Instagram DM (Instagram API with Instagram Login): POST https://graph.instagram.com/v25.0/me/messages {recipient:{id:IGSID},message:{text}} (text <= 1000 bytes)
+ *  - Messenger Send API: POST https://graph.facebook.com/{v}/{page-id}/messages {recipient:{id:PSID},messaging_type:"RESPONSE",message:{text}} (Page token)
+ *  - Page publish: POST https://graph.facebook.com/{v}/{page-id}/feed {message, link?} (Page token, pages_manage_posts)
+ *  - Instagram publish (Facebook Login): POST /{ig-user-id}/media {image_url,caption} then POST /{ig-user-id}/media_publish {creation_id}
+ *    Messenger / Page / IG publish shapes ported from the owner's MeTaPen agent (muze-agentverse 6acfff7, hackathon work).
  *  - SMTP: nodemailer transport (host/port/user/password)
  * Each adapter is pure over an injected fetch / transport so it can be unit-tested without the network.
  */
@@ -16,6 +20,7 @@ import { metaCall, MetaApiError } from '@/lib/metabos/ai/meta-call';
 import { taskClassFor } from '@/lib/metabos/ai/token-saver';
 import { businessStore, BusinessError, type BusinessStore } from '@/lib/metabos/store';
 import { getEntry, missingFor } from '@/lib/metabos/muse-catalog';
+import { GRAPH_VERSION } from '@/lib/metabos/meta/graph';
 
 export type Env = Record<string, string | undefined>;
 export type Fetch = (url: string, init: { method: string; headers: Record<string, string>; body: string; signal?: AbortSignal }) => Promise<{ status: number; ok: boolean; text(): Promise<string> }>;
@@ -28,6 +33,9 @@ export class NotConnected extends Error { constructor(public missing: string[]) 
 export const CHANNELS = {
   whatsapp: { env: ['MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN', 'MUZEBOS_WHATSAPP_PHONE_NUMBER_ID'], schema: z.object({ to: z.string().regex(/^\+?[1-9]\d{6,14}$/, 'E.164 phone number'), body: z.string().trim().min(1).max(4096) }).strict() },
   instagram: { env: ['MUZEBOS_INSTAGRAM_ACCESS_TOKEN'], schema: z.object({ to: z.string().regex(/^\d{5,30}$/, 'Instagram-scoped user id (IGSID)'), body: z.string().trim().min(1).refine((b) => Buffer.byteLength(b, 'utf8') <= 1000, 'Instagram text is limited to 1000 bytes') }).strict() },
+  messenger: { env: ['MUZEBOS_META_PAGE_ID', 'MUZEBOS_META_PAGE_ACCESS_TOKEN'], schema: z.object({ to: z.string().regex(/^\d{5,30}$/, 'Page-scoped user id (PSID)'), body: z.string().trim().min(1).max(2000) }).strict() },
+  'page-post': { env: ['MUZEBOS_META_PAGE_ID', 'MUZEBOS_META_PAGE_ACCESS_TOKEN'], schema: z.object({ message: z.string().trim().min(1).max(5000), link: z.string().url().startsWith('https://').max(2000).optional() }).strict() },
+  'ig-publish': { env: ['MUZEBOS_IG_USER_ID', 'MUZEBOS_META_PAGE_ACCESS_TOKEN'], schema: z.object({ imageUrl: z.string().url().startsWith('https://').max(2000), caption: z.string().max(2200).default('') }).strict() },
   email: { env: ['MUZEBOS_SMTP_HOST', 'MUZEBOS_SMTP_PORT', 'MUZEBOS_SMTP_USER', 'MUZEBOS_SMTP_PASSWORD', 'MUZEBOS_SMTP_FROM'], schema: z.object({ to: z.string().trim().email().max(200), subject: z.string().trim().min(1).max(200), body: z.string().trim().min(1).max(20000) }).strict() },
   'payment-link': { env: ['MUZEBOS_RAZORPAY_KEY_ID', 'MUZEBOS_RAZORPAY_KEY_SECRET'], schema: z.object({ amount: z.number().int().min(100).max(50_000_000_00), description: z.string().trim().min(1).max(2048), customerName: z.string().trim().min(1).max(120), customerEmail: z.string().trim().email().max(200).optional(), customerContact: z.string().regex(/^\+?\d{8,14}$/).optional() }).strict() },
   completion: { env: ['MODEL_API_KEY', 'OPENROUTER_API_KEY'], schema: z.object({ prompt: z.string().trim().min(1).max(8000), tier: z.enum(['auto', 'small', 'medium', 'large']).default('auto'), maxTokens: z.number().int().min(1).max(1000).default(400) }).strict() },
@@ -47,7 +55,7 @@ const timeout = () => AbortSignal.timeout(15_000);
 export const appsecretProof = (token: string, env: Env) => env.META_APP_SECRET?.trim() ? createHmac('sha256', env.META_APP_SECRET.trim()).update(token).digest('hex') : null;
 
 async function whatsapp(p: Payload<'whatsapp'>, key: string, d: Deps): Promise<AdapterResult> {
-  const r = await d.fetch(`https://graph.facebook.com/v25.0/${encodeURIComponent(d.env.MUZEBOS_WHATSAPP_PHONE_NUMBER_ID!)}/messages${appsecretProof(d.env.MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN!, d.env) ? `?appsecret_proof=${appsecretProof(d.env.MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN!, d.env)}` : ''}`, {
+  const r = await d.fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${encodeURIComponent(d.env.MUZEBOS_WHATSAPP_PHONE_NUMBER_ID!)}/messages${appsecretProof(d.env.MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN!, d.env) ? `?appsecret_proof=${appsecretProof(d.env.MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN!, d.env)}` : ''}`, {
     method: 'POST', signal: timeout(),
     headers: { authorization: `Bearer ${d.env.MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN}`, 'content-type': 'application/json' },
     body: JSON.stringify({ messaging_product: 'whatsapp', recipient_type: 'individual', to: p.to, type: 'text', text: { preview_url: false, body: p.body }, biz_opaque_callback_data: key }),
@@ -56,13 +64,34 @@ async function whatsapp(p: Payload<'whatsapp'>, key: string, d: Deps): Promise<A
   return { ok: r.ok, status: r.status, providerRef: j?.messages?.[0]?.id ?? null, evidence: clip(t) };
 }
 async function instagram(p: Payload<'instagram'>, _key: string, d: Deps): Promise<AdapterResult> {
-  const r = await d.fetch('https://graph.instagram.com/v25.0/me/messages', {
+  const r = await d.fetch(`https://graph.instagram.com/${GRAPH_VERSION}/me/messages`, {
     method: 'POST', signal: timeout(),
     headers: { authorization: `Bearer ${d.env.MUZEBOS_INSTAGRAM_ACCESS_TOKEN}`, 'content-type': 'application/json' },
     body: JSON.stringify({ recipient: { id: p.to }, message: { text: p.body } }),
   });
   const t = await r.text(); const j = json(t);
   return { ok: r.ok, status: r.status, providerRef: j?.message_id ?? null, evidence: clip(t) };
+}
+const graph = (path: string, token: string, env: Env) => { const proof = appsecretProof(token, env); return `https://graph.facebook.com/${GRAPH_VERSION}/${path}${proof ? `?appsecret_proof=${proof}` : ''}`; };
+async function graphPost(path: string, body: unknown, d: Deps) {
+  const token = d.env.MUZEBOS_META_PAGE_ACCESS_TOKEN!;
+  const r = await d.fetch(graph(path, token, d.env), { method: 'POST', signal: timeout(), headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  const t = await r.text(); return { r, t, j: json(t) };
+}
+async function messenger(p: Payload<'messenger'>, _key: string, d: Deps): Promise<AdapterResult> {
+  const { r, t, j } = await graphPost(`${encodeURIComponent(d.env.MUZEBOS_META_PAGE_ID!)}/messages`, { recipient: { id: p.to }, messaging_type: 'RESPONSE', message: { text: p.body } }, d);
+  return { ok: r.ok, status: r.status, providerRef: j?.message_id ?? null, evidence: clip(t) };
+}
+async function pagePost(p: Payload<'page-post'>, _key: string, d: Deps): Promise<AdapterResult> {
+  const { r, t, j } = await graphPost(`${encodeURIComponent(d.env.MUZEBOS_META_PAGE_ID!)}/feed`, { message: p.message, ...(p.link ? { link: p.link } : {}) }, d);
+  return { ok: r.ok, status: r.status, providerRef: j?.id ?? null, evidence: clip(t) };
+}
+async function igPublish(p: Payload<'ig-publish'>, _key: string, d: Deps): Promise<AdapterResult> {
+  const ig = encodeURIComponent(d.env.MUZEBOS_IG_USER_ID!);
+  const c = await graphPost(`${ig}/media`, { image_url: p.imageUrl, caption: p.caption }, d);
+  if (!c.r.ok || !c.j?.id) return { ok: false, status: c.r.status, providerRef: null, evidence: clip(`container: ${c.t}`) };
+  const pub = await graphPost(`${ig}/media_publish`, { creation_id: String(c.j.id) }, d);
+  return { ok: pub.r.ok, status: pub.r.status, providerRef: pub.j?.id ?? null, evidence: clip(`container ${c.j.id}; publish: ${pub.t}`) };
 }
 async function paymentLink(p: Payload<'payment-link'>, key: string, d: Deps): Promise<AdapterResult> {
   const auth = Buffer.from(`${d.env.MUZEBOS_RAZORPAY_KEY_ID}:${d.env.MUZEBOS_RAZORPAY_KEY_SECRET}`).toString('base64');
@@ -136,6 +165,9 @@ export async function runAdapter(channel: Channel, payload: unknown, key: string
     case 'whatsapp': return whatsapp(p as Payload<'whatsapp'>, key, d);
     case 'email': return email(p as Payload<'email'>, key, d);
     case 'payment-link': return paymentLink(p as Payload<'payment-link'>, key, d);
+    case 'messenger': return messenger(p as Payload<'messenger'>, key, d);
+    case 'page-post': return pagePost(p as Payload<'page-post'>, key, d);
+    case 'ig-publish': return igPublish(p as Payload<'ig-publish'>, key, d);
     case 'instagram': return instagram(p as Payload<'instagram'>, key, d);
     case 'completion': return completion(p as Payload<'completion'>, key, d);
     case 'tool-call': return toolCall(p as Payload<'tool-call'>, key, d);

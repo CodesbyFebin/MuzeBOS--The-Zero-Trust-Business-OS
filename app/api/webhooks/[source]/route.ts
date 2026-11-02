@@ -1,5 +1,5 @@
 import { businessStore } from '@/lib/metabos/store';
-import { ingest, parseMetaWebhook } from '@/lib/metabos/talk/service';
+import { ingest, parseLeadgen, parseMetaWebhook } from '@/lib/metabos/talk/service';
 import { BodyTooLarge, isWebhookSource, readBodyCapped, receiveWebhook, verifyChallenge } from '@/lib/metabos/webhooks';
 
 export const runtime = 'nodejs';
@@ -28,7 +28,11 @@ export async function POST(req: Request, props: { params: Promise<{ source: stri
   const r = receiveWebhook(store, { source: params.source, raw, signature: req.headers.get('x-hub-signature-256'), secret });
   // Only a verified, parsed body reaches the Talk ingest. Messages are deduped by provider message id.
   if (r.status === 200) {
-    try { await ingest(store, parseMetaWebhook(params.source, JSON.parse(raw.toString('utf8')))); }
+    try {
+      const body = JSON.parse(raw.toString('utf8'));
+      await ingest(store, parseMetaWebhook(params.source, body));
+      for (const l of parseLeadgen(body)) store.appendEvidence('meta.leadgen.received', l.leadgenId, `Lead Ads lead ${l.leadgenId}${l.formId ? ` form ${l.formId}` : ''}${l.pageId ? ` page ${l.pageId}` : ''}; fields not fetched (needs leads_retrieval)`);
+    }
     catch (e) { store.appendEvidence('talk.ingest-failed', params.source, e instanceof Error ? e.message.slice(0, 200) : 'ingest error'); }
   }
   return reply(r);

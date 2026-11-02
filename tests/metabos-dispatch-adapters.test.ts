@@ -14,7 +14,7 @@ function fake(status: number, response: unknown) {
   const f: Fetch = async (url, init) => { calls.push({ url, headers: init.headers, body: JSON.parse(init.body) }); return { status, ok: status < 300, text: async () => JSON.stringify(response) }; };
   return { calls, f };
 }
-const ENV = { MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN: 'wa-token', MUZEBOS_WHATSAPP_PHONE_NUMBER_ID: '106540352242922', MUZEBOS_RAZORPAY_KEY_ID: 'rzp_test_x', MUZEBOS_RAZORPAY_KEY_SECRET: 'sec', OPENROUTER_API_KEY: 'or-key', MUZEBOS_SMTP_HOST: 'smtp.example.com', MUZEBOS_SMTP_PORT: '587', MUZEBOS_SMTP_USER: 'u', MUZEBOS_SMTP_PASSWORD: 'p', MUZEBOS_SMTP_FROM: 'billing@example.com' };
+const ENV = { MUZEBOS_META_DRY_RUN: '0', MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN: 'wa-token', MUZEBOS_WHATSAPP_PHONE_NUMBER_ID: '106540352242922', MUZEBOS_RAZORPAY_KEY_ID: 'rzp_test_x', MUZEBOS_RAZORPAY_KEY_SECRET: 'sec', OPENROUTER_API_KEY: 'or-key', MUZEBOS_SMTP_HOST: 'smtp.example.com', MUZEBOS_SMTP_PORT: '587', MUZEBOS_SMTP_USER: 'u', MUZEBOS_SMTP_PASSWORD: 'p', MUZEBOS_SMTP_FROM: 'billing@example.com' };
 const approved = (s: BusinessStore, channel: Parameters<typeof propose>[2], payload: unknown) => { const d = propose(s, 'm1', channel, payload); return decide(s, 'owner', d.id, d.payloadHash, true); };
 const evidence = (s: BusinessStore, id: string) => (s.db.prepare('SELECT action FROM mb_audit WHERE target=?').all(id) as { action: string }[]).map((e) => e.action);
 

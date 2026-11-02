@@ -8,9 +8,10 @@ import { BusinessError, type BusinessStore } from '../store';
 import { propose as proposeDispatch } from '../dispatch/service';
 import { ensureTalk } from '../talk/core';
 import { propose as jevPropose, queue } from '../ai/jev';
-import type { Env } from '../dispatch/adapters';
+import { missingEnv, type Env } from '../dispatch/adapters';
 
-export const GRAPH_VERSION = 'v19.0';
+import { GRAPH_VERSION, metaDryRun } from './graph';
+export { GRAPH_VERSION };
 const has = (env: Env, k: string) => !!env[k]?.trim();
 const now = () => new Date().toISOString();
 
@@ -50,7 +51,7 @@ export function buildOrder(s: BusinessStore, env: Env) {
   return [
     { n: 1, title: 'Business Portfolio, app registration and verification', state: st(false, app), detail: app ? 'Meta app env present. Business verification and App Review are done in Meta, not here: not recorded.' : 'Not configured — set META_APP_ID and META_APP_SECRET. Business verification happens in Meta Business Manager.' },
     { n: 2, title: 'Auth (Login with Facebook) and multi-tenancy', state: st(tokens > 0 && tenants > 0, app || tenants > 0), detail: `${tokens} stored token(s) · ${tenants} brand mapping(s). ${has(env, 'MUZEBOS_TOKEN_KEY') ? '' : 'Token storage needs MUZEBOS_TOKEN_KEY (32-byte base64).'}`.trim() },
-    { n: 3, title: 'Publishing and unified inbox', state: st(false, wa || has(env, 'META_VERIFY_TOKEN')), detail: `Webhooks at /api/webhooks/{whatsapp,instagram,messenger} verify X-Hub-Signature-256${has(env, 'META_APP_SECRET') ? '' : ' (returns not_configured until META_APP_SECRET is set)'}. Page publishing adapter: not built yet.` },
+    { n: 3, title: 'Publishing and unified inbox', state: st(false, wa || has(env, 'META_VERIFY_TOKEN')), detail: `Webhooks at /api/webhooks/{whatsapp,instagram,messenger} verify X-Hub-Signature-256${has(env, 'META_APP_SECRET') ? '' : ' (returns not_configured until META_APP_SECRET is set)'}. Page publish, IG publish and Messenger replies go through Jev and /api/dispatch${metaDryRun(env) ? ' (DRY_RUN on: nothing is sent)' : ''}.` },
     { n: 4, title: 'Catalogue and Shops', state: st(false, has(env, 'META_CATALOG_ID')), detail: has(env, 'META_CATALOG_ID') ? 'Catalogue ID present; sync is a preview only (no write adapter).' : 'Not configured — set META_CATALOG_ID. Needs catalog_management (App Review).' },
     { n: 5, title: 'Ads: read-only reporting, then writes', state: 'blocked' as StepState, detail: 'Not configured — needs ads_read / ads_management, which require Meta App Review. Ad drafts only.' },
     { n: 6, title: 'WhatsApp and AI assistant', state: st(wa), detail: wa ? 'WhatsApp Cloud env present (not a delivery claim). Replies go through Jev and /api/dispatch.' : 'Not configured — set MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN and MUZEBOS_WHATSAPP_PHONE_NUMBER_ID.' },
@@ -185,7 +186,44 @@ export function pixelChecklist(s: BusinessStore, env: Env) {
 }
 
 
+/** Per-channel send readiness. Names of missing env vars only; values never leave the server. */
+export function liveWiring(env: Env) {
+  const ch = [['whatsapp', 'WhatsApp Cloud replies'], ['instagram', 'Instagram DM replies'], ['messenger', 'Messenger (Page) replies'], ['page-post', 'Facebook Page publish'], ['ig-publish', 'Instagram publish']] as const;
+  return { dryRun: metaDryRun(env), graphVersion: GRAPH_VERSION, webhookSecret: has(env, 'META_APP_SECRET'), verifyToken: has(env, 'META_VERIFY_TOKEN'),
+    channels: ch.map(([channel, label]) => { const missing = missingEnv(channel, env); return { channel, label, state: missing.length ? 'Not configured' : metaDryRun(env) ? 'Configured · dry run' : 'Configured', missing }; }) };
+}
+
+function storedToken(s: BusinessStore, env: Env) {
+  ensureMeta(s);
+  const r = s.db.prepare('SELECT * FROM mb_meta_tokens ORDER BY createdAt DESC LIMIT 1').get() as { id: string; sealed: string } | undefined;
+  if (!r) throw new BusinessError('Not configured — connect with Login with Facebook first', 424);
+  return { id: r.id, token: openToken(r.sealed, env) };
+}
+const gget = (path: string, token: string, f: typeof fetch) => graphFetch(`https://graph.facebook.com/${GRAPH_VERSION}/${path}`, { headers: { authorization: `Bearer ${token}` } }, f);
+/** Read-only asset discovery with the stored user token (ported from MeTaPen discovery.ts). IDs and names only; Page tokens are never requested. */
+export async function discoverAssets(s: BusinessStore, env: Env, f: typeof fetch = fetch) {
+  const { id, token } = storedToken(s, env);
+  const pages = await gget('me/accounts?fields=id,name,instagram_business_account{id,username}&limit=50', token, f);
+  const biz = await gget('me/businesses?fields=id,name&limit=50', token, f).catch(() => ({ data: [] }));
+  const ads = await gget('me/adaccounts?fields=id,name,account_status&limit=50', token, f).catch(() => ({ data: [] }));
+  const arr = (x: any) => (Array.isArray(x?.data) ? x.data : []) as any[];
+  const out = { pages: arr(pages).map((p) => ({ id: String(p.id), name: String(p.name ?? ''), instagram: p.instagram_business_account ? { id: String(p.instagram_business_account.id), username: String(p.instagram_business_account.username ?? '') } : null })),
+    businesses: arr(biz).map((b) => ({ id: String(b.id), name: String(b.name ?? '') })), adAccounts: arr(ads).map((a) => ({ id: String(a.id), name: String(a.name ?? ''), status: Number(a.account_status ?? 0) })) };
+  s.transact(() => s.appendEvidence('meta.assets.discovered', id, `${out.pages.length} page(s), ${out.businesses.length} business(es), ${out.adAccounts.length} ad account(s); read-only`));
+  return out;
+}
+/** Token health via /debug_token (app token in the Authorization header, as MeTaPen does). Updates the stored expiry. */
+export async function tokenHealth(s: BusinessStore, env: Env, f: typeof fetch = fetch) {
+  if (!has(env, 'META_APP_ID') || !has(env, 'META_APP_SECRET')) throw new BusinessError('Not configured — set META_APP_ID and META_APP_SECRET', 424);
+  const { id, token } = storedToken(s, env);
+  const j = await graphFetch(`https://graph.facebook.com/${GRAPH_VERSION}/debug_token?input_token=${encodeURIComponent(token)}`, { headers: { authorization: `Bearer ${env.META_APP_ID!.trim()}|${env.META_APP_SECRET!.trim()}` } }, f);
+  const d: any = (j as any)?.data ?? {}; const exp = Number(d.expires_at) > 0 ? new Date(Number(d.expires_at) * 1000).toISOString() : null;
+  const scopes = Array.isArray(d.scopes) ? d.scopes.map(String) : [];
+  s.transact(() => { s.db.prepare('UPDATE mb_meta_tokens SET expiresAt=?, scopes=? WHERE id=?').run(exp, scopes.join(','), id); s.appendEvidence('meta.token.checked', id, `valid ${Boolean(d.is_valid)}; expires ${exp ?? 'never/unknown'}; ${scopes.length} scope(s)`); });
+  return { valid: Boolean(d.is_valid), expiresAt: exp, scopes, expiresInDays: exp ? Math.floor((Date.parse(exp) - Date.now()) / 86_400_000) : null };
+}
+
 export function metaOverview(s: BusinessStore, env: Env) {
-  return { buildOrder: buildOrder(s, env), scopes: SCOPES, appReview: 'Not submitted — Meta App Review is required for every scope above and usually takes weeks.', oauthReady: has(env, 'META_APP_ID') && has(env, 'META_OAUTH_REDIRECT_URI') && has(env, 'MUZEBOS_TOKEN_KEY'),
+  return { live: liveWiring(env), buildOrder: buildOrder(s, env), scopes: SCOPES, appReview: 'Not submitted — Meta App Review is required for every scope above and usually takes weeks.', oauthReady: has(env, 'META_APP_ID') && has(env, 'META_OAUTH_REDIRECT_URI') && has(env, 'MUZEBOS_TOKEN_KEY'),
     tenants: tenants(s), leads: leads(s), calendar: calendar(s), catalog: catalog(s, env), report: weeklyReport(s), pixel: pixelChecklist(s, env) };
 }

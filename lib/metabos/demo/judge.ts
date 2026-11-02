@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { BusinessError, type BusinessStore } from '../store';
 import { conversationFor, ensureTalk } from '../talk/core';
 import { missingEnv, type Env } from '../dispatch/adapters';
+import { metaDryRun } from '../meta/graph';
 
 export const FIXTURE_ADDRESS = '+910000000000';
 export const FIXTURE_NAME = 'Fixture lead (demo)';
@@ -19,6 +20,7 @@ export const templateDraft = (brand: string) => `Hi! Thanks for messaging ${bran
 export const DemoInput = z.discriminatedUnion('action', [
   z.object({ action: z.literal('status') }).strict(),
   z.object({ action: z.literal('fixtureLead') }).strict(),
+  z.object({ action: z.literal('realLead') }).strict(),
   z.object({ action: z.literal('draft'), conversationId: z.string().min(1).max(80), brand: z.string().trim().min(1).max(80) }).strict(),
   z.object({ action: z.literal('held'), dispatchId: z.string().uuid(), reason: z.string().max(300) }).strict(),
 ]);
@@ -28,7 +30,15 @@ export function demoStatus(s: BusinessStore, env: Env) {
   const real = s.db.prepare("SELECT COUNT(*) n FROM mb_messages m JOIN mb_conversations c ON c.id=m.conversationId WHERE c.channel='whatsapp' AND m.direction='in' AND m.kind<>'fixture'").get() as { n: number };
   const wa = missingEnv('whatsapp', env);
   return { whatsappSend: wa.length ? `Not connected — add ${wa.join(', ')}` : 'Configured (env vars present; not a delivery claim)',
-    webhook: env.META_APP_SECRET && env.META_VERIFY_TOKEN ? 'Webhook env present' : 'Webhook not configured — the demo uses a labelled fixture lead', realInbound: real.n, fixtures: fixturesEnabled(env) };
+    webhook: env.META_APP_SECRET && env.META_VERIFY_TOKEN ? 'Signed webhook ready (X-Hub-Signature-256 checked on every delivery)' : 'Webhook not configured — the demo uses a labelled fixture lead', realInbound: real.n, fixtures: fixturesEnabled(env),
+    dryRun: metaDryRun(env) ? 'DRY_RUN on — an approved send is recorded, not sent' : 'DRY_RUN off — an approved send calls WhatsApp Cloud' };
+}
+/** Latest real (webhook-delivered, signature-verified) WhatsApp inbound message, for the demo's lead step. */
+export function realLead(s: BusinessStore) {
+  ensureTalk(s);
+  const r = s.db.prepare("SELECT c.id conversationId, c.name name, c.address address, m.body body FROM mb_messages m JOIN mb_conversations c ON c.id=m.conversationId WHERE c.channel='whatsapp' AND m.direction='in' AND m.kind<>'fixture' ORDER BY m.at DESC LIMIT 1").get() as { conversationId: string; name: string | null; address: string; body: string } | undefined;
+  if (!r) throw new BusinessError('No real WhatsApp message has arrived through the webhook yet', 404);
+  return { conversationId: r.conversationId, name: r.name || `+${r.address}`, body: r.body.slice(0, 280), fixture: false };
 }
 export function fixtureLead(s: BusinessStore, actor: string, env: Env) {
   if (!fixturesEnabled(env)) throw new BusinessError('Demo fixtures are off (MUZE_DEMO_FIXTURES=off)', 403);
