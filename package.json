@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "seed": "tsx scripts/seed.ts",
+    "seed:demo-story": "tsx scripts/seed-demo-story.ts",
     "brain:docs": "tsx scripts/generate-brain-docs.ts",
     "adscout": "tsx scripts/adscout.ts",
     "lab-sync": "tsx scripts/lab-sync.ts",
