@@ -192,3 +192,12 @@ Route: `/workspace/builder/agentverse`. The layout follows two owner-supplied re
 - Cmd/Ctrl+K search. Roles: Admin (owner), Agent (manager) and Viewer (member). Onboarding shows whether each env var is present, never its value. Knowledge graph built from real records. WhatsApp sends carry `appsecret_proof` when `META_APP_SECRET` is set.
 - Footnote: "Built by codesbyfebin — Kochi".
 - Tests: `tests/agentverse.test.ts`. Browser check: `scripts/e2e-agentverse.mjs`, which includes axe and a 44px audit.
+
+
+## MuZe — Meta AI Business Operating Server (combined shell)
+MeTaBos stays the platform name. The product shell at /workspace/builder/agentverse is titled **MuZe — Meta AI Business Operating Server**. It merges AgentVerse V3 with the layout of the owner-made AI Studio app (t74; see THIRD_PARTY.md).
+- **#sanctum** (default home): the real MUSE fur simulator plus real counts (commits, Jev waiting, owner-created workspaces).
+- **#home-overview**: the HUD (Live Activity with a type/query filter, campaigns, queue probes).
+- **#fleet-console**: claw, Yao and local LLM probes, plus agent evidence from the audit chain.
+- **#sparring-pit**: links to the Arena in PRs #59/#60, which aren't in this stack, so the Arena is linked, not wrapped.
+- No mock data ships. ROAS stays "Usage unavailable" without real insights. Every send still goes Jev → /api/dispatch.

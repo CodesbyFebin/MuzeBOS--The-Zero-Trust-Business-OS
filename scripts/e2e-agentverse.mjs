@@ -19,7 +19,9 @@ const audit = async (name) => { if (!axeSrc) return; await p.addScriptTag({ cont
     return { axe: ax, blueOrPurple: [...new Set(bad)].slice(0, 8), under44: [...new Set(small)].slice(0, 8) }; }); };
 const chan = (n) => p.locator('.mb-av-side').getByRole('button', { name: new RegExp(`^${n}`) }).click();
 await p.goto(base + '/workspace/builder/agentverse'); const root = p.getByTestId('agentverse'); await root.waitFor({ timeout: 30000 });
-await p.getByText('No records yet').first().waitFor({ timeout: 15000 });
+await p.getByTestId('muze-sanctum').waitFor({ timeout: 15000 }); await p.getByText('MuZe — Meta AI Business Operating Server').first().waitFor();
+await p.waitForTimeout(2500); await p.screenshot({ path: `${out}/muze-sanctum-empty.png` }); await audit('sanctum empty');
+await chan('home-overview'); await p.getByText('No records yet').first().waitFor({ timeout: 15000 });
 assert.equal(await p.locator('.mb-av-srv').count(), 2, 'only Home + create; nothing seeded');
 for (const t of ['Ramesh', 'ewaste-leads']) assert.equal(await p.getByText(t).count(), 0);
 await p.getByTestId('av-queues').waitFor(); for (const q of ['Kafka', 'Redis', 'Qdrant']) { const t = await p.getByTestId('av-queues').locator('li', { hasText: q }).innerText(); console.log('queue', t.replace(/\n/g, ' ')); assert.match(t, /not configured|Not configured|not connected/); }
@@ -35,7 +37,7 @@ await p.getByRole('button', { name: 'Next' }).click();
 await p.getByLabel('Campaign name').fill('E2E pickup drive'); await p.getByLabel('Creative text').fill('Pickup tomorrow, DM us'); await p.getByRole('button', { name: 'Next' }).click();
 await p.getByLabel('Daily budget (₹)').fill('500'); await p.screenshot({ path: `${out}/agentverse-wizard.png` }); await audit('campaigns wizard');
 await p.getByRole('button', { name: 'Save draft for Jev' }).click(); await p.getByText('Nothing was created on Meta').waitFor();
-await chan('roas-dashboard'); await p.getByText('Usage unavailable').first().waitFor(); await audit('roas');
+await chan('roas-dashboard'); await p.getByText('Usage unavailable').first().waitFor(); console.log('roas', await p.getByTestId('av-roas-sum').innerText()); await audit('roas');
 // commit console
 await chan('commit-log'); const c = p.locator('.mb-av-commit').first(); await c.waitFor();
 const tagText = await c.locator('.mb-av-tag').innerText(); console.log('first commit tag', tagText); assert.notEqual(tagText, 'SHIPPED');
@@ -43,7 +45,11 @@ await p.getByRole('tab', { name: 'Diffs' }).click(); await p.getByText(/co-autho
 await p.screenshot({ path: `${out}/agentverse-commit-log.png` }); await audit('commit-log diffs');
 await p.getByRole('button', { name: 'Revert (Jev)' }).click(); await p.getByText(/queued as a new Jev item/).waitFor();
 await p.getByRole('tab', { name: 'Logs' }).click(); await p.screenshot({ path: `${out}/agentverse-logs.png` });
-await chan('home-overview'); await p.getByText('Agent drafted').first().waitFor(); await p.screenshot({ path: `${out}/agentverse-home.png` }); await audit('home with records');
+await chan('home-overview'); await p.locator('.mb-av-feed').getByText('Agent drafted').first().waitFor(); await p.screenshot({ path: `${out}/agentverse-home.png` }); await audit('home with records');
+await p.getByLabel('Filter').fill('zzz-no-match'); await p.getByText('No records yet').first().waitFor(); await p.getByLabel('Filter').fill('');
+await chan('fleet-console'); await p.getByText('Runners and agent activity from real records').waitFor(); await p.screenshot({ path: `${out}/muze-fleet.png` }); await audit('fleet-console');
+await chan('sparring-pit'); await p.getByRole('link', { name: 'Arena PR #59' }).waitFor(); await audit('sparring-pit');
+await chan('sanctum'); await p.getByTestId('muze-sanctum').locator('strong').first().waitFor(); await p.waitForTimeout(1500); await p.screenshot({ path: `${out}/muze-sanctum.png` }); await audit('sanctum with records');
 await chan('pending-approvals'); const pend = await p.locator('.mb-av-commit').count(); console.log('pending commits', pend); assert.ok(pend >= 2);
 // inbox not connected, onboarding, cmd+k
 await chan('unified-inbox'); await p.getByText(/Not connected/).first().waitFor(); await audit('inbox');
