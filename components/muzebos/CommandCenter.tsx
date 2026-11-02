@@ -3,7 +3,10 @@ import { useEffect, useState } from 'react';
 import { inr, postTo, SignedInAs, useMe } from './bizClient';
 type Ref = { record: string; id: string };
 type Friction = { kind: string; severity: number; title: string; detail: string; refs: Ref[]; playbook: { title: string; steps: string[]; href: string } };
+type Step = { idx: number; kind: string; state: string; title: string; detail: string; decidedBy: string | null };
+type Plan = { id: string; ask: string; status: string; items: Friction[]; steps: Step[] };
 type View = {
+  plans: Plan[];
   radar: Friction[];
   promises: { id: string; party: string; text: string; dueAt: string; state: string; evidence: { reference: string | null } | null }[];
   proofs: { id: string; reference: string; amount: number; payer: string; status: string; candidates: { invoiceId: string; number: string; customer: string; total: number }[] }[];
@@ -14,6 +17,7 @@ type View = {
 const post = postTo('/api/muzebos/command-center');
 export function CommandCenter() {
   const me = useMe(); const [v, setV] = useState<View | null>(null); const [error, setError] = useState<string | null>(null);
+  const [ask, setAsk] = useState('');
   const [pr, setPr] = useState({ party: '', text: '', due: '' }); const [pf, setPf] = useState({ reference: '', amount: '', payer: '' });
   const load = async () => { try { const r = await fetch('/api/muzebos/command-center'); const j = await r.json(); if (!r.ok) throw new Error(j.error); setV(j); } catch (e) { setError((e as Error).message); } };
   useEffect(() => { void load(); }, []);
@@ -24,6 +28,15 @@ export function CommandCenter() {
     {error && <p className="mb-alert" role="alert">{error}</p>}
     <SignedInAs me={me} />
     {v && <>
+      <section className="mb-panel" id="plan" aria-label="Ask, review, act"><h2>Ask · Review · Act</h2>
+        <form onSubmit={(e) => { e.preventDefault(); void act({ action: 'plan.ask', ask })(); setAsk(''); }}><label>Ask about your records <input value={ask} onChange={(e) => setAsk(e.target.value)} placeholder="Which invoices are overdue?" maxLength={300} /></label> <button type="submit" disabled={ask.trim().length < 3}>Make a plan</button></form>
+        <small className="mb-muted">Matched by keyword against the Friction Radar. No model is called. Approving records your decision only.</small>
+        {v.plans.map((p) => <article className="mb-order" key={p.id} data-plan={p.status}><div className="mb-row"><div><strong>{p.ask}</strong><small>{p.status} · {p.items.length} item(s)</small></div></div>
+          <ol>{p.steps.map((s) => <li key={s.idx} data-step={s.kind} data-state={s.state}><strong>{s.kind.toUpperCase()}</strong> <span className="mb-tool-status">{s.state.replace(/_/g, ' ')}</span> {s.title}: <small>{s.detail}{s.decidedBy ? ` · by ${s.decidedBy}` : ''}</small>
+            {s.kind === 'review' && s.state === 'ready' && <><ul>{p.items.map((f, i) => <li key={i}>{f.title} · <small>{f.detail} · {f.refs.map((r) => `${r.record}:${r.id.slice(0, 8)}`).join(', ')}</small></li>)}</ul><button onClick={act({ action: 'plan.review', id: p.id })}>Confirm review</button></>}
+            {s.kind === 'act' && s.state === 'awaiting_approval' && <><ul>{[...new Map(p.items.map((f) => [f.kind, f.playbook])).values()].map((pb) => <li key={pb.title}><a href={pb.href}>{pb.title}</a>: {pb.steps.join(' ')}</li>)}</ul><button onClick={act({ action: 'plan.approve', id: p.id })}>Approve</button> <button onClick={act({ action: 'plan.reject', id: p.id })}>Reject</button></>}
+          </li>)}</ol></article>)}
+      </section>
       <section className="mb-panel" id="radar" aria-label="Friction Radar"><h2>Friction Radar ({v.radar.length})</h2>
         {!v.radar.length ? <p className="mb-empty">No friction found in stored records.</p> : v.radar.map((f, i) => <article className="mb-order" key={`${f.kind}-${i}`} data-kind={f.kind}>
           <div className="mb-row"><div><strong>{f.title}</strong><small>{f.kind.replace(/_/g, ' ')} · {f.detail}</small></div></div>

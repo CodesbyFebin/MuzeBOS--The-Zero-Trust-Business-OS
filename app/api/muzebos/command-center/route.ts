@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
 import { businessAccess } from '@/lib/muzebos/http';
 import { requireMember, requirePermission } from '@/lib/muzebos/biz/accounts';
+import { askPlan, reviewPlan, decidePlan, plans } from '@/lib/muzebos/cc-plan';
 import { commandCenter, addPromise, closePromise, submitProof, decideProof, approveBundle } from '@/lib/muzebos/command-center';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -14,21 +15,29 @@ const cmd = z.discriminatedUnion('action', [
   z.object({ action: z.literal('proof.submit'), proof: z.unknown() }),
   z.object({ action: z.literal('proof.accept'), id, invoiceId: id }),
   z.object({ action: z.literal('proof.reject'), id, reason: z.string().trim().min(1).max(200) }),
+  z.object({ action: z.literal('plan.ask'), ask: z.string().max(300) }),
+  z.object({ action: z.literal('plan.review'), id }),
+  z.object({ action: z.literal('plan.approve'), id }),
+  z.object({ action: z.literal('plan.reject'), id }),
   z.object({ action: z.literal('bundle.approve'), workflowId: z.string().max(80), bundleHash: z.string().regex(/^[a-f0-9]{64}$/) }),
 ]);
+const view = (s: ReturnType<typeof businessStore>) => ({ ...commandCenter(s), plans: plans(s) });
 export async function GET(req: Request) {
-  try { businessAccess(req); const s = businessStore(); requirePermission(requireMember(s, req), 'finance.read'); return NextResponse.json(commandCenter(s)); } catch (e) { return fail(e); }
+  try { businessAccess(req); const s = businessStore(); requirePermission(requireMember(s, req), 'finance.read'); return NextResponse.json(view(s)); } catch (e) { return fail(e); }
 }
 export async function POST(req: Request) {
   try {
     businessAccess(req); const c = cmd.parse(await readJsonBounded(req)); const s = businessStore(); const me = requireMember(s, req);
     if (c.action === 'promise.add') { requirePermission(me, 'finance.read'); addPromise(s, c.promise); }
     else if (c.action === 'proof.submit') { requirePermission(me, 'finance.read'); submitProof(s, c.proof); }
+    else if (c.action === 'plan.ask') { requirePermission(me, 'finance.read'); askPlan(s, me.id, { ask: c.ask }); }
+    else if (c.action === 'plan.review') { requirePermission(me, 'finance.read'); reviewPlan(s, me.id, c.id); }
+    else if (c.action === 'plan.approve' || c.action === 'plan.reject') { requirePermission(me, 'jev.decide'); decidePlan(s, me.id, c.id, c.action === 'plan.approve'); }
     else if (c.action === 'promise.close') { requirePermission(me, 'finance.write'); closePromise(s, c.id, c.status); }
     else if (c.action === 'proof.accept') { requirePermission(me, 'finance.write'); decideProof(s, c.id, { accept: true, invoiceId: c.invoiceId }); }
     else if (c.action === 'proof.reject') { requirePermission(me, 'finance.write'); decideProof(s, c.id, { accept: false, reason: c.reason }); }
-    else { requirePermission(me, 'jev.decide'); return NextResponse.json({ results: approveBundle(s, c.workflowId, c.bundleHash), ...commandCenter(s) }); }
-    return NextResponse.json(commandCenter(s));
+    else { requirePermission(me, 'jev.decide'); return NextResponse.json({ results: approveBundle(s, c.workflowId, c.bundleHash), ...view(s) }); }
+    return NextResponse.json(view(s));
   } catch (e) { return fail(e); }
 }
 function fail(e: unknown) {
