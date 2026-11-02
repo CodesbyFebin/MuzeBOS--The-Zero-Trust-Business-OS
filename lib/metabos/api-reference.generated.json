@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 221,
+ "count": 227,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -259,6 +259,71 @@
     "POST"
    ],
    "summary": "The password manager behind Setup → Security. set no password yet → write one (reachable only on loopback, see middleware) change current + new → new hash, new session secret (other devices signed out) rotate current → new session secret only remove current → back to open-on-this-machine-only Every action that needs...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/b3/mcp",
+   "file": "app/api/b3/mcp/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/b3/pipelines",
+   "file": "app/api/b3/pipelines/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/b3/social",
+   "file": "app/api/b3/social/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/b3/swarms",
+   "file": "app/api/b3/swarms/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/b3/writing",
+   "file": "app/api/b3/writing/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": true,
@@ -1347,6 +1412,19 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/hub",
+   "file": "app/api/hub/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
    "access": "session"
   },
   {

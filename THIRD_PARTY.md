@@ -42,3 +42,11 @@ None yet.
 - Llama 3.2 is licensed under the Llama 3.2 Community License, Copyright © Meta Platforms, Inc. All Rights Reserved. Use must follow the Llama Acceptable Use Policy (llama.com/llama3_2/use-policy).
 - "Built with Llama" is shown on /help and in AI settings.
 - Sarvam-Translate is GPL-3.0. It may only run as a separate local service; none of its code is copied here.
+
+## Design prototypes reviewed (Agent Hub, MUSE companion) — 2026-11-02
+
+| Source | What it contained | Licence finding | What shipped |
+|---|---|---|---|
+| `designs/muse-companion.html` | Bundled **three.js** (header: "Copyright 2010-2021 Three.js Authors", MIT) plus a "Ported GPU-fur creature engine" with no author or licence. It also pulled Google Fonts and called `api.meta.ai` / `127.0.0.1`. Its fleet console printed random lines. | three.js is MIT, but it is **not used**. The fur engine's origin is unclear, so **none of its code was copied**. | `components/metabos/muse/MuseAvatar.tsx` is a clean-room Canvas2D avatar written from the visual idea only (fur, coat, listening/speaking states). It has no WebGL, no three.js and no network calls. The fake console was replaced by panels that read real APIs. |
+| `designs/muse-mascot.png` | A mascot image used as a visual reference. | Supplied by the owner. | Not bundled. It was used only as a reference for the avatar's shape and colours. |
+| `designs/agent-command-center.*` | A Discord-style layout with jsdelivr Geist fonts, `alert()` stubs and mock workspaces and people. | Owner's prototype. | Only the layout idea was used. `components/metabos/hub/AgentHub.tsx` was rewritten from scratch on real swarm, draft and Jev data, with no CDN fonts and no mock data. Meta and Discord colours were replaced with the MeTaBos palette. |

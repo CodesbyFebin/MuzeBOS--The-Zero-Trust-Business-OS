@@ -176,3 +176,12 @@ Routing: rules → local 1B (classify, short replies) → Meta `muse-spark-1.3-c
 
 ## Voice (muse-voice-transcribe-1.0)
 Uses the same `MODEL_API_KEY` (runtime only). Without it, `/api/voice` audio returns "Not connected" and the browser falls back to the Web Speech API. Typed commands always work. STT price is not verified, so it is logged as cost unknown.
+
+## Agent runs: Yao and the local Claw swarm
+| Env | Example | Use |
+|---|---|---|
+| `MUZEBOS_YAO_BASE_URL` | `http://127.0.0.1:5099/v1` | Yao OpenAPI base. Each agent card runs as assistant `metabos.<card-id>`. |
+| `MUZEBOS_YAO_ACCESS_TOKEN` | runtime only, never committed | A Yao OAuth access token from an existing Yao user's login. Without it, the status reads "Not connected". |
+| `MUZEBOS_CLAW_DIR` | `/workspace/claw-local` | A folder with an executable `claw`. Uses local Llama 3.2 3B, with Meta fallback only inside claw's $5 cap. |
+
+Every run is saved as a Brain draft, checked by Llama Guard (`MUZEBOS_LOCAL_GUARD_URL`), and then waits in Jev. Nothing is sent.

@@ -2,7 +2,7 @@
 
 Generated from lib/metabos/registry.ts. Do not edit by hand. "Available" means a MeTaBos operation works locally and has the listed tests; it is not a production-readiness claim. "Needs credentials" means local records work but the provider action is not wired.
 
-Totals: available 168, existing 23, needs-credentials 43, planned 0, blocked 0 (234 pages).
+Totals: available 194, existing 7, needs-credentials 43, planned 0, blocked 0 (244 pages).
 
 ## 01 Mission Control (/)
 
@@ -18,7 +18,7 @@ Totals: available 168, existing 23, needs-credentials 43, planned 0, blocked 0 (
 | POS Terminal | /workspace/orders/pos | available | member | tests/metabos-modules-a.test.ts; tests/metabos-issuance.test.ts; scripts/metabos-crawl-routes.mjs |
 | Bookings & Appointments | /workspace/orders/bookings | available | member | tests/metabos-modules-a.test.ts; tests/metabos-issuance.test.ts; scripts/metabos-crawl-routes.mjs |
 | CRM Profiles | /workspace/orders/customers | available | member | tests/metabos-modules-a.test.ts; tests/metabos-issuance.test.ts; scripts/metabos-crawl-routes.mjs |
-| Deals & Pipeline | /workspace/orders/deals | existing | member |  |
+| Deals & Pipeline | /workspace/orders/deals | available | member | tests/metabos-modules-a.test.ts; tests/metabos-issuance.test.ts; scripts/metabos-crawl-routes.mjs |
 | Cart Abandonment | /workspace/orders/abandoned-carts | needs-credentials | member | External provider account and credentials; Provider dispatch adapter (not built; items stay queued) |
 | Returns & Refunds | /workspace/orders/returns | available | member | tests/metabos-modules-a.test.ts; tests/metabos-issuance.test.ts; scripts/metabos-crawl-routes.mjs |
 | Subscription Scheduler | /workspace/orders/subscriptions | available | member | tests/metabos-modules-a.test.ts; tests/metabos-issuance.test.ts; scripts/metabos-crawl-routes.mjs |
@@ -124,6 +124,7 @@ Totals: available 168, existing 23, needs-credentials 43, planned 0, blocked 0 (
 | Online Store Builder | /workspace/growth/store | available | member | tests/metabos-analytics.test.ts; scripts/metabos-crawl-routes.mjs |
 | Website Builder | /workspace/growth/website | available | member | tests/metabos-analytics.test.ts; scripts/metabos-crawl-routes.mjs |
 | Analytics & Funnel | /workspace/growth/analytics | available | member | tests/metabos-analytics.test.ts; scripts/metabos-crawl-routes.mjs |
+| Social Post Queue | /workspace/growth/social | available | member | tests/metabos-analytics.test.ts; scripts/metabos-crawl-routes.mjs |
 | SEO & Content | /workspace/growth/seo | available | member | tests/metabos-analytics.test.ts; scripts/metabos-crawl-routes.mjs |
 | Referrals & Loyalty | /workspace/growth/loyalty | available | member | tests/metabos-analytics.test.ts; scripts/metabos-crawl-routes.mjs |
 | Email Marketing | /workspace/growth/email | needs-credentials | member | External provider account and credentials; Provider dispatch adapter (not built; items stay queued) |
@@ -145,10 +146,11 @@ Totals: available 168, existing 23, needs-credentials 43, planned 0, blocked 0 (
 | Page | Route | Status | Permission | Evidence / dependencies |
 |---|---|---|---|---|
 | Staff Management | /workspace/operations/staff | available | member | scripts/metabos-crawl-routes.mjs |
-| Tasks & Goals | /workspace/operations/tasks | existing | member |  |
+| Tasks & Goals | /workspace/operations/tasks | available | member | scripts/metabos-crawl-routes.mjs |
 | Projects | /workspace/operations/projects | available | member | scripts/metabos-crawl-routes.mjs |
 | Attendance & Leave | /workspace/operations/attendance | available | member | scripts/metabos-crawl-routes.mjs |
 | Time Tracker | /workspace/operations/time | available | member | scripts/metabos-crawl-routes.mjs |
+| Pipelines | /workspace/operations/pipelines | available | member | scripts/metabos-crawl-routes.mjs |
 | Meeting Notes | /workspace/operations/meetings | available | member | scripts/metabos-crawl-routes.mjs |
 | SOP Library | /workspace/operations/sops | available | member | scripts/metabos-crawl-routes.mjs |
 | Vendors & Purchases | /workspace/operations/vendors | available | member | scripts/metabos-crawl-routes.mjs |
@@ -171,9 +173,11 @@ Totals: available 168, existing 23, needs-credentials 43, planned 0, blocked 0 (
 |---|---|---|---|---|
 | Media & Assets Gallery | /workspace/builder/media | available | member | scripts/metabos-crawl-routes.mjs |
 | Content Block Studio | /workspace/builder/blocks | available | member | scripts/metabos-crawl-routes.mjs |
-| Theme Customizer | /workspace/builder/themes | existing | member |  |
+| Theme Customizer | /workspace/builder/themes | available | member | scripts/metabos-crawl-routes.mjs |
 | Form & Intake Constructor | /workspace/builder/forms | available | member | scripts/metabos-crawl-routes.mjs |
 | Asset Transform Pipeline | /workspace/builder/transforms | available | member | scripts/metabos-crawl-routes.mjs |
+| Agent Hub | /workspace/builder/agent-hub | available | member | scripts/metabos-crawl-routes.mjs |
+| Claw swarms | /workspace/builder/swarms | available | member | scripts/metabos-crawl-routes.mjs |
 | CDN Controller | /workspace/builder/cdn | needs-credentials | member | External provider account and credentials; Provider dispatch adapter (not built; items stay queued) |
 | Deep Linking Registry | /workspace/builder/deep-links | available | member | scripts/metabos-crawl-routes.mjs |
 | Localization Matrix | /workspace/builder/localization | available | member | scripts/metabos-crawl-routes.mjs |
@@ -195,24 +199,27 @@ Totals: available 168, existing 23, needs-credentials 43, planned 0, blocked 0 (
 | Page | Route | Status | Permission | Evidence / dependencies |
 |---|---|---|---|---|
 | AI Assistant | /workspace/brain/assistant | existing | member |  |
-| Voice HQ | /workspace/brain/voice | needs-credentials | member | External provider account and credentials; Provider dispatch adapter (not built; items stay queued) |
+| Voice HQ | /workspace/brain/voice-hq | needs-credentials | member | External provider account and credentials; Provider dispatch adapter (not built; items stay queued) |
 | Evidence & Audit | /workspace/brain/evidence | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Prompt Library | /workspace/brain/employees | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Model Router | /workspace/brain/models | needs-credentials | member | External provider account and credentials; Provider dispatch adapter (not built; items stay queued) |
+| Safe Outputs | /workspace/brain/safe-outputs | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Founder Templates | /workspace/brain/templates | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | AI Runtime | /workspace/brain/runtime | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Missions | /workspace/brain/missions | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Goals & Check-ins | /workspace/brain/goals | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
+| Voice Assistant | /workspace/brain/voice | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Chief of Staff | /workspace/brain/chief-of-staff | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Department Walls | /workspace/brain/department-walls | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Layered Memory | /workspace/brain/memory | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Jev Approvals & Activity | /workspace/brain/activity | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Agents | /workspace/brain/agents | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
-| Tool Registry | /workspace/brain/tools | existing | member |  |
+| Tool Registry | /workspace/brain/tools | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Memory Graph | /workspace/brain/memory-graph | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Run Summary & Evidence | /workspace/brain/decisions | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Validation Gate | /workspace/brain/validation | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Approval Desk | /workspace/brain/approvals | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
+| Writing library | /workspace/brain/writing | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Commit Executor | /workspace/brain/executor | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Observer Ledger | /workspace/brain/runs | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
 | Evaluation Harness | /workspace/brain/evals | available | member | tests/metabos-brain-templates.test.ts; scripts/metabos-crawl-routes.mjs |
@@ -248,17 +255,18 @@ Totals: available 168, existing 23, needs-credentials 43, planned 0, blocked 0 (
 | Encryption Configuration | /workspace/foundation/encryption | available | member | scripts/metabos-crawl-routes.mjs |
 | Backup & Snapshot Ledger | /workspace/foundation/backups | available | member | scripts/metabos-crawl-routes.mjs |
 | Device Passkey Registrar | /workspace/foundation/passkeys | needs-credentials | member | External provider account and credentials; Provider dispatch adapter (not built; items stay queued) |
-| Settings & Sovereignty | /workspace/foundation/sovereignty | existing | member |  |
+| Settings & Sovereignty | /workspace/foundation/sovereignty | available | member | scripts/metabos-crawl-routes.mjs |
 
 ## 11 System (/workspace/system)
 
 | Page | Route | Status | Permission | Evidence / dependencies |
 |---|---|---|---|---|
-| Integrations & Adapters | /workspace/system/sources | existing | member |  |
+| Integrations & Adapters | /workspace/system/sources | available | member | scripts/metabos-crawl-routes.mjs |
 | Workflows Broker | /workspace/system/broker | available | member | scripts/metabos-crawl-routes.mjs |
 | Database Migration Ledger | /workspace/system/migrations | available | member | scripts/metabos-crawl-routes.mjs |
 | API Gateway & Rate Limiter | /workspace/system/gateway | available | member | scripts/metabos-crawl-routes.mjs |
 | Task Queue Orchestrator | /workspace/system/queues | available | member | scripts/metabos-crawl-routes.mjs |
+| Accessibility Self-Audit | /workspace/system/accessibility | available | member | scripts/metabos-crawl-routes.mjs |
 | Webhook Listener Pool | /workspace/system/webhooks | available | member | scripts/metabos-crawl-routes.mjs |
 | Telemetry & Logs | /workspace/system/logs | available | member | scripts/metabos-crawl-routes.mjs |
 | Health Heartbeat | /workspace/system/health | available | member | scripts/metabos-crawl-routes.mjs |
@@ -279,7 +287,7 @@ Totals: available 168, existing 23, needs-credentials 43, planned 0, blocked 0 (
 
 | Page | Route | Status | Permission | Evidence / dependencies |
 |---|---|---|---|---|
-| Workflow Canvas | /workflows | existing | member |  |
+| Workflow Canvas | /workspace/workflows/canvas | available | member | scripts/metabos-crawl-routes.mjs |
 
 ## 13 Evidence (/workspace/evidence)
 
@@ -292,38 +300,40 @@ Totals: available 168, existing 23, needs-credentials 43, planned 0, blocked 0 (
 
 | Page | Route | Status | Permission | Evidence / dependencies |
 |---|---|---|---|---|
-| Application settings | /workspace/settings/application-settings | existing | member |  |
-| Merchant profile | /workspace/settings/merchant-profile | existing | member |  |
-| Connections | /workspace/settings/connections | existing | member |  |
+| Application settings | /workspace/settings/application-settings | available | member | scripts/metabos-crawl-routes.mjs |
+| Merchant profile | /workspace/settings/merchant-profile | available | member | scripts/metabos-crawl-routes.mjs |
+| Connections | /workspace/settings/connections | available | member | scripts/metabos-crawl-routes.mjs |
+| Language | /workspace/settings/language | available | member | scripts/metabos-crawl-routes.mjs |
 
 ## 15 Upgrade (/workspace/upgrade)
 
 | Page | Route | Status | Permission | Evidence / dependencies |
 |---|---|---|---|---|
-| Inspect usage | /workspace/upgrade/inspect-usage | existing | member |  |
+| Inspect usage | /workspace/upgrade/inspect-usage | available | member | scripts/metabos-crawl-routes.mjs |
 
 ## 16 Help & Support (/workspace/support)
 
 | Page | Route | Status | Permission | Evidence / dependencies |
 |---|---|---|---|---|
 | Customer inbox | /workspace/support/customer-inbox | existing | member |  |
-| Setup checklist | /workspace/support/setup-checklist | existing | member |  |
-| Project roadmap | /workspace/support/project-roadmap | existing | member |  |
+| Setup checklist | /workspace/support/setup-checklist | available | member | scripts/metabos-crawl-routes.mjs |
+| Project roadmap | /workspace/support/project-roadmap | available | member | scripts/metabos-crawl-routes.mjs |
 
 ## 17 API & Webhooks (/workspace/developer)
 
 | Page | Route | Status | Permission | Evidence / dependencies |
 |---|---|---|---|---|
-| Integration directory | /workspace/developer/integration-directory | existing | member |  |
-| System blueprint | /workspace/developer/system-blueprint | existing | member |  |
+| Integration directory | /workspace/developer/integration-directory | available | member | scripts/metabos-crawl-routes.mjs |
+| System blueprint | /workspace/developer/system-blueprint | available | member | scripts/metabos-crawl-routes.mjs |
 | Meta webhook status | /workspace/developer/meta-webhooks | available | member | scripts/metabos-crawl-routes.mjs |
 | API routes | /workspace/developer/api-reference | available | member | scripts/metabos-crawl-routes.mjs |
+| GST MCP Server | /workspace/developer/mcp | available | member | scripts/metabos-crawl-routes.mjs |
 
 ## 18 Account (/workspace/account)
 
 | Page | Route | Status | Permission | Evidence / dependencies |
 |---|---|---|---|---|
-| Operator security | /workspace/account/operator-security | existing | member |  |
+| Operator security | /workspace/account/operator-security | available | member | scripts/metabos-crawl-routes.mjs |
 | Sign in / manage session | /workspace/account/sign-in-manage-session | existing | member |  |
 | Sign in | /workspace/account/sign-in | available | member | scripts/metabos-crawl-routes.mjs |
 | People and Roles | /workspace/account/people | available | member | scripts/metabos-crawl-routes.mjs |

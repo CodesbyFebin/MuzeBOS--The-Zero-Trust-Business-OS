@@ -47,6 +47,12 @@ const ROUTES: RouteEntry[] = [
   { route: 'metabos/founder', load: () => import('@/app/api/metabos/founder/route'), url: 'http://localhost/api/metabos/founder' },
   { route: 'analytics', load: () => import('@/app/api/analytics/route'), url: 'http://localhost/api/analytics' },
   { route: 'evidence', load: () => import('@/app/api/evidence/route'), url: 'http://localhost/api/evidence' },
+  { route: 'b3/mcp', load: () => import('@/app/api/b3/mcp/route'), url: 'http://localhost/api/b3/mcp' },
+  { route: 'b3/pipelines', load: () => import('@/app/api/b3/pipelines/route'), url: 'http://localhost/api/b3/pipelines' },
+  { route: 'b3/social', load: () => import('@/app/api/b3/social/route'), url: 'http://localhost/api/b3/social' },
+  { route: 'b3/swarms', load: () => import('@/app/api/b3/swarms/route'), url: 'http://localhost/api/b3/swarms' },
+  { route: 'b3/writing', load: () => import('@/app/api/b3/writing/route'), url: 'http://localhost/api/b3/writing' },
+  { route: 'hub', load: () => import('@/app/api/hub/route'), url: 'http://localhost/api/hub' },
   { route: 'workflow-runs', load: () => import('@/app/api/workflow-runs/route'), url: 'http://localhost/api/workflow-runs' },
   { route: 'business', load: () => import('@/app/api/business/route'), url: 'http://localhost/api/business' },
   { route: 'agents', load: () => import('@/app/api/agents/route'), url: 'http://localhost/api/agents' },
@@ -185,7 +191,7 @@ function discoverGetRoutes(dir: string, base = ''): string[] {
 }
 
 /** Routes that hold business records: a signed-out GET must be refused (401), never 200. */
-const MEMBER_ONLY = new Set(['metabos/arena', 'metabos/hubs/[hub]', 'metabos/command-center', 'metabos/overdue', 'ai', 'ai/budget', 'ai/local', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops', 'data']);
+const MEMBER_ONLY = new Set(['metabos/arena', 'metabos/hubs/[hub]', 'metabos/command-center', 'metabos/overdue', 'ai', 'ai/budget', 'ai/local', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops', 'data', 'b3/mcp', 'b3/pipelines', 'b3/social', 'b3/swarms', 'b3/writing', 'hub']);
 describe('platform smoke — every GET API route answers 200 with JSON', () => {
   test.each(ROUTES)('GET /api/$route', async ({ route, load, url, params }) => {
     const mod = await load();
