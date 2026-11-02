@@ -5,7 +5,9 @@
 import { useCallback, useEffect, useState } from 'react';
 type Step = { n: number; title: string; state: string; detail: string };
 type Lead = { conversationId: string; channel: string; address: string; name: string | null; lastInboundAt: string | null; stage: string; followUpAt: string | null; note: string | null };
-type Data = { buildOrder: Step[]; scopes: { scope: string; use: string; review: boolean }[]; appReview: string; oauthReady: boolean;
+type Live = { dryRun: boolean; graphVersion: string; webhookSecret: boolean; verifyToken: boolean; channels: { channel: string; label: string; state: string; missing: string[] }[] };
+type Assets = { pages: { id: string; name: string; instagram: { id: string; username: string } | null }[]; businesses: { id: string; name: string }[]; adAccounts: { id: string; name: string; status: number }[] };
+type Data = { live: Live; buildOrder: Step[]; scopes: { scope: string; use: string; review: boolean }[]; appReview: string; oauthReady: boolean;
   tenants: Record<string, string | null>[]; leads: Lead[];
   calendar: { drafts: { id: string; product: string; body: string; createdAt: string }[]; bestTimes: { day: number; hourUtc: number; posts: number; engagementRate: number }[]; insightsRows: number };
   catalog: { status: string; items: { retailer_id: string; title: string; price: string; availability: string }[] };
@@ -21,6 +23,7 @@ const post = async (action: string, input: unknown) => { const r = await fetch('
 export function MetaIntegration() {
   const [d, setD] = useState<Data | null>(null); const [err, setErr] = useState(''); const [note, setNote] = useState(''); const [tab, setTab] = useState<(typeof TABS)[number]>('setup');
   const [scopes, setScopes] = useState<string[]>([]); const [replies, setReplies] = useState<Record<string, string>>({}); const [busy, setBusy] = useState(false);
+  const [assets, setAssets] = useState<Assets | null>(null); const [health, setHealth] = useState<string>('');
   const [map, setMap] = useState<Record<string, Record<string, string>>>({});
   const load = useCallback(() => { fetch('/api/meta').then(async (r) => { const j = await r.json(); if (!r.ok) throw new Error(j.error); setD(j); }).catch((e) => setErr(String(e.message ?? e))); }, []);
   useEffect(() => { load(); }, [load]);
@@ -33,6 +36,16 @@ export function MetaIntegration() {
     {!d ? <p className="mb-muted">Loading…</p> : <div role="tabpanel" aria-label={LABEL[tab]}>
       {tab === 'setup' && <>
         <ol className="mb-av-cards" data-testid="meta-build-order">{d.buildOrder.map((s) => <li key={s.n}><span><span className="mb-av-tag" data-tone={tone(s.state)}>{s.state.replace('_', ' ')}</span> <strong>{s.n}. {s.title}</strong></span><span className="mb-muted">{s.detail}</span></li>)}</ol>
+        <h2 className="mb-hub-group">Live wiring</h2>
+        <p className="mb-muted" data-testid="meta-dry-run">{d.live.dryRun ? 'DRY_RUN is on: approved Meta sends are recorded as evidence and nothing is sent. Set MUZEBOS_META_DRY_RUN=0 on the server to send.' : 'DRY_RUN is off: approved Meta sends call the Graph API.'} Graph API {d.live.graphVersion}. Webhook signature secret: {d.live.webhookSecret ? 'set' : 'Not configured'}; verify token: {d.live.verifyToken ? 'set' : 'Not configured'}.</p>
+        <ul className="mb-av-cards" data-testid="meta-live-channels">{d.live.channels.map((c) => <li key={c.channel}><span><span className="mb-av-tag" data-tone={c.missing.length ? 'idle' : d.live.dryRun ? 'warn' : 'ok'}>{c.state}</span> <strong>{c.label}</strong></span><span className="mb-muted">{c.missing.length ? `Set ${c.missing.join(', ')}` : 'Every send needs Jev approval, then /api/dispatch.'}</span></li>)}</ul>
+        <div className="mb-av-form"><button type="button" disabled={busy} onClick={() => run(async () => setAssets(await post('discover', {})), 'Assets read')}>Discover assets</button>
+          <button type="button" disabled={busy} onClick={() => run(async () => { const h = await post('tokenHealth', {}); setHealth(`${h.valid ? 'Valid' : 'Not valid'} · expires ${h.expiresAt ? h.expiresAt.slice(0, 10) : 'unknown'} · ${h.scopes.length} scope(s)`); }, 'Token checked')}>Check token</button>
+          {health && <p className="mb-muted" role="status">{health}</p>}</div>
+        {assets && (assets.pages.length + assets.businesses.length + assets.adAccounts.length === 0 ? empty('No assets returned for this token.') : <ul className="mb-av-cards" data-testid="meta-assets">
+          {assets.pages.map((p) => <li key={`p${p.id}`}><strong>Page · {p.name}</strong><span className="mb-muted">{p.id}{p.instagram ? ` · Instagram @${p.instagram.username} (${p.instagram.id})` : ''}</span></li>)}
+          {assets.businesses.map((b) => <li key={`b${b.id}`}><strong>Business · {b.name}</strong><span className="mb-muted">{b.id}</span></li>)}
+          {assets.adAccounts.map((a) => <li key={`a${a.id}`}><strong>Ad account · {a.name}</strong><span className="mb-muted">{a.id} · status {a.status}</span></li>)}</ul>)}
         <h2 className="mb-hub-group">Login with Facebook — permissions</h2><p className="mb-muted">{d.appReview}</p>
         <fieldset className="mb-av-form"><legend>Scopes to request</legend>{d.scopes.map((s) => <label key={s.scope} className="mb-av-check"><input type="checkbox" checked={scopes.includes(s.scope)} onChange={(e) => setScopes(e.target.checked ? [...scopes, s.scope] : scopes.filter((x) => x !== s.scope))} /><code>{s.scope}</code> <span className="mb-muted">{s.use}{s.review ? ' · App Review required' : ''}</span></label>)}
           <button type="button" disabled={busy || !d.oauthReady || scopes.length === 0} onClick={() => run(async () => { const r = await post('oauthStart', { scopes }); window.location.assign(r.url); }, 'Opening Meta login…')}>Login with Facebook</button>

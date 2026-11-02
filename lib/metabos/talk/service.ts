@@ -89,6 +89,15 @@ export function resume(s: BusinessStore, memberId: string, conversationId: strin
 // ---------- Inbound ingest ----------
 export type Inbound = { channel: TalkChannel; from: string; name?: string | null; externalId: string; kind: string; text: string; mediaId?: string | null; at: string; echo?: boolean };
 /** Pull messages out of a verified Meta webhook body (WhatsApp Cloud and Instagram messaging shapes). */
+/** Lead Ads webhook (Page subscription, field "leadgen"): ids only. Lead fields need leads_retrieval and are not fetched. */
+export function parseLeadgen(body: any): { leadgenId: string; formId: string | null; pageId: string | null }[] {
+  const out: { leadgenId: string; formId: string | null; pageId: string | null }[] = [];
+  for (const e of Array.isArray(body?.entry) ? body.entry : []) for (const ch of Array.isArray(e?.changes) ? e.changes : []) {
+    const v = ch?.value; if (ch?.field !== 'leadgen' || !v?.leadgen_id) continue;
+    out.push({ leadgenId: String(v.leadgen_id), formId: v.form_id ? String(v.form_id) : null, pageId: v.page_id ? String(v.page_id) : null });
+  }
+  return out;
+}
 export function parseMetaWebhook(source: string, body: any): Inbound[] {
   const out: Inbound[] = [];
   for (const e of Array.isArray(body?.entry) ? body.entry : []) {
@@ -100,6 +109,12 @@ export function parseMetaWebhook(source: string, body: any): Inbound[] {
         const text = kind === 'text' ? String(m.text?.body ?? '') : kind === 'button' ? String(m.button?.text ?? '') : kind === 'interactive' ? String(m.interactive?.button_reply?.title ?? m.interactive?.list_reply?.title ?? '') : String(m[kind]?.caption ?? '');
         out.push({ channel: 'whatsapp', from: String(m.from), name: names.get(String(m.from)) || null, externalId: String(m.id), kind, text, mediaId: m[kind]?.id ? String(m[kind].id) : null, at: m.timestamp ? iso(Number(m.timestamp) * 1000) : iso() });
       }
+    }
+    // Messenger (Page) DMs: same messaging[] shape as Instagram. Parsing ported from the owner's MeTaPen agent (6acfff7).
+    if (source === 'messenger') for (const m of Array.isArray(e?.messaging) ? e.messaging : []) {
+      const msg = m?.message; if (!msg?.mid || msg.is_echo) continue;
+      const att = Array.isArray(msg.attachments) ? msg.attachments[0] : null;
+      out.push({ channel: 'messenger', from: String(m.sender?.id), externalId: String(msg.mid), kind: att ? String(att.type ?? 'attachment') : 'text', text: String(msg.text ?? ''), mediaId: att?.payload?.url ? String(att.payload.url) : null, at: m.timestamp ? iso(Number(m.timestamp)) : iso() });
     }
     if (source === 'instagram') for (const m of Array.isArray(e?.messaging) ? e.messaging : []) {
       const msg = m?.message; if (!msg?.mid) continue;

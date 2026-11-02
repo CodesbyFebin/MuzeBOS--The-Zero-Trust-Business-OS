@@ -12,7 +12,7 @@ export const META_PRODUCTS = [
 ] as const;
 export type ProductName = (typeof META_PRODUCTS)[number][1];
 /** Which products a dispatch channel depends on. Channels not listed are not Meta products. */
-export const CHANNEL_PRODUCTS: Record<string, ProductName[]> = { whatsapp: ['WhatsApp Business Platform', 'Graph API'], instagram: ['Messenger API for Instagram', 'Graph API'] };
+export const CHANNEL_PRODUCTS: Record<string, ProductName[]> = { whatsapp: ['WhatsApp Business Platform', 'Graph API'], instagram: ['Messenger API for Instagram', 'Graph API'], messenger: ['Messenger Platform', 'Graph API'], 'page-post': ['Graph API'], 'ig-publish': ['Graph API'] };
 const ensure = (s: BusinessStore) => s.db.exec('CREATE TABLE IF NOT EXISTS mb_meta_status_marks(product TEXT PRIMARY KEY, state TEXT NOT NULL, note TEXT, markedBy TEXT NOT NULL, markedAt TEXT NOT NULL)');
 type Mark = { product: string; state: 'degraded' | 'outage'; note: string | null; markedBy: string; markedAt: string };
 export function metaStatus(s: BusinessStore) {
