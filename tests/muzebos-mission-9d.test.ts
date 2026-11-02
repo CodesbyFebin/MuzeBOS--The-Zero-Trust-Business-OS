@@ -56,7 +56,7 @@ describe('slice 9d Mission Control layouts', () => {
 
 describe('slice 9d no registry route renders FeatureStub', () => {
   it(`all ${ALL_FEATURES.length} registry pages render a workspace or redirect, never .mb-stub`, async () => {
-    expect(ALL_FEATURES.length).toBe(232);
+    expect(ALL_FEATURES.length).toBe(234);
     const stubs: string[] = [];
     for (const f of ALL_FEATURES) {
       const dedicated = f.route === '/' ? 'app/page.tsx' : `app${f.route}/page.tsx`;
