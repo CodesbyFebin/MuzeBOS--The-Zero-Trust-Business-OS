@@ -26,6 +26,7 @@ export function Board() {
   return <div data-testid="bos-board"><h2>Board</h2>
     <p className="mb-muted">Each tile runs a real check on this server. Refreshes every {POLL_MS / 1000}s; checks are cached briefly. {at && <>Last check <time>{new Date(at).toLocaleTimeString()}</time>.</>}</p>
     <div className="mb-board-bar">{edit ? <><button type="button" onClick={save}>Save layout</button><button type="button" onClick={() => { setEdit(false); loadBoard(); }}>Cancel</button></> : <button type="button" onClick={() => setEdit(true)}>Edit board</button>}<button type="button" onClick={poll}>Check now</button>{msg && <span role="status">{msg}</span>}</div>
+    <Summary st={st} defs={defs} />
     {err && <p role="alert" className="mb-bos-err">Could not load: {err}</p>}
     {tiles.length === 0 && !err && <p className="mb-muted">Loading board…</p>}
     <ul className="mb-board-grid" aria-label="Service tiles">{shown.map((t, i) => { const s = st[t.id]; const d = defs.find((x) => x.id === t.id);
@@ -45,4 +46,15 @@ export function Board() {
         </div>}
       </li>; })}</ul>
   </div>;
+}
+
+/** Honest version of the reference's "28/28 systems wired": counts by real status, plus the model substrate (AI tiles). */
+function Summary({ st, defs }: { st: Record<string, Status>; defs: Def[] }) {
+  const all = Object.values(st); if (all.length === 0) return null;
+  const n = (k: Status['status']) => all.filter((t) => t.status === k).length;
+  const models = defs.filter((d) => d.group === 'AI');
+  return <section className="mb-board-sum" aria-label="Board summary" data-testid="board-summary">
+    <p><strong data-testid="systems-ok">{n('ok')} of {all.length}</strong> checks ok · {n('dry run')} dry run · {n('down')} down · {n('not configured')} not configured</p>
+    <p className="mb-board-models">Model substrate: {models.map((d) => <span key={d.id} className="mb-board-pill" data-status={st[d.id]?.status}>{d.name}: {st[d.id]?.status ?? 'checking'}</span>)}</p>
+  </section>;
 }

@@ -806,3 +806,7 @@ body.mb-muze-full .mb-bos-rail,body.mb-muze-full .mb-console{display:none}
 .mb-board-lat{color:#FF2A2A;font-variant-numeric:tabular-nums}
 .mb-board-tile summary{min-height:44px;display:flex;align-items:center;cursor:pointer;color:#ccc}
 .mb-board-edit{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center}
+/* Board summary + Issues (feat/hackathon-ready) */
+.mb-board-sum{border:1px solid #FF2A2A;background:#0A0A0A;padding:.6rem .8rem;margin:.6rem 0}.mb-board-models{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.mb-issues-form{display:flex;flex-wrap:wrap;gap:.6rem;align-items:end}.mb-issues-form input,.mb-issues-form select,.mb-issues select{min-height:44px;background:#0A0A0A;color:#fff;border:1px solid #FF2A2A}
+.mb-issues-form button{min-height:44px;min-width:44px;background:#FF2A2A;color:#0A0A0A;border:0;font-weight:700}.mb-issues{list-style:none;padding:0}.mb-issues li{border-bottom:1px solid #3a0d0d;padding:.5rem 0;display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}

@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 237,
+ "count": 238,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -410,6 +410,20 @@
     "POST"
    ],
    "summary": "Records the operator's decision on one piece of agent work: approve, dismiss, or leave it open, with the ability to undo back into the queue. POST { id, decision, decidedRevision?, note? } → record it POST { id, decision: null } → undo, back to the open queue POST { items: [{id, decidedRevision?}], decision } → the ...",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/board/issues",
+   "file": "app/api/board/issues/route.ts",
+   "methods": [
+    "GET",
+    "POST",
+    "PATCH"
+   ],
+   "summary": "Issues assigned to agents, plus the agents that can take one.",
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": true,
