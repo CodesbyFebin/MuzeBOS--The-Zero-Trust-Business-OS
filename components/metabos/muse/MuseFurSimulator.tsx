@@ -13,9 +13,9 @@ import { chooseTier, downgrade, probeCaps, type Tier } from '@/lib/metabos/fur-s
 import type { MuseController, MuseStats } from '@/lib/metabos/fur-sim/controller';
 
 export type MuseFurHandle = Omit<MuseController, 'dispose' | 'setParams' | 'setGpu' | 'stats'> & { flipCoat(): CoatPresetId; coat(): CoatPresetId };
-type Props = { state: MuseState; coat: CoatPresetId; onCoatChange(id: CoatPresetId): void; size?: number };
+type Props = { state: MuseState; coat: CoatPresetId; onCoatChange(id: CoatPresetId): void; size?: number; compact?: boolean };
 
-export const MuseFurSimulator = forwardRef<MuseFurHandle, Props>(function MuseFurSimulator({ state, coat, onCoatChange, size = 320 }, ref) {
+export const MuseFurSimulator = forwardRef<MuseFurHandle, Props>(function MuseFurSimulator({ state, coat, onCoatChange, size = 320, compact = false }, ref) {
   const canvas = useRef<HTMLCanvasElement>(null); const video = useRef<HTMLVideoElement>(null);
   const eng = useRef<MuseController | null>(null);
   const [tier, setTier] = useState<Tier | null>(null); const [reason, setReason] = useState('');
@@ -65,13 +65,13 @@ export const MuseFurSimulator = forwardRef<MuseFurHandle, Props>(function MuseFu
   const boopCount = stats?.boops ?? boops2d;
 
   return <div className="mb-fur" data-testid="muse-fur" data-tier={tier ?? 'loading'} data-env={env} data-coat={coat} data-fps={stats?.fps ?? ''} data-boops={boopCount} data-paused={stats?.paused ? 'true' : 'false'} data-downgrades={measured}>
-    <nav className="mb-fur-envs" aria-label="MuZe scene">
+    {!compact && <nav className="mb-fur-envs" aria-label="MuZe scene">
       {ENVIRONMENTS.map((e) => <button key={e.id} type="button" aria-pressed={env === e.id} onClick={() => pickEnv(e.id)} data-testid={`fur-env-${e.id}`}>{e.label}</button>)}
-    </nav>
-    <div className="mb-fur-stage" style={{ background: E.backdrop, height: size }}>
+    </nav>}
+    <div className="mb-fur-stage" style={{ background: compact ? 'transparent' : E.backdrop, height: size }}>
       {E.usesCamera && <video ref={video} className="mb-fur-video" muted playsInline aria-hidden="true" hidden={cam !== 'on'} />}
-      {tier === '2d' ? <button type="button" className="mb-fur-2d" onClick={boop} aria-label={`Boop MUSE (${c.label} coat)`}><MuseAvatar state={state} coat={c.legacy2d} size={Math.min(size, 240)} /></button>
-        : <canvas ref={canvas} className="mb-fur-canvas" role="img" aria-label={`MUSE 3D fur creature, ${c.label} coat, ${state}. Drag to orbit, drag across MUSE to pet, click MUSE to boop.`} data-testid="muse-fur-canvas" />}
+      {tier === '2d' ? <button type="button" className="mb-fur-2d" onClick={boop} aria-label={`Boop MuZe (${c.label} coat)`}><MuseAvatar state={state} coat={c.legacy2d} size={Math.min(size, 240)} /></button>
+        : <canvas ref={canvas} className="mb-fur-canvas" role="img" aria-label={`MuZe 3D fur creature, ${c.label} coat, ${state}. Drag to orbit, drag across MuZe to pet, click MuZe to boop.`} data-testid="muse-fur-canvas" />}
       {E.usesCamera && cam !== 'on' && <div className="mb-fur-ar" role="region" aria-label="AR camera">
         <p>AR View places MuZe over your camera. The feed stays on this device and is never recorded or uploaded. Your browser will ask for permission.</p>
         {cam === 'denied' && <p className="mb-warn" role="status">Camera unavailable or permission denied.</p>}
@@ -79,6 +79,7 @@ export const MuseFurSimulator = forwardRef<MuseFurHandle, Props>(function MuseFu
       </div>}
       {E.usesCamera && cam === 'on' && <button type="button" className="mb-fur-ar-stop" onClick={stopCam} data-testid="fur-ar-stop">Stop camera</button>}
     </div>
+    {!compact && <>
     <ul className="mb-fur-stats" aria-label="Fur stats" data-testid="fur-stats">
       <li>{tier === '2d' ? `2D fallback (${reason})` : `${stats?.shells ?? '…'} shells`}</li>
       {tier !== '2d' && <li>{stats ? stats.strands.toLocaleString('en-IN') : '…'} strands</li>}
@@ -98,5 +99,6 @@ export const MuseFurSimulator = forwardRef<MuseFurHandle, Props>(function MuseFu
       <label className="mb-voice-opt"><input type="checkbox" checked={gpuOn} disabled={tier === '2d'} onChange={(e) => { setGpuOn(e.target.checked); setReason(e.target.checked ? 'GPGPU' : 'GPU fur off'); eng.current?.setGpu(e.target.checked); }} data-testid="fur-gpu" /> GPU fur (GPGPU physics, 60k strands)</label>
       {tier === '2d' && <p className="mb-muted">Sliders need WebGL; this device uses the 2D MuZe.</p>}
     </section>}
+    </>}
   </div>;
 });

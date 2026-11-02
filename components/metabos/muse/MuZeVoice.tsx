@@ -5,13 +5,14 @@
  * model text from /api/ai or a plain status. Sends never leave from here: they become a MUSE dispatch proposal that needs two
  * different reviewers (/api/bos museReview) before /api/dispatch will send it, with MUZEBOS_META_DRY_RUN respected.
  */
+import { emitRoam } from '@/lib/metabos/muse/roam';
 import { useEffect, useRef, useState } from 'react';
 import { MuseFurSimulator, type MuseFurHandle } from './MuseFurSimulator';
 import { DEFAULT_COAT, type CoatPresetId } from '@/lib/metabos/fur-sim/presets';
 import type { BosView, MuseRoute } from '@/lib/metabos/muse/voice';
 type SR = { lang: string; interimResults: boolean; onresult: (e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void; onend: () => void; onerror: () => void; start(): void; stop(): void };
 const post = async (url: string, body: unknown) => { const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error ?? `HTTP ${r.status}`); return j; };
-const CHIPS = ['Boop MuZe', 'Flip my coat', 'Open trust stack', 'Tell the customer their order is ready', 'What is waiting for approval?'];
+const CHIPS = ['Boop MuZe', 'Flip my coat', 'Open trust stack', 'Dance', 'Tell the customer their order is ready', 'What is waiting for approval?'];
 export type MuZeDraft = { text: string; channel: 'whatsapp' | 'instagram'; source: string };
 export function MuZeVoice({ onView, onDraft, size = 240 }: { onView?(v: BosView): void; onDraft?(d: MuZeDraft): void; size?: number }) {
   const fur = useRef<MuseFurHandle>(null); const rec = useRef<SR | null>(null);
@@ -26,7 +27,8 @@ export function MuZeVoice({ onView, onDraft, size = 240 }: { onView?(v: BosView)
   const run = async (raw: string, via: 'voice' | 'typed' | 'chip') => { const text = raw.trim(); if (!text) return; setHeard(text); setBusy(true);
     try { const { route } = (await post('/api/muse', { command: text, via })) as { route: MuseRoute };
       if (route.kind === 'local') { const c = route.command; if (c.kind === 'boop') fur.current?.triggerBoop(); else if (c.kind === 'coat') { if (c.preset === 'next') fur.current?.flipCoat(); else fur.current?.setCoatPreset(c.preset); } else fur.current?.setEnvironment(c.env); setSaid(null); }
-      else if (route.kind === 'view') { onView ? onView(route.view) : (window.location.href = `/workspace/builder/business-open-server?view=${route.view}`); setSaid(`Opened ${route.view}.`); }
+      else if (route.kind === 'roam') { emitRoam({ kind: route.action }); setSaid(route.action === 'dance' ? 'Dancing.' : route.action === 'fullscreen' ? 'Fullscreen toggled.' : 'Back home.'); }
+      else if (route.kind === 'view') { onView ? onView(route.view) : document.querySelector(`[data-guide-id="rail-${route.view}"]`) ? emitRoam({ kind: 'guide', selector: `[data-guide-id="rail-${route.view}"]` }) : (window.location.href = `/workspace/builder/business-open-server?view=${route.view}`); setSaid(`Opened ${route.view}.`); }
       else if (route.kind === 'send') { const r = await ask(`You are MuZe, a business assistant. Write a short customer message (max 600 characters) that carries out this owner command. Reply with the message only.\n\nCommand: ${route.text}`);
         if (!r) say('Model not configured. No message was drafted, so nothing goes to Jev.', false);
         else { say(r.text, false); if (onDraft) onDraft({ text: r.text, channel: route.channel, source: r.source }); else setSaid(`${r.text}\n\nOpen MuZe Sanctum to send this through two-reviewer Jev approval.`); } }

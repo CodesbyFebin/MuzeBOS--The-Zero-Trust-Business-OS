@@ -4,12 +4,16 @@
  * Layout ideas from the owner's AI Studio builds (t77, t81, t88, t91, t94) and the Pixtuoid-style office idea; the code is ours.
  * Real records only: every number comes from /api/bos, /api/ai or /api/dispatch. Empty means empty.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { AgentOffice, type Desk } from './AgentOffice';
 import { Sanctum, type SanctumData } from './Sanctum';
 import { McpDirectory, Operator, type OperatorData } from './Operator';
 import { DiscordView, type DiscordData } from './DiscordView';
+import { MuZeRoam } from '../muse/MuZeRoam';
+import { emitRoam } from '@/lib/metabos/muse/roam';
+/** What each view holds, stated plainly. MuZe reads these when it flies to a rail item. */
+const GUIDE: Record<string, string> = { office: 'Agent Office: one desk per agent, showing its recorded state.', sanctum: 'MuZe Sanctum: talk to MuZe. Sends need two reviewers, then dispatch.', hq: 'HQ: counts of Jev reviews, dispatches and evidence rows from this server.', operator: 'Operator console: recorded runs and approvals.', discord: 'Channels: messages recorded on this server, grouped by channel.', mcp: 'MCP directory: the MCP servers this server knows about.', trust: 'Trust stack R0–R6: the state of each trust layer, as recorded.', verify: 'Verification: re-check the evidence hash chain.' };
 type Bos = { office: { desks: Desk[] }; sanctum: SanctumData; trust: { id: string; name: string; state: string; detail: string }[]; pipeline: { id: string; label: string; count: number }[]; hq: { jevWaiting: number; dispatchPending: number; dispatchSent: number; evidenceRows: number; chainValid: boolean }; activity: { seq: number; kind: string; action: string; target: string; at: string; hash: string }[]; operator: OperatorData; discord: DiscordData };
 const RAIL = [['office', 'Agent Office'], ['sanctum', 'MuZe Sanctum'], ['hq', 'HQ'], ['operator', 'Operator console'], ['discord', 'Channels'], ['mcp', 'MCP directory'], ['trust', 'Trust stack R0–R6'], ['verify', 'Verification']] as const;
 const PLATFORMS = [['office', 'MeTaBos'], ['operator', 'METAPEN Operator'], ['discord', 'Discord view'], ['mcp', 'MCPSERVER.in']] as const;
@@ -19,11 +23,14 @@ export function BusinessOpenServer() {
   const [d, setD] = useState<Bos | null>(null); const [err, setErr] = useState<string | null>(null); const [sec, setSec] = useState<(typeof RAIL)[number][0]>('office');
   const load = useCallback(async () => { try { const r = await fetch('/api/bos', { cache: 'no-store' }); const j = await r.json(); if (!r.ok) throw new Error(j.error ?? `HTTP ${r.status}`); setD(j); setErr(null); } catch (e) { setErr(e instanceof Error ? e.message : 'Failed'); } }, []);
   useEffect(() => { const v = new URLSearchParams(window.location.search).get('view'); if (v && RAIL.some(([id]) => id === v)) setSec(v as (typeof RAIL)[number][0]); }, []);
+  const first = useRef(true);
+  useEffect(() => { if (first.current) { first.current = false; return; } emitRoam({ kind: 'guide', selector: `[data-guide-id="rail-${sec}"]` }); }, [sec]);
   useEffect(() => { load(); const t = setInterval(load, 8000); return () => clearInterval(t); }, [load]);
   return <div className="mb-bos" data-testid="bos">
+    <MuZeRoam homeSelector='[data-guide-id="rail-sanctum"]' />
     <nav className="mb-bos-rail" aria-label="Server rail">
       <p className="mb-bos-brand">MuZe<span> Business Open Server</span></p>
-      <ul>{RAIL.map(([id, label]) => <li key={id}><button type="button" aria-current={sec === id ? 'page' : undefined} onClick={() => setSec(id)}>{label}</button></li>)}</ul>
+      <ul>{RAIL.map(([id, label]) => <li key={id}><button type="button" aria-current={sec === id ? 'page' : undefined} data-guide-id={`rail-${id}`} data-guide={GUIDE[id]} onClick={() => setSec(id)}>{label}</button></li>)}</ul>
       <p className="mb-bos-railhead">Also on this server</p>
       <ul>{LINKS.map(([href, label]) => <li key={href}><Link href={href}>{label}</Link></li>)}</ul>
     </nav>

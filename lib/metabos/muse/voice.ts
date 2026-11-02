@@ -14,6 +14,7 @@ export type MuseRoute =
   | { kind: 'view'; view: BosView }
   | { kind: 'send'; channel: 'whatsapp' | 'instagram'; text: string }
   | { kind: 'ask'; text: string }
+  | { kind: 'roam'; action: 'dance' | 'fullscreen' | 'home' }
   | { kind: 'empty' };
 const VIEW_WORDS: [RegExp, BosView][] = [
   [/\b(trust|r0|r6|governance|kill switch)/, 'trust'], [/\b(verify|verification|proof|pipeline)\b/, 'verify'], [/\b(mcp|directory|tools?)\b/, 'mcp'],
@@ -23,7 +24,10 @@ export function routeMuseVoice(raw: string): MuseRoute {
   const text = raw.trim().slice(0, 600); if (!text) return { kind: 'empty' };
   const local = parseMuseCommand(text); if (local) return { kind: 'local', command: local };
   const t = text.toLowerCase();
-  if (/^(open|show|go to|switch to|take me to)\b/.test(t)) for (const [re, view] of VIEW_WORDS) if (re.test(t)) return { kind: 'view', view };
+  if (/\b(dance|spin)\b/.test(t) && t.length < 40) return { kind: 'roam', action: 'dance' };
+  if (/\b(full ?screen)\b/.test(t)) return { kind: 'roam', action: 'fullscreen' };
+  if (/\b(come back|go home|back to sanctum|return)\b/.test(t) && t.length < 40) return { kind: 'roam', action: 'home' };
+  if (/^(open|show|go to|switch to|take me to|where is)\b/.test(t)) for (const [re, view] of VIEW_WORDS) if (re.test(t)) return { kind: 'view', view };
   if (/\b(send|message|tell|reply|dm|whatsapp|notify|remind)\b/.test(t) && !/\?\s*$/.test(t)) return { kind: 'send', channel: /\b(instagram|dm|ig)\b/.test(t) ? 'instagram' : 'whatsapp', text };
   return { kind: 'ask', text };
 }

@@ -777,3 +777,23 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-muse-voice-chips button{font-size:.75rem}
 .mb-muse-home{margin:1rem;max-width:720px}
 .mb-muse-home h2{color:#FF2A2A}
+
+/* Free-roaming MuZe overlay: never blocks clicks except on the handle */
+.mb-muze-roam{position:fixed;inset:0;pointer-events:none;z-index:60}
+.mb-muze-roam-handle{position:absolute;left:0;top:0;width:96px;pointer-events:none;transition:transform .6s cubic-bezier(.3,1.4,.5,1)}
+.mb-muze-roam-body,.mb-muze-roam-tools button{pointer-events:auto}
+.mb-muze-roam-body{width:96px;height:96px;border-radius:50%;overflow:hidden;border:1px solid #FF2A2A;background:#0A0A0A;cursor:grab;touch-action:none}
+.mb-muze-roam-body:focus-visible{outline:2px solid #FF2A2A;outline-offset:3px}
+.mb-muze-roam-body .mb-fur{margin:0}.mb-muze-roam-body .mb-fur-stage{border:0}
+.mb-muze-roam-tools{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.mb-muze-roam-tools button{flex:none;box-sizing:border-box;min-height:46px;min-width:44px;width:max-content;white-space:nowrap;padding:0 .6rem;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:8px;font-size:.75rem;cursor:pointer}
+.mb-muze-roam-tools button:hover,.mb-muze-roam-tools button[aria-pressed="true"]{background:#FF2A2A;color:#0A0A0A}
+.mb-muze-roam-guide{pointer-events:none;width:220px;margin-top:6px;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:10px;padding:.5rem .6rem;font-size:.8rem}
+.mb-muze-roam-handle.is-dancing .mb-muze-roam-body{animation:mb-muze-spin 1.2s ease-in-out}
+@keyframes mb-muze-spin{0%{transform:rotate(0) scale(1)}50%{transform:rotate(360deg) scale(1.12)}100%{transform:rotate(720deg) scale(1)}}
+body.mb-muze-full{background:#0A0A0A}
+body.mb-muze-full .mb-bos-rail,body.mb-muze-full .mb-console{display:none}
+@media (prefers-reduced-motion: reduce){.mb-muze-roam-handle{transition:none}.mb-muze-roam-handle.is-dancing .mb-muze-roam-body{animation:none}}
+.mb-muze-roam .mb-muze-roam-tools button{min-height:46px;height:46px}
+.mb-muse-home button,.mb-muse-home select,.mb-muse-home input,.mb-muse-home textarea{min-height:44px;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:8px;padding:.3rem .7rem}
+.mb-muse-home button{cursor:pointer;margin-right:.4rem}.mb-muse-home label{display:block;margin:.4rem 0}
