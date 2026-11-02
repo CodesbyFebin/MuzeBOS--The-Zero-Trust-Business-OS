@@ -135,3 +135,14 @@ Tests: tests/hackathon-missions-goals.test.ts (8 tests). They use injected proto
 | Decisions registry: append-only, lookup-first matching; a decided question cannot be silently re-decided. | gquthier/company-os (MIT) | same |
 
 Tests: tests/hackathon-chief-of-staff.test.ts (3 tests).
+
+## Built during the event: batch 4 (stacked PR on #26)
+
+| Feature | Inspired by (observed behaviour) | Files |
+|---|---|---|
+| Sales pipeline: deals by stage, default win probability per stage with an override while open, weighted forecast, win rate, and a lost reason required. Won and lost are final. Muse Spark next-step advice is a gated inference draft and never changes the deal by itself. | coreBOS potentials; boombignose deal kanban (AGPL-3.0, behaviour only) | lib/muzebos/biz/pipeline.ts, app/api/muzebos/pipeline/route.ts, components/muzebos/PipelineBoard.tsx, app/workspace/money/pipeline/page.tsx |
+| Founder dashboard: runway, net burn, repeat-customer revenue (an MRR proxy, labelled as such), receivables and weighted pipeline, all from invoices, reconciled payments, approved expenses and an owner-entered cash balance. A Muse Wonder brief over those numbers is a gated draft. | boombignose dashboard (AGPL-3.0, behaviour only) | lib/muzebos/biz/dashboard.ts, app/api/muzebos/founder/route.ts, components/muzebos/FounderDashboard.tsx, app/workspace/money/dashboard/page.tsx |
+| Expense approvals for multiple members: nobody approves their own claim (also a database CHECK), managers only for their own department and up to ₹25,000, decisions bound to the claim hash and final. The preview has no login, so the acting member is picked in the UI and every rule is enforced on the server. | boombignose expenses (AGPL-3.0, behaviour only) | lib/muzebos/biz/expenses.ts, lib/muzebos/biz/members.ts, app/api/muzebos/expenses/route.ts, components/muzebos/ExpensesBoard.tsx, app/workspace/money/expenses/page.tsx |
+
+Tests: tests/hackathon-pipeline-finance.test.ts (4 tests, injected fixtures only).
+

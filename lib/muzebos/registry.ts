@@ -162,6 +162,13 @@ const BRAIN_CHIEF: FeatureDefinition = {
   summary: 'One brief across approvals, missions, goals and decisions, with an observer that flags risky agent proposals. Advisory only. Built during the Meta hackathon.',
 };
 
+const mk = (slug: string, label: string, summary: string, menuId = 'money'): FeatureDefinition => ({ id: `${menuId}.${slug}`, menuId, clusterId: '', label, route: `/workspace/${menuId}/${slug}`, status: 'available', dependencies: [], summary: `${summary} Built during the Meta hackathon.` });
+const MONEY_HACK: FeatureDefinition[] = [
+  mk('pipeline', 'Sales Pipeline', 'Deals by stage with win probability and a weighted forecast; Muse Spark suggests a next step behind the Jev gate.'),
+  mk('dashboard', 'Founder Dashboard', 'Runway, net burn and repeat-customer revenue computed only from your invoices, payments, approved expenses and cash.'),
+  mk('expenses', 'Expense Approvals', 'Claims that nobody can approve themselves, with department and amount limits for managers.'),
+];
+
 const LEGACY_ALIASES: Record<string, string[]> = {
   orders: ['/business', '/funnel', '/clients', '/brand-deals'],
   money: ['/finances', '/trading'],
@@ -208,6 +215,7 @@ const cat = (id: string) => WORKSPACE_CATEGORIES.find((c) => c.id === id)!;
 const MENU_LABELS: Record<string, string> = { orders: 'Orders', money: 'Money', talk: 'Talk', stock: 'Stock', growth: 'Growth', operations: 'Operations', builder: 'Builder', brain: 'Brain', foundation: 'Foundation', system: 'System' };
 const categoryMenu = (id: string, section: MenuSection): Omit<MenuDefinition, 'number'> => {
   const clusters = categoryClusters(id);
+  if (id === 'money') clusters[0].pages.push(...MONEY_HACK.map((f) => ({ ...f, clusterId: clusters[0].id })));
   if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME, BRAIN_MISSIONS, BRAIN_GOALS, BRAIN_CHIEF); clusters[2].pages.push(BRAIN_EXTRA); }
   return { id, label: MENU_LABELS[id], route: `/workspace/${id}`, icon: cat(id).icon, section, summary: cat(id).summary, aliases: LEGACY_ALIASES[id] ?? [], clusters };
 };
