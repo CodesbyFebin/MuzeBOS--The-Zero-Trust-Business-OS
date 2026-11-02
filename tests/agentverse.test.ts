@@ -54,7 +54,7 @@ describe('agentverse', () => {
 });
 import { home } from '@/lib/metabos/agentverse/core';
 describe('home server overview', () => {
-  it('Live Activity reads only evidence; Kafka/Redis/Qdrant are Not configured without env; no hardcoded numbers', async () => {
+  it('Activity reads only evidence; Kafka/Redis/Qdrant are Not configured without env; no hardcoded numbers', async () => {
     const s = new BusinessStore(':memory:'); const h0 = await home(s, {});
     expect(h0.campaigns).toEqual([]); expect(h0.activity.length).toBe(s.evidence().length);
     for (const id of ['kafka', 'redis', 'qdrant', 'claw', 'yao', 'ollama']) expect(h0.queues.find((q) => q.id === id)!.state).toBe('not_configured');

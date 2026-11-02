@@ -706,3 +706,14 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-demo button, .mb-demo a { min-height:44px; } .mb-demo a { color:var(--mb-accent); display:inline-flex; align-items:center; }
 .mb-demo-muse { font-size:14px; color:var(--mb-text); } .mb-demo-err { color:var(--mb-danger); }
 .mb-demo-feed { list-style:none; padding:0; margin:0; display:grid; gap:4px; } .mb-demo-feed code { color:var(--mb-accent); }
+/* win-polish: loading skeleton, empty hints, skip link, keyboard focus, mobile channels drawer */
+.mb-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.mb-av-skel{display:grid;gap:12px;padding:16px}.mb-av-skel span:not(.mb-sr){display:block;height:56px;border-radius:8px;background:linear-gradient(90deg,#141414,#1f1f1f,#141414);background-size:200% 100%;animation:mb-skel 1.2s linear infinite}
+@keyframes mb-skel{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.mb-av-skel span{animation:none}}
+.mb-hub-empty{border:1px dashed #3a1414;border-radius:8px;padding:16px}.mb-av-hint{display:block;margin-top:4px;font-size:.9em;color:#b8b8b8}
+.mb-av-skip{position:absolute;left:-9999px;top:8px;z-index:50;background:#FF2A2A;color:#0A0A0A;padding:12px 16px;min-height:44px;border-radius:6px;font-weight:600}.mb-av-skip:focus{left:8px}
+.mb-av :focus-visible{outline:2px solid #FF2A2A;outline-offset:2px}.mb-av-main:focus{outline:none}
+.mb-av-navbtn{display:none}
+@media (max-width:820px){.mb-av-navbtn{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;background:#141414;color:#fff;border:1px solid #FF2A2A;border-radius:6px}
+  .mb-av[data-nav=closed] .mb-av-side{display:none}.mb-av-main{min-width:0;overflow-x:auto}.mb-av-table{display:block;overflow-x:auto}}

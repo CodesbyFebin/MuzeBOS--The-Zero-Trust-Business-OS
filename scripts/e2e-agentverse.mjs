@@ -48,6 +48,9 @@ assert.equal(await p.getByRole('button', { name: 'Revert (Jev)' }).isDisabled(),
 await p.getByLabel('Commit an intent').fill('feat(ads): pause weak creative'); await p.getByRole('button', { name: 'Propose (Jev)' }).click(); await p.getByText(/Intent queued as one Jev item/).waitFor();
 await p.screenshot({ path: `${out}/agentverse-composer.png` }); await audit('composer');
 await p.getByRole('tab', { name: 'Logs' }).click(); await p.screenshot({ path: `${out}/agentverse-logs.png` });
+// keyboard: arrow keys move between commits; skip link targets main
+await p.locator('.mb-av-commit').first().focus(); await p.keyboard.press('ArrowDown'); assert.equal(await p.evaluate(() => [...document.querySelectorAll('.mb-av-commit')].indexOf(document.activeElement)), 1, 'ArrowDown moves to the next commit');
+assert.equal(await p.locator('a.mb-av-skip').getAttribute('href'), '#mb-av-main');
 await chan('home-overview'); await p.locator('.mb-av-feed').getByText('Agent drafted').first().waitFor(); await p.screenshot({ path: `${out}/agentverse-home.png` }); await audit('home with records');
 await p.getByLabel('Filter').fill('zzz-no-match'); await p.getByText('No records yet').first().waitFor(); await p.getByLabel('Filter').fill('');
 await chan('fleet-console'); await p.getByText('Runners and agent activity from real records').waitFor(); await p.screenshot({ path: `${out}/muze-fleet.png` }); await audit('fleet-console');
@@ -67,7 +70,10 @@ await chan('onboarding'); await p.getByTestId('av-onboarding').waitFor(); await 
 await p.keyboard.press('Control+k'); await p.getByRole('dialog', { name: 'Search' }).waitFor(); await p.getByRole('dialog').getByLabel('Search commits, inbox, ads and agents').fill('pickup'); await p.locator('.mb-av-kbox li button').first().waitFor();
 await p.screenshot({ path: `${out}/agentverse-cmdk.png` }); await audit('cmd+k'); await p.keyboard.press('Escape');
 await p.getByRole('button', { name: 'personal' }).click(); assert.equal(await p.locator('.mb-av-side').getByRole('button', { name: /campaigns/ }).count(), 0);
-await p.setViewportSize({ width: 390, height: 844 }); await p.getByRole('button', { name: 'business' }).click(); await chan('commit-log'); await p.screenshot({ path: `${out}/agentverse-mobile.png`, fullPage: true }); await audit('mobile');
+await p.setViewportSize({ width: 390, height: 844 }); await p.getByRole('button', { name: 'business' }).click();
+assert.equal(await p.locator('.mb-av-side').isVisible(), false, 'mobile: channel drawer closed by default'); await p.getByRole('button', { name: 'Channels' }).click(); await p.screenshot({ path: `${out}/agentverse-mobile-drawer.png` }); await audit('mobile drawer');
+await chan('commit-log'); assert.equal(await p.locator('.mb-av-side').isVisible(), false, 'drawer closes after picking a channel');
+assert.equal(await p.evaluate(() => document.activeElement?.id), 'mb-av-main', 'focus moves to the channel'); await p.screenshot({ path: `${out}/agentverse-mobile.png`, fullPage: true }); await audit('mobile');
 // Meta integration page: honest status, empty states
 await p.setViewportSize({ width: 1440, height: 900 }); await p.goto(base + '/workspace/developer/meta-integration'); await p.getByTestId('meta-build-order').waitFor({ timeout: 30000 });
 const bo = await p.getByTestId('meta-build-order').innerText(); assert.match(bo, /not configured/i); assert.doesNotMatch(bo, /^done/im); assert.match(bo, /App Review/);
