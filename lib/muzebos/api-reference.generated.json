@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 210,
+ "count": 211,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1945,6 +1945,19 @@
   {
    "path": "/api/muzebos/chief-of-staff",
    "file": "app/api/muzebos/chief-of-staff/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/muzebos/command-center",
+   "file": "app/api/muzebos/command-center/route.ts",
    "methods": [
     "GET",
     "POST"

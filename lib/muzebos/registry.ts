@@ -164,6 +164,7 @@ const BRAIN_CHIEF: FeatureDefinition = {
 
 const mk = (slug: string, label: string, summary: string, menuId = 'money'): FeatureDefinition => ({ id: `${menuId}.${slug}`, menuId, clusterId: '', label, route: `/workspace/${menuId}/${slug}`, status: 'available', dependencies: [], summary: `${summary} Built during the Meta hackathon.` });
 const MONEY_HACK: FeatureDefinition[] = [
+  mk('command-center', 'Command Center', 'Friction Radar with playbooks, Promise Tracker, Payment Proof Inbox, Verified Business Brief, Approval Bundles and Near-Miss Memory, all from stored records.'),
   mk('pipeline', 'Sales Pipeline', 'Deals by stage with win probability and a weighted forecast; Muse Spark suggests a next step behind the Jev gate.'),
   mk('dashboard', 'Founder Dashboard', 'Runway, net burn and repeat-customer revenue computed only from your invoices, payments, approved expenses and cash.'),
   mk('expenses', 'Expense Approvals', 'Claims that nobody can approve themselves, with department and amount limits for managers.'),
