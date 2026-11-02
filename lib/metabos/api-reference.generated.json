@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 232,
+ "count": 233,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -424,6 +424,19 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/bos",
+   "file": "app/api/bos/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Business Open Server read model. Plans go through /api/ai, sends through /api/dispatch; the only write here is a Jev review.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
    "access": "session"
   },
   {
