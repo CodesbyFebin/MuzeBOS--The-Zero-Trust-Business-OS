@@ -1,0 +1,290 @@
+data: {"choices":[{"delta":{"content":"🚀 output.stream_start - [output.view_trace](http://localhost:8000/__yao_admin_root/trace/20261028794620203953/view)\n"},"finish_reason":null,"index":0}],"created":1793178663,"id":"","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"{\"draft\": \"","role":"assistant"},"finish_reason":null,"index":0}],"created":1793178678,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"LONG-FORM CTA VARIANTS - Di"},"finish_reason":null,"index":0}],"created":1793178678,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"wali Sweets Gift Box | Small Koch"},"finish_reason":null,"index":0}],"created":1793178678,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"i Bakery\\n\\nVARIANT 1"},"finish_reason":null,"index":0}],"created":1793178678,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" - Warm"},"finish_reason":null,"index":0}],"created":1793178678,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Family"},"finish_reason":null,"index":0}],"created":1793178678,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Gifting\\nHeadline: This Di"},"finish_reason":null,"index":0}],"created":1793178678,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"wali, Gift"},"finish_reason":null,"index":0}],"created":1793178678,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Something Tr"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"uly Made in Kochi.\\"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"nBody: This"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" year"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":", skip"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" the mass-produced boxes"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":". From our small bakery in Kochi"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":", we are hand"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"crafting just 200 Diwali"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" S"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"weets Gift Boxes - with"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" g"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"hee Mysore Pak, coconut lado"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"o, un"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"niyapp"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"am with a festive twist, and our"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" signature chocolate-d"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"ipped banana"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" chips, all packed"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" fresh"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" in a beautiful reusable"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" keepsake box. No preserv"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"atives, just"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" small"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"-batch love and festive"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" warmth"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":". Pre-"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"orders are"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" open"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" now for delivery"},"finish_reason":null,"index":0}],"created":1793178679,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" across Koch"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"i before Diwali,"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" and once"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" they are"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" gone, they are gone.\\nButton"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":": Reserve My Diwali Gift Box Now"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"\\n\\nVARIANT 2 - Ur"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"gency +"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Local Pride"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"\\nHeadline: Fresh"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" From"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Our Oven"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" to Your"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Diwali Table"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" - But"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Only Till"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Stocks"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Last"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":".\\nBody: We are not a"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" big factory. We are your"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" neighbourhood"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Koch"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"i bakery, and we bake in"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" small batches so"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" every lado"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"o melts"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" just"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" right. Our Diwali Sweets Gift"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Box is our"},"finish_reason":null,"index":0}],"created":1793178680,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" once"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"-a-year celebration"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" - "},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"12 hand"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"crafted sweets, festive"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" packaging, and a handwritten Di"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"wali card"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" for your"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" loved ones. Orders"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" close"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" soon"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" so"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" we can bake"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":","},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" pack and deliver fresh in"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" time for"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" the festival."},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" If you want to gift"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" local"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":", thoughtful"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" and delicious this"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Di"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"wali, order"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" today.\\nButton: Order"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Before We Sell Out\\n\\nV"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"ARIANT 3 - G"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"ifting /"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Corporate\\nHeadline: Make"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Your"},"finish_reason":null,"index":0}],"created":1793178681,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Diwali G"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"ifting Un"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"forgettable This Year.\\nBody: Looking"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" for a"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" gift that feels"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" personal, not corporate"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"? Share"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" the"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" taste of Kochi with clients"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":", friends"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" and family. Our Diwali Sweets"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Gift Box brings together"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" classic"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" festive"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" flavours and Kerala"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" favourites, loving"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"ly made"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" and"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" beautifully packed"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" by our small team"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":". Bulk and"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" custom orders available for"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" 10+ boxes"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" with free"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" delivery"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" in"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Kochi and"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" personalised"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" message"},"finish_reason":null,"index":0}],"created":1793178682,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" cards. Let"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" us help"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" you spread"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" light"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":","},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" sweetness and local"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" love"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" this Diwali.\\nButton: Pre"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"-Order Your"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" Gift Boxes Today"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"\", \"proposed_actions\": [{\"tool"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"\": \"dispatch:completion\", \"args"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"\": {}, \"reason\": \"Long-form"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" CTA variants drafted"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" and"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" ready for human review"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":" in approval gate\"}], \"confidence\": "},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"content":"0.88}"},"finish_reason":null,"index":0}],"created":1793178683,"id":"M1","model":"yao-agent","object":"chat.completion.chunk"}
+
+data: [DONE]
+
