@@ -99,6 +99,8 @@ Every credential page stores only the *names* of env vars. Values are read from 
 - `MUZEBOS_TELEPHONY_BASE_URL`
 - `MUZEBOS_WEBAUTHN_CONFIG`
 - `MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN`
+- `MUZEBOS_INSTAGRAM_ACCESS_TOKEN`
+- `MUZEBOS_APPROVAL_SIGNING_SECRET`
 - `OPENROUTER_API_KEY`
 
 ## Existing screens: backing
@@ -136,6 +138,8 @@ Every send needs a Jev approval whose payload hash matches and an `idempotency-k
 | Channel | Env | Provider call |
 | --- | --- | --- |
 | WhatsApp text | `MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN`, `MUZEBOS_WHATSAPP_PHONE_NUMBER_ID` | `POST graph.facebook.com/v25.0/{phone-number-id}/messages` |
+| Instagram DM | `MUZEBOS_INSTAGRAM_ACCESS_TOKEN` (Instagram User token) | `POST graph.instagram.com/v25.0/me/messages` (text ≤ 1000 bytes, 24h window) |
+| WhatsApp approval prompts | `MUZEBOS_APPROVAL_SIGNING_SECRET` (32+ chars, HMAC key for single-use codes) | sent as a WhatsApp dispatch; no extra provider |
 | Email (SMTP) | `MUZEBOS_SMTP_HOST`, `MUZEBOS_SMTP_PORT`, `MUZEBOS_SMTP_USER`, `MUZEBOS_SMTP_PASSWORD`, `MUZEBOS_SMTP_FROM` | nodemailer `sendMail` |
 | Razorpay payment link | `MUZEBOS_RAZORPAY_KEY_ID`, `MUZEBOS_RAZORPAY_KEY_SECRET` | `POST api.razorpay.com/v1/payment_links` (paise, reference_id = idempotency key) |
 | OpenRouter completion | `OPENROUTER_API_KEY` | `POST openrouter.ai/api/v1/chat/completions` |

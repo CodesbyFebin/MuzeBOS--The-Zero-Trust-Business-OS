@@ -1,4 +1,5 @@
 import { businessStore } from '@/lib/metabos/store';
+import { ingest, parseMetaWebhook } from '@/lib/metabos/talk/service';
 import { BodyTooLarge, isWebhookSource, readBodyCapped, receiveWebhook, verifyChallenge } from '@/lib/metabos/webhooks';
 
 export const runtime = 'nodejs';
@@ -23,5 +24,12 @@ export async function POST(req: Request, props: { params: Promise<{ source: stri
     if (e instanceof BodyTooLarge) return reply({ status: 413, body: 'too_large' });
     return reply({ status: 400, body: 'unreadable_body' });
   }
-  return reply(receiveWebhook(businessStore(), { source: params.source, raw, signature: req.headers.get('x-hub-signature-256'), secret }));
+  const store = businessStore();
+  const r = receiveWebhook(store, { source: params.source, raw, signature: req.headers.get('x-hub-signature-256'), secret });
+  // Only a verified, parsed body reaches the Talk ingest. Messages are deduped by provider message id.
+  if (r.status === 200) {
+    try { await ingest(store, parseMetaWebhook(params.source, JSON.parse(raw.toString('utf8')))); }
+    catch (e) { store.appendEvidence('talk.ingest-failed', params.source, e instanceof Error ? e.message.slice(0, 200) : 'ingest error'); }
+  }
+  return reply(r);
 }

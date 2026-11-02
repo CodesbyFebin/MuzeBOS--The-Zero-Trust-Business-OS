@@ -864,3 +864,9 @@ None of the raw hits shows mock data in default (real) mode. Every fixture path 
 - 16 workspace pages that were local-SQLite-only now have real modules: persisted CRUD, role-gated writes, evidence and tests. `account.sign-in-manage-session` stays existing because it is the real auth screen.
 - `/api/dispatch`: WhatsApp, SMTP, Razorpay payment-link and OpenRouter adapters, gated by Jev approval and an idempotency key. Tests use a mocked HTTP/SMTP layer and are labelled that way. No live send has been made.
 - `/api/passkeys`: WebAuthn registration and step-up verification. Tests sign real ES256 assertions with a software authenticator. Passkeys don't issue sessions.
+
+## Talk copilot (feat/talk-copilot)
+- Conversations, messages, opt-outs, handoffs and WhatsApp approval codes are SQLite rows filled only by signature-verified Meta webhooks or member actions. No seed data.
+- Sentiment is a fixed English/Hinglish lexicon rule, labelled as such in the UI. It is not a model.
+- Voice notes: transcript status is "Not connected — add META_MODEL_API_KEY" without a key; with a key the existing Muse Voice adapter still refuses (not qualified), and that message is stored.
+- tests/talk-copilot.test.ts uses a fake fetch (labelled MOCKED HTTP). It proves gating and request shape, not a live send.
