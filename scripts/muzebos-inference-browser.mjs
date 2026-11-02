@@ -1,6 +1,8 @@
 /** UI/API persistence checks. No model weights or paid provider calls are made. */
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+if (!process.env.TEST_JEV_DB) throw new Error('Run through npm run test:qualify-browser for a disposable fixture database');
 const base = process.env.TEST_BASE_URL || 'http://127.0.0.1:4100';
 const browser = await chromium.launch({ executablePath: process.env.TEST_CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -61,9 +63,40 @@ try {
   await page.getByRole('button', { name: 'Send proposal to Jev', exact: true }).click();
   await page.getByText('Operation saved. Inference outputs remain drafts.', { exact: true }).waitFor();
   assert.equal(handoffs, 1);
-  assert.equal(await page.getByRole('link', { name: 'Open Jev action approvals', exact: true }).getAttribute('href'), '/workflows?view=governed');
+  assert.equal(await page.getByRole('link', { name: 'Open Jev action approvals', exact: true }).getAttribute('href'), '/workspace/brain/runtime#jev');
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Server proposal handoff overflows mobile viewport');
   await page.unroute('**/api/inference');
+  // Real browser -> HTTP -> SQLite -> Jev -> reminder path, with only provider output fixture-injected.
+  const fixture = JSON.parse(execFileSync(process.execPath, ['--import', 'tsx', 'scripts/muzebos-jev-browser-fixture.ts', process.env.TEST_JEV_DB], { encoding: 'utf8' }));
+  assert.equal(fixture.evidenceMode, 'fixture');
+  await page.goto(base + '/workspace/brain/inference', { waitUntil: 'networkidle' });
+  const fixtureRow = page.locator('.mb-booking-row').filter({ hasText: fixture.title });
+  await fixtureRow.getByRole('button', { name: 'Review task', exact: true }).click();
+  const handoffResponse = page.waitForResponse(r => r.url() === base + '/api/inference' && r.request().method() === 'POST');
+  await page.getByRole('button', { name: 'Send proposal to Jev', exact: true }).click();
+  const handoff = await handoffResponse; assert.equal(handoff.status(), 200);
+  const actionRun = (await handoff.json()).result;
+  assert.equal(actionRun.status, 'awaiting_approval');
+  await page.getByRole('link', { name: 'Open Jev action approvals', exact: true }).click();
+  await page.getByRole('region', { name: 'Jev approval queue', exact: true }).waitFor();
+  const actionCard = page.locator(`[data-run="${actionRun.id}"]`);
+  await actionCard.getByText(fixture.title, { exact: true }).waitFor();
+  assert.match(await actionCard.innerText(), new RegExp(actionRun.payloadHash));
+  assert.equal(await actionCard.getByRole('button', { name: 'Run approved write', exact: true }).count(), 0);
+  await page.reload({ waitUntil: 'networkidle' }); // Hash link must survive reload.
+  await actionCard.getByRole('button', { name: 'Approve this payload', exact: true }).click();
+  await actionCard.getByRole('button', { name: 'Run approved write', exact: true }).click();
+  await actionCard.locator('.mb-badge').filter({ hasText: 'succeeded' }).waitFor();
+  await page.reload({ waitUntil: 'networkidle' });
+  await actionCard.locator('.mb-badge').filter({ hasText: 'succeeded' }).waitFor();
+  const overview = await (await page.request.get(base + '/api/mission-control')).json();
+  assert.equal(overview.todo.filter(t => t.title.startsWith(fixture.title)).length, 1);
+  assert.equal(overview.auditValid, true);
+  const finalState = await (await page.request.get(base + '/api/workflow-runs')).json();
+  const persisted = finalState.runs.find(r => r.id === actionRun.id);
+  assert.equal(persisted.status, 'succeeded');
+  assert.equal(persisted.steps[0].output.reminderIds.length, 1);
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Jev queue overflows mobile viewport');
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ result: 'PASS', checks: ['18 sidebar entries', 'WebGPU absence is explicit', 'persisted task creation', 'size and agent assignment', 'exact Jev approval', 'reload persistence', 'lease token hidden from snapshot', 'fixture-only completion contract', 'bounded child task review', 'provider readiness labels', 'no false zkVM proof', 'stale snapshot retained', 'mobile layout', 'fixture server proposal handoff', 'separate Jev approval link', 'no runtime errors'], limits: ['No physical WebGPU inference, paid provider or external agent runtime exercised'] }));
+  console.log(JSON.stringify({ result: 'PASS', checks: ['18 sidebar entries', 'WebGPU absence is explicit', 'persisted task creation', 'size and agent assignment', 'exact Jev approval', 'reload persistence', 'lease token hidden from snapshot', 'fixture-only completion contract', 'bounded child task review', 'provider readiness labels', 'no false zkVM proof', 'stale snapshot retained', 'mobile layout', 'fixture server proposal handoff', 'separate Jev approval link', 'real HTTP Jev queue navigation', 'approval before reminder execution', 'durable approved reminder', 'Jev hash link reload', 'no runtime errors'], limits: ['No physical WebGPU inference, paid provider or external agent runtime exercised'] }));
 } finally { await browser.close(); }

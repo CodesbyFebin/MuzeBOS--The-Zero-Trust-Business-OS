@@ -27,6 +27,7 @@ try {
   }
   if (!ready) throw new Error('Production server startup timed out');
   process.env.TEST_BASE_URL = base;
+  process.env.TEST_JEV_DB = env.MUZEBOS_DB;
   await import('./muzebos-browser.mjs');
   await import('./muzebos-mission-browser.mjs');
   await import('./muzebos-integrations-browser.mjs');
