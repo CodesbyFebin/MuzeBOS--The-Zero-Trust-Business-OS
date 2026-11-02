@@ -156,6 +156,7 @@ const ROUTES: RouteEntry[] = [
   { route: 'dispatch', load: () => import('@/app/api/dispatch/route'), url: 'http://localhost/api/dispatch' },
   { route: 'talk', load: () => import('@/app/api/talk/route'), url: 'http://localhost/api/talk' },
   { route: 'brain-ops', load: () => import('@/app/api/brain-ops/route'), url: 'http://localhost/api/brain-ops' },
+  { route: 'demo', load: () => import('@/app/api/demo/route'), url: 'http://localhost/api/demo' },
   { route: 'data', load: () => import('@/app/api/data/route'), url: 'http://localhost/api/data' },
   { route: 'passkeys', load: () => import('@/app/api/passkeys/route'), url: 'http://localhost/api/passkeys' },
   { route: 'metrics', load: () => import('@/app/api/metrics/route'), url: 'http://localhost/api/metrics' },
@@ -195,7 +196,7 @@ function discoverGetRoutes(dir: string, base = ''): string[] {
 }
 
 /** Routes that hold business records: a signed-out GET must be refused (401), never 200. */
-const MEMBER_ONLY = new Set(['metabos/hubs/[hub]', 'muse/catalog', 'metabos/command-center', 'metabos/overdue', 'ai', 'ai/budget', 'ai/local', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops', 'data', 'b3/mcp', 'b3/pipelines', 'b3/social', 'b3/swarms', 'b3/writing', 'hub', 'server', 'agentverse', 'meta', 'metabos/arena']);
+const MEMBER_ONLY = new Set(['metabos/hubs/[hub]', 'muse/catalog', 'metabos/command-center', 'metabos/overdue', 'ai', 'ai/budget', 'ai/local', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops', 'data', 'b3/mcp', 'b3/pipelines', 'b3/social', 'b3/swarms', 'b3/writing', 'hub', 'server', 'agentverse', 'meta', 'demo', 'metabos/arena']);
 describe('platform smoke — every GET API route answers 200 with JSON', () => {
   test.each(ROUTES)('GET /api/$route', async ({ route, load, url, params }) => {
     const mod = await load();

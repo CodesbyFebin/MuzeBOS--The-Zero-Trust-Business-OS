@@ -207,7 +207,7 @@ export function LegacyKitSpecimen() {
         <SlabCard title="Status and marks" sub="chips · badges · LEDs · emblem · mark" i={8}>
           <div className="l-card-body flex flex-col gap-4">
             <div className="l-kit-row">
-              <Chip tone="ok">3/25 systems live</Chip>
+              <Chip tone="ok">3/25 systems connected</Chip>
               <Chip tone="warn">stale 12 min</Chip>
               <Chip tone="err">feed down</Chip>
               <Chip tone="accent">agent</Chip>

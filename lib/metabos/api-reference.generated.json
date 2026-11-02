@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 232,
+ "count": 233,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1328,6 +1328,19 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/demo",
+   "file": "app/api/demo/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Judge demo helpers. Writes need jev.decide. Fixtures are labelled; sends still use /api/dispatch.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
    "access": "session"
   },
   {

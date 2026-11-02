@@ -49,12 +49,12 @@ export function LegacySideFoot() {
     return () => ctrl.abort();
   }, []);
   const ok = !!live && live.up > 0;
-  const label = live ? `${live.up} of ${live.total} systems live` : 'Systems live: checking';
+  const label = live ? `${live.up} of ${live.total} systems connected` : 'Systems connected: checking';
   return (
     <div className="l-side-foot" data-l="SideFoot">
       <Link href="/integrations" className="l-side-live" title={label} aria-label={label}>
         <span className={`l-dot ${ok ? 'ok pulse' : 'off'}`} aria-hidden />
-        <span className="l-side-foot-text">{live ? `${live.up}/${live.total}` : '-/-'} systems live</span>
+        <span className="l-side-foot-text">{live ? `${live.up}/${live.total}` : '-/-'} systems connected</span>
       </Link>
       <div className="l-side-host l-side-foot-text">{host ?? '…'} · sqlite</div>
     </div>
