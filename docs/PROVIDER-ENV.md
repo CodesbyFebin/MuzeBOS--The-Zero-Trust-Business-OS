@@ -35,7 +35,7 @@ Every credential page stores only the *names* of env vars. Values are read from 
 | builder.cdn-controller | GET api.cloudflare.com/client/v4/user/tokens/verify | `MUZEBOS_CLOUDFLARE_API_TOKEN` |
 | builder.domain-and-dns-manager | GET api.cloudflare.com/client/v4/user/tokens/verify | `MUZEBOS_CLOUDFLARE_API_TOKEN` |
 | brain.voice-hq | GET openrouter.ai/api/v1/key | `OPENROUTER_API_KEY` |
-| brain.model-router | GET openrouter.ai/api/v1/key | `OPENROUTER_API_KEY` |
+| brain.model-router | GET api.meta.ai/v1/models (Bearer; key check only, billing not checked) | `MODEL_API_KEY` |
 | brain.translation-layer | GET openrouter.ai/api/v1/key | `OPENROUTER_API_KEY` |
 | brain.vision-service | GET openrouter.ai/api/v1/key | `OPENROUTER_API_KEY` |
 | foundation.kyc-inbound-hub | GET {BASE_URL} (Bearer); no vendor fixed | `MUZEBOS_KYC_PROVIDER_BASE_URL`, `MUZEBOS_KYC_PROVIDER_API_KEY` |
@@ -144,3 +144,18 @@ Every send needs a Jev approval whose payload hash matches and an `idempotency-k
 | Razorpay payment link | `MUZEBOS_RAZORPAY_KEY_ID`, `MUZEBOS_RAZORPAY_KEY_SECRET` | `POST api.razorpay.com/v1/payment_links` (paise, reference_id = idempotency key) |
 | OpenRouter completion | `OPENROUTER_API_KEY` | `POST openrouter.ai/api/v1/chat/completions` |
 | Passkeys (WebAuthn) | `MUZEBOS_WEBAUTHN_RP_ID`, `MUZEBOS_WEBAUTHN_ORIGIN`, optional `MUZEBOS_WEBAUTHN_RP_NAME` | local verification with @simplewebauthn/server; no network call |
+
+## Meta Model API (preferred AI provider)
+- Base `https://api.meta.ai/v1`, OpenAI-compatible `POST /chat/completions` (default) and `POST /responses`.
+- Env: `MODEL_API_KEY` (`META_MODEL_API_KEY` is also accepted and wins if both are set).
+- Models: **contributor by default** — `muse-spark-1.3-contributor`, fallback `muse-spark-1.2-contributor`. The owner can switch to standard (`muse-spark-1.3`, `muse-wonder-1.0` for the large tier) in AI settings (`/workspace/system/ai-settings`, stored in `mb_settings` `meta.model.mode`).
+- **Contributor terms:** prompts and replies may be used by Meta to train its models. This is stated in AI settings, on `/privacy`, and in the DPDP panel.
+- Order: Meta Model API first, OpenRouter (`OPENROUTER_API_KEY`) as fallback, then Llama options.
+- Registry status: needs credentials (brain.model-router tester: `GET /v1/models`).
+- All Meta calls go through `lib/metabos/ai/meta-call.ts` (chat runtime, dispatch completion, inference lane, overdue reminder drafts).
+- **Hard spend cap:** USD 50 = `5000` integer cents in `mb_provider_spend_caps` (owner-only edit, audited). Before each call the worst case (input chars as tokens + full output limit, which includes reasoning) is reserved; a call that would pass the cap is refused with "No request sent". After the call the cost is recorded from usage (uncached input, cached input, output incl. reasoning) in `mb_model_calls`, in integer pico-USD.
+- Prices (`mb_model_prices`, integer micro-USD per 1M tokens), verified from https://dev.meta.ai/docs/pricing-rate-limits on 28 Oct 2026: contributor input $0.10 / cached $0.002 / output $0.20; muse-spark-1.3 $1.25 / $0.15 / $4.25; muse-wonder-1.0 $4 / $0.20 / $20. Unknown models use a conservative unverified rate ($4 / $4 / $20) shown as "unverified price" in the UI.
+- Contributor rate limit 150 RPM / 3M TPM per team: 429 is retried up to 3 times, honouring `Retry-After`, otherwise exponential backoff with full jitter (max 20 s).
+- `reasoning_effort` (chat) / `reasoning.effort` (responses) is set per task; `max` is never sent (not available on contributor). See docs/TOKEN-SAVER.md.
+- A `402 billing_not_configured` reply is shown as **Billing not set up**, recorded at cost 0, and the router falls back; no output is invented.
+- Live history, 28 Oct 2026 (IST): 13:11 `GET /v1/models` 200, chat and responses 402 `billing_not_configured`. 13:17 billing fixed (muse-spark-1.3 200). 13:27–13:28: six real `muse-spark-1.3-contributor` calls through the budget store, all HTTP 200, total recorded USD 0.000559 of the USD 50.00 cap (numbers in docs/TOKEN-SAVER.md).

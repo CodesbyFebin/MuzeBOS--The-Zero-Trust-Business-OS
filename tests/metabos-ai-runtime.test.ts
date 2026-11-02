@@ -26,7 +26,7 @@ describe('router', () => {
     const s = route('add tea', 'auto', all);
     expect(s.tier).toBe('small'); expect(s.chosen?.family).toBe('llama'); expect(s.chosen?.model).toMatch(/Llama-3\.2-1B/);
     const l = route('x', 'large', all);
-    expect(l.chosen).toMatchObject({ provider: 'openrouter', model: 'meta/muse-wonder' }); expect(l.fallback).toBe(false);
+    expect(l.chosen).toMatchObject({ provider: 'meta', model: 'muse-wonder-1.0' }); expect(l.fallback).toBe(false);
   });
   it('skips WebLLM without WebGPU and explains it', () => {
     const d = route('add tea', 'small', { webgpu: false, states: { openrouter: 'ready' } });
@@ -49,7 +49,7 @@ describe('router', () => {
     expect(d.chosen).toBeNull(); expect(d.reasons.at(-1)).toMatch(/No model is available/);
   });
   it('lists only verified ids and Muse Wonder is the large tier', () => {
-    expect(TIERS.large.candidates.filter((c) => c.family === 'muse').map((c) => c.model)).toEqual(['meta/muse-wonder', 'muse-wonder-1.0']);
+    expect(TIERS.large.candidates.filter((c) => c.family === 'muse').map((c) => c.model)).toEqual(['muse-wonder-1.0', 'meta/muse-wonder']);
     expect(TIERS.small.candidates.every((c) => c.family === 'llama')).toBe(true);
   });
 });
@@ -153,7 +153,7 @@ describe('providers', () => {
   });
   it('Meta adapter uses the Responses API and maps usage; errors surface', async () => {
     const f = vi.fn(async () => new Response(JSON.stringify({ output_text: 'yo', usage: { input_tokens: 3, output_tokens: 4 } })));
-    const r = await metaProvider({ META_MODEL_API_KEY: 'k' }, f as any).chat('muse-wonder-1.0', []);
+    const r = await metaProvider({ META_MODEL_API_KEY: 'k' }, f as any, 'responses').chat('muse-wonder-1.0', []);
     expect((f.mock.calls[0] as any)[0]).toBe('https://api.meta.ai/v1/responses'); expect(r.usage?.totalTokens).toBe(7);
     const bad = vi.fn(async () => new Response('{}', { status: 401 }));
     await expect(openRouterProvider({ OPENROUTER_API_KEY: 'k' }, bad as any).chat('m', [])).rejects.toThrow(/401/);

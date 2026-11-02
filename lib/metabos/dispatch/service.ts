@@ -65,7 +65,7 @@ export async function dispatch(s: BusinessStore, id: string, hash: string, idemp
   // Claim the key before the network call so a concurrent retry cannot send twice.
   const claimed = s.db.prepare("UPDATE mb_dispatches SET idempotencyKey=?, updatedAt=? WHERE id=? AND idempotencyKey IS NULL AND status='approved'").run(idempotencyKey, new Date().toISOString(), id);
   if (claimed.changes !== 1) return row(s, id);
-  let r; try { r = await runAdapter(d.channel, d.payload, idempotencyKey, deps); }
+  let r; try { r = await runAdapter(d.channel, d.payload, idempotencyKey, { store: s, ...deps }); }
   catch (e) { r = { ok: false, status: 0, providerRef: null, evidence: `Adapter error: ${e instanceof Error ? e.message.slice(0, 300) : 'unknown'}` }; }
   s.transact(() => {
     s.db.prepare('UPDATE mb_dispatches SET status=?, providerStatus=?, providerRef=?, providerResponse=?, updatedAt=? WHERE id=?').run(r.ok ? 'sent' : 'failed', r.status, r.providerRef, r.evidence, new Date().toISOString(), id);

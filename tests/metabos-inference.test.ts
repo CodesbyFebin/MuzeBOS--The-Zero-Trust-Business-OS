@@ -17,7 +17,7 @@ describe('Routing and Jev boundaries', () => {
   it('assigns small, medium and large deterministically without claiming Wonder Full API access', () => {
     expect(chooseRoute('draft', 'short', 'auto', routes({})).route.provider).toBe('browser');
     expect(chooseRoute('analysis', 'short', 'auto', routes({})).route.provider).toBe('ollama');
-    expect(chooseRoute('plan', 'short', 'auto', routes({})).route.model).toBe('muse-wonder-1.0');
+    expect(chooseRoute('plan', 'short', 'auto', routes({})).route.model).toBe('muse-spark-1.3-contributor');
     expect(routes({}).find(r => r.provider === 'muse-code')?.configured).toBe(false);
     expect(routes({}).find(r => r.provider === 'openclaw')?.configured).toBe(false);
   });

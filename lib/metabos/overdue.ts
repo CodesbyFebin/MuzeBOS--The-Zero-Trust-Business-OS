@@ -4,7 +4,8 @@
  */
 import { z } from 'zod';
 import { BusinessError, type BusinessStore } from './store';
-import { META_BASE, META_MODELS, metaKey } from './ai/meta';
+import { META_MODELS, metaKey } from './ai/meta';
+import { metaCall } from './ai/meta-call';
 import { WorkflowEngine, OVERDUE_INVOICE_REMINDER } from './workflows';
 import { draftHash, ensureOutbound, findOverdue, fixtureDraft, validateDraft, type Draft, type OverdueFinding, type Outbound } from './overdue-core';
 export * from './overdue-core';
@@ -85,13 +86,14 @@ export async function draftReminder(store: BusinessStore, invoiceId: string, opt
   const prompt = [`Write a short, polite payment reminder email. Return JSON {"subject","body"} only.`, `Invoice number: ${finding.number}`, `Amount (write exactly): ${finding.amountText}`, `Issued: ${finding.createdAt.slice(0, 10)}`, `Due (derived): ${finding.dueAt.slice(0, 10)}`, `Customer name: ${finding.customerName.slice(0, 80)}`, `Sender: ${merchant.slice(0, 80)}`, 'Do not include links, do not claim payment was received, do not threaten legal action. Ask them to reply with a bank reference if already paid.'].join('\n').slice(0, DRAFT_LIMITS.maxPromptChars);
   let usd = (prompt.length * gate.priceInPerMTok! + DRAFT_LIMITS.maxOutputTokens * gate.priceOutPerMTok!) / 1e6;
   try {
-    const res = await (opts.fetcher ?? fetch)(`${META_BASE}/chat/completions`, { method: 'POST', redirect: 'error', signal: AbortSignal.timeout(DRAFT_LIMITS.timeoutMs), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${metaKey(env)}` }, body: JSON.stringify({ model: META_MODELS.spark, stream: false, max_tokens: DRAFT_LIMITS.maxOutputTokens, messages: [{ role: 'system', content: 'You draft business emails only. Output JSON only.' }, { role: 'user', content: prompt }] }) });
-    if (!res.ok) { await res.body?.cancel(); throw new Error(`provider status ${res.status}`); }
-    const text = await res.text();
-    if (text.length > DRAFT_LIMITS.maxResponseBytes) throw new Error('response exceeded size cap');
-    const parsed = responseSchema.parse(JSON.parse(text));
-    if (parsed.usage) usd = (parsed.usage.prompt_tokens * gate.priceInPerMTok! + parsed.usage.completion_tokens * gate.priceOutPerMTok!) / 1e6;
+    // Static instructions first, invoice data last, so the provider's prompt cache can reuse the prefix.
+    const sys = 'You draft business emails only. Output JSON only.\nWrite a short, polite payment reminder email. Return JSON {"subject","body"} only.\nDo not include links, do not claim payment was received, do not threaten legal action. Ask them to reply with a bank reference if already paid.';
+    const vars = prompt.split('\n').filter((l) => /^(Invoice number|Amount|Issued|Due|Customer name|Sender):/.test(l)).join('\n');
+    const r = await metaCall({ store, key: metaKey(env)!, messages: [{ role: 'system', content: sys }, { role: 'user', content: vars }], task: 'draft', model: META_MODELS.spark, maxOutputTokens: DRAFT_LIMITS.maxOutputTokens, fetch: opts.fetcher ?? fetch, signal: AbortSignal.timeout(DRAFT_LIMITS.timeoutMs), sideEffects: true, skipRules: true, maxRetries: 1 });
+    if (r.text.length > DRAFT_LIMITS.maxResponseBytes) throw new Error('response exceeded size cap');
+    if (r.usage) usd = (r.usage.promptTokens * gate.priceInPerMTok! + r.usage.completionTokens * gate.priceOutPerMTok!) / 1e6;
     recordSpend(store, nowMs, usd);
+    const parsed = { choices: [{ message: { content: r.text } }] };
     const content = parsed.choices[0].message.content.replace(/^```(?:json)?\s*|\s*```$/g, '');
     let raw: unknown; try { raw = JSON.parse(content); } catch { throw new Error('model output was not JSON'); }
     const v = validateDraft(raw, finding);

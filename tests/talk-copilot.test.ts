@@ -91,7 +91,7 @@ describe('follow-up gate', () => {
 
 describe('voice notes', () => {
   it('reports Not connected without a key and the adapter refusal with one', async () => {
-    expect(await transcribeStatus('m', {})).toBe('Not connected — add META_MODEL_API_KEY');
+    expect(await transcribeStatus('m', {})).toBe('Not connected — add MODEL_API_KEY');
     expect(await transcribeStatus('m', { META_MODEL_API_KEY: 'k' })).toMatch(/^Not transcribed: Muse Voice is not qualified/);
   });
 });

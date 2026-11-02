@@ -2,7 +2,8 @@
  * Provider send adapters, checked against the official docs (Oct 2026):
  *  - WhatsApp Cloud API: POST https://graph.facebook.com/v25.0/{phone-number-id}/messages (type "text")
  *  - Razorpay: POST https://api.razorpay.com/v1/payment_links (Basic auth; amount in paise; reference_id unique, max 40)
- *  - OpenRouter: POST https://openrouter.ai/api/v1/chat/completions (Bearer; model chosen by lib/metabos/ai/router)
+ *  - Meta Model API (preferred): POST https://api.meta.ai/v1/chat/completions (Bearer MODEL_API_KEY); 402 billing_not_configured = "Billing not set up"
+ *  - OpenRouter (fallback): POST https://openrouter.ai/api/v1/chat/completions (Bearer; model chosen by lib/metabos/ai/router)
  *  - Instagram DM (Instagram API with Instagram Login): POST https://graph.instagram.com/v25.0/me/messages {recipient:{id:IGSID},message:{text}} (text <= 1000 bytes)
  *  - SMTP: nodemailer transport (host/port/user/password)
  * Each adapter is pure over an injected fetch / transport so it can be unit-tested without the network.
@@ -10,11 +11,14 @@
 import { z } from 'zod';
 import nodemailer from 'nodemailer';
 import { route } from '../ai/router';
+import { metaCall, MetaApiError } from '@/lib/metabos/ai/meta-call';
+import { taskClassFor } from '@/lib/metabos/ai/token-saver';
+import { businessStore, BusinessError, type BusinessStore } from '@/lib/metabos/store';
 
 export type Env = Record<string, string | undefined>;
 export type Fetch = (url: string, init: { method: string; headers: Record<string, string>; body: string; signal?: AbortSignal }) => Promise<{ status: number; ok: boolean; text(): Promise<string> }>;
 export type MailTransport = { sendMail(m: { from: string; to: string; subject: string; text: string; headers: Record<string, string> }): Promise<{ messageId?: string; response?: string; accepted?: unknown[]; rejected?: unknown[] }> };
-export type Deps = { env: Env; fetch: Fetch; mail?: (opts: { host: string; port: number; secure: boolean; auth: { user: string; pass: string } }) => MailTransport };
+export type Deps = { env: Env; fetch: Fetch; store?: BusinessStore; mail?: (opts: { host: string; port: number; secure: boolean; auth: { user: string; pass: string } }) => MailTransport };
 export type Usage = { model: string; promptTokens: number; completionTokens: number; costMicroUsd: number | null };
 export type AdapterResult = { ok: boolean; status: number; providerRef: string | null; evidence: string; usage?: Usage };
 export class NotConnected extends Error { constructor(public missing: string[]) { super(`Not connected — add ${missing.join(', ')}`); } }
@@ -24,12 +28,13 @@ export const CHANNELS = {
   instagram: { env: ['MUZEBOS_INSTAGRAM_ACCESS_TOKEN'], schema: z.object({ to: z.string().regex(/^\d{5,30}$/, 'Instagram-scoped user id (IGSID)'), body: z.string().trim().min(1).refine((b) => Buffer.byteLength(b, 'utf8') <= 1000, 'Instagram text is limited to 1000 bytes') }).strict() },
   email: { env: ['MUZEBOS_SMTP_HOST', 'MUZEBOS_SMTP_PORT', 'MUZEBOS_SMTP_USER', 'MUZEBOS_SMTP_PASSWORD', 'MUZEBOS_SMTP_FROM'], schema: z.object({ to: z.string().trim().email().max(200), subject: z.string().trim().min(1).max(200), body: z.string().trim().min(1).max(20000) }).strict() },
   'payment-link': { env: ['MUZEBOS_RAZORPAY_KEY_ID', 'MUZEBOS_RAZORPAY_KEY_SECRET'], schema: z.object({ amount: z.number().int().min(100).max(50_000_000_00), description: z.string().trim().min(1).max(2048), customerName: z.string().trim().min(1).max(120), customerEmail: z.string().trim().email().max(200).optional(), customerContact: z.string().regex(/^\+?\d{8,14}$/).optional() }).strict() },
-  completion: { env: ['OPENROUTER_API_KEY'], schema: z.object({ prompt: z.string().trim().min(1).max(8000), tier: z.enum(['auto', 'small', 'medium', 'large']).default('auto'), maxTokens: z.number().int().min(1).max(1000).default(400) }).strict() },
+  completion: { env: ['MODEL_API_KEY', 'OPENROUTER_API_KEY'], schema: z.object({ prompt: z.string().trim().min(1).max(8000), tier: z.enum(['auto', 'small', 'medium', 'large']).default('auto'), maxTokens: z.number().int().min(1).max(1000).default(400) }).strict() },
 } as const;
 export type Channel = keyof typeof CHANNELS;
 export type Payload<C extends Channel> = z.infer<(typeof CHANNELS)[C]['schema']>;
 
-export function missingEnv(channel: Channel, env: Env) { return CHANNELS[channel].env.filter((k) => !env[k]); }
+/** Completion needs either provider key (Meta preferred, OpenRouter fallback); other channels need all their vars. */
+export function missingEnv(channel: Channel, env: Env) { if (channel === 'completion') return env.MODEL_API_KEY || env.META_MODEL_API_KEY || env.OPENROUTER_API_KEY ? [] : ['MODEL_API_KEY or OPENROUTER_API_KEY']; return CHANNELS[channel].env.filter((k) => !env[k]); }
 function need(channel: Channel, env: Env) { const m = missingEnv(channel, env); if (m.length) throw new NotConnected(m); }
 const clip = (t: string) => t.slice(0, 4000);
 const json = (t: string) => { try { return JSON.parse(t); } catch { return null; } };
@@ -66,6 +71,26 @@ async function paymentLink(p: Payload<'payment-link'>, key: string, d: Deps): Pr
   return { ok: r.ok, status: r.status, providerRef: j?.id ? `${j.id} ${j.short_url ?? ''}`.trim() : null, evidence: clip(t) };
 }
 async function completion(p: Payload<'completion'>, key: string, d: Deps): Promise<AdapterResult> {
+  const meta = (d.env.MODEL_API_KEY || d.env.META_MODEL_API_KEY)?.trim();
+  const notes: string[] = [];
+  if (meta) {
+    const decision = route(p.prompt, p.tier, { webgpu: false, states: { meta: 'ready' } });
+    if (decision.chosen?.provider === 'meta') {
+      try {
+        const store = d.store ?? businessStore();
+        const r = await metaCall({ store, key: meta, messages: [{ role: 'user', content: p.prompt }], task: taskClassFor(p.prompt, p.tier), maxOutputTokens: p.maxTokens, model: decision.chosen.model, fetch: d.fetch as typeof fetch, sideEffects: true });
+        const u = r.usage;
+        return { ok: true, status: 200, providerRef: r.responseId ?? r.callId ?? null, evidence: clip(JSON.stringify({ provider: 'meta', model: r.model, source: r.source, effort: r.effort, maxOutputTokens: r.maxOutputTokens, usage: u, reasons: decision.reasons, text: r.text })), usage: u ? { model: r.model, promptTokens: u.promptTokens, completionTokens: u.completionTokens, costMicroUsd: r.costPico != null ? Math.round(r.costPico / 1_000_000) : null } : undefined };
+      } catch (e) {
+        const status = e instanceof MetaApiError ? e.status : e instanceof BusinessError ? e.status : 0;
+        const billing = e instanceof MetaApiError && e.status === 402;
+        const capped = !billing && e instanceof BusinessError && e.status === 402;
+        notes.push(billing ? `Meta Model API: Billing not set up (HTTP 402 ${e.code ?? ''}).`.trim() : capped ? `Meta Model API: ${e.message}` : `Meta Model API failed (${e instanceof Error ? e.message.slice(0, 160) : 'error'}).`);
+        if (!d.env.OPENROUTER_API_KEY) return { ok: false, status, providerRef: null, evidence: clip(JSON.stringify({ provider: 'meta', state: billing ? 'Billing not set up' : capped ? 'Spend cap reached' : 'failed', notes })) };
+      }
+    }
+  }
+  if (!d.env.OPENROUTER_API_KEY) return { ok: false, status: 0, providerRef: null, evidence: `No completion provider available. ${notes.join(' ')}`.trim() };
   const decision = route(p.prompt, p.tier, { webgpu: false, states: { openrouter: 'ready' } });
   if (!decision.chosen || decision.chosen.provider !== 'openrouter') return { ok: false, status: 0, providerRef: null, evidence: `Router chose no OpenRouter model: ${decision.reasons.join(' ')}` };
   const r = await d.fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -76,7 +101,7 @@ async function completion(p: Payload<'completion'>, key: string, d: Deps): Promi
   const t = await r.text(); const j = json(t);
   const u = j?.usage; const cost = typeof u?.cost === 'number' ? Math.round(u.cost * 1_000_000) : null;
   const usage = u ? { model: String(j?.model ?? decision.chosen.model), promptTokens: Number(u.prompt_tokens) || 0, completionTokens: Number(u.completion_tokens) || 0, costMicroUsd: cost } : undefined;
-  return { ok: r.ok, status: r.status, providerRef: j?.id ?? null, evidence: clip(JSON.stringify({ model: decision.chosen.model, reasons: decision.reasons, response: j ?? t })), usage };
+  return { ok: r.ok, status: r.status, providerRef: j?.id ?? null, evidence: clip(JSON.stringify({ provider: 'openrouter', model: decision.chosen.model, reasons: [...notes, ...decision.reasons], response: j ?? t })), usage };
 }
 async function email(p: Payload<'email'>, key: string, d: Deps): Promise<AdapterResult> {
   const port = Number(d.env.MUZEBOS_SMTP_PORT);

@@ -51,6 +51,7 @@ export function DataConsole({ panel }: { panel: DataPanel }) {
     {panel === 'privacy' && <>
       <h2>DPDP data requests</h2>
       <p className="mb-muted">Export everything held about a customer, or redact their personal details. Redaction keeps invoice numbers and amounts for tax records and keeps opt-outs so they are never messaged again. Owner only.</p>
+      <p className="mb-muted" data-testid="dpdp-meta-training">AI drafts: prompts and replies sent to Meta contributor models may be used by Meta to train its models. See the <a href="/privacy">privacy policy</a>; the owner can switch to standard models in <a href="/workspace/system/ai-settings">AI settings</a>.</p>
       {v.customers ? <>
         <form className="mb-actions" onSubmit={async (e) => { e.preventDefault(); const j = await act({ action: 'export', customerId: f.cid, addresses: f.addr ? [f.addr] : [] }, () => 'Export ready'); if (j) { const url = URL.createObjectURL(new Blob([JSON.stringify(j.bundle, null, 2)], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = `dpdp-export-${f.cid.slice(0, 8)}.json`; a.click(); URL.revokeObjectURL(url); } }}>
           <label className="mb-field">Customer<select value={f.cid ?? ''} onChange={set('cid')} required><option value="">Choose…</option>{v.customers.map((c) => <option key={c.id} value={c.id}>{c.name} {c.email}</option>)}</select></label>
