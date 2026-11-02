@@ -762,3 +762,18 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-bos-msgs{list-style:none;padding:0;margin:0;display:grid;gap:8px}.mb-bos-msgs li{background:#111;border-radius:8px;padding:8px}.mb-bos-msgs p{margin:4px 0;overflow-wrap:anywhere}.mb-bos-msgs time{color:var(--mb-muted);font-size:12px}
 .mb-bos-embed{border-left:3px solid #FF2A2A;background:#161616;padding:6px 8px;display:flex;flex-wrap:wrap;gap:10px;font-size:12px}
 @media (max-width:820px){.mb-bos-dc{grid-template-columns:1fr}}
+
+/* MUSE voice assistant (ported from the owner's "Miri" HTML; red/black only) */
+.mb-muse-voice{display:grid;gap:.75rem;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:12px;padding:1rem}
+.mb-muse-voice-stage{display:flex;justify-content:center}
+.mb-muse-voice-bubble{border:1px solid rgba(255,42,42,.5);border-radius:10px;padding:.6rem .8rem;white-space:pre-wrap}
+.mb-muse-voice-state{display:flex;justify-content:space-between;gap:.5rem;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:#FF2A2A;margin:0 0 .25rem}
+.mb-muse-voice button{min-height:44px;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:8px;padding:.3rem .7rem;cursor:pointer}
+.mb-muse-voice button[aria-pressed="true"],.mb-muse-voice button:hover:not(:disabled){background:#FF2A2A;color:#0A0A0A}
+.mb-muse-voice button:disabled{opacity:.6;cursor:not-allowed}
+.mb-muse-voice-bar{display:flex;gap:.5rem;flex-wrap:wrap}
+.mb-muse-voice-bar input{min-height:44px;flex:1;min-width:12rem;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:8px;padding:.4rem .6rem}
+.mb-muse-voice-chips{display:flex;gap:.4rem;flex-wrap:wrap}
+.mb-muse-voice-chips button{font-size:.75rem}
+.mb-muse-home{margin:1rem;max-width:720px}
+.mb-muse-home h2{color:#FF2A2A}

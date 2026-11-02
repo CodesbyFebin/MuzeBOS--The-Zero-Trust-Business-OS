@@ -5,7 +5,7 @@ export type MuseCommand = { kind: 'boop' } | { kind: 'coat'; preset: CoatPresetI
 export function parseMuseCommand(text: string): MuseCommand | null {
   const t = text.toLowerCase().replace(/[^a-z\s-]/g, ' ').replace(/\s+/g, ' ').trim();
   if (!t) return null;
-  if (/^(muse )?boop( muse| me)?$/.test(t) || /\bboop (muse|the nose)\b/.test(t)) return { kind: 'boop' };
+  if (/^(muse |muze )?boop( muse| muze| me)?$/.test(t) || /\bboop (muse|muze|the nose)\b/.test(t)) return { kind: 'boop' };
   if (/\bflip (my|your|the) coat\b/.test(t) || /\b(next|change|switch) (my |your |the )?coat\b/.test(t)) {
     for (const c of COAT_PRESETS) if (t.includes(c.label.toLowerCase().split(' (')[0]) || t.includes(c.id.replace('-', ' '))) return { kind: 'coat', preset: c.id };
     return { kind: 'coat', preset: 'next' };

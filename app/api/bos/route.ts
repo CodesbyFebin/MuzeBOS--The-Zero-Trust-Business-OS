@@ -6,6 +6,7 @@ import { memberRead } from '@/lib/metabos/member-read';
 import { requirePermission } from '@/lib/metabos/biz/accounts';
 import { hq, office, pipeline, sanctumReceipts, trustStack } from '@/lib/metabos/bos/core';
 import { discord, operator, review } from '@/lib/metabos/bos/operator';
+import { museReview } from '@/lib/metabos/bos/muse-gate';
 import { liveActivity } from '@/lib/metabos/agentverse/core';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -17,6 +18,7 @@ export async function GET(req: Request) {
   } catch (e) { return err(e); }
 }
 export async function POST(req: Request) {
-  try { const { s, me } = memberRead(req); requirePermission(me, 'jev.decide'); const b = z.object({ action: z.literal('review'), input: z.unknown() }).strict().parse(await readJsonBounded(req));
-    return NextResponse.json(review(s, String((me as { email?: string; id: string }).email ?? me.id), b.input)); } catch (e) { return err(e); }
+  try { const { s, me } = memberRead(req); requirePermission(me, 'jev.decide'); const b = z.object({ action: z.enum(['review', 'museReview']), input: z.unknown() }).strict().parse(await readJsonBounded(req));
+    const who = String((me as { email?: string; id: string }).email ?? me.id);
+    return NextResponse.json(b.action === 'museReview' ? museReview(s, who, b.input) : review(s, who, b.input)); } catch (e) { return err(e); }
 }

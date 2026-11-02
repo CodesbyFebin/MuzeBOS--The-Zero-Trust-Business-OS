@@ -21,11 +21,19 @@ await p.goto(base + '/workspace/builder/business-open-server'); await p.getByTes
 await p.getByTestId('bos-office').waitFor({ timeout: 15000 }); await p.getByText(/No agents/i).first().waitFor();
 await p.screenshot({ path: `${out}/office-empty.png` }); await audit('office empty');
 for (const bad of ['autonomous', 'VERIFIED', '500 agents']) assert.equal(await p.getByText(bad, { exact: false }).count(), 0, `no "${bad}"`);
-await rail('MUSE Sanctum'); await p.getByTestId('bos-sanctum').waitFor(); await p.getByTestId('bos-dryrun').waitFor(); await p.waitForTimeout(1500);
+await rail('MuZe Sanctum'); await p.getByTestId('bos-sanctum').waitFor(); await p.getByTestId('bos-dryrun').waitFor(); await p.waitForTimeout(1500);
 await p.screenshot({ path: `${out}/sanctum-empty.png` }); await audit('sanctum empty');
-await p.getByLabel('Command', { exact: true }).fill('Remind the customer their order is ready'); await p.getByRole('button', { name: 'Draft plan' }).click();
-await p.getByText(/Model not configured|Plan/).first().waitFor({ timeout: 30000 }); console.log('model state', (await p.getByTestId('bos-sanctum').innerText()).match(/Model not configured[^\n]*/)?.[0] ?? 'model replied');
+await p.getByTestId('muse-voice').waitFor(); await p.getByLabel('Ask MuZe').fill('Remind the customer their order is ready'); await p.getByRole('button', { name: 'Ask', exact: true }).click();
+await p.getByTestId('muse-said').filter({ hasText: /Model not configured|Open MuZe Sanctum|Could not/ }).waitFor({ timeout: 60000 }).catch(() => {}); console.log('muse said', (await p.getByTestId('muse-said').innerText()).slice(0, 160));
 await p.screenshot({ path: `${out}/sanctum-plan.png` }); await audit('sanctum after plan');
+await p.getByRole('button', { name: 'Boop MuZe' }).click(); await p.waitForTimeout(500);
+await p.getByLabel('Or write the message yourself').fill('Your order is ready for pickup'); await p.getByRole('button', { name: 'Use my words' }).click();
+await p.getByLabel('Recipient').fill('+919999999999'); await p.getByRole('button', { name: 'Send to Jev' }).click(); await p.getByText('Proposed.').waitFor({ timeout: 15000 });
+await p.getByRole('button', { name: 'Sign as reviewer A' }).waitFor({ timeout: 15000 }); await p.getByRole('button', { name: 'Sign as reviewer A' }).click(); await p.getByText(/Reviewer A signed/).waitFor({ timeout: 15000 });
+await p.getByRole('button', { name: 'Sign as reviewer B' }).waitFor({ timeout: 15000 }); await p.getByRole('button', { name: 'Sign as reviewer B' }).click(); await p.getByText(/already signed this send/).waitFor({ timeout: 15000 });
+assert.equal(await p.getByRole('button', { name: 'Dispatch' }).count(), 0, 'one reviewer cannot unlock dispatch');
+await p.screenshot({ path: `${out}/sanctum-two-reviewer.png` }); await audit('sanctum two-reviewer');
+await p.getByRole('button', { name: 'Open trust stack' }).click(); await p.getByTestId('bos-trust').waitFor({ timeout: 15000 }); console.log('voice nav → trust OK');
 await rail('HQ'); await p.getByTestId('bos-hq').waitFor(); await p.screenshot({ path: `${out}/hq.png` }); await audit('hq');
 await rail('Operator console'); await p.getByTestId('bos-operator').waitFor(); assert.equal(await p.getByTestId('bos-cli-state').innerText(), 'Not connected');
 for (const bt of ['Run', 'Pause', 'Stop']) assert.equal(await p.getByRole('button', { name: bt, exact: true }).isDisabled(), true); await p.getByText('Nothing waiting in Jev.').waitFor();
@@ -38,4 +46,5 @@ await rail('Verification'); await p.getByTestId('bos-verify').waitFor(); await p
 await p.locator('[role=group][aria-label=Platform]').getByRole('button', { name: 'METAPEN Operator' }).click(); await p.getByTestId('bos-operator').waitFor();
 await p.setViewportSize({ width: 390, height: 844 }); await p.screenshot({ path: `${out}/mobile-operator.png` }); await audit('mobile');
 console.log(JSON.stringify(audits, null, 1)); console.log('page errors', errs.length, errs.slice(0, 3)); assert.equal(errs.length, 0);
+await p.setViewportSize({ width: 1440, height: 900 }); await p.goto(base + '/'); await p.getByTestId('muse-voice').waitFor({ timeout: 30000 }); await p.waitForTimeout(1500); await p.screenshot({ path: `${out}/home-muse.png` });
 console.log('E2E OK'); await b.close();

@@ -65,7 +65,7 @@ export const MuseFurSimulator = forwardRef<MuseFurHandle, Props>(function MuseFu
   const boopCount = stats?.boops ?? boops2d;
 
   return <div className="mb-fur" data-testid="muse-fur" data-tier={tier ?? 'loading'} data-env={env} data-coat={coat} data-fps={stats?.fps ?? ''} data-boops={boopCount} data-paused={stats?.paused ? 'true' : 'false'} data-downgrades={measured}>
-    <nav className="mb-fur-envs" aria-label="MUSE scene">
+    <nav className="mb-fur-envs" aria-label="MuZe scene">
       {ENVIRONMENTS.map((e) => <button key={e.id} type="button" aria-pressed={env === e.id} onClick={() => pickEnv(e.id)} data-testid={`fur-env-${e.id}`}>{e.label}</button>)}
     </nav>
     <div className="mb-fur-stage" style={{ background: E.backdrop, height: size }}>
@@ -73,7 +73,7 @@ export const MuseFurSimulator = forwardRef<MuseFurHandle, Props>(function MuseFu
       {tier === '2d' ? <button type="button" className="mb-fur-2d" onClick={boop} aria-label={`Boop MUSE (${c.label} coat)`}><MuseAvatar state={state} coat={c.legacy2d} size={Math.min(size, 240)} /></button>
         : <canvas ref={canvas} className="mb-fur-canvas" role="img" aria-label={`MUSE 3D fur creature, ${c.label} coat, ${state}. Drag to orbit, drag across MUSE to pet, click MUSE to boop.`} data-testid="muse-fur-canvas" />}
       {E.usesCamera && cam !== 'on' && <div className="mb-fur-ar" role="region" aria-label="AR camera">
-        <p>AR View places MUSE over your camera. The feed stays on this device and is never recorded or uploaded. Your browser will ask for permission.</p>
+        <p>AR View places MuZe over your camera. The feed stays on this device and is never recorded or uploaded. Your browser will ask for permission.</p>
         {cam === 'denied' && <p className="mb-warn" role="status">Camera unavailable or permission denied.</p>}
         <button type="button" onClick={() => void startCam()} disabled={cam === 'asking'} data-testid="fur-ar-start">{cam === 'asking' ? 'Waiting for permission…' : 'Start camera'}</button>
       </div>}
@@ -96,7 +96,7 @@ export const MuseFurSimulator = forwardRef<MuseFurHandle, Props>(function MuseFu
       {FUR_SLIDERS.map((s) => <label key={s.key} className="mb-fur-slider">{s.label} <span className="mb-muted">{params[s.key]}</span>
         <input type="range" min={s.min} max={s.max} step={s.step} value={params[s.key]} onChange={(e) => setParam(s.key, Number(e.target.value))} disabled={tier === '2d'} data-testid={`fur-slider-${s.key}`} /></label>)}
       <label className="mb-voice-opt"><input type="checkbox" checked={gpuOn} disabled={tier === '2d'} onChange={(e) => { setGpuOn(e.target.checked); setReason(e.target.checked ? 'GPGPU' : 'GPU fur off'); eng.current?.setGpu(e.target.checked); }} data-testid="fur-gpu" /> GPU fur (GPGPU physics, 60k strands)</label>
-      {tier === '2d' && <p className="mb-muted">Sliders need WebGL; this device uses the 2D MUSE.</p>}
+      {tier === '2d' && <p className="mb-muted">Sliders need WebGL; this device uses the 2D MuZe.</p>}
     </section>}
   </div>;
 });
