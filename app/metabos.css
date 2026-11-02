@@ -381,14 +381,6 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 @media (prefers-reduced-motion: reduce) {
   .mb-intro-mark .mb-mark-path, .mb-intro-word, .mb-intro-accent { animation:none;stroke-dashoffset:0;fill-opacity:1;opacity:1;width:120px; }
 }
-/* Side panel upgrades (from the neural-recruitment reference, recoloured to black/red) */
-.mb-secondary-link { position:relative;border:1px solid transparent;transition:background .15s,color .15s; }
-.mb-secondary-link:hover { background:rgba(255,255,255,.03);color:var(--mb-text); }
-.mb-secondary-link[aria-current="page"] { background:var(--mb-accent-dim);color:var(--mb-text);border-color:rgba(255,42,42,.25); }
-.mb-secondary-link[aria-current="page"]::before { content:'';position:absolute;left:-1px;top:4px;bottom:4px;width:2px;background:var(--mb-accent); }
-.mb-cluster summary .mb-count { font-family:var(--mb-mono);font-size:8px;padding:1px 6px;border-radius:4px;background:var(--mb-raised);color:var(--mb-muted); }
-.mb-rail-link[aria-current="page"] { box-shadow:inset 2px 0 0 var(--mb-accent); }
-@media (prefers-reduced-motion: reduce) { .mb-secondary-link { transition:none; } }
 .mb-widgets { display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px; }
 .mb-widget { margin:0; }
 .mb-widget-label { font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mb-muted); }
@@ -459,16 +451,9 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-kpi-arrow{color:#777;flex-shrink:0;margin-top:4px}
 @media (prefers-reduced-motion:reduce){.mb-kpi-card{transition:none}.mb-kpi-card:hover{transform:none}}
 
-/* Mission Control v3 shell layer: neutral status tokens (no blue/purple), v3 rail/sidebar/topbar */
-:root { --mb-blue:#8a8a8a; --mb-purple:#8a8a8a; }
-.mb-status-dot.mb-status-existing { background:#6b6b6b; }
-.mb-rail { background:#0A0A0A; border-right:1px solid #1c1c1c; }
-.mb-rail-link, .mb-side-link { min-height:44px; border-radius:8px; color:var(--mb-text2); transition:background .15s,color .15s; }
-.mb-rail-link:hover, .mb-side-link:hover { background:#161616; color:var(--mb-text); }
-.mb-rail-link[aria-current="page"], .mb-side-link[aria-current="page"] { background:var(--mb-accent-dim); color:#fff; box-shadow:inset 2px 0 0 var(--mb-accent); }
-.mb-rail-link:focus-visible, .mb-side-link:focus-visible { outline:2px solid var(--mb-accent); outline-offset:2px; }
-.mb-shell-nav, .mb-sidebar-menu { background:#111111; border-right:1px solid #1c1c1c; }
-.mb-topbar { background:rgba(10,10,10,.92); border-bottom:1px solid #1c1c1c; }
-.mb-topbar-title { font-weight:600; letter-spacing:-.01em; }
-.mb-meter > span { background:var(--mb-accent); }
-@media (prefers-reduced-motion: reduce) { .mb-rail-link, .mb-side-link { transition:none; } }
+/* Mission Control v3 shell layer: restored to PR #46 (fa9d32d).
+ * Keep the original 56px rail / 248px side panel / 52px topbar declarations above.
+ * Later page-level v3 styles and live-data widgets remain unchanged.
+ * No additional shell overrides: the original keyboard, focus, safe-area and
+ * reduced-motion rules stay authoritative.
+ */
