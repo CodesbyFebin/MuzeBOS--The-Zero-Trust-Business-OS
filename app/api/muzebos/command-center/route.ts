@@ -17,7 +17,7 @@ const cmd = z.discriminatedUnion('action', [
   z.object({ action: z.literal('bundle.approve'), workflowId: z.string().max(80), bundleHash: z.string().regex(/^[a-f0-9]{64}$/) }),
 ]);
 export async function GET(req: Request) {
-  try { businessAccess(req); return NextResponse.json(commandCenter(businessStore())); } catch (e) { return fail(e); }
+  try { businessAccess(req); const s = businessStore(); requirePermission(requireMember(s, req), 'finance.read'); return NextResponse.json(commandCenter(s)); } catch (e) { return fail(e); }
 }
 export async function POST(req: Request) {
   try {

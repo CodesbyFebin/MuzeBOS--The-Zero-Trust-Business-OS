@@ -175,12 +175,14 @@ function discoverGetRoutes(dir: string, base = ''): string[] {
   return out;
 }
 
+/** Routes that hold business records: a signed-out GET must be refused (401), never 200. */
+const MEMBER_ONLY = new Set(['muzebos/command-center', 'muzebos/overdue']);
 describe('platform smoke — every GET API route answers 200 with JSON', () => {
-  test.each(ROUTES)('GET /api/$route', async ({ load, url, params }) => {
+  test.each(ROUTES)('GET /api/$route', async ({ route, load, url, params }) => {
     const mod = await load();
     expect(mod.GET, 'route should export GET').toBeTypeOf('function');
     const res = (await mod.GET!(new Request(url), { params })) as Response;
-    expect(res.status, `GET ${url} should be 200 (honest state, not 500/400)`).toBe(200);
+    expect(res.status, `GET ${url} should be ${MEMBER_ONLY.has(route) ? '401 signed out' : '200 (honest state, not 500/400)'}`).toBe(MEMBER_ONLY.has(route) ? 401 : 200);
     const body = await res.json();
     expect(body && typeof body === 'object').toBe(true);
   }, 20_000);
