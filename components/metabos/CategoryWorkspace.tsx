@@ -6,6 +6,7 @@ import { WORKSPACE_CATEGORIES, PINNED_UTILITIES } from '@/lib/metabos/navigation
 import { menuById, statusCounts, FEATURE_STATUSES, STATUS_LABEL, type FeatureStatus } from '@/lib/metabos/registry';
 import { StatusBadge } from '@/components/metabos/StatusBadge';
 import { HubOverview } from '@/components/metabos/HubOverview';
+import { HubKpis } from '@/components/metabos/HubKpis';
 export function CategoryWorkspace({section}:{section:string}) {
  const category=WORKSPACE_CATEGORIES.find(c=>c.id===section);
  const utility=PINNED_UTILITIES.find(p=>p.key===section);
@@ -25,8 +26,10 @@ export function CategoryDirectory({section}:{section:string}) {
  const q=query.trim().toLowerCase();
  const match=(p:typeof all[number])=>(status==='all'||p.status===status)&&(!q||`${p.pillar??''} ${p.label} ${p.summary}`.toLowerCase().includes(q));
  const shown=menu.clusters.map(c=>({...c,pages:c.pages.filter(match)})).filter(c=>c.pages.length);
- return <div className="mb-console mb-category"><header className="mb-heading"><div><span className="mb-eyebrow">{String(menu.number).padStart(2,'0')} / {category.code} / {category.cadence.toUpperCase()} WORKSPACE</span><h1>{category.title}</h1><p>{category.summary}</p></div><span className="mb-badge">PILLARS {category.first}–{category.first+19}</span></header>
+ const v3=section==='orders'||section==='money'||section==='talk';
+ return <div className={`mb-console mb-category${v3?' mb-v3':''}`} data-design={v3?'v3':undefined}><header className="mb-heading"><div><span className="mb-eyebrow">{String(menu.number).padStart(2,'0')} / {category.code} / {category.cadence.toUpperCase()} WORKSPACE</span><h1>{category.title}</h1><p>{category.summary}</p></div><span className="mb-badge">PILLARS {category.first}–{category.first+19}</span></header>
  <section className="mb-panel mb-source-shortcuts"><Link href="/workspace/system/sources">Source integration catalog</Link>{section==='brain'&&<><Link href="/workspace/brain/inference">Inference & agent workspace</Link><Link href="/workspace/brain/runtime">Interactive AI runtime</Link><Link href="/workspace/brain/employees">AI employees & founder prompts</Link><Link href="/workspace/brain/security">Agent permission review</Link></>}{section==='orders'&&<Link href="/workspace/orders/bookings">Bookings & appointments</Link>}</section>
+ {v3&&<HubKpis hub={section as 'orders'|'money'|'talk'}/>}
  {['money','growth','brain'].includes(section)&&<HubOverview hub={section}/>}
  <section className="mb-status-summary" aria-label="Status summary">{FEATURE_STATUSES.map(s=><span key={s}><StatusBadge status={s}/> {counts[s]}</span>)}</section>
  <div className="mb-category-toolbar"><label className="mb-search"><span className="sr-only">Search {menu.label} pages</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Find a page or pillar…"/></label><label className="mb-filter"><span className="sr-only">Filter by status</span><select value={status} onChange={e=>setStatus(e.target.value as FeatureStatus|'all')}><option value="all">All statuses</option>{FEATURE_STATUSES.map(s=><option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select></label></div>
