@@ -31,6 +31,7 @@ Written on 2026-10-28 (IST) **before** changes on branch `fix/release-readiness`
 | 1 Approval journey | PASS (local fixture) | `tests/release-gate1-approval.test.ts` 7/7 (approve, then exactly one reminder; reject; expiry; changed or tampered proposal; refused tool; cross-DB). Browser: `npm run test:qualify-browser` exit 0 includes "separate Jev approval link", "approval before reminder execution", "durable approved reminder" and "Jev hash link reload". |
 | 2 Dependencies | PASS (scan) | `npm audit --omit=dev` exit 0, 0 vulnerabilities after zod 4.6.7 (fix/zod4). Array bounds and streaming body cap tested. See docs/SECURITY-TRIAGE.md. A clean scan is not proof of a secure deployment. |
 | 3 Overdue-invoice workflow | PASS (fixture) · live BLOCKED · real send UNVERIFIED | Branch `feat/gate3-overdue`. `/workspace/money/overdue` plus `/api/muzebos/overdue`, `lib/muzebos/overdue{,-core}.ts`, workflow `overdue-invoice-reminder` (only grant of `messages.send`). `tests/release-gate3-overdue.test.ts` 7/7: findings come only from stored pending invoices with no reference; cited fields; uncertainty (derived due date, assumed 30-day terms unless configured); a FIXTURE label and BLOCKED gate with no key or price and no network call; a live call capped (350 max_tokens, 15 s timeout, 64 KB response, 2,000-char prompt, 20 calls/day, USD 0.02/call, USD 0.25/day, which needs a configured price) and validated, with a bad, timed-out or invalid draft falling back to fixture; Jev hash approval required; with no sender, a `not_sent` record; with a sender, queued once and handed off once; reconcile after approval gives a stale hash and nothing sent; evidence chain verifies. Live: no Meta key on the box, so BLOCKED. Real send: no inbox or gsend on the box; the hand-off path is tested only with a stub sender. |
+| 5 v4 port (records) | PASS (local tests) | Branch `feat/v4-port` (stacked on `feat/gate3-overdue`). `lib/muzebos/records.ts`, `POST /api/muzebos/records` (member + `finance.read`; backup needs `members.manage`; unauthenticated POST answers 403 locally). `tests/release-v4-port.test.ts` 5/5: UPI QR amount from the stored invoice, 409 without UPI or after reconcile; stock ledger balanced and detects a direct edit; tax CSV formula neutralising; redacted evidence export with chain status that detects tampering; backup reopened and verified. See docs/MERGE.md. Backups unencrypted and local only. |
 | 4 Event and eligibility | UNCONFIRMED | Official page: https://dev.meta.ai/events/global-hackathon (submissions due Nov 4, 9:00 PM ET; Indie and Startup tracks). Existing-codebase eligibility is UNCONFIRMED. Question for the organizers: "May a project submitted to the Meta Global AI Developer Hackathon build on a codebase that existed before Oct 26, 2026, provided the Meta-model work done during the event is identified in the submission?" |
 
 Gate 4 checklist: [ ] track chosen  [ ] demo video recorded  [ ] submission receipt received. None of these has been verified here.
@@ -70,3 +71,17 @@ Both `test` jobs passed (runs 40598410733 and 40598416214): `npm ci`, typecheck,
 
 ### CI for #31 (Node 22)
 Both `test` jobs passed (runs 40600003065 and 40600007878).
+
+## v4 port (feat/v4-port), checks run 2026-10-27 UTC
+
+| Command | Exit | Result |
+|---|---|---|
+| `npx tsc --noEmit -p .` | 0 | 0 errors |
+| `npx vitest run` | 1 | 1 failed (known `lab-v2-g-copy`; `lab-v2-g.test.ts` file-level, same as base), 8 skipped; api-reference regenerated, then 142/142 in api-reference + smoke-api |
+| `npx vitest run tests/release-v4-port.test.ts` | 0 | 5/5 |
+| `npm run build` | 0 | Next 15.5.28 |
+| crawl against `next start -p 4100` | 0 | 231/231 desktop and 231/231 mobile, 0 stubs |
+| `npm run test:qualify-browser` | 0 | PASS |
+| `npm audit --omit=dev` | 0 | 0 vulnerabilities (with qrcode 1.5.x) |
+
+No defensible numeric score available.
