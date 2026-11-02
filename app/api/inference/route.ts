@@ -1,10 +1,10 @@
-import { memberRead } from '@/lib/muzebos/member-read';
+import { memberRead } from '@/lib/metabos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { businessAccess } from '@/lib/muzebos/http';
-import { businessStore, BusinessError } from '@/lib/muzebos/store';
-import { InferenceStore } from '@/lib/muzebos/inference/store';
-import { proposeInferenceAction } from '@/lib/muzebos/inference/jev-bridge';
+import { businessAccess } from '@/lib/metabos/http';
+import { businessStore, BusinessError } from '@/lib/metabos/store';
+import { InferenceStore } from '@/lib/metabos/inference/store';
+import { proposeInferenceAction } from '@/lib/metabos/inference/jev-bridge';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const id = z.string().uuid();

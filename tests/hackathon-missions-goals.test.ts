@@ -1,11 +1,11 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { BusinessStore } from '../lib/muzebos/store';
-import { createMission, advanceMission, adoptLeadPlan, parseLeadPlan, rulePlan, listMissions } from '../lib/muzebos/ai/lead';
-import { createGoal, addProject, toggleProject, addCheckin, ruleDraft, progressOf, requestModelDraft, readModelDraft, listGoals } from '../lib/muzebos/goals';
-import { InferenceStore } from '../lib/muzebos/inference/store';
-import { routes } from '../lib/muzebos/inference/routing';
-import { runServerOnce } from '../lib/muzebos/inference/providers';
-import { WorkflowEngine } from '../lib/muzebos/workflows';
+import { BusinessStore } from '../lib/metabos/store';
+import { createMission, advanceMission, adoptLeadPlan, parseLeadPlan, rulePlan, listMissions } from '../lib/metabos/ai/lead';
+import { createGoal, addProject, toggleProject, addCheckin, ruleDraft, progressOf, requestModelDraft, readModelDraft, listGoals } from '../lib/metabos/goals';
+import { InferenceStore } from '../lib/metabos/inference/store';
+import { routes } from '../lib/metabos/inference/routing';
+import { runServerOnce } from '../lib/metabos/inference/providers';
+import { WorkflowEngine } from '../lib/metabos/workflows';
 
 // Injected protocol fixtures only; no live inference.
 const env = { META_MODEL_API_KEY: 'fixture', MUZEBOS_INFERENCE_PAID: '1', MUZEBOS_META_MODEL: 'muse-wonder-1.0' };

@@ -1,2 +1,2 @@
-import { ExpensesBoard } from '@/components/muzebos/ExpensesBoard';
+import { ExpensesBoard } from '@/components/metabos/ExpensesBoard';
 export default function Page() { return <ExpensesBoard/>; }

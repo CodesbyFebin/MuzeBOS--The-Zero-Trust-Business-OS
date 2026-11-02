@@ -1,2 +1,2 @@
-import { FounderDashboard } from '@/components/muzebos/FounderDashboard';
+import { FounderDashboard } from '@/components/metabos/FounderDashboard';
 export default function Page() { return <FounderDashboard/>; }

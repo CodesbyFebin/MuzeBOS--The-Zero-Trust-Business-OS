@@ -30,18 +30,18 @@ const ROUTES: RouteEntry[] = [
   { route: 'mission-control/layout', load: () => import('@/app/api/mission-control/layout/route'), url: 'http://localhost/api/mission-control/layout' },
   { route: 'brain-templates', load: () => import('@/app/api/brain-templates/route'), url: 'http://localhost/api/brain-templates' },
   { route: 'ai', load: () => import('@/app/api/ai/route'), url: 'http://localhost/api/ai' },
-  { route: 'muzebos/missions', load: () => import('@/app/api/muzebos/missions/route'), url: 'http://localhost/api/muzebos/missions' },
-  { route: 'muzebos/goals', load: () => import('@/app/api/muzebos/goals/route'), url: 'http://localhost/api/muzebos/goals' },
-  { route: 'muzebos/chief-of-staff', load: () => import('@/app/api/muzebos/chief-of-staff/route'), url: 'http://localhost/api/muzebos/chief-of-staff' },
-  { route: 'muzebos/pipeline', load: () => import('@/app/api/muzebos/pipeline/route'), url: 'http://localhost/api/muzebos/pipeline' },
-  { route: 'muzebos/hubs/[hub]', load: () => import('@/app/api/muzebos/hubs/[hub]/route'), url: 'http://localhost/api/muzebos/hubs/money', params: { hub: 'money' } },
-  { route: 'muzebos/command-center', load: () => import('@/app/api/muzebos/command-center/route'), url: 'http://localhost/api/muzebos/command-center' },
-  { route: 'muzebos/overdue', load: () => import('@/app/api/muzebos/overdue/route'), url: 'http://localhost/api/muzebos/overdue' },
-  { route: 'muzebos/expenses', load: () => import('@/app/api/muzebos/expenses/route'), url: 'http://localhost/api/muzebos/expenses' },
-  { route: 'muzebos/walls', load: () => import('@/app/api/muzebos/walls/route'), url: 'http://localhost/api/muzebos/walls' },
-  { route: 'muzebos/memory', load: () => import('@/app/api/muzebos/memory/route'), url: 'http://localhost/api/muzebos/memory' },
-  { route: 'muzebos/auth', load: () => import('@/app/api/muzebos/auth/route'), url: 'http://localhost/api/muzebos/auth' },
-  { route: 'muzebos/founder', load: () => import('@/app/api/muzebos/founder/route'), url: 'http://localhost/api/muzebos/founder' },
+  { route: 'metabos/missions', load: () => import('@/app/api/metabos/missions/route'), url: 'http://localhost/api/metabos/missions' },
+  { route: 'metabos/goals', load: () => import('@/app/api/metabos/goals/route'), url: 'http://localhost/api/metabos/goals' },
+  { route: 'metabos/chief-of-staff', load: () => import('@/app/api/metabos/chief-of-staff/route'), url: 'http://localhost/api/metabos/chief-of-staff' },
+  { route: 'metabos/pipeline', load: () => import('@/app/api/metabos/pipeline/route'), url: 'http://localhost/api/metabos/pipeline' },
+  { route: 'metabos/hubs/[hub]', load: () => import('@/app/api/metabos/hubs/[hub]/route'), url: 'http://localhost/api/metabos/hubs/money', params: { hub: 'money' } },
+  { route: 'metabos/command-center', load: () => import('@/app/api/metabos/command-center/route'), url: 'http://localhost/api/metabos/command-center' },
+  { route: 'metabos/overdue', load: () => import('@/app/api/metabos/overdue/route'), url: 'http://localhost/api/metabos/overdue' },
+  { route: 'metabos/expenses', load: () => import('@/app/api/metabos/expenses/route'), url: 'http://localhost/api/metabos/expenses' },
+  { route: 'metabos/walls', load: () => import('@/app/api/metabos/walls/route'), url: 'http://localhost/api/metabos/walls' },
+  { route: 'metabos/memory', load: () => import('@/app/api/metabos/memory/route'), url: 'http://localhost/api/metabos/memory' },
+  { route: 'metabos/auth', load: () => import('@/app/api/metabos/auth/route'), url: 'http://localhost/api/metabos/auth' },
+  { route: 'metabos/founder', load: () => import('@/app/api/metabos/founder/route'), url: 'http://localhost/api/metabos/founder' },
   { route: 'analytics', load: () => import('@/app/api/analytics/route'), url: 'http://localhost/api/analytics' },
   { route: 'evidence', load: () => import('@/app/api/evidence/route'), url: 'http://localhost/api/evidence' },
   { route: 'workflow-runs', load: () => import('@/app/api/workflow-runs/route'), url: 'http://localhost/api/workflow-runs' },
@@ -177,7 +177,7 @@ function discoverGetRoutes(dir: string, base = ''): string[] {
 }
 
 /** Routes that hold business records: a signed-out GET must be refused (401), never 200. */
-const MEMBER_ONLY = new Set(['muzebos/hubs/[hub]', 'muzebos/command-center', 'muzebos/overdue', 'ai', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'muzebos/chief-of-staff', 'muzebos/expenses', 'muzebos/founder', 'muzebos/goals', 'muzebos/memory', 'muzebos/missions', 'muzebos/pipeline', 'muzebos/walls', 'providers/[module]', 'workflow-runs']);
+const MEMBER_ONLY = new Set(['metabos/hubs/[hub]', 'metabos/command-center', 'metabos/overdue', 'ai', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs']);
 describe('platform smoke — every GET API route answers 200 with JSON', () => {
   test.each(ROUTES)('GET /api/$route', async ({ route, load, url, params }) => {
     const mod = await load();
@@ -206,7 +206,7 @@ describe('platform smoke — every GET API route answers 200 with JSON', () => {
       'lab/oauth/[provider]/callback',
       // serves the contact sheet image (raw bytes, 404 without a sheet); covered in tests/lab-gen-frames.test.ts
       'lab/frames',
-      // Meta subscription challenge: text/plain, 503/403 without a token; covered in tests/muzebos-webhooks.test.ts
+      // Meta subscription challenge: text/plain, 503/403 without a token; covered in tests/metabos-webhooks.test.ts
       'webhooks/[source]',
     ]);
     const discovered = discoverGetRoutes(path.join(process.cwd(), 'app', 'api')).filter((r) => !IGNORE.has(r)).sort();

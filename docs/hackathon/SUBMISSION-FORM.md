@@ -1,6 +1,6 @@
 # Submission form draft — founder reviews and submits
 
-- Project: MuzeBOS — The Zero-Trust Business OS.
+- Project: MeTaBos — The Zero-Trust Business OS.
 - Theme candidate: Build for Your World.
 - Track: **Unconfirmed**. Existing FounderOS-based product; confirm organizer
   permission and correct track before submission. Do not default to Indie.

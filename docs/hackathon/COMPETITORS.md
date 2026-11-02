@@ -1,9 +1,9 @@
-# Reference projects and how MuzeBOS differs
+# Reference projects and how MeTaBos differs
 
 Sources: each project's GitHub repo, README and license file (read via the
 GitHub API on 2026-10-28), plus https://businessos.dev/, operately.com (200) and corebos.org (200; says the open-source project is discontinued; demo.corebos.com unreachable). Star counts are as of
 that date. **No code, assets or text from these projects is copied into
-MuzeBOS.** That is required by the hackathon's new-work and rights rules, and
+MeTaBos.** That is required by the hackathon's new-work and rights rules, and
 also by their licenses (see the notes column).
 
 | Project | License | Stack | What it does | AI usage | License note for us |
@@ -12,9 +12,9 @@ also by their licenses (see the notes column).
 | [Miosa-osa/BusinessOS](https://github.com/Miosa-osa/BusinessOS) / [businessos.dev](https://businessos.dev/) | Apache-2.0 | Go backend, SvelteKit, PostgreSQL, Redis, Elixir parts | Local-first desktop with module windows, CRM, projects, tasks, docs, PTY terminal, custom-module builder; paid cloud computer plans ($40 to $200/mo) | BYO keys; hosts agent runtimes (Claude Code, Codex, OSA-Agent…) running automations 24/7; "self-learning" from signals | Permissive, but attribution and NOTICE are required if code is ever used. We use none. |
 | [Operately](https://github.com/operately/operately) | Apache-2.0, plus a separate Enterprise license for `ee/` | Elixir/Phoenix, React/TS | Company OS: goals/OKRs, projects, check-ins, team spaces, message boards, docs | CLI + API + published agent skills so external agents can create goals and post check-ins | `ee/` is not open source. Don't touch it. |
 
-## Where MuzeBOS is different
+## Where MeTaBos is different
 
-1. **The approval gate is the product.** In MuzeBOS an agent can only *propose*.
+1. **The approval gate is the product.** In MeTaBos an agent can only *propose*.
    Jev binds a human approval to the canonical payload hash, so a tampered
    proposal is refused, and there is no auto-approve path. BusinessOS runs
    agents autonomously 24/7, and Operately gives agents direct API write
@@ -34,16 +34,16 @@ also by their licenses (see the notes column).
 
 ## Where they are ahead (honest gaps)
 
-- **Real multi-user auth, roles and teams** (BusinessOS, Operately). MuzeBOS
+- **Real multi-user auth, roles and teams** (BusinessOS, Operately). MeTaBos
   is a single-operator local preview.
 - **Production deployments and integrations.** coreBOS has dozens of
-  integrations, and BusinessOS ships a desktop app and cloud hosting. MuzeBOS
+  integrations, and BusinessOS ships a desktop app and cloud hosting. MeTaBos
   sends nothing to external providers yet.
 - **External agent access.** Operately publishes a CLI, an API and agent
   skills.
 - **Maturity.** About 596 stars for Operately, 162 for coreBOS (archived) and
-  136 for BusinessOS, with years of history. MuzeBOS is days old.
-- **Proposal breadth.** MuzeBOS agents can only propose `reminders.create`.
+  136 for BusinessOS, with years of history. MeTaBos is days old.
+- **Proposal breadth.** MeTaBos agents can only propose `reminders.create`.
 
 ## Second set of reference projects (analysed 2026-10-28)
 
@@ -73,14 +73,14 @@ studied for observed behaviour only.
 
 ### Deduped feature matrix and what we did
 
-| Feature (deduped) | Seen in | Hackathon value | MuzeBOS status |
+| Feature (deduped) | Seen in | Hackathon value | MeTaBos status |
 | --- | --- | --- | --- |
 | Lead/worker delegation with dependent tasks | agent-swarm, hive, clawcompany, Agent-Staff | High | **Built during the event** (Missions, PR #25) |
 | Goals, linked projects, check-ins | Operately, cyber-ai-team (KPIs) | High | **Built during the event** (Goals, PR #25) |
 | Chief-of-staff rollup brief | Agent-Staff, hive, gquthier, cyber-ai-team | High | **Built during the event** (Chief of Staff, PR #26) |
 | Decisions registry (lookup before asking) | gquthier | Medium | **Built during the event** (PR #26) |
 | Observer critique of agent proposals (injection, drift) | cyber-ai-team | High (fits zero-trust) | **Built during the event** (PR #26); advisory only |
-| Tiered autonomy | gquthier, cyber-ai-team, dswh | Medium | Adopted as an **advisory label only**; MuzeBOS never auto-approves |
+| Tiered autonomy | gquthier, cyber-ai-team, dswh | Medium | Adopted as an **advisory label only**; MeTaBos never auto-approves |
 | Human approval bound to the exact payload | cyber-ai-team (replay protection) | Already ours | Inherited before the event (Jev) |
 | Deal pipeline with win probability, founder dashboard (runway, MRR) | BoomBigNose (AGPL), coreBOS | High | **Built during the event** (PR #27), clean-room |
 | Expenses where nobody approves their own | BoomBigNose (AGPL) | Medium | **Built during the event** (PR #27), multi-member rules |

@@ -1,5 +1,5 @@
-import ref from '@/lib/muzebos/api-reference.generated.json';
-import type { ApiReference } from '@/lib/muzebos/api-reference';
+import ref from '@/lib/metabos/api-reference.generated.json';
+import type { ApiReference } from '@/lib/metabos/api-reference';
 export const dynamic = 'force-static';
 const ACCESS: Record<string, string> = { session: 'Session cookie (or loopback with no password set)', token: 'Bearer token push endpoint', open: 'Open (sign-in)', webhook: 'Signed webhook receiver' };
 /** Developer API reference generated from the real app/api route files (scripts/gen-api-reference.ts). Describes only what the source contains. */

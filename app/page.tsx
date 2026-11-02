@@ -1,4 +1,4 @@
-import { MissionControl } from '@/components/muzebos/MissionControl';
+import { MissionControl } from '@/components/metabos/MissionControl';
 import { Home6Console } from '@/components/Home6Console';
 import { BRAND } from '@/lib/brand';
 export const dynamic = 'force-dynamic';

@@ -1,9 +1,9 @@
-import { memberRead } from '@/lib/muzebos/member-read';
+import { memberRead } from '@/lib/metabos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { businessStore, BusinessError } from '@/lib/muzebos/store';
-import { businessAccess } from '@/lib/muzebos/http';
-import { describeWorkflow, WorkflowEngine, WORKFLOWS } from '@/lib/muzebos/workflows';
+import { businessStore, BusinessError } from '@/lib/metabos/store';
+import { businessAccess } from '@/lib/metabos/http';
+import { describeWorkflow, WorkflowEngine, WORKFLOWS } from '@/lib/metabos/workflows';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const hash = z.string().regex(/^[0-9a-f]{64}$/); const id = z.string().uuid();

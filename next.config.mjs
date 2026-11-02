@@ -29,14 +29,14 @@ const nextConfig = {
       // FounderOS kept lead magnets under /content/lead-magnets; GladOS has no
       // /content page (archived 2026-09-17), so the old path 308s (SPEC O2).
       { source: '/content/lead-magnets', destination: '/lead-magnets', permanent: true },
-      // MuzeBOS short paths -> canonical registry routes (lib/muzebos/registry.ts;
-      // tests/muzebos-registry.test.ts keeps this list in sync). 307 so the
+      // MeTaBos short paths -> canonical registry routes (lib/metabos/registry.ts;
+      // tests/metabos-registry.test.ts keeps this list in sync). 307 so the
       // short paths stay free for later use.
       ...MUZEBOS_SHORT_PATHS.map((id) => ({ source: `/${id}`, destination: `/workspace/${id}`, permanent: false })),
       { source: '/help', destination: '/workspace/support', permanent: false },
       { source: '/api-docs', destination: '/workspace/developer', permanent: false },
       { source: '/billing', destination: '/workspace/upgrade', permanent: false },
-      // Old flat workspace paths -> their registry pages (tests/muzebos-registry.test.ts).
+      // Old flat workspace paths -> their registry pages (tests/metabos-registry.test.ts).
       ...MUZEBOS_LEGACY_WORKSPACE.map(([from, to]) => ({ source: from, destination: to, permanent: false })),
     ];
   },

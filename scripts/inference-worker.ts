@@ -1,8 +1,8 @@
 /** Always-on draft worker. Supervisor restarts this process; SQLite preserves state. */
 import { randomUUID } from 'node:crypto';
-import { businessStore } from '../lib/muzebos/store';
-import { InferenceStore } from '../lib/muzebos/inference/store';
-import { runServerOnce } from '../lib/muzebos/inference/providers';
+import { businessStore } from '../lib/metabos/store';
+import { InferenceStore } from '../lib/metabos/inference/store';
+import { runServerOnce } from '../lib/metabos/inference/providers';
 import { runtimeEnv } from '../lib/creds';
 const once = process.argv.includes('--once');
 const settings = runtimeEnv();

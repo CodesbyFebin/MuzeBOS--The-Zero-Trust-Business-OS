@@ -1,6 +1,6 @@
 # Slice 8 plan: remaining registry pages
 
-Generated from the live registry (lib/muzebos/registry.ts) on 2026-10-26 before slice 8 work. 139 pages were planned and 25 blocked.
+Generated from the live registry (lib/metabos/registry.ts) on 2026-10-26 before slice 8 work. 139 pages were planned and 25 blocked.
 
 Rule: a page moves to `available` only when its module or screen exists and tests cover it. Everything else keeps an honest stub listing its dependencies.
 
@@ -30,7 +30,7 @@ Legend for "needs":
 | 74 | stock | Inter-Warehouse Transfer | DB only |
 | 75 | stock | Shrinkage & Damage Ledger | DB only |
 
-## Batch (b) Money - DB only, built in this slice (done: all six available, tests/muzebos-modules-b.test.ts + MODULE_BATCH=b browser run)
+## Batch (b) Money - DB only, built in this slice (done: all six available, tests/metabos-modules-b.test.ts + MODULE_BATCH=b browser run)
 
 | Pillar | Menu | Page | Needs |
 |---|---|---|---|
@@ -79,11 +79,11 @@ Legend for "needs":
 | 93 | growth | UTM Tracker | DB only |
 | 99 | growth | Growth Experiments | DB only |
 
-Status: done - all six available (tests/muzebos-modules-e.test.ts, Playwright batch e + coupon redeem flow on desktop and mobile). Templates and canned replies only store text; nothing is sent from these pages.
+Status: done - all six available (tests/metabos-modules-e.test.ts, Playwright batch e + coupon redeem flow on desktop and mobile). Templates and canned replies only store text; nothing is sent from these pages.
 
 ## Batch (d) Settings, Account, Support, Upgrade, Developer
 
-These menus are pinned utilities that already link to existing screens (setup, login, usage, roadmap, integrations, blueprint). They contain no planned pillars. Slice 8 adds a Developer API reference generated from the real `app/api` route files; no plans, prices or tiers are invented. (done: /workspace/developer/api-reference, tests/muzebos-api-reference.test.ts keeps it in sync)
+These menus are pinned utilities that already link to existing screens (setup, login, usage, roadmap, integrations, blueprint). They contain no planned pillars. Slice 8 adds a Developer API reference generated from the real `app/api` route files; no plans, prices or tiers are invented. (done: /workspace/developer/api-reference, tests/metabos-api-reference.test.ts keeps it in sync)
 
 ## Needs a provider or credentials (stay blocked/planned)
 
@@ -213,6 +213,6 @@ Some of these could be DB-only later (8 Subscription Scheduler, 17 Wholesale Con
 
 ## Engine
 
-DB-only pages are declarative modules (`lib/muzebos/modules`): typed fields validated server-side with zod, reference checks, uniqueness, an explicit state machine with domain guards and effects (stock moves, order drafts), optimistic versions (409 "Stale" on concurrent edits), idempotency keys, and a hash-chained evidence entry per change. Storage: migration v10 adds `mb_module_records` and `mb_stock_moves`. One generic API (`/api/modules/[module]`) and one generic page component render loading, empty, error and stale states.
+DB-only pages are declarative modules (`lib/metabos/modules`): typed fields validated server-side with zod, reference checks, uniqueness, an explicit state machine with domain guards and effects (stock moves, order drafts), optimistic versions (409 "Stale" on concurrent edits), idempotency keys, and a hash-chained evidence entry per change. Storage: migration v10 adds `mb_module_records` and `mb_stock_moves`. One generic API (`/api/modules/[module]`) and one generic page component render loading, empty, error and stale states.
 
 Also fixed: the provider regex matched "voice" inside "Invoice" and "ach" inside other words, wrongly blocking "Proforma to Invoice". "Invoice Send" stays blocked because it needs a sending provider.

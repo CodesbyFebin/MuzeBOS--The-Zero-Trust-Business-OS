@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { BusinessStore } from '@/lib/muzebos/store';
-import { metaKey, basetenKey, metaImage, metaTranscribe, BASETEN_MUSE_SPARK_OPEN } from '@/lib/muzebos/ai/meta';
-import { runOpsAgent } from '@/lib/muzebos/ai/ops-agent';
-import { InferenceStore } from '@/lib/muzebos/inference/store';
-import { routes } from '@/lib/muzebos/inference/routing';
+import { BusinessStore } from '@/lib/metabos/store';
+import { metaKey, basetenKey, metaImage, metaTranscribe, BASETEN_MUSE_SPARK_OPEN } from '@/lib/metabos/ai/meta';
+import { runOpsAgent } from '@/lib/metabos/ai/ops-agent';
+import { InferenceStore } from '@/lib/metabos/inference/store';
+import { routes } from '@/lib/metabos/inference/routing';
 describe('PR #22 compatibility hardening', () => {
   it('accepts requested and legacy key names with deterministic precedence', () => {
     expect(metaKey({ META_MODEL_API_KEY: 'new', MODEL_API_KEY: 'old' })).toBe('new');

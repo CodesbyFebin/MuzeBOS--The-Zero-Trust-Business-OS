@@ -5,7 +5,7 @@ import { OPERATOR_NAME } from '@/lib/operator';
 import type { AgentRun } from '@/lib/schemas';
 import { getAppearance } from '@/lib/appearance-server';
 import { treeFor } from '@/lib/appearance';
-import { GovernedWorkflows } from '@/components/muzebos/GovernedWorkflows';
+import { GovernedWorkflows } from '@/components/metabos/GovernedWorkflows';
 
 export const dynamic = 'force-dynamic';
 

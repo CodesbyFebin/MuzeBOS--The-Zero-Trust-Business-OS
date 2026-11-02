@@ -63,7 +63,7 @@ try {
 }
 const get = (k) => (process.env[k] ?? envLocal[k] ?? '').trim();
 // The product name this deployment shows (lib/brand.ts): FounderOS unless GLADOS_BRAND=glados.
-const brandName = get('GLADOS_BRAND').toLowerCase() === 'glados' ? 'GladOS' : 'MuzeBOS';
+const brandName = get('GLADOS_BRAND').toLowerCase() === 'glados' ? 'GladOS' : 'MeTaBos';
 
 const host = get('GLADOS_HOST') || '127.0.0.1';
 const port = get('PORT') || '4100';

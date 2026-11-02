@@ -1,10 +1,10 @@
 import { notFound, redirect } from 'next/navigation';
-import { pageForSegments } from '@/lib/muzebos/registry';
-import { FeatureStub } from '@/components/muzebos/FeatureStub';
-import { ModuleWorkspace } from '@/components/muzebos/ModuleWorkspace';
-import { moduleById } from '@/lib/muzebos/modules';
-import { isInfraPage } from '@/lib/muzebos/infra-pages';
-import { InfraWorkspace } from '@/components/muzebos/InfraWorkspace';
+import { pageForSegments } from '@/lib/metabos/registry';
+import { FeatureStub } from '@/components/metabos/FeatureStub';
+import { ModuleWorkspace } from '@/components/metabos/ModuleWorkspace';
+import { moduleById } from '@/lib/metabos/modules';
+import { isInfraPage } from '@/lib/metabos/infra-pages';
+import { InfraWorkspace } from '@/components/metabos/InfraWorkspace';
 export const dynamic='force-dynamic';
 /** Canonical page route. Working pages alias to the screen that implements them, declarative modules render their workspace, the rest render an honest status stub. */
 export default async function FeaturePage(props:{params: Promise<{section:string;page:string}>}) {

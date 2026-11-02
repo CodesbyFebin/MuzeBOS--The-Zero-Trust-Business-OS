@@ -1,13 +1,13 @@
-# MuzeBOS
+# MeTaBos
 
 Self-hostable business workspace; single-operator preview. This optional document is a navigation aid, not a search-engine requirement or ranking mechanism.
 
-- [MuzeBOS documentation — self-hostable business OS](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/): MuzeBOS project documentation: self-hosting, approval-bound invoicing, inventory, WebLLM inference, data boundaries and verification.
-- [Self-host MuzeBOS — local business workspace](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/self-hosting/): Run MuzeBOS with Node.js and SQLite. Understand local setup, persistence, responsive mobile access and deployment qualification.
-- [Approval-bound invoices and inventory — MuzeBOS](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/invoice-approvals/): How MuzeBOS binds approval to an invoice payload, rechecks stock and commits invoice, inventory and audit evidence together.
-- [WebLLM inference and Jev model routing — MuzeBOS](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/webllm-inference/): Browser Llama inference, persistent server workers, explicit model routing and Jev approval boundaries, with live-runtime limitations.
-- [UPI requests, settlement and tax limits — MuzeBOS](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/upi-and-tax/): Understand why a UPI request is not settlement evidence, how manual reconciliation is labelled and what local tax calculations do not prove.
-- [Local data, approvals and security boundaries — MuzeBOS](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/security-and-data/): Read MuzeBOS data retention, provider, authentication and audit-chain boundaries. The preview is not a security certification.
-- [Feature status, evidence and release limits — MuzeBOS](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/verification/): Distinguish implemented local features, provider-dependent pages, software fixtures and unexecuted live or production gates.
+- [MeTaBos documentation — self-hostable business OS](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/): MeTaBos project documentation: self-hosting, approval-bound invoicing, inventory, WebLLM inference, data boundaries and verification.
+- [Self-host MeTaBos — local business workspace](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/self-hosting/): Run MeTaBos with Node.js and SQLite. Understand local setup, persistence, responsive mobile access and deployment qualification.
+- [Approval-bound invoices and inventory — MeTaBos](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/invoice-approvals/): How MeTaBos binds approval to an invoice payload, rechecks stock and commits invoice, inventory and audit evidence together.
+- [WebLLM inference and Jev model routing — MeTaBos](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/webllm-inference/): Browser Llama inference, persistent server workers, explicit model routing and Jev approval boundaries, with live-runtime limitations.
+- [UPI requests, settlement and tax limits — MeTaBos](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/upi-and-tax/): Understand why a UPI request is not settlement evidence, how manual reconciliation is labelled and what local tax calculations do not prove.
+- [Local data, approvals and security boundaries — MeTaBos](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/security-and-data/): Read MeTaBos data retention, provider, authentication and audit-chain boundaries. The preview is not a security certification.
+- [Feature status, evidence and release limits — MeTaBos](https://codesbyfebin.github.io/MuzeBOS--The-Zero-Trust-Business-OS/verification/): Distinguish implemented local features, provider-dependent pages, software fixtures and unexecuted live or production gates.
 
 Source and limitations: https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS

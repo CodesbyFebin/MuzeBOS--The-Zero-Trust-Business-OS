@@ -1,9 +1,9 @@
-import { memberRead } from '@/lib/muzebos/member-read';
+import { memberRead } from '@/lib/metabos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { businessAccess } from '@/lib/muzebos/http';
-import { businessStore, BusinessError } from '@/lib/muzebos/store';
-import { getLayout, resetLayout, saveLayout } from '@/lib/muzebos/mission-layout';
+import { businessAccess } from '@/lib/metabos/http';
+import { businessStore, BusinessError } from '@/lib/metabos/store';
+import { getLayout, resetLayout, saveLayout } from '@/lib/metabos/mission-layout';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const Body = z.discriminatedUnion('action', [z.object({ action: z.literal('save'), widgets: z.array(z.string().max(32)).max(16) }), z.object({ action: z.literal('reset') })]);

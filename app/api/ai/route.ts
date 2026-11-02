@@ -1,14 +1,14 @@
-import { memberRead } from '@/lib/muzebos/member-read';
+import { memberRead } from '@/lib/metabos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { businessStore, BusinessError } from '@/lib/muzebos/store';
-import { businessAccess } from '@/lib/muzebos/http';
-import { MUSE_FINDINGS, PRICES, SOURCES, TIERS, VERIFIED_AT, WEBLLM_VERSION } from '@/lib/muzebos/ai/models';
-import { serverProviders, type ChatMessage, type ProviderState } from '@/lib/muzebos/ai/providers';
-import { route, type Availability, type RouteDecision } from '@/lib/muzebos/ai/router';
-import { parseModelProposal, PROPOSAL_PROMPT, ruleProposal, sortTask } from '@/lib/muzebos/ai/swarm';
-import { propose, queue } from '@/lib/muzebos/ai/jev';
-import { AGENT_ROLES } from '@/lib/muzebos/workflows';
+import { businessStore, BusinessError } from '@/lib/metabos/store';
+import { businessAccess } from '@/lib/metabos/http';
+import { MUSE_FINDINGS, PRICES, SOURCES, TIERS, VERIFIED_AT, WEBLLM_VERSION } from '@/lib/metabos/ai/models';
+import { serverProviders, type ChatMessage, type ProviderState } from '@/lib/metabos/ai/providers';
+import { route, type Availability, type RouteDecision } from '@/lib/metabos/ai/router';
+import { parseModelProposal, PROPOSAL_PROMPT, ruleProposal, sortTask } from '@/lib/metabos/ai/swarm';
+import { propose, queue } from '@/lib/metabos/ai/jev';
+import { AGENT_ROLES } from '@/lib/metabos/workflows';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 

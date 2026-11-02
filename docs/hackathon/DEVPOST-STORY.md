@@ -1,7 +1,7 @@
 # Project story (Devpost-style sections)
 
 Scope: **hackathon work = PR #22** (`feat/hackathon-submission`). Everything
-earlier is inherited: the FounderOS fork, plus MuzeBOS commits made before the
+earlier is inherited: the FounderOS fork, plus MeTaBos commits made before the
 Oct 26 kickoff. See HACKATHON.md. No metrics below are invented. Anything not
 measured is not stated.
 
@@ -13,7 +13,7 @@ make anything happen.
 
 ## What it does
 You type one messy request, such as "Invoice Acme for 3 lamps, then remind me
-to chase payment Friday; restock LAMP-01". MuzeBOS splits it into agent
+to chase payment Friday; restock LAMP-01". MeTaBos splits it into agent
 subtasks. Small subtasks go to Muse Spark 1.3, large planning ones go to Muse
 Wonder 1.0, and you can choose open-weight Muse Spark Open on Baseten instead.
 Each model's answer is treated as untrusted JSON and checked against a strict

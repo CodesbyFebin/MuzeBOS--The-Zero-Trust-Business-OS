@@ -1,6 +1,6 @@
-# WebLLM inference and model routing in MuzeBOS
+# WebLLM inference and model routing in MeTaBos
 
-MuzeBOS has a persistent inference workspace at `/workspace/brain/inference`.
+MeTaBos has a persistent inference workspace at `/workspace/brain/inference`.
 It routes small drafts toward browser WebLLM, medium analysis toward configured
 local inference, and large planning toward an explicitly configured cloud route.
 The operator reviews the exact task and route before dispatch.
@@ -23,7 +23,7 @@ reservations are workload limits, not a currency spending cap.
 
 ## What is Jev?
 
-Jev names MuzeBOS's built-in approval boundary. Approval binds the task payload,
+Jev names MeTaBos's built-in approval boundary. Approval binds the task payload,
 model and configuration fingerprint. Every delegated child needs separate
 review. It is not a claim of connection to an external Jev service.
 
@@ -40,7 +40,7 @@ behavior. Its Jev gate governs proposed business writes; it is not the persisten
 inference dispatch gate. Do not treat the two interfaces as equivalent or assume
 one interface's cost policy protects the other.
 
-Read [exact setup and limits](../MUZEBOS-INFERENCE.md) and
-[verification](../MUZEBOS-INFERENCE-VERIFICATION.md).
+Read [exact setup and limits](../METABOS-INFERENCE.md) and
+[verification](../METABOS-INFERENCE-VERIFICATION.md).
 Primary model reference: [Meta model documentation](https://dev.meta.ai/docs/models).
 Return to the [documentation hub](README.md).

@@ -1,4 +1,4 @@
-# MuzeBOS submission audit — October 28, 2026 (IST)
+# MeTaBos submission audit — October 28, 2026 (IST)
 
 **Verdict: NOT submission-ready. A 100/100 readiness claim is unsupported.**
 The repository has strong local engineering evidence and honest provenance, but
@@ -18,7 +18,7 @@ The audit fix below is a separate follow-up; do not confuse it with the audited 
 
 ### P1 — Browser action-approval handoff does not reach its queue
 
-Main's `components/muzebos/InferenceWorkspace.tsx` links completed server proposals
+Main's `components/metabos/InferenceWorkspace.tsx` links completed server proposals
 to `/workflows?view=governed`. `GovernedWorkflows.tsx:46` filters runs to the first
 workflow definition, the low-stock workflow. Jev agent proposals use the separate
 `agent-proposed-write` definition and therefore are invisible there. The new
@@ -125,7 +125,7 @@ what actually happened; do not fabricate ROI, quality scores or speed claims.
 
 ### P2 — Request sorting is not an executed, mixed-model agent swarm
 
-`lib/muzebos/ai/ops-agent.ts:18` creates tasks with `paidConsent: false`; approval
+`lib/metabos/ai/ops-agent.ts:18` creates tasks with `paidConsent: false`; approval
 rejects these for paid routes until the operator creates a newly reviewed,
 consented task. A selected workspace model is frozen into each draft. It does
 not implement automatic small-task Spark/large-task Wonder execution. This

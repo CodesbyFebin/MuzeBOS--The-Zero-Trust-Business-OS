@@ -1,2 +1,2 @@
-import { AccountPanel } from '@/components/muzebos/AccountPanel';
+import { AccountPanel } from '@/components/metabos/AccountPanel';
 export default function Page() { return <AccountPanel/>; }

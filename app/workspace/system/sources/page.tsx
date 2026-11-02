@@ -1,2 +1,2 @@
-import { SourceCatalogWorkspace } from '@/components/muzebos/SourceCatalogWorkspace';
+import { SourceCatalogWorkspace } from '@/components/metabos/SourceCatalogWorkspace';
 export default function SourceCatalogPage() { return <SourceCatalogWorkspace/>; }

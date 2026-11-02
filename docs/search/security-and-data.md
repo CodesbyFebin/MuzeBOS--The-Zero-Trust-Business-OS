@@ -1,6 +1,6 @@
-# MuzeBOS security and data boundaries
+# MeTaBos security and data boundaries
 
-MuzeBOS is designed around explicit approvals, local durable records and
+MeTaBos is designed around explicit approvals, local durable records and
 inspectable evidence. Its zero-trust name is a design goal, not an independent
 certification or a claim of complete production security.
 
@@ -33,6 +33,6 @@ retention/deletion policy, isolated tool execution and independent security
 review remain separate gates. Provider-dependent workspaces do not remove those
 requirements. Use private TLS and current dependency/security updates before a pilot.
 
-See [threat model](../MUZEBOS-ARCHITECTURE.md), [operations](../MUZEBOS-OPERATIONS.md)
-and [inference boundaries](../MUZEBOS-INFERENCE.md).
+See [threat model](../METABOS-ARCHITECTURE.md), [operations](../METABOS-OPERATIONS.md)
+and [inference boundaries](../METABOS-INFERENCE.md).
 Return to the [documentation hub](README.md).

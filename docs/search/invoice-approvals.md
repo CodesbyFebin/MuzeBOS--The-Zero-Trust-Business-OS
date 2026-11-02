@@ -1,6 +1,6 @@
-# How MuzeBOS verifies invoice approval
+# How MeTaBos verifies invoice approval
 
-MuzeBOS binds merchant approval to the exact canonical invoice payload. Issuance
+MeTaBos binds merchant approval to the exact canonical invoice payload. Issuance
 rechecks the approved payload and available stock, then writes the issued
 invoice, inventory movements and audit evidence in one database transaction.
 An altered or replayed approval cannot authorize a different invoice.
@@ -31,6 +31,6 @@ exact-task Jev gate and bounded workers. Business writes retain their separate
 validation, permission and transaction boundaries. A model response cannot grant
 itself authority.
 
-See [commerce architecture](../MUZEBOS-ARCHITECTURE.md),
-[issuance tests](../../tests/muzebos-issuance.test.ts) and
+See [commerce architecture](../METABOS-ARCHITECTURE.md),
+[issuance tests](../../tests/metabos-issuance.test.ts) and
 [UPI versus settlement](upi-and-tax.md). Return to the [documentation hub](README.md).

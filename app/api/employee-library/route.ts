@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { businessAccess } from '@/lib/muzebos/http';
-import { BusinessError } from '@/lib/muzebos/store';
+import { businessAccess } from '@/lib/metabos/http';
+import { BusinessError } from '@/lib/metabos/store';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import index from '@/lib/muzebos/employee-index.json';
+import index from '@/lib/metabos/employee-index.json';
 export const dynamic = 'force-dynamic';
 export async function GET(req: Request) {
   try {

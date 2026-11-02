@@ -1,2 +1,2 @@
-import { PipelineBoard } from '@/components/muzebos/PipelineBoard';
+import { PipelineBoard } from '@/components/metabos/PipelineBoard';
 export default function Page() { return <PipelineBoard/>; }
