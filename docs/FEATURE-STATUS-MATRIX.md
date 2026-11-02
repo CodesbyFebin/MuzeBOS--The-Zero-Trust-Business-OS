@@ -2,7 +2,7 @@
 
 Generated from lib/metabos/registry.ts. Do not edit by hand. "Available" means a MeTaBos operation works locally and has the listed tests; it is not a production-readiness claim. "Needs credentials" means local records work but the provider action is not wired.
 
-Totals: available 194, existing 7, needs-credentials 43, planned 0, blocked 0 (244 pages).
+Totals: available 195, existing 7, needs-credentials 43, planned 0, blocked 0 (245 pages).
 
 ## 01 Mission Control (/)
 
@@ -176,6 +176,7 @@ Totals: available 194, existing 7, needs-credentials 43, planned 0, blocked 0 (2
 | Theme Customizer | /workspace/builder/themes | available | member | scripts/metabos-crawl-routes.mjs |
 | Form & Intake Constructor | /workspace/builder/forms | available | member | scripts/metabos-crawl-routes.mjs |
 | Asset Transform Pipeline | /workspace/builder/transforms | available | member | scripts/metabos-crawl-routes.mjs |
+| MeTa Server | /workspace/builder/meta-server | available | member | scripts/metabos-crawl-routes.mjs |
 | Agent Hub | /workspace/builder/agent-hub | available | member | scripts/metabos-crawl-routes.mjs |
 | Claw swarms | /workspace/builder/swarms | available | member | scripts/metabos-crawl-routes.mjs |
 | CDN Controller | /workspace/builder/cdn | needs-credentials | member | External provider account and credentials; Provider dispatch adapter (not built; items stay queued) |

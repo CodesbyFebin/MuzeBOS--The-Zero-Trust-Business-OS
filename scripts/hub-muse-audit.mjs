@@ -5,7 +5,7 @@ const [base] = process.argv.slice(2); const axe = readFileSync(process.env.AXE, 
 const b = await chromium.launch({ args: ['--no-sandbox'] }); const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage();
 const si = await p.request.post(`${base}/api/metabos/auth`, { headers: { origin: base }, data: { action: 'signIn', credentials: { email: 'owner@example.com', password: 'e2e-only-Passw0rd!' } } }); console.log('signIn', si.status());
 const out = {};
-for (const [path, root] of [['/workspace/builder/agent-hub', '[data-testid=agent-hub]'], ['/workspace/brain/voice', '.mb-muse']]) {
+for (const [path, root] of [['/workspace/builder/meta-server', '[data-testid=meta-server]'], ['/workspace/builder/agent-hub', '[data-testid=agent-hub]'], ['/workspace/brain/voice', '.mb-muse']]) {
   await p.goto(base + path); await p.locator(root).waitFor({ timeout: 20000 }); await p.waitForTimeout(1200);
   await p.addScriptTag({ content: axe });
   const ax = await p.evaluate(async (root) => { const r = await window.axe.run(document.querySelector(root), { runOnly: ['wcag2a', 'wcag2aa', 'wcag21aa'] }); return r.violations.map((v) => ({ id: v.id, impact: v.impact, n: v.nodes.length, ex: v.nodes.slice(0, 3).map((x) => x.target.join(' ')) })); }, root);
