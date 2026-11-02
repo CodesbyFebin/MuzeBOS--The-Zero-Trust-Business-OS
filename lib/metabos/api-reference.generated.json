@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 228,
+ "count": 229,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -2030,6 +2030,19 @@
    ],
    "summary": "",
    "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/metabos/arena",
+   "file": "app/api/metabos/arena/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": true,
    "originCheck": false,
    "schemaValidated": true,
    "access": "session"
