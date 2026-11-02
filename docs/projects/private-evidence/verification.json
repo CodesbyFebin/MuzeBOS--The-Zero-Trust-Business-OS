@@ -37,5 +37,10 @@
     "private-build-clean.log": "ba94a5c5e196854d4a6c5ec8011aab581c7a8f1195d0c16f19e53e753d17afcc",
     "private-http.log": "4062a67831e9620c78363512ca22909ff304663983c16f9e8bd3e8ecffecd34b",
     "private-baseline.log": "63e9fa1d9a7a03970f2084ecb4a52b91cab79324d3ba79b1fbddb7a936b0f33f"
+  },
+  "githubQualification": {
+    "firstRun": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/actions/runs/41531562917",
+    "result": "existing fixture timeouts; new evidence tests passed",
+    "adjustment": "bounded 90-second test / 60-second hook budgets for shared runners; assertions retained; no retries or skips added"
   }
 }

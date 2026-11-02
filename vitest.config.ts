@@ -19,8 +19,10 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.test.ts'],
     environment: 'node',
-    // vitest 4 runs files in forks; heavy lab suites exceed 5 s under full parallel load.
-    testTimeout: 30000,
+    // Full fixture-world integration tests take >30 s on shared CI runners. Keep
+    // assertions intact with finite execution/setup budgets, not test retries.
+    testTimeout: 90000,
+    hookTimeout: 60000,
     // Hermetic creds: .env.local is a live credential store read fresh at call
     // time (lib/creds.ts), so tests must never see the operator's real file. Tests
     // that exercise the store point this at their own tmp path.
