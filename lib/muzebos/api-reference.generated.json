@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 205,
+ "count": 207,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1982,6 +1982,19 @@
    "access": "session"
   },
   {
+   "path": "/api/muzebos/memory",
+   "file": "app/api/muzebos/memory/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
    "path": "/api/muzebos/missions",
    "file": "app/api/muzebos/missions/route.ts",
    "methods": [
@@ -2000,6 +2013,18 @@
    "methods": [
     "GET",
     "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": true,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/muzebos/walls",
+   "file": "app/api/muzebos/walls/route.ts",
+   "methods": [
+    "GET"
    ],
    "summary": "",
    "idempotencyKey": false,
