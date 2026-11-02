@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "incident-review",
+  "name": "Incident review draft",
+  "description": "Summarize supplied incident evidence and suggest a checklist. No self-healing execution.",
+  "tags": [
+    "operations"
+  ],
+  "approval": "jev-exact-hash",
+  "tools": [
+    "inference.draft"
+  ],
+  "steps": [
+    {
+      "name": "Review incident",
+      "kind": "plan",
+      "lane": "browser",
+      "maxTokens": 256,
+      "instructions": "Summarize the supplied incident evidence and propose a recovery checklist. Separate observation from inference. Do not execute commands or claim a recovery happened."
+    }
+  ]
+}
