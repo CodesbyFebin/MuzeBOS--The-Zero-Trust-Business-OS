@@ -14,6 +14,27 @@ type Env = Record<string, string | undefined>;
 /** Hard caps on any live draft call. Cost is enforced only when a price is configured; otherwise live is refused. */
 export const DRAFT_LIMITS = { maxPromptChars: 2000, maxOutputTokens: 350, timeoutMs: 15_000, maxResponseBytes: 64_000, maxCallsPerDay: 20, maxUsdPerCall: 0.02, maxUsdPerDay: 0.25 } as const;
 
+/** Spend limits an owner may lower or raise, stored in mb_settings. Never above these hard ceilings. */
+export const SPEND_CEILINGS = { maxCallsPerDay: 200, maxUsdPerCall: 0.1, maxUsdPerDay: 2 } as const;
+export const spendLimitsSchema = z.object({ maxCallsPerDay: z.number().int().min(0).max(SPEND_CEILINGS.maxCallsPerDay), maxUsdPerCall: z.number().min(0).max(SPEND_CEILINGS.maxUsdPerCall), maxUsdPerDay: z.number().min(0).max(SPEND_CEILINGS.maxUsdPerDay) }).strict();
+export type SpendLimits = z.infer<typeof spendLimitsSchema> & { source: 'configured' | 'default' };
+const LIMITS_KEY = 'overdue.limits';
+export function spendLimits(store: BusinessStore): SpendLimits {
+  const d = { maxCallsPerDay: DRAFT_LIMITS.maxCallsPerDay, maxUsdPerCall: DRAFT_LIMITS.maxUsdPerCall, maxUsdPerDay: DRAFT_LIMITS.maxUsdPerDay };
+  const row = store.db.prepare('SELECT value FROM mb_settings WHERE key=?').get(LIMITS_KEY) as { value: string } | undefined;
+  if (!row) return { ...d, source: 'default' };
+  try { return { ...spendLimitsSchema.parse(JSON.parse(row.value)), source: 'configured' }; } catch { return { maxCallsPerDay: 0, maxUsdPerCall: 0, maxUsdPerDay: 0, source: 'configured' }; } // corrupt row fails closed
+}
+export function setSpendLimits(store: BusinessStore, actor: string, input: unknown): SpendLimits {
+  const v = spendLimitsSchema.parse(input);
+  if (v.maxUsdPerCall > v.maxUsdPerDay) throw new BusinessError('Per-call cap cannot exceed the daily cap', 422);
+  store.transact(() => {
+    store.db.prepare("INSERT INTO mb_settings VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(LIMITS_KEY, JSON.stringify(v));
+    store.appendEvidence('overdue.limits.set', actor, `Live-call limits set: ${v.maxCallsPerDay} calls/day, USD ${v.maxUsdPerCall}/call, USD ${v.maxUsdPerDay}/day`);
+  });
+  return { ...v, source: 'configured' };
+}
+
 export type LiveGate = { available: boolean; reason: string; priceInPerMTok: number | null; priceOutPerMTok: number | null };
 
 const day = (nowMs: number) => new Date(nowMs).toISOString().slice(0, 10);
@@ -35,10 +56,10 @@ export function liveGate(store: BusinessStore, env: Env = process.env, nowMs = D
   const base = { priceInPerMTok: pin, priceOutPerMTok: pout };
   if (!metaKey(env)) return { available: false, reason: 'BLOCKED: no Meta model API key configured', ...base };
   if (pin === null || pout === null) return { available: false, reason: 'BLOCKED: model price not configured, so the cost cap cannot be enforced', ...base };
-  const s = spend(store, nowMs);
-  if (s.calls >= DRAFT_LIMITS.maxCallsPerDay) return { available: false, reason: `Daily call cap reached (${DRAFT_LIMITS.maxCallsPerDay})`, ...base };
-  if (worstCaseUsd(pin, pout) > DRAFT_LIMITS.maxUsdPerCall) return { available: false, reason: `Worst-case call cost exceeds the per-call cap (USD ${DRAFT_LIMITS.maxUsdPerCall})`, ...base };
-  if (s.usd + worstCaseUsd(pin, pout) > DRAFT_LIMITS.maxUsdPerDay) return { available: false, reason: `Daily cost cap would be exceeded (USD ${DRAFT_LIMITS.maxUsdPerDay})`, ...base };
+  const s = spend(store, nowMs); const L = spendLimits(store);
+  if (s.calls >= L.maxCallsPerDay) return { available: false, reason: `Daily call cap reached (${L.maxCallsPerDay})`, ...base };
+  if (worstCaseUsd(pin, pout) > L.maxUsdPerCall) return { available: false, reason: `Worst-case call cost exceeds the per-call cap (USD ${L.maxUsdPerCall})`, ...base };
+  if (s.usd + worstCaseUsd(pin, pout) > L.maxUsdPerDay) return { available: false, reason: `Daily cost cap would be exceeded (USD ${L.maxUsdPerDay})`, ...base };
   return { available: true, reason: 'Live Muse draft allowed within caps', ...base };
 }
 /** Upper bound: every prompt char counted as one token, plus the full output budget. */
