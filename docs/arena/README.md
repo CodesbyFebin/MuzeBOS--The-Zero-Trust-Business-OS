@@ -18,3 +18,9 @@ Files:
 - Starter manifests: [invoice review](starter-pack/invoice-review.json), [customer reply](starter-pack/customer-reply.json), [incident review](starter-pack/incident-review.json)
 
 These examples draft from merchant-supplied context. They do not fetch live tax rules, verify bank statements, send messages, heal systems or provision computers. No compatibility with another agent runtime is promised by the export formats. No Refly code or separately licensed Munder Difflin artwork is included.
+
+## 3D office
+
+The Arena now defaults to original Three.js robot avatars. Orbit, zoom and click a robot to inspect its recorded task; use the 2D office or HTML list if graphics are unavailable. See [3D-AGENTS.md](3D-AGENTS.md).
+
+Muse Code integration remains a separately qualified worker boundary; see [MUSE-CODE-ADAPTER.md](MUSE-CODE-ADAPTER.md) for official SDK references, Jev mediation requirements and rollout conditions.

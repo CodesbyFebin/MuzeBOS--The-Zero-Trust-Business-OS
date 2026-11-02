@@ -6,7 +6,7 @@ The office is a projection of existing records, not an agent runtime. It is moun
 
 1. `GET /api/metabos/arena` verifies operator/loopback access, workspace membership and `finance.read`. It reads existing inference tasks, worker heartbeat records, the local evidence chain and saved skill versions. Lease tokens and prompt/output bodies are not included in the observer response.
 2. The client refreshes every 15 seconds while visible and on focus. Aborted/older reads cannot replace a newer snapshot. Authorization failures clear private content; other failures keep the last timestamped snapshot.
-3. `ArenaFloor` dynamically imports Pixi.js only on this page. Original geometric station cards and robot avatars use the app's theme tokens. No asset pack or remote sprite/font CDN is loaded.
+3. `ArenaOffice` defaults to dynamically loaded Three.js 3D robots; its selectable `ArenaFloor` fallback dynamically imports Pixi.js. Original geometric station cards and robot avatars use the app's theme tokens. No asset pack or remote sprite/font CDN is loaded.
 4. An avatar represents a task assignment. Placement follows stored state and task kind. Only a running task with a future lease is marked leased. Movement occurs when a later snapshot changes a task's station. New parent/child rows can show a delegation envelope from the completed-parent staging dock; that is not evidence of a peer messaging transport.
 5. The HTML list is authoritative and accessible when WebGL is unavailable. Up to 24 nonterminal assignments are returned for the floor and at most four are painted per station; the list shows up to the latest 100 stored tasks. This is not a claim to display or run 500 agents.
 
@@ -31,3 +31,5 @@ The existing inference queue performs exact-task approval, route/budget checks a
 OpenBot's dedicated-computer pattern is a future adapter boundary, not an implementation included here. Before adding it, require an authenticated broker, scoped tool grants, per-task isolation, network policy, resource/time quotas, exact-payload approval, lease fencing, cancellation and independently checked artifacts. A worker ID string is not a DID or hardware attestation. A hash chain is not a zkVM proof.
 
 No privileged installers, host OS changes, terminal spawning, AG-UI gateway, self-training, automatic repairs, cross-dojo mailbox, external skill publication or blanket agent autonomy was added.
+
+For 3D rendering, picking, mobile and lifecycle details see `3D-AGENTS.md`. The observer API and Jev proposal path are unchanged.

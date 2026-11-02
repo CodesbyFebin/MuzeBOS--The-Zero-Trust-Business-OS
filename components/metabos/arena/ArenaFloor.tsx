@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { STATIONS } from '@/lib/metabos/arena/snapshot';
-export type FloorActor = { id: string; agent: string; title: string; state: string; station: string; leased: boolean; parentId: string | null };
+import type { FloorActor } from '@/lib/metabos/arena/floor-layout';
 /** Original procedural artwork. No upstream tilesets, cast sprites, or terminal processes. */
 export function ArenaFloor({ actors, taskIds }: { actors: FloorActor[]; taskIds: string[] }) {
   const host = useRef<HTMLDivElement>(null), latest = useRef({ actors, taskIds }); latest.current = { actors, taskIds };
