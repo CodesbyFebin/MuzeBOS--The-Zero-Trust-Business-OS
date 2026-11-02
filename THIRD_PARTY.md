@@ -82,3 +82,11 @@ Built by the repository owner's **MeTaPen** agent during the hackathon in a sepa
 - Already in our stack, so not ported: AES-256-GCM token sealing, OAuth code → long-lived exchange, X-Hub-Signature-256 verification, the 24-hour window check.
 - Skipped: the Express server, JSON-file stores and git ledger (we use SQLite and the hash-chained audit log); the leads campaign chain (campaign / ad set / form / creative / ad and activation) because ads_management needs Meta App Review and step 5 stays blocked here; the approved-recipient list (idea noted for later).
 - Fixed on the way: the OAuth code used Graph API v19.0, which expired on 21 May 2026. All Meta calls now use one constant, v25.0 (override with `MUZEBOS_GRAPH_VERSION`).
+
+## MuZe Business Open Server (t94 + Qwen chat ideas): owner-made AI Studio material
+- `designs/t94/*/App.tsx` (HQ dashboard, R0–R6 trust stack, fur-asset build, verification flow) were made by the repository owner (codesbyfebin) in Google AI Studio, with earlier owner refs t77, t81, t88 and t91. The Agent Office (Pixtuoid-style desks) and MUSE Sanctum ideas came from the owner's own Qwen chat export. All used as **design reference only**; `components/metabos/bos/*` and `lib/metabos/bos/core.ts` are new code.
+- Not carried over: every hard-coded number, name, store, invoice, amount, latency, attestation hash and "VERIFIED" badge in those sources. Layers this server cannot attest show "Not attested".
+
+### Business Open Server — t96 Unified Command Center, METAPEN Operator Console and Discord view
+- The layout ideas (platform switcher, Mission Scope, coverage matrix, swarm radar, clan cards, two-reviewer JEV gatekeeper, evidence receipts, MUSE CLI terminal, MCP server directory and the Discord channel groups) come from Google AI Studio exports **made by the repository owner** ("MUSE x MeTaBos x MCPSERVER.in Unified Command Center" and "METAPEN Operator Console + Discord").
+- No code, numbers, names, SHAs or badges were copied. Every value shown is read from this app's own records, or the panel shows an empty state.
