@@ -1,6 +1,6 @@
 # Project board
 
-Updated: 2026-10-26
+Updated: 2026-10-29
 
 ## MeTaBos commerce and reference UI
 
@@ -119,3 +119,25 @@ Submission remains blocked; a 100/100 readiness claim is unsupported.
 - Competitive gap: fixed-reminder demo does not demonstrate useful business reasoning.
 - Full findings and closure conditions: `docs/hackathon/SUBMISSION-AUDIT.md`.
 - Patch qualification: 5,030 tests passed, 8 skipped; 41 focused checks passed; types/build and all four production browser suites passed, including the real Jev approval/reminder flow. Follow-up patch prepared for review.
+
+## PR #46 shell restoration — 2026-10-29
+
+- Restore the 56px rail, 248px secondary panel and 52px topbar from PR #46 on top of PR #57.
+- Keep all 18 destinations, Brain pinned above category clusters, command search, real notifications, details drawer and mobile tabs.
+- Remove later shell CSS overrides and the automatic opening intro; preserve page-level v3 design and newer backend functionality.
+- Typecheck, production build, 12 shell tests and desktop/mobile browser checks passed. Full suite: 5,350 passed, 2 Lab timeouts, 9 skipped; see `docs/PR46-SHELL-RESTORATION.md`. Prepared as a draft restoration PR; no stacked PRs merged by this work.
+
+## Arena workspace — 2026-10-29
+
+- Reviewed Munder Difflin, Nakama, Omarchy, OpenBot and Refly at pinned revisions; source and asset licenses recorded in `docs/arena/UPSTREAM-REVIEW.md`.
+- Implementing an original Pixi.js office bound to existing inference rows, versioned declarative skills and draft-only Jev proposals. No arbitrary CLI execution, computer provisioning or model call is enabled by the Arena.
+- Typecheck, production build and authenticated desktop/mobile browser checks completed; full suite: 5,358 passed, 2 previously reported Lab timeouts, 9 skipped. Production dependency audit: zero reported advisories. See `docs/arena/VERIFICATION.md`. Based on isolated PR #58; no default-branch merge or external sandbox deployment.
+
+## Arena 3D agents — 2026-10-29
+
+- Added a default Three.js office with original procedural robot models, camera controls and raycast selection linked to stored task details. The existing Pixi office and accessible task list remain selectable fallbacks.
+- Preserved persisted-task projection, Jev approval, the 18-menu shell and all server execution boundaries. No model call, worker provisioning or autonomous action added.
+- Added bounded layout coverage and expanded production browser checks for 3D selection, camera/view switching, context loss and mobile sizing. AdPilot's old global Three.js ban is now scoped to keep every non-Arena renderer free of that import.
+- Qualification and known inherited failures are recorded in `docs/arena/VERIFICATION.md`. Prepared on an isolated branch above PR #59, without a default-branch merge or deployment.
+
+- Final 3D qualification: types/build/43 focused tests and production desktop/mobile browser checks passed. Full suite: 5,361 passed, 2 inherited Lab timeouts, 9 skipped. Muse Code SDK integration is documented as planned, not executed.

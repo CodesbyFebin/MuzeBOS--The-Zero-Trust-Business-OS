@@ -204,14 +204,19 @@ describe('cityBreakdown (City card)', () => {
 describe('globe source rules (S11 §9)', () => {
   const globe = read('components/adpilot/Globe.tsx');
 
-  it('three.js is gone from the globe (AC11.1); only the MUSE fur sim may import it', () => {
-    // three was re-added by the owner for the MUSE fur simulator (lib/metabos/fur-sim), lazy-loaded.
+  it('AdPilot stays free of Three.js; only the lazy Arena renderer and the MUSE fur sim may import it', () => {
+    // AC11.1 removed Three.js from AdPilot. The separately requested 3D Arena
+    // now owns the dependency, without adding it to any other app renderer.
+    const arenaRenderer = path.join('components', 'metabos', 'arena', 'arena-scene.ts');
     for (const dir of ['app', 'components', 'lib']) {
       const walk = (d: string): string[] =>
         fs.readdirSync(path.join(root, d), { withFileTypes: true }).flatMap((e) =>
           e.isDirectory() ? walk(path.join(d, e.name)) : /\.(tsx?|mjs|js)$/.test(e.name) ? [path.join(d, e.name)] : [],
         );
-      for (const f of walk(dir).filter((f) => !f.includes(path.join('lib', 'metabos', 'fur-sim')))) expect(read(f), f).not.toMatch(/from ['"]three['"]/);
+      for (const f of walk(dir)) {
+        if (f === arenaRenderer || f.includes(path.join('lib', 'metabos', 'fur-sim'))) continue;
+        expect(read(f), f).not.toMatch(/(?:from\s*|import\s*\()\s*['"]three(?:\/|['"])/);
+      }
     }
   });
 
