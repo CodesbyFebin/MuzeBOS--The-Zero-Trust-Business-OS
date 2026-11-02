@@ -155,3 +155,19 @@ export function AiConsole() {
     </section>
   );
 }
+
+type Snap = Inference & { budget: { attempts: number; reservedOutputTokens: number } };
+/** Mission Control widgets from the dashboard reference, bound to the inference snapshot and bundled registry. */
+export function MissionWidgets() {
+  const [s] = useApi<Snap>('/api/inference');
+  const roles = (library as { roles: Role[] }).roles.length;
+  const tile = (id: string, label: string, body: React.ReactNode) => <div className="mb-panel mb-widget" data-testid={id}><span className="mb-widget-label">{label}</span>{body}</div>;
+  return (
+    <section className="mb-studio mb-widgets" aria-label="Operator widgets">
+      {tile('w-jev', 'Jev queue', s.kind === 'ok' ? <h3>{s.data.counters.awaitingApproval} awaiting · {s.data.counters.running} running</h3> : <Status s={s} />)}
+      {tile('w-budget', 'Inference budget today', s.kind === 'ok' ? <h3>{s.data.budget.attempts} / 50 attempts · {s.data.budget.reservedOutputTokens.toLocaleString()} / 65,536 tokens</h3> : <Status s={s} />)}
+      {tile('w-agents', 'AI employees', <h3>{roles} definitions <Link className="mb-link" href="/workspace/brain/employees">Registry</Link></h3>)}
+      {tile('w-voice', 'Voice input', <p className="mb-muted">Muse Voice is not connected or qualified, so voice input is off. When it is enabled it will only file drafts for Jev review.</p>)}
+    </section>
+  );
+}
