@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { businessAccess } from '@/lib/muzebos/http';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -16,7 +17,7 @@ async function boundedConnections():Promise<ConnectorStatus[]> {
 function tzOffset(req:Request){const v=Number(new URL(req.url).searchParams.get('tz'));return Number.isInteger(v)&&Math.abs(v)<=840?v:0;}
 export async function GET(req:Request) {
  try {
-  businessAccess(req);
+  memberRead(req, 'finance.read');
   // The commerce store is real even if inherited preview mode is on. Never
   // mix fictional tasks/connectors into the real mission-control summary.
   const demo=filmingMode();

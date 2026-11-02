@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { businessAccess } from '@/lib/muzebos/http';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -6,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export async function GET(req: Request) {
   try {
-    businessAccess(req);
+    memberRead(req, 'finance.read');
     const q = new URL(req.url).searchParams;
     const tzRaw = Number(q.get('tz')); const tz = Number.isInteger(tzRaw) && Math.abs(tzRaw) <= 840 ? tzRaw : 0;
     let range; try { range = parseRange(q.get('from'), q.get('to')); } catch (e) { throw new BusinessError(e instanceof Error ? e.message : 'Invalid range'); }

@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -24,7 +25,7 @@ const cmd = z.discriminatedUnion('action', [
   z.object({ action: z.literal('readCompaction'), taskId: z.string().max(64) }),
 ]);
 export async function GET(req: Request) {
-  try { businessAccess(req); const s = businessStore(); return NextResponse.json({ memory: listMemory(s), me: currentMember(s, req), layers: LAYER_NAMES, departments: DEPARTMENTS }); } catch (e) { return fail(e); }
+  try { memberRead(req); const s = businessStore(); return NextResponse.json({ memory: listMemory(s), me: currentMember(s, req), layers: LAYER_NAMES, departments: DEPARTMENTS }); } catch (e) { return fail(e); }
 }
 export async function POST(req: Request) {
   try {

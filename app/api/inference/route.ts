@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessAccess } from '@/lib/muzebos/http';
@@ -20,7 +21,7 @@ const command = z.discriminatedUnion('action', [
 ]);
 function failure(error: unknown) { return NextResponse.json({ error: error instanceof BusinessError ? error.message : error instanceof z.ZodError || error instanceof SyntaxError ? 'Invalid inference request' : 'Inference operation failed' }, { status: error instanceof BusinessError ? error.status : error instanceof z.ZodError || error instanceof SyntaxError ? 400 : 500, headers: { 'Cache-Control': 'no-store' } }); }
 export function GET(req: Request) {
-  try { businessAccess(req); return NextResponse.json(new InferenceStore(businessStore()).snapshot(), { headers: { 'Cache-Control': 'no-store' } }); } catch (e) { return failure(e); }
+  try { memberRead(req, 'finance.read'); return NextResponse.json(new InferenceStore(businessStore()).snapshot(), { headers: { 'Cache-Control': 'no-store' } }); } catch (e) { return failure(e); }
 }
 export async function POST(req: Request) {
   try {

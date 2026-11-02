@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -18,7 +19,7 @@ function fail(e: unknown) {
   return NextResponse.json({ error: 'Mission failed' }, { status: 500 });
 }
 export async function GET(req: Request) {
-  try { businessAccess(req); const s = businessStore(); return NextResponse.json({ missions: listMissions(s), pendingJev: queue(s).filter((r) => r.status === 'awaiting_approval').length }); } catch (e) { return fail(e); }
+  try { memberRead(req); const s = businessStore(); return NextResponse.json({ missions: listMissions(s), pendingJev: queue(s).filter((r) => r.status === 'awaiting_approval').length }); } catch (e) { return fail(e); }
 }
 export async function POST(req: Request) {
   try {

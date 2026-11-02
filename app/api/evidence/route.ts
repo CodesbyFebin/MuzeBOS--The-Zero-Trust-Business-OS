@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
 import { businessAccess } from '@/lib/muzebos/http';
@@ -6,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export async function GET(req: Request) {
   try {
-    businessAccess(req);
+    memberRead(req, 'finance.read');
     const u = new URL(req.url); const p = (k: string) => u.searchParams.get(k);
     const all = annotate(businessStore().evidence());
     const rows = filterEvidence(all.rows, { actor: p('actor'), entity: p('entity'), action: p('action'), result: p('result'), from: p('from'), to: p('to'), q: p('q') }).reverse();

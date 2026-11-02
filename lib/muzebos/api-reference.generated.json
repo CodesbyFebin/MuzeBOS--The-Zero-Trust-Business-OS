@@ -187,7 +187,7 @@
    ],
    "summary": "",
    "idempotencyKey": false,
-   "originCheck": true,
+   "originCheck": false,
    "schemaValidated": false,
    "access": "session"
   },
@@ -319,7 +319,7 @@
    ],
    "summary": "",
    "idempotencyKey": false,
-   "originCheck": true,
+   "originCheck": false,
    "schemaValidated": false,
    "access": "session"
   },
@@ -343,7 +343,7 @@
    ],
    "summary": "Read model for the Brain templates screen. Writes go through POST /api/business (idempotent commands).",
    "idempotencyKey": false,
-   "originCheck": true,
+   "originCheck": false,
    "schemaValidated": false,
    "access": "session"
   },
@@ -1233,7 +1233,7 @@
    ],
    "summary": "",
    "idempotencyKey": false,
-   "originCheck": true,
+   "originCheck": false,
    "schemaValidated": false,
    "access": "session"
   },
@@ -1306,7 +1306,7 @@
    ],
    "summary": "Live measurements for an infra page (process, DB, filesystem). Read-only.",
    "idempotencyKey": false,
-   "originCheck": true,
+   "originCheck": false,
    "schemaValidated": false,
    "access": "session"
   },
@@ -1899,7 +1899,7 @@
    ],
    "summary": "",
    "idempotencyKey": false,
-   "originCheck": true,
+   "originCheck": false,
    "schemaValidated": false,
    "access": "session"
   },
@@ -2079,7 +2079,7 @@
    ],
    "summary": "",
    "idempotencyKey": false,
-   "originCheck": true,
+   "originCheck": false,
    "schemaValidated": true,
    "access": "session"
   },

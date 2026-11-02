@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { businessAccess } from '@/lib/muzebos/http';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -7,7 +8,7 @@ export const runtime = 'nodejs';
 /** Read model for the Brain templates screen. Writes go through POST /api/business (idempotent commands). */
 export async function GET(req: Request) {
   try {
-    businessAccess(req);
+    memberRead(req);
     const store = businessStore();
     return NextResponse.json({ templates: FOUNDER_TEMPLATES, roles: BRAIN_ROLES, role: store.rolePreference(), favorites: store.templateFavorites(), drafts: store.brainDrafts() }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (e) {

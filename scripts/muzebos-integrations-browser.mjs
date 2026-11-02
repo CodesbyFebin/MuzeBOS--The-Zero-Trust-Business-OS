@@ -1,9 +1,10 @@
+import { signInOwner } from './browser-sign-in.mjs';
 /** Real local flows only; use disposable databases. No external sources executed. */
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 const base = process.env.TEST_BASE_URL || 'http://127.0.0.1:4100';
 const browser = await chromium.launch({ executablePath: process.env.TEST_CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });await signInOwner(page,base);
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const suffix = Date.now();
 try {

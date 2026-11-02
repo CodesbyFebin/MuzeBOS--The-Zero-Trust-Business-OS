@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -16,7 +17,7 @@ function fail(e: unknown) {
   return NextResponse.json({ error: 'Chief of staff failed' }, { status: 500 });
 }
 export async function GET(req: Request) {
-  try { businessAccess(req); return NextResponse.json({ brief: brief(businessStore()) }); } catch (e) { return fail(e); }
+  try { memberRead(req, 'finance.read'); return NextResponse.json({ brief: brief(businessStore()) }); } catch (e) { return fail(e); }
 }
 export async function POST(req: Request) {
   try {

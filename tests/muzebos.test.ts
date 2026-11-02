@@ -79,7 +79,10 @@ describe('HTTP command handlers',()=>{
   expect((await POST(request('x'.repeat(64001)))).status).toBe(413);
   expect((await POST(request('{}'))).status).toBe(400);
   expect((await POST(request(JSON.stringify({action:'customer',data:{name:'different'}})))).status).toBe(409);
-  const snapshot=await (await GET(new Request(url,{headers:{host:'localhost:4100'}}))).json();expect(snapshot.customers).toHaveLength(1);expect(snapshot.customers[0].name).toBe('HTTP customer');
+  const {setupWorkspace,USER_COOKIE}=await import('@/lib/muzebos/biz/accounts');const {businessStore}=await import('@/lib/muzebos/store');
+  expect((await GET(new Request(url,{headers:{host:'localhost:4100'}}))).status).toBe(401);
+  const tok=setupWorkspace(businessStore(),{workspace:'H',name:'Owner',email:'o@example.com',password:'long enough secret'}).token;
+  const snapshot=await (await GET(new Request(url,{headers:{host:'localhost:4100',cookie:`${USER_COOKIE}=${tok}`}}))).json();expect(snapshot.customers).toHaveLength(1);expect(snapshot.customers[0].name).toBe('HTTP customer');
  });
  it('requires the operator session after password setup',async()=>{
   const dir=mkdtempSync(path.join(tmpdir(),'mb-auth-'));dirs.push(dir);vi.stubEnv('GLADOS_ENV_LOCAL',path.join(dir,'.env.local'));

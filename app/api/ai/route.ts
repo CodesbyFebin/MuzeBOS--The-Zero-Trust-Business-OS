@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -43,7 +44,7 @@ async function callWithFallback(text: string, t: z.infer<typeof tier>, a: Availa
 
 export async function GET(req: Request) {
   try {
-    businessAccess(req);
+    memberRead(req, 'finance.read');
     return NextResponse.json({ verifiedAt: VERIFIED_AT, webllmVersion: WEBLLM_VERSION, sources: SOURCES, tiers: TIERS, prices: PRICES, providers: Object.values(serverProviders()).map((p) => p.status()), muse: MUSE_FINDINGS, queue: queue(businessStore()) }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (e) { return failure(e); }
 }

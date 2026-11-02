@@ -176,7 +176,7 @@ function discoverGetRoutes(dir: string, base = ''): string[] {
 }
 
 /** Routes that hold business records: a signed-out GET must be refused (401), never 200. */
-const MEMBER_ONLY = new Set(['muzebos/command-center', 'muzebos/overdue']);
+const MEMBER_ONLY = new Set(['muzebos/command-center', 'muzebos/overdue', 'ai', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'muzebos/chief-of-staff', 'muzebos/expenses', 'muzebos/founder', 'muzebos/goals', 'muzebos/memory', 'muzebos/missions', 'muzebos/pipeline', 'muzebos/walls', 'providers/[module]', 'workflow-runs']);
 describe('platform smoke — every GET API route answers 200 with JSON', () => {
   test.each(ROUTES)('GET /api/$route', async ({ route, load, url, params }) => {
     const mod = await load();

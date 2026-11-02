@@ -1,3 +1,4 @@
+import { signInOwner } from './browser-sign-in.mjs';
 /** UI/API persistence checks. No model weights or paid provider calls are made. */
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
@@ -5,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 if (!process.env.TEST_JEV_DB) throw new Error('Run through npm run test:qualify-browser for a disposable fixture database');
 const base = process.env.TEST_BASE_URL || 'http://127.0.0.1:4100';
 const browser = await chromium.launch({ executablePath: process.env.TEST_CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });await signInOwner(page,base);
 await page.addInitScript(() => { Object.defineProperty(navigator, 'gpu', { value: undefined, configurable: true }); });
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const api = async payload => page.request.post(base + '/api/inference', { headers: { origin: base, 'idempotency-key': crypto.randomUUID() }, data: payload });

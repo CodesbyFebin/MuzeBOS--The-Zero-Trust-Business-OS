@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -12,7 +13,7 @@ function fail(e: unknown) {
 import { readScope, wallMatrix } from '@/lib/muzebos/biz/departments';
 export async function GET(req: Request) {
   try {
-    businessAccess(req); const u = new URL(req.url); const d = u.searchParams.get('department'); const sc = u.searchParams.get('scope');
+    memberRead(req, 'finance.read'); const u = new URL(req.url); const d = u.searchParams.get('department'); const sc = u.searchParams.get('scope');
     if (!d || !sc) return NextResponse.json({ walls: wallMatrix() });
     const rows = readScope(businessStore(), d, sc); return NextResponse.json({ department: d, scope: sc, count: rows.length, rows: rows.slice(0, 50) });
   } catch (e) { return fail(e); }

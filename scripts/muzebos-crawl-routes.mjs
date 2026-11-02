@@ -2,6 +2,7 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { signInOwner } from './browser-sign-in.mjs';
 const base = process.env.TEST_BASE_URL || 'http://127.0.0.1:4100';
 const routes = JSON.parse(execFileSync('npx', ['tsx', '-e', "import('./lib/muzebos/registry.ts').then(m=>console.log(JSON.stringify((m.ALL_FEATURES??m.default.ALL_FEATURES).map(f=>f.route))))"], { encoding: 'utf8' }).trim().split('\n').pop());
 assert.equal(routes.length, 232);
@@ -10,6 +11,15 @@ const summary = [];
 for (const vp of [{ name: 'desktop', width: 1440, height: 1000 }, { name: 'mobile', width: 390, height: 844, isMobile: true, hasTouch: true }]) {
   const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height }, isMobile: vp.isMobile, hasTouch: vp.hasTouch });
   const bad = [];
+  if (vp.name === 'desktop') {
+    // Signed out: business pages must show the sign-in message, not records.
+    for (const r of ['/', '/workspace/money/command-center']) {
+      await page.goto(base + r, { waitUntil: 'networkidle' });
+      await page.getByText('Sign in to do this').first().waitFor({ timeout: 15000 });
+    }
+    summary.push('signed-out: / and /workspace/money/command-center show "Sign in to do this"');
+  }
+  await signInOwner(page, base);
   for (const r of routes) {
     const res = await page.goto(base + r, { waitUntil: 'domcontentloaded' });
     const status = res?.status(); const stubs = await page.locator('.mb-stub').count();

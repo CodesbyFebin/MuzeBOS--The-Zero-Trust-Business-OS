@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -21,7 +22,7 @@ const cmd = z.discriminatedUnion('action', [
 ]);
 export async function GET(req: Request) {
   try {
-    businessAccess(req); const s = businessStore(); const me = currentMember(s, req); const actor = me?.id ?? null;
+    memberRead(req, 'expense.submit'); const s = businessStore(); const me = currentMember(s, req); const actor = me?.id ?? null;
     const members = listMembers(s); const expenses = listExpenses(s).map((e) => ({ ...e, blockedFor: actor && members.some((m) => m.id === actor) ? cannotDecide(s, actor, e) : null }));
     return NextResponse.json({ me, members, expenses, managerLimit: MANAGER_LIMIT, categories: EXPENSE_CATEGORIES });
   } catch (e) { return fail(e); }

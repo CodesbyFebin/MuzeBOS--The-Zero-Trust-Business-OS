@@ -1,3 +1,4 @@
+import { memberRead } from '@/lib/muzebos/member-read';
 import { NextResponse } from 'next/server';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
 import { businessAccess } from '@/lib/muzebos/http';
@@ -8,7 +9,7 @@ export const runtime = 'nodejs';
 export async function GET(req: Request, props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
   try {
-    businessAccess(req);
+    memberRead(req, 'finance.read');
     const r = infraReport(businessStore(), params.page);
     if (!r) throw new BusinessError('Unknown infra page', 404);
     return NextResponse.json(r, { headers: { 'Cache-Control': 'no-store' } });
