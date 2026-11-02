@@ -17,3 +17,10 @@ Say aloud: Yao runs are wired and the engine works, but the in-app Yao run needs
 3. Marketing & Ads → #ads-manager: status reads "Not connected — no Marketing API adapter". Save a ₹500/day draft; it appears in #commits with diff `dailyBudgetMinor: 50000 INR`, pending, plus evidence hashes.
 4. Meta Suite → Threads → Personal → save a draft → waiting in Jev, nothing sent. Personal mode hides #ads-manager.
 5. Click a swarm icon: the Agent Hub opens inside the shell. On a phone, use the Servers / Channels toggles.
+
+## MUSE fur (voice page)
+1. Open the voice page. MUSE loads on the best tier available (gpu, webgl or 2D). Force a tier with `?muse=gpu|webgl|2d`.
+2. Click MUSE or press Boop. Drag on the fur to pet it; drag elsewhere to orbit.
+3. Say or type "flip my coat" or "boop".
+4. Open the Fur Lab: presets, 9 sliders and the GPU toggle.
+5. Choose AR View, then click "Start camera". The camera is used only after that click, video only, and nothing is recorded.

@@ -175,3 +175,6 @@ Tests: tests/hackathon-walls-memory.test.ts (3 tests, injected fixtures only).
 - `/workspace/builder/meta-server`: Discord-style shell. 9 business servers (HQ, Sales & CRM, Ops & Finance, Marketing & Ads, Support & WhatsApp, Data & Privacy, Knowledge & Builder, Brain, Dev & Systems) list all 245 registry pages as channels that link to (or preview) the real pages; the 10 Claw swarms embed the Agent Hub; a Meta Suite server has Facebook, Instagram, Messenger, WhatsApp, Threads and Meta AI channels with personal/business mode.
 - `#commits` ("git for agents") is a read model over Jev runs, agent/hub/social/ad/suite drafts, dispatches and the evidence chain: short hash, author, diff, approval state, evidence rows, /api/dispatch state. No parallel store.
 - Ads Manager and Meta Suite composers only save drafts plus one Jev item. Connection status comes from existing adapters; Facebook, Threads, Messenger and Ads say "Not connected — no adapter". Arena joins when #59 merges.
+
+## MUSE fur simulator (feat/muse-fur)
+- Built clean-room on three.js (MIT); see THIRD_PARTY.md. Shell and strand fur, GPGPU Verlet with a CPU fallback, 4 environments, the Fur Lab, and 6 coats (Ember is the default).

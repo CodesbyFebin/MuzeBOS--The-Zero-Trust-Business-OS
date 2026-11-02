@@ -64,6 +64,6 @@ describe('design hygiene', () => {
   it('MUSE defaults to the red/black coat, keeps violet as an option, is clean-room and motion-safe', () => {
     expect(Object.keys(COATS)[0]).toBe('ember'); expect(COATS.ember.tip).toBe('#FF2A2A'); expect(COATS.violet).toBeDefined();
     expect(avatar).toContain('prefers-reduced-motion'); expect(avatar).toMatch(/IntersectionObserver/); expect(avatar).not.toMatch(/from 'three'|getContext\('webgl/);
-    expect(readFileSync('components/metabos/VoiceAssistant.tsx', 'utf8')).toContain("useState<CoatId>('ember')");
+    expect(readFileSync('components/metabos/VoiceAssistant.tsx', 'utf8')).toContain('useState<CoatPresetId>(DEFAULT_COAT)'); // DEFAULT_COAT is 'ember' (tests/muse-fur.test.ts)
   });
 });

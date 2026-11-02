@@ -52,3 +52,10 @@ Checked 2 Nov 2026, between 1:30 and 2:00 AM IST, on branch `feat/agent-hub` (dr
 | a11y audit | 0 axe violations, 0 targets <44px, no off-palette colours on meta-server, agent-hub, voice |
 
 Verdict: ready for review as a draft. Meta Suite products without adapters (Facebook, Threads, Messenger, Ads) show "Not connected"; all sends are drafts through Jev + /api/dispatch. Screenshots: /tmp/shots/meta-server-*.png, /tmp/shots/meta-suite-*.png.
+
+## MUSE fur simulator — measured in headless Chromium with SwiftShader (software GL, no real GPU)
+- Forced gpu tier (64 shells, 60k strands, GPGPU): 1 fps. Forced webgl tier (32 shells, 12k strands, CPU physics): 1–2 fps.
+- Auto: software GL was detected, so it started on webgl, ran at 2 fps, and adaptively downgraded to the 2D fallback ("too slow for WebGL (2 fps)").
+- Turning the GPU toggle off switched to the CPU tier. ?muse=2d forces the 2D avatar. Reduced motion renders on demand.
+- getUserMedia was not called before the click; it was called once after it, with {video, audio:false}. Off-screen paused: true. 0 page errors. E2E OK.
+- Not measured: real-GPU fps.
