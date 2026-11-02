@@ -7,6 +7,7 @@ import { conversationFor } from '@/lib/metabos/talk/core';
 import { appsecretProof } from '@/lib/metabos/dispatch/adapters';
 import { addRule, adWizard, adsView, approveReply, commitTag, createWorkspace, evaluateRules, FOOTNOTE, gitOp, inboxStatus, listWorkspaces, onboarding, overview, roas, search, SUGGESTED_WORKSPACES, CHANNEL_GROUPS } from '@/lib/metabos/agentverse/core';
 import { commitLog } from '@/lib/metabos/server/commits';
+import { WorkflowEngine } from '@/lib/metabos/workflows';
 
 const wiz = { objective: 'leads', audience: 'Kochi 10km', placements: ['instagram_feed'], creative: { name: 'Test', text: 'Hello' }, dailyBudgetMinor: 50000 };
 describe('agentverse', () => {
@@ -36,6 +37,9 @@ describe('agentverse', () => {
   });
   it('revert and cherry-pick create new Jev items; SHIPPED needs a sent dispatch', () => {
     const s = new BusinessStore(':memory:'); adWizard(s, 'owner', wiz); const [c] = commitLog(s);
+    expect(() => gitOp(s, 'owner', { op: 'revert', commitId: c.id })).toThrow(/approved/);
+    const eng = new WorkflowEngine(s); eng.approve(c.jevRunId!, eng.run(c.jevRunId!).payloadHash);
+    expect(commitLog(s).find((x) => x.id === c.id)?.status).not.toBe('pending');
     const before = queue(s).length; const r = gitOp(s, 'owner', { op: 'revert', commitId: c.id });
     expect(queue(s).length).toBe(before + 1); expect(r.diff.every((l) => !l.startsWith('+ '))).toBe(true);
     expect(() => gitOp(s, 'owner', { op: 'cherry-pick', commitId: c.id })).toThrow();
@@ -57,5 +61,16 @@ describe('home server overview', () => {
     const h1 = await home(s, { REDIS_URL: 'redis://127.0.0.1:1' }); expect(h1.queues.find((q) => q.id === 'redis')!.state).toBe('not_connected');
     adWizard(s, 'owner', wiz); const h2 = await home(s, {}); expect(h2.campaigns[0].roas).toBeNull(); expect(h2.activity[0].kind).toBe('Agent drafted');
     expect(readFileSync('components/metabos/agentverse/AgentVerse.tsx', 'utf8')).not.toMatch(/47\\.2k|Kafka Lag|0\\.2s/);
+  });
+});
+
+import { evidenceVault, firewallEvents, proposeIntent } from '@/lib/metabos/agentverse/core';
+describe('evidence vault, firewall and commit composer', () => {
+  it('vault reads the real chain; composer only queues a Jev item', () => {
+    const s = new BusinessStore(':memory:'); expect(firewallEvents(s)).toEqual([]);
+    const before = queue(s).length; const r = proposeIntent(s, 'owner', { message: 'feat(ads): pause weak creative' });
+    expect(queue(s).length).toBe(before + 1); expect(r.jevRunId).toBeTruthy();
+    const v = evidenceVault(s); expect(v.valid).toBe(true); expect(v.rows.some((x) => x.action === 'agentverse.intent.pending_jev')).toBe(true);
+    expect(() => proposeIntent(s, 'owner', { message: 'x' })).toThrow();
   });
 });
