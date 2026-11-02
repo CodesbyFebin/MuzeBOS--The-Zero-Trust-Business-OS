@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 219,
+ "count": 220,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -2503,6 +2503,18 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/voice",
+   "file": "app/api/voice/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "POST JSON {text} (typed or browser speech) or multipart {audio: WAV} (Muse Voice Transcribe). Members only.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
    "access": "session"
   },
   {

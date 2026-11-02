@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { MissionGraph } from './MissionGraph';
+import { VoiceAssistant } from './VoiceAssistant';
 import { LayoutEditor } from './MissionLayoutEditor';
 import { DEFAULT_LAYOUT, type MissionWidget } from '@/lib/metabos/mission-layout-client';
 import { ArrowUpRight, Check, Clock3, ListTodo, Package, RefreshCw, ShieldCheck, Wallet } from 'lucide-react';
@@ -42,7 +43,7 @@ export function MissionControl() {
  const stale=!!data&&tick-Date.parse(data.asOf)>60_000;
  const shown=data?data.todo.filter(t=>filter==='all'||(filter==='overdue'?t.overdue:t.dueToday)):[];
  const unknown=data&&Object.values(data.sources).some(s=>s!=='available');
- return <div className="mb-console mb-mission"><header className="mb-heading"><div><span className="mb-eyebrow">FOUNDER HQ / OBSERVE · REVIEW · ACT</span><h1>Mission Control</h1><p>Your orders, money, conversations and stock. One operational view.</p></div><div className="mb-live-state"><span className={`mb-badge ${error?'mb-state-warning':''}`}><span className="mb-dot"/>{error?'UPDATE FAILED':stale?'STALE':refreshing?'UPDATING':'AUTO-REFRESH · 20s'}</span><small>{data?`Last received ${date(data.asOf)}`:'Waiting for local status'}</small><button aria-label="Refresh mission status" onClick={()=>refresh().catch(e=>setError(e.message))}><RefreshCw size={13}/></button></div></header>
+ return <div className="mb-console mb-mission"><header className="mb-heading"><div><span className="mb-eyebrow">FOUNDER HQ / OBSERVE · REVIEW · ACT</span><h1>Mission Control</h1><p>Your orders, money, conversations and stock. One operational view.</p></div><div className="mb-live-state"><span className={`mb-badge ${error?'mb-state-warning':''}`}><span className="mb-dot"/>{error?'UPDATE FAILED':stale?'STALE':refreshing?'UPDATING':'AUTO-REFRESH · 20s'}</span><small>{data?`Last received ${date(data.asOf)}`:'Waiting for local status'}</small><button aria-label="Refresh mission status" onClick={()=>refresh().catch(e=>setError(e.message))}><RefreshCw size={13}/></button></div></header><VoiceAssistant/>
  {stale&&!error&&<div role="alert" className="mb-alert" data-stale>Data is stale: last received {date(data!.asOf)}. Refresh to update.</div>}{error&&<div role="alert" className="mb-alert">{error}{data&&' · Showing the last received snapshot. Its timestamp has not changed.'}</div>}{notice&&<div role="status" className="mb-notice"><Check size={14}/>{notice}</div>}
  {!data?<div className="mb-panel mb-empty">{error?'Status unavailable. Retry to reconnect.':'Reading business records, tasks and connector status…'}</div>:<>
  {unknown&&<div className="mb-notice">Some sources are unavailable or excluded because inherited preview mode is on. No sample tasks or connector counts are used here.</div>}

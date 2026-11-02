@@ -199,6 +199,12 @@ const MONEY_HACK: FeatureDefinition[] = [
   mk('overdue', 'Overdue Reminders', 'Overdue invoices from stored records with cited fields; a fixture or capped Muse draft goes to Jev approval and is sent only via a connected integration.'),
 ];
 
+const BRAIN_VOICE: FeatureDefinition = {
+  id: 'brain.voice-assistant', menuId: 'brain', clusterId: 'brain.assistants-and-employees', label: 'Voice Assistant',
+  route: '/workspace/brain/voice', status: 'available', dependencies: [], keywords: 'voice hey metabos push to talk speech transcribe',
+  summary: 'Push-to-talk (Alt+M) or typed commands. muse-voice-transcribe-1.0 speech to text needs MODEL_API_KEY, else the browser Web Speech API. Reads status from the DB and only creates pending Jev items or Brain drafts; approvals are refused by voice. Verified with unit tests, a production-build e2e and a live round trip. Built during the Meta hackathon.',
+};
+
 const BRAIN_HACK: FeatureDefinition[] = [
   mk('department-walls', 'Department Walls', 'Each department agent reads only its own data; refused reads are logged as evidence.', 'brain'),
   mk('memory', 'Layered Memory', 'Session, department, company and owner memory; agent and Muse notes stay drafts until a person promotes them.', 'brain'),
@@ -262,7 +268,7 @@ const MENU_LABELS: Record<string, string> = { orders: 'Orders', money: 'Money', 
 const categoryMenu = (id: string, section: MenuSection): Omit<MenuDefinition, 'number'> => {
   const clusters = categoryClusters(id);
   if (id === 'money') clusters[0].pages.push(...MONEY_HACK.map((f) => ({ ...f, clusterId: clusters[0].id })));
-  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME, BRAIN_MISSIONS, BRAIN_GOALS, BRAIN_CHIEF, ...BRAIN_HACK.map((f) => ({ ...f, clusterId: clusters[0].id }))); clusters[2].pages.push(BRAIN_EXTRA); }
+  if (id === 'brain') { clusters[0].pages.push(BRAIN_TEMPLATES, BRAIN_RUNTIME, BRAIN_MISSIONS, BRAIN_GOALS, BRAIN_VOICE, BRAIN_CHIEF, ...BRAIN_HACK.map((f) => ({ ...f, clusterId: clusters[0].id }))); clusters[2].pages.push(BRAIN_EXTRA); }
   return { id, label: MENU_LABELS[id], route: `/workspace/${id}`, icon: cat(id).icon, section, summary: cat(id).summary, aliases: LEGACY_ALIASES[id] ?? [], clusters };
 };
 
