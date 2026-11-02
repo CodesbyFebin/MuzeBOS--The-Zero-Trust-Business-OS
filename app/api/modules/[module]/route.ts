@@ -26,7 +26,10 @@ export async function POST(req: Request, props: { params: Promise<{ module: stri
   const params = await props.params;
   try {
     businessAccess(req);
-    if (!moduleById(params.module)) throw new BusinessError('Unknown module', 404);
+    const def = moduleById(params.module);
+    if (!def) throw new BusinessError('Unknown module', 404);
+    // Modules with a write permission need a signed-in member holding it (401 / 403).
+    if (def.writePermission) memberRead(req, def.writePermission);
     if (!req.headers.get('content-type')?.toLowerCase().startsWith('application/json')) throw new BusinessError('JSON content type required', 415);
     const text = await req.text();
     if (text.length > 64_000) throw new BusinessError('Request too large', 413);

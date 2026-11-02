@@ -128,3 +128,15 @@ Every credential page stores only the *names* of env vars. Values are read from 
 | developer.system-blueprint | Backed by the local SQLite database only (no provider needed) |
 | account.operator-security | Backed by the local SQLite database only (no provider needed) |
 | account.sign-in-manage-session | Backed by the local SQLite database only (no provider needed) |
+
+## Dispatch adapters and passkeys (feat/real-adapters)
+
+Every send needs a Jev approval whose payload hash matches and an `idempotency-key` UUID header. If keys are missing, the API answers 424 "Not connected — add …". The tests use a mocked HTTP layer and don't prove a live send.
+
+| Channel | Env | Provider call |
+| --- | --- | --- |
+| WhatsApp text | `MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN`, `MUZEBOS_WHATSAPP_PHONE_NUMBER_ID` | `POST graph.facebook.com/v25.0/{phone-number-id}/messages` |
+| Email (SMTP) | `MUZEBOS_SMTP_HOST`, `MUZEBOS_SMTP_PORT`, `MUZEBOS_SMTP_USER`, `MUZEBOS_SMTP_PASSWORD`, `MUZEBOS_SMTP_FROM` | nodemailer `sendMail` |
+| Razorpay payment link | `MUZEBOS_RAZORPAY_KEY_ID`, `MUZEBOS_RAZORPAY_KEY_SECRET` | `POST api.razorpay.com/v1/payment_links` (paise, reference_id = idempotency key) |
+| OpenRouter completion | `OPENROUTER_API_KEY` | `POST openrouter.ai/api/v1/chat/completions` |
+| Passkeys (WebAuthn) | `MUZEBOS_WEBAUTHN_RP_ID`, `MUZEBOS_WEBAUTHN_ORIGIN`, optional `MUZEBOS_WEBAUTHN_RP_NAME` | local verification with @simplewebauthn/server; no network call |
