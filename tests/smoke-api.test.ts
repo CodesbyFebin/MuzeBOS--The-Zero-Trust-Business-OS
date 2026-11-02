@@ -54,6 +54,7 @@ const ROUTES: RouteEntry[] = [
   { route: 'b3/swarms', load: () => import('@/app/api/b3/swarms/route'), url: 'http://localhost/api/b3/swarms' },
   { route: 'b3/writing', load: () => import('@/app/api/b3/writing/route'), url: 'http://localhost/api/b3/writing' },
   { route: 'agentverse', load: () => import('@/app/api/agentverse/route'), url: 'http://localhost/api/agentverse' },
+  { route: 'meta', load: () => import('@/app/api/meta/route'), url: 'http://localhost/api/meta' },
   { route: 'hub', load: () => import('@/app/api/hub/route'), url: 'http://localhost/api/hub' },
   { route: 'server', load: () => import('@/app/api/server/route'), url: 'http://localhost/api/server' },
   { route: 'workflow-runs', load: () => import('@/app/api/workflow-runs/route'), url: 'http://localhost/api/workflow-runs' },
@@ -194,7 +195,7 @@ function discoverGetRoutes(dir: string, base = ''): string[] {
 }
 
 /** Routes that hold business records: a signed-out GET must be refused (401), never 200. */
-const MEMBER_ONLY = new Set(['metabos/hubs/[hub]', 'muse/catalog', 'metabos/command-center', 'metabos/overdue', 'ai', 'ai/budget', 'ai/local', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops', 'data', 'b3/mcp', 'b3/pipelines', 'b3/social', 'b3/swarms', 'b3/writing', 'hub', 'server', 'agentverse', 'metabos/arena']);
+const MEMBER_ONLY = new Set(['metabos/hubs/[hub]', 'muse/catalog', 'metabos/command-center', 'metabos/overdue', 'ai', 'ai/budget', 'ai/local', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops', 'data', 'b3/mcp', 'b3/pipelines', 'b3/social', 'b3/swarms', 'b3/writing', 'hub', 'server', 'agentverse', 'meta', 'metabos/arena']);
 describe('platform smoke — every GET API route answers 200 with JSON', () => {
   test.each(ROUTES)('GET /api/$route', async ({ route, load, url, params }) => {
     const mod = await load();
@@ -225,6 +226,8 @@ describe('platform smoke — every GET API route answers 200 with JSON', () => {
       'lab/frames',
       // Meta subscription challenge: text/plain, 503/403 without a token; covered in tests/metabos-webhooks.test.ts
       'webhooks/[source]',
+      // Login with Facebook callback: redirects back to the Meta integration page; its own test below
+      'meta/oauth/callback',
     ]);
     const discovered = discoverGetRoutes(path.join(process.cwd(), 'app', 'api')).filter((r) => !IGNORE.has(r)).sort();
     const covered = ROUTES.map((r) => r.route).sort();
@@ -267,6 +270,11 @@ describe('Content Lab v2 lane S smoke (AC-08-4, 09.7)', () => {
     const { GET } = await import('@/app/api/lab/setup/route');
     expect((await GET(new Request('http://localhost/api/lab/setup'))).status).toBe(200);
   }, 20_000);
+  test('GET /api/meta/oauth/callback with no params redirects with oauth=denied and stores nothing', async () => {
+    const { GET } = await import('@/app/api/meta/oauth/callback/route');
+    const res = await GET(new Request('http://localhost/api/meta/oauth/callback'));
+    expect(res.status).toBe(307); expect(res.headers.get('location')).toContain('/workspace/developer/meta-integration?oauth=denied');
+  });
   test('GET /api/lab/oauth/youtube/callback with no params answers 200 "No sign-in in progress."', async () => {
     const { GET } = await import('@/app/api/lab/oauth/[provider]/callback/route');
     const res = await GET(new Request('http://localhost/api/lab/oauth/youtube/callback'), { params: Promise.resolve({ provider: "youtube" }) });

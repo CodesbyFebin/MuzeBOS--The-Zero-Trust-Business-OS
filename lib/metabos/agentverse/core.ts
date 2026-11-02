@@ -5,6 +5,7 @@
  *  - The ads wizard writes a draft and a Jev item. It makes no Marketing API call. ROAS appears
  *    only when real insights rows exist, and auto-rules can only propose a pause as a Jev item.
  *  - The Git console is built on commitLog and the evidence chain. Revert and cherry-pick are new Jev items. */
+import { metaStatus, markProduct } from '@/lib/metabos/meta/status';
 import { randomUUID } from 'node:crypto';
 import net from 'node:net';
 import { clawStatus, yaoStatus } from '../b3/agent-run';
@@ -23,10 +24,10 @@ export const SUGGESTED_WORKSPACES = ['Codes By Febin', 'Ewaste Kochi', 'XFree.ap
 /** Channel groups follow the owner's commit-console reference. The earlier group names
  *  (Unified Inbox, Content Studio, Business Suite, AgentVerse, Meta AI Lab) become the channels inside these groups. */
 export const CHANNEL_GROUPS = [
-  { id: 'git', label: 'Git for agents', channels: ['commit-log', 'branches', 'pending-approvals', 'knowledge-graph'] },
+  { id: 'git', label: 'Git for agents', channels: ['commit-log', 'branches', 'pending-approvals', 'knowledge-graph', 'evidence-vault', 'firewall', 'activity-feed'] },
   { id: 'suite', label: 'Meta Suite', channels: ['unified-inbox', 'facebook', 'instagram', 'whatsapp', 'messenger', 'threads', 'meta-ai'] },
   { id: 'ads', label: 'Ads command center', channels: ['campaigns', 'creatives-lab', 'audiences', 'roas-dashboard'], business: true },
-  { id: 'swarm', label: 'Agent swarm', channels: ['agents-online', 'fleet-console', 'sparring-pit', 'blame', 'onboarding', 'roles'] },
+  { id: 'swarm', label: 'Agent swarm', channels: ['agents-online', 'fleet-console', 'sparring-pit', 'blame', 'onboarding', 'meta-integration', 'meta-status', 'roles'] },
 ] as const;
 /** SHIPPED means a Jev approval and a dispatch receipt (provider accepted). Nothing else counts as shipped. */
 export const commitTag = (c: Pick<Commit, 'status' | 'dispatchId'>) => c.status === 'sent' && c.dispatchId ? 'SHIPPED' : c.status === 'pending' ? 'PENDING' : c.status.toUpperCase();
@@ -132,10 +133,13 @@ export function blame(commits: Commit[]) {
   for (const c of commits) { const e = m.get(c.author) ?? { author: c.author, commits: 0, lines: 0, kinds: new Set() }; e.commits++; e.lines += c.diff.length; e.kinds.add(c.kind); m.set(c.author, e); }
   return [...m.values()].map((e) => ({ ...e, kinds: [...e.kinds] })).sort((a, b) => b.lines - a.lines);
 }
+/** Revert and cherry-pick apply only to commits backed by a decided Jev approval record. */
+export const APPROVED = new Set(['approved', 'executed', 'sent']);
 export const GitOpInput = z.object({ op: z.enum(['revert', 'cherry-pick']), commitId: z.string().min(1).max(80), target: z.string().max(40).optional() }).strict();
 export function gitOp(s: BusinessStore, actor: string, raw: unknown) {
   const g = GitOpInput.parse(raw); ensure(s);
   const c = commitLog(s).find((x) => x.id === g.commitId); if (!c) throw new BusinessError('Commit not found', 404);
+  if (!(c.jevRunId || c.dispatchId) || !APPROVED.has(c.status)) throw new BusinessError(g.op === 'revert' ? 'Only approved records can be reverted. Reject a pending item in Jev instead.' : 'Only approved records can be cherry-picked.', 409);
   if (g.op === 'cherry-pick' && !g.target) throw new BusinessError('Pick a target workspace', 422);
   const inverse = g.op === 'revert' ? c.diff.map((l) => l.replace(/^\+ /, '- ')) : c.diff;
   const id = `op_${randomUUID().slice(0, 8)}`;
@@ -178,7 +182,7 @@ export function graph(s: BusinessStore) {
 }
 export function overview(s: BusinessStore, env: Env, swarms: { name: string; agents: number; pending: number }[] = []) {
   const commits = commitLog(s);
-  return { workspaces: listWorkspaces(s), suggested: SUGGESTED_WORKSPACES, groups: CHANNEL_GROUPS, inbox: inbox(s), inboxStatus: inboxStatus(env), ads: adsView(s), adsConnection: metaConnections(env).find((m) => m.id === 'ads')!.status, commits, blame: blame(commits), onboarding: onboarding(env), graph: graph(s), swarms, footnote: FOOTNOTE };
+  return { workspaces: listWorkspaces(s), suggested: SUGGESTED_WORKSPACES, groups: CHANNEL_GROUPS, inbox: inbox(s), inboxStatus: inboxStatus(env), ads: adsView(s), adsConnection: metaConnections(env).find((m) => m.id === 'ads')!.status, commits, blame: blame(commits), onboarding: onboarding(env), graph: graph(s), vault: evidenceVault(s), firewall: firewallEvents(s), feed: activityFeed(s), metaStatus: metaStatus(s), swarms, footnote: FOOTNOTE };
 }
 
 // Home Server overview (HUD). Live Activity comes only from the evidence chain and Jev. Queue Status probes only real infrastructure.
@@ -211,3 +215,25 @@ export async function home(s: BusinessStore, env: Env) {
   const campaigns = adsView(s).map((a) => { const c = commits.find((x) => x.id === a.id); return { id: a.id, name: a.name, objective: a.objective, dailyBudgetMinor: a.dailyBudgetMinor, status: c ? commitTag(c) : 'DRAFT', roas: a.roas }; });
   return { activity: liveActivity(s), campaigns, queues: await queueStatus(s, env), jevWaiting: queue(s).length };
 }
+
+// Evidence vault and firewall: read-only views of the hash-chained ledger.
+export function evidenceVault(s: BusinessStore, limit = 100) {
+  const ev = s.evidence(); return { valid: s.verifyAudit(), total: ev.length, rows: ev.slice(-limit).reverse().map((e) => ({ seq: e.seq, action: e.action, target: e.target, at: e.createdAt, hash: e.hash.slice(0, 16), prev: e.previousHash.slice(0, 16) })) };
+}
+export const firewallEvents = (s: BusinessStore) => s.evidence().filter((e) => /guard|blocked|denied|safe.?output|reject/i.test(e.action)).slice(-100).reverse().map((e) => ({ seq: e.seq, action: e.action, target: e.target, detail: String(e.detail ?? '').slice(0, 200), at: e.createdAt }));
+// Commit composer: an intent typed by a person becomes one Jev item. Nothing runs until approved.
+export const IntentInput = z.object({ message: z.string().trim().min(3).max(300), workspaceId: z.string().max(40).nullable().default(null) }).strict();
+export function proposeIntent(s: BusinessStore, actor: string, raw: unknown) {
+  const i = IntentInput.parse(raw); ensure(s);
+  const run = jev(s, `intent-${randomUUID().slice(0, 8)}`, `Intent: ${i.message}`, `Typed in the commit composer by ${actor}${i.workspaceId ? ` for ${i.workspaceId}` : ''}; nothing runs until approved in Jev`);
+  s.transact(() => s.appendEvidence('agentverse.intent.pending_jev', run.id, i.message.slice(0, 120)));
+  return { jevRunId: run.id };
+}
+
+// #activity-feed: only approval, commit, reject and dispatch records from the evidence chain.
+const FEED: [RegExp, string][] = [[/reject|cancel/i, 'reject'], [/dispatch/i, 'dispatch'], [/approv|jev\.decide|decided/i, 'approval'], [/commit|revert|cherry|intent|draft|propos/i, 'commit']];
+export function activityFeed(s: BusinessStore, limit = 200) {
+  return s.evidence().map((e) => ({ e, kind: FEED.find(([r]) => r.test(e.action))?.[1] })).filter((x) => x.kind).slice(-limit).reverse()
+    .map(({ e, kind }) => ({ seq: e.seq, kind: kind!, action: e.action, target: e.target, detail: String(e.detail ?? '').slice(0, 200), at: e.createdAt, hash: e.hash }));
+}
+export { markProduct };

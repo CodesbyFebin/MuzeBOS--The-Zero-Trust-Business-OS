@@ -2,6 +2,7 @@
  * Outbound dispatch behind Jev approval. propose -> approve (jev.decide, exact payload hash) -> dispatch
  * (idempotency key; at most one provider call per key). Every step and the provider response are evidence.
  */
+import { assertChannelOpen } from '@/lib/metabos/meta/status';
 import { createHash, randomUUID } from 'node:crypto';
 import { BusinessError, type BusinessStore } from '../store';
 import { assertNotOptedOut, onDispatchSent } from '../talk/core';
@@ -60,6 +61,7 @@ export async function dispatch(s: BusinessStore, id: string, hash: string, idemp
   const d = row(s, id);
   if (d.status !== 'approved') throw new BusinessError(d.status === 'pending' ? 'Needs Jev approval first' : `Dispatch is ${d.status}`, 409);
   if (hash !== d.payloadHash || payloadHash(d.channel, d.payload) !== d.payloadHash) throw new BusinessError('Approved payload hash does not match', 409);
+  assertChannelOpen(s, d.channel, d.id);
   // Opt-out is re-checked at send time: a STOP that arrived after approval still blocks the send.
   assertNotOptedOut(s, d.channel, d.payload);
   const missing = missingEnv(d.channel, deps.env);

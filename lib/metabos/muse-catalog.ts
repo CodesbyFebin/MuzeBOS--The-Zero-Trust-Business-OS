@@ -53,3 +53,11 @@ export function searchCatalog(opts: { q?: string; kind?: CatalogKind; status?: C
   const offset = Math.max(0, opts.offset ?? 0); const limit = Math.min(100, Math.max(1, opts.limit ?? 30));
   return { total: rows.length, items: rows.slice(offset, offset + limit).map((e) => ({ ...e, connection: connectionLabel(e, env), needsJev: needsJev(e) })) };
 }
+/** MUSE catalog exported in the registry row shape from INTEROP.md (mcpserver-in-share).
+ *  Only non-blocked MCP entries. Everything is `stub`: we have reviewed no tool schemas and run no live server, so `capabilities` is empty
+ *  and `server_url` is '' (the column is NOT NULL; empty means "no endpoint known"). Sibling projects (MetaPen) are not catalog entries. */
+export type InteropRow = { name: string; version: string; server_url: string; capabilities: { name: string; description: string; inputSchema: Record<string, unknown> }[]; verification: 'stub' | 'verified' | 'owner-attested'; licence: string; catalog_status: CatalogStatus; source: string };
+export function toInteropRegistry(entries = loadCatalog().entries): InteropRow[] {
+  return entries.filter((e) => e.kind === 'mcp' && e.status !== 'blocked' && !/metapen/i.test(`${e.id} ${e.name}`))
+    .map((e) => ({ name: e.id, version: e.version ?? 'unversioned', server_url: '', capabilities: [], verification: 'stub' as const, licence: e.license, catalog_status: e.status, source: e.source }));
+}
