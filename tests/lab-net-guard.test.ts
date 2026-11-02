@@ -11,6 +11,13 @@ import { DryNetworkError, labFetch, setLabFetchImpl } from '@/lib/lab/net';
 import { runTick } from '@/lib/lab/setup/jobs';
 import { setBinProbe } from '@/lib/lab/setup/health';
 
+// This fixture checks network isolation, not confidence-interval convergence. Keep every
+// predictor/window and the real evaluator, with a bounded resample count (math has its own tests).
+vi.mock('@/lib/lab/ledger/evals', async importOriginal => {
+  const actual = await importOriginal<typeof import('@/lib/lab/ledger/evals')>();
+  return { ...actual, computeEvals: (store: Parameters<typeof actual.computeEvals>[0], opts: Parameters<typeof actual.computeEvals>[1]) => actual.computeEvals(store, { ...opts, B: 10 }) };
+});
+
 /**
  * AC-08-17: with LAB_DRY=1 a full forced tick over the `full` fixture world makes zero fetch calls
  * (spy through labFetch and on the global) and no DryNetworkError; a direct labFetch to Apify

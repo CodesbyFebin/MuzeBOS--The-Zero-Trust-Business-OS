@@ -2,6 +2,13 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
+// Network/retention integration, not a 2,000-resample statistics benchmark. All evaluator
+// branches still run; bootstrap correctness and defaults are covered by the metrics suites.
+vi.mock('@/lib/lab/ledger/evals', async importOriginal => {
+  const actual = await importOriginal<typeof import('@/lib/lab/ledger/evals')>();
+  return { ...actual, computeEvals: (store: Parameters<typeof actual.computeEvals>[0], opts: Parameters<typeof actual.computeEvals>[1]) => actual.computeEvals(store, { ...opts, B: 10 }) };
+});
+
 vi.mock('@/lib/lab/ledger/deps', async (importOriginal) => (await import('./helpers/lab-measure-ref')).withMeasureFallback(await importOriginal()));
 const google = vi.hoisted(() => ({ calls: 0 }));
 vi.mock('@/lib/lab/setup/oauth-google', () => ({

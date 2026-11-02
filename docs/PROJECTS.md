@@ -1,6 +1,6 @@
 # Project board
 
-Updated: 2026-10-29
+Updated: 2026-11-03
 
 ## MeTaBos commerce and reference UI
 
@@ -141,3 +141,19 @@ Submission remains blocked; a 100/100 readiness claim is unsupported.
 - Qualification and known inherited failures are recorded in `docs/arena/VERIFICATION.md`. Prepared on an isolated branch above PR #59, without a default-branch merge or deployment.
 
 - Final 3D qualification: types/build/43 focused tests and production desktop/mobile browser checks passed. Full suite: 5,361 passed, 2 inherited Lab timeouts, 9 skipped. Muse Code SDK integration is documented as planned, not executed.
+
+
+## Private evidence and ZK source review — 2026-11-03
+
+| Area | State |
+| --- | --- |
+| Ente / Union / Tachyon sparse clones, revisions and license review | Recorded in docs/projects/private-evidence/sources.json |
+| Browser-side encrypted full-chain download | Implemented; passwords never sent to the export API |
+| Portable bundles, event inclusion paths and offline CLI | Implemented; no ZK or signature claims |
+| Existing member / finance.read export gates | Retained and tested |
+| Upstream source or native prover import | None; original platform-crypto implementation |
+| Verification | 5,535 passed / 9 skipped; typecheck, production build and HTTP smoke passed |
+
+- [x] Clone and inspect the requested upstream source subsets and licensing.
+- [x] Add useful privacy and portable evidence-verification capabilities.
+- [x] Qualify the reviewed integration for main; GitHub merge history records publication.
