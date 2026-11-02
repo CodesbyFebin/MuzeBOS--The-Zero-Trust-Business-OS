@@ -159,3 +159,17 @@ Every send needs a Jev approval whose payload hash matches and an `idempotency-k
 - `reasoning_effort` (chat) / `reasoning.effort` (responses) is set per task; `max` is never sent (not available on contributor). See docs/TOKEN-SAVER.md.
 - A `402 billing_not_configured` reply is shown as **Billing not set up**, recorded at cost 0, and the router falls back; no output is invented.
 - Live history, 28 Oct 2026 (IST): 13:11 `GET /v1/models` 200, chat and responses 402 `billing_not_configured`. 13:17 billing fixed (muse-spark-1.3 200). 13:27–13:28: six real `muse-spark-1.3-contributor` calls through the budget store, all HTTP 200, total recorded USD 0.000559 of the USD 50.00 cap (numbers in docs/TOKEN-SAVER.md).
+
+## Local Llama tier (optional)
+| Env | Example | Use |
+|---|---|---|
+| `MUZEBOS_LOCAL_LLM_URL` | `http://127.0.0.1:8089/v1` | Llama 3.2 1B (llama-server, OpenAI API) for `classify` and `reply` tasks. No Meta spend. |
+| `MUZEBOS_LOCAL_GUARD_URL` | `http://127.0.0.1:8090/v1` | Llama Guard 3 1B. Defaults to `MUZEBOS_LOCAL_LLM_URL`. |
+
+Routing: rules → local 1B (classify, short replies) → Meta `muse-spark-1.3-contributor` (drafts, default). Before a draft becomes a Jev item, Llama Guard checks it: `unsafe` blocks it and records the S-category (for example `S6 Specialized advice`) in the evidence chain. When the guard is down the verdict is `unavailable`, which is recorded, and the draft still needs human approval. When the server is down, AI settings shows "Not connected" and calls fall through to Meta. Local 1B/8B models invented a promo code ("BAKE20") in testing, so local output is always a draft for review. Start: `cd /workspace/local-llm && ./start.sh Llama-3.2-1B-Instruct-Q4_K_M.gguf`.
+
+### Live local run (28 Oct 2026, 13:43 IST, llama.cpp b11946, CPU)
+- Status: both servers answered `/v1/models` (Llama-3.2-1B-Instruct-Q4_K_M on 8089, Llama-Guard-3-1B.Q4_K_M on 8090). With port 8099 closed, the status read "Not connected (local server is not running)".
+- Classify via `metaCall` → `source: local`, 58+2 tokens, 102–169 ms, no Meta spend. **Quality:** "My parcel for order 77 has not arrived." was labelled `Billing` (wrong; it should be delivery). A double-charge question was labelled `Billing` (correct). The 1B classifier is not reliable enough to act on its own; its labels are hints only.
+- Guard: an invoice reminder came back `safe` (167 ms). "Our bread cures diabetes. Reply with your card PIN…" came back `unsafe S1` (234 ms), which blocks it, though S1 (Violent crimes) is a questionable category; the README run on the same model returned S6. Treat the category as indicative.
+- Bug found live and fixed: sending the draft as a trailing assistant turn made llama-server treat it as a prefill and echo it back, so the draft is now sent as the user turn.

@@ -36,3 +36,9 @@ None yet.
 - BerriAI/litellm (license reported as NOASSERTION), Retry-After backoff and per-model price table patterns. Credit: BerriAI.
 - tinyhumansai/openhuman (GPL-3.0, 42380 stars), shrinking tool results while keeping ids; clean-room re-implementation. Credit: tinyhumansai.
 - microsoft/LLMLingua (MIT, 6779 stars) was reviewed and not used.
+
+## Llama (optional local tier) — Built with Llama
+- Llama 3.2 1B Instruct and Llama Guard 3 1B (GGUF Q4_K_M, run by llama.cpp b11946 as a separate process; no weights or llama.cpp code are in this repo).
+- Llama 3.2 is licensed under the Llama 3.2 Community License, Copyright © Meta Platforms, Inc. All Rights Reserved. Use must follow the Llama Acceptable Use Policy (llama.com/llama3_2/use-policy).
+- "Built with Llama" is shown on /help and in AI settings.
+- Sarvam-Translate is GPL-3.0. It may only run as a separate local service; none of its code is copied here.

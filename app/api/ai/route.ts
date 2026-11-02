@@ -1,3 +1,4 @@
+import { guardDraft } from '@/lib/metabos/ai/local-llm';
 import { memberRead } from '@/lib/metabos/member-read';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -64,7 +65,9 @@ export async function POST(req: Request) {
     if (c.action === 'proposeFromModel') {
       const p = parseModelProposal(c.raw, { taskId: c.taskId, role: c.role, model: c.model });
       if (!p.ok) { log('ai.proposal.refused', c.taskId, p.reason); return NextResponse.json({ error: p.reason }, { status: 422 }); }
-      return NextResponse.json(propose(store, p.proposal));
+      const guard = await guardDraft(store, JSON.stringify(p.proposal), { target: c.taskId });
+      if (guard.verdict === 'unsafe') return NextResponse.json({ error: `Blocked by Llama Guard: unsafe ${guard.categories.map((x) => `${x.code} ${x.name}`).join(', ')}`, guard }, { status: 422 });
+      return NextResponse.json({ ...propose(store, p.proposal), guard });
     }
     // swarm
     const prefix = `t${Date.now().toString(36)}-`;
@@ -81,9 +84,11 @@ export async function POST(req: Request) {
           if (parsed.ok) { proposal = parsed.proposal; note = 'Model proposal passed the schema.'; } else { note = parsed.reason; log('ai.proposal.refused', t.id, parsed.reason); }
         } else { proposal = ruleProposal(t); note = 'No server model available; rule-based draft (no model used).'; }
       }
-      let run = null; let error = null;
+      let run = null; let error = null; let guard = null;
+      if (proposal) guard = await guardDraft(store, JSON.stringify(proposal), { target: t.id });
+      if (proposal && guard?.verdict === 'unsafe') { error = `Blocked by Llama Guard: unsafe ${guard.categories.map((x) => `${x.code} ${x.name}`).join(', ')}`; proposal = null; }
       if (proposal) { try { run = propose(store, proposal); } catch (e) { error = e instanceof Error ? e.message : 'Refused'; } }
-      out.push({ ...t, decision, note, runId: run?.id ?? null, payloadHash: run?.payloadHash ?? null, error });
+      out.push({ ...t, decision, note, guard, runId: run?.id ?? null, payloadHash: run?.payloadHash ?? null, error });
     }
     log('ai.swarm', 'swarm', `${subtasks.length} subtasks: ${subtasks.map((t) => `${t.id}=${t.role}/${t.tier}`).join(', ')}`);
     return NextResponse.json({ subtasks: out });

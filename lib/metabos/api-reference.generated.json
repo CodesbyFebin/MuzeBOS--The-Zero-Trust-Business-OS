@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 218,
+ "count": 219,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -190,6 +190,18 @@
    "idempotencyKey": false,
    "originCheck": true,
    "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/ai/local",
+   "file": "app/api/ai/local/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Local Llama tier status. Never reports \"ready\" without a live answer from the server.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
    "access": "session"
   },
   {

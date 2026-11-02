@@ -6,6 +6,7 @@
  */
 import { BusinessError, type BusinessStore } from '@/lib/metabos/store';
 import { failMetaCall, reserveMetaCall, settleMetaCall, type MetaUsage } from './meta-budget';
+import { localChat, localUrl, LOCAL_TASKS } from './local-llm';
 import { cacheGet, cacheKey, cachePut, deterministic, policyFor, stablePrefix, type Msg, type TaskClass } from './token-saver';
 
 export const META_API = 'https://api.meta.ai/v1';
@@ -41,8 +42,8 @@ export function modelsFor(s: BusinessStore, task: TaskClass, requested?: string)
   return [first, ...(m.fallback && m.fallback !== first ? [m.fallback] : [])];
 }
 
-export type MetaCallResult = { text: string; model: string; usage: MetaUsage | null; source: 'model' | 'cache' | 'rule'; rule?: string; callId?: string; effort: string; maxOutputTokens: number; estimatePico?: number; costPico?: number; responseId?: string | null };
-export type MetaCallOpts = { store: BusinessStore; key: string; messages: Msg[]; task: TaskClass; api?: 'chat' | 'responses'; model?: string; maxOutputTokens?: number; ownerHighEffort?: boolean; sideEffects?: boolean; fetch?: typeof fetch; signal?: AbortSignal; sleep?: (ms: number) => Promise<void>; random?: () => number; maxRetries?: number; skipRules?: boolean };
+export type MetaCallResult = { text: string; model: string; usage: MetaUsage | null; source: 'model' | 'cache' | 'rule' | 'local'; rule?: string; callId?: string; effort: string; maxOutputTokens: number; estimatePico?: number; costPico?: number; responseId?: string | null };
+export type MetaCallOpts = { store: BusinessStore; key: string; messages: Msg[]; task: TaskClass; api?: 'chat' | 'responses'; model?: string; maxOutputTokens?: number; ownerHighEffort?: boolean; sideEffects?: boolean; fetch?: typeof fetch; signal?: AbortSignal; sleep?: (ms: number) => Promise<void>; random?: () => number; maxRetries?: number; skipRules?: boolean; env?: Record<string, string | undefined> };
 
 export class MetaApiError extends Error { constructor(public status: number, public code: string | null, message: string) { super(message); } }
 export const parseUsage = (u: any): MetaUsage | null => {
@@ -95,6 +96,15 @@ export async function metaCall(o: MetaCallOpts): Promise<MetaCallResult> {
   if (!o.skipRules && messages.filter((m) => m.role === 'user').length === 1) {
     const d = deterministic(lastUser);
     if (d) return { text: d.text, model: 'rule', usage: null, source: 'rule', rule: d.rule, effort: 'none', maxOutputTokens: 0 };
+  }
+  // Local tier (optional): Llama 3.2 1B for classification and short replies; falls through to Meta when not connected.
+  const local = localUrl(o.env ?? process.env);
+  if (local && LOCAL_TASKS.has(o.task) && !o.sideEffects) {
+    try {
+      const r = await localChat(local, messages, pol.maxOutputTokens, o.fetch);
+      o.store.transact(() => o.store.appendEvidence('ai.local', o.task, `Local ${r.model}: ${r.usage ? `${r.usage.promptTokens}+${r.usage.completionTokens} tokens` : 'usage unavailable'}, no Meta spend`));
+      return { text: r.text, model: r.model, usage: r.usage ? { ...r.usage, cachedTokens: 0, reasoningTokens: 0 } : null, source: 'local', effort: 'none', maxOutputTokens: pol.maxOutputTokens, costPico: 0 };
+    } catch { /* Not connected: use the Meta tier */ }
   }
   const models = o.model ? modelsFor(o.store, o.task, o.model) : modelsFor(o.store, o.task);
   const cacheable = pol.cacheable && !o.sideEffects;
