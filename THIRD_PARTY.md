@@ -90,3 +90,17 @@ Built by the repository owner's **MeTaPen** agent during the hackathon in a sepa
 ### Business Open Server — t96 Unified Command Center, METAPEN Operator Console and Discord view
 - The layout ideas (platform switcher, Mission Scope, coverage matrix, swarm radar, clan cards, two-reviewer JEV gatekeeper, evidence receipts, MUSE CLI terminal, MCP server directory and the Discord channel groups) come from Google AI Studio exports **made by the repository owner** ("MUSE x MeTaBos x MCPSERVER.in Unified Command Center" and "METAPEN Operator Console + Discord").
 - No code, numbers, names, SHAs or badges were copied. Every value shown is read from this app's own records, or the panel shows an empty state.
+
+### MuZe voice assistant — "Miri" standalone HTML (pre-existing owner / AI Studio code)
+- Source: `Miri — 3D GPU-Fur Voice Assistant · BroCODE-/> Standalone` (single HTML file, about 193 KB), supplied by the repository owner on 2 Nov 2026. It is **pre-existing** owner-made Google AI Studio code (it predates this PR and was not written during it). No licence is stated in the file.
+- Renamed Miri → MuZe in all displayed text (internal code and routes such as `/api/muse` keep the MUSE name). Ported (rewritten in React/TypeScript, not copied verbatim): the voice UI pattern (transcript bubble, listening/speaking state line, speak/type bar, quick-prompt chips, voice-reply on/off toggle using the browser's SpeechSynthesis/SpeechRecognition) and the boop interaction. These live in `components/metabos/muse/MuZeVoice.tsx`; the keyword command parsing idea lives in `lib/metabos/muse/voice.ts`.
+- Not ported: its bundled three.js r128 CDN build and its own fur shader/geometry (the repo's existing three.js 0.169 engine in `lib/metabos/fur-sim` and `MuseFurSimulator` is used instead), the Tailwind CDN, the purple/blue palette (restyled to #0A0A0A / #FF2A2A), and every canned reply and invented status in it ("spawned a Claude Code clone", "audited all 500 DID sandboxes… 100% verified", "11 kill switches armed", bounty/receipt claims, arena/forge/sandbox simulations). Replies now come only from a real model via `/api/ai`, or MuZe says "Model not configured".
+
+## MuZe free-roaming guide — "METABOS Operator Mode — MuZe Business Open Server & Free-Roaming 3D GPU-Fur Guide" standalone HTML (pre-existing owner code)
+
+Source: a standalone HTML file supplied by the repository owner (their own pre-existing code; three.js r128 via CDN).
+Ideas taken: a full-viewport overlay with pointer-events off except the MuZe handle, MuZe flying to UI elements and reading their
+`data-guide` text, a drag handle, dance spin, boop, and a black fullscreen mode. Rewritten for this repo in
+`components/metabos/muse/MuZeRoam.tsx`, `components/metabos/muse/MuZeHome.tsx` and `lib/metabos/muse/roam.ts`, on the repo's own
+three.js 0.169 fur engine (`lib/metabos/fur-sim`). Not copied: the r128 renderer, the file's operator-mode rail/panels and every
+hard-coded status line, count, FPS figure or capability claim in it; guide text here comes only from the target element.

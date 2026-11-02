@@ -7,6 +7,7 @@ import type { BusinessStore } from '../store';
 import { listDrafts } from '../b3/agent-run';
 import { queue } from '../ai/jev';
 import { listDispatches } from '../dispatch/service';
+import { reviewers } from './operator';
 import { metaDryRun } from '../meta/graph';
 
 export type DeskState = 'working' | 'awaiting_approval' | 'rejected' | 'idle';
@@ -41,7 +42,7 @@ export function sanctumReceipts(s: BusinessStore, env: Record<string, string | u
   const ds = listDispatches(s).filter((d) => (d.payload as { body?: string; subject?: string })?.body?.startsWith?.('[MUSE plan]') || String((d.payload as { subject?: string })?.subject ?? '').startsWith('[MUSE plan]'));
   const ids = new Set(ds.map((d) => d.id));
   const ev = s.evidence().filter((e) => ids.has(e.target)).reverse().slice(0, 100).map((e) => ({ seq: e.seq, action: e.action, target: e.target, detail: e.detail.slice(0, 200), at: e.createdAt, hash: e.hash.slice(0, 16) }));
-  return { dryRun: metaDryRun(env), dispatches: ds.map((d) => ({ id: d.id, channel: d.channel, status: d.status, payloadHash: d.payloadHash, createdAt: d.createdAt, providerStatus: d.providerStatus })), evidence: ev };
+  return { dryRun: metaDryRun(env), dispatches: ds.map((d) => ({ id: d.id, channel: d.channel, status: d.status, payloadHash: d.payloadHash, createdAt: d.createdAt, providerStatus: d.providerStatus, reviewers: reviewers(s, d.id) })), evidence: ev };
 }
 
 /** R0–R6 trust stack. Layers we have no attestation for say so; only R6 is checked against the real chain. */

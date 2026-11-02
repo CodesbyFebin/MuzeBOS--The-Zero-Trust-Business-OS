@@ -2315,6 +2315,18 @@
    "access": "session"
   },
   {
+   "path": "/api/muse",
+   "file": "app/api/muse/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "MUSE command intake: classifies a spoken or typed command and records it in the evidence chain. Inference is /api/ai; sends are /api/bos then /api/dispatch.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
    "path": "/api/muse/catalog",
    "file": "app/api/muse/catalog/route.ts",
    "methods": [

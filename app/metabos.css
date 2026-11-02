@@ -762,3 +762,38 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
 .mb-bos-msgs{list-style:none;padding:0;margin:0;display:grid;gap:8px}.mb-bos-msgs li{background:#111;border-radius:8px;padding:8px}.mb-bos-msgs p{margin:4px 0;overflow-wrap:anywhere}.mb-bos-msgs time{color:var(--mb-muted);font-size:12px}
 .mb-bos-embed{border-left:3px solid #FF2A2A;background:#161616;padding:6px 8px;display:flex;flex-wrap:wrap;gap:10px;font-size:12px}
 @media (max-width:820px){.mb-bos-dc{grid-template-columns:1fr}}
+
+/* MUSE voice assistant (ported from the owner's "Miri" HTML; red/black only) */
+.mb-muse-voice{display:grid;gap:.75rem;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:12px;padding:1rem}
+.mb-muse-voice-stage{display:flex;justify-content:center}
+.mb-muse-voice-bubble{border:1px solid rgba(255,42,42,.5);border-radius:10px;padding:.6rem .8rem;white-space:pre-wrap}
+.mb-muse-voice-state{display:flex;justify-content:space-between;gap:.5rem;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:#FF2A2A;margin:0 0 .25rem}
+.mb-muse-voice button{min-height:44px;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:8px;padding:.3rem .7rem;cursor:pointer}
+.mb-muse-voice button[aria-pressed="true"],.mb-muse-voice button:hover:not(:disabled){background:#FF2A2A;color:#0A0A0A}
+.mb-muse-voice button:disabled{opacity:.6;cursor:not-allowed}
+.mb-muse-voice-bar{display:flex;gap:.5rem;flex-wrap:wrap}
+.mb-muse-voice-bar input{min-height:44px;flex:1;min-width:12rem;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:8px;padding:.4rem .6rem}
+.mb-muse-voice-chips{display:flex;gap:.4rem;flex-wrap:wrap}
+.mb-muse-voice-chips button{font-size:.75rem}
+.mb-muse-home{margin:1rem;max-width:720px}
+.mb-muse-home h2{color:#FF2A2A}
+
+/* Free-roaming MuZe overlay: never blocks clicks except on the handle */
+.mb-muze-roam{position:fixed;inset:0;pointer-events:none;z-index:60}
+.mb-muze-roam-handle{position:absolute;left:0;top:0;width:96px;pointer-events:none;transition:transform .6s cubic-bezier(.3,1.4,.5,1)}
+.mb-muze-roam-body,.mb-muze-roam-tools button{pointer-events:auto}
+.mb-muze-roam-body{width:96px;height:96px;border-radius:50%;overflow:hidden;border:1px solid #FF2A2A;background:#0A0A0A;cursor:grab;touch-action:none}
+.mb-muze-roam-body:focus-visible{outline:2px solid #FF2A2A;outline-offset:3px}
+.mb-muze-roam-body .mb-fur{margin:0}.mb-muze-roam-body .mb-fur-stage{border:0}
+.mb-muze-roam-tools{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.mb-muze-roam-tools button{flex:none;box-sizing:border-box;min-height:46px;min-width:44px;width:max-content;white-space:nowrap;padding:0 .6rem;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:8px;font-size:.75rem;cursor:pointer}
+.mb-muze-roam-tools button:hover,.mb-muze-roam-tools button[aria-pressed="true"]{background:#FF2A2A;color:#0A0A0A}
+.mb-muze-roam-guide{pointer-events:none;width:220px;margin-top:6px;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:10px;padding:.5rem .6rem;font-size:.8rem}
+.mb-muze-roam-handle.is-dancing .mb-muze-roam-body{animation:mb-muze-spin 1.2s ease-in-out}
+@keyframes mb-muze-spin{0%{transform:rotate(0) scale(1)}50%{transform:rotate(360deg) scale(1.12)}100%{transform:rotate(720deg) scale(1)}}
+body.mb-muze-full{background:#0A0A0A}
+body.mb-muze-full .mb-bos-rail,body.mb-muze-full .mb-console{display:none}
+@media (prefers-reduced-motion: reduce){.mb-muze-roam-handle{transition:none}.mb-muze-roam-handle.is-dancing .mb-muze-roam-body{animation:none}}
+.mb-muze-roam .mb-muze-roam-tools button{min-height:46px;height:46px}
+.mb-muse-home button,.mb-muse-home select,.mb-muse-home input,.mb-muse-home textarea{min-height:44px;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:8px;padding:.3rem .7rem}
+.mb-muse-home button{cursor:pointer;margin-right:.4rem}.mb-muse-home label{display:block;margin:.4rem 0}
