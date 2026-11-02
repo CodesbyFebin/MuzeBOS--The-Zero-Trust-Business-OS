@@ -1,0 +1,200 @@
+import React from 'react';
+import { Swarm } from '../types/metabos.ts';
+import {
+  TrendingUp,
+  Cpu,
+  DollarSign,
+  Activity,
+  Layers,
+  ArrowDownRight,
+  ShieldCheck,
+  CheckCircle,
+  Clock,
+  Sparkles,
+} from 'lucide-react';
+
+interface AnalyticsDashboardProps {
+  swarms: Swarm[];
+}
+
+export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ swarms }) => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const hireDays = [42, 38, 35, 28, 24, 22, 19, 18, 16, 15, 14, 12];
+
+  return (
+    <div className="space-y-6 max-w-[1400px] mx-auto">
+      {/* Top Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-[#111622] border border-white/10">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white tracking-tight">Real-Time Analytics & Cost Telemetry</h2>
+            <span className="mono text-[10px] px-2 py-0.5 rounded-full bg-[#00ff9d]/20 text-[#00ff9d] border border-[#00ff9d]/30 font-semibold">
+              SELF-HOSTED FOSS FIRST
+            </span>
+          </div>
+          <p className="mono text-xs text-white/50 mt-1">
+            Zero token egress · Local vLLM cluster cost breakdown vs proprietary closed APIs
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 mono text-xs text-[#00ff9d] bg-[#00ff9d]/10 border border-[#00ff9d]/20 px-3.5 py-1.5 rounded-xl">
+          <TrendingUp className="w-3.5 h-3.5" />
+          <span>Operational ROI: 3.8x Annualized</span>
+        </div>
+      </div>
+
+      {/* Top Metric Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Monthly Self-Hosted Compute', val: '$85,400', sub: 'vs $280k API equivalent', accent: '#00ff9d' },
+          { label: 'Token Throughput (Shared Pool)', val: '142.8k tps', sub: '16x H100 vLLM cluster', accent: '#00d4ff' },
+          { label: 'Median Time to Hire', val: '12 Days', sub: '↓ 71% from industry avg', accent: '#8b5cf6' },
+          { label: 'Quarterly Pipeline Value', val: '$847,000', sub: '24 enterprise placements', accent: '#f59e0b' },
+        ].map((card, i) => (
+          <div key={i} className="p-5 rounded-2xl bg-[#111622] border border-white/10 relative overflow-hidden">
+            <div
+              className="absolute top-0 right-0 w-24 h-24 blur-[35px] opacity-15 rounded-full"
+              style={{ background: card.accent }}
+            />
+            <div className="mono text-xs text-white/40">{card.label}</div>
+            <div className="mono text-2xl font-black text-white mt-2 tracking-tight">{card.val}</div>
+            <div className="mono text-[11px] text-white/60 mt-1">{card.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts Grid: Time-to-Hire Trend + Cost Comparison Breakdown */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-6">
+        {/* Time-to-Hire Trend (High-Craft SVG/CSS Bar Chart) */}
+        <div className="p-5 rounded-2xl bg-[#111622] border border-white/10 space-y-4">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+            <div>
+              <h3 className="font-bold text-sm text-white">Time-to-Hire Trajectory (Days)</h3>
+              <p className="mono text-[11px] text-white/40">From initial candidate discovery to signed offer</p>
+            </div>
+            <div className="mono text-xs font-bold text-[#00ff9d] flex items-center gap-1">
+              <ArrowDownRight className="w-4 h-4" />
+              <span>34% Velocity Boost in Q4</span>
+            </div>
+          </div>
+
+          <div className="flex items-end gap-2 h-44 pt-4">
+            {hireDays.map((val, idx) => {
+              const heightPct = (val / 42) * 100;
+              return (
+                <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
+                  <div className="mono text-[10px] text-white/0 group-hover:text-white transition font-bold">
+                    {val}d
+                  </div>
+                  <div
+                    className="w-full rounded-t-lg bg-gradient-to-t from-[#00d4ff]/40 to-[#00ff9d] transition-all duration-300 group-hover:brightness-125"
+                    style={{ height: `${heightPct}%` }}
+                  />
+                  <span className="mono text-[10px] text-white/40">{months[idx].slice(0, 1)}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Cost Comparison: Proprietary API vs Self-Hosted Llama 4 */}
+        <div className="p-5 rounded-2xl bg-[#111622] border border-white/10 space-y-4">
+          <div className="border-b border-white/5 pb-3">
+            <h3 className="font-bold text-sm text-white">Architectural Cost Comparison</h3>
+            <p className="mono text-[11px] text-white/40">From Section 11 of Master Blueprint</p>
+          </div>
+
+          <div className="space-y-3 mono text-xs">
+            <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-1.5">
+              <div className="flex justify-between items-center text-white/50">
+                <span>Proprietary API Token Cost:</span>
+                <span className="text-[#f43f5e] font-bold">~$220,000/mo</span>
+              </div>
+              <div className="flex justify-between items-center text-white/50">
+                <span>Self-Hosted Llama 4 Compute:</span>
+                <span className="text-[#00ff9d] font-bold">~$85,000/mo</span>
+              </div>
+              <div className="border-t border-white/10 pt-1.5 flex justify-between items-center font-bold">
+                <span className="text-white">Monthly Cost Savings:</span>
+                <span className="text-[#00ff9d]">+$135,000/mo</span>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-white/80 space-y-1 text-[11px]">
+              <div className="font-bold text-[#00d4ff]">Strategic Advantage:</div>
+              <ul className="space-y-1 text-white/70">
+                <li>• <strong>Zero Token Egress</strong>: Data never leaves private VPC.</li>
+                <li>• <strong>Apache 2.0 Weights</strong>: Immune to vendor shutdowns.</li>
+                <li>• <strong>Break-Even</strong>: ~4 months at moderate utilization.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sourcing Funnel & Source Effectiveness */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Sourcing Funnel */}
+        <div className="p-5 rounded-2xl bg-[#111622] border border-white/10 space-y-4">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+            <h3 className="font-bold text-sm text-white">Autonomous Sourcing Funnel</h3>
+            <span className="mono text-[11px] text-white/40">Last 24 Hours</span>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { label: 'Discovered', count: 412, pct: 100 },
+              { label: 'Enriched via APIs', count: 311, pct: 76 },
+              { label: 'LLM Scored >85%', count: 247, pct: 60 },
+              { label: 'Personalized Outreach', count: 184, pct: 45 },
+              { label: 'Replied & Scheduled', count: 62, pct: 15 },
+            ].map((step, idx) => (
+              <div key={idx} className="space-y-1">
+                <div className="flex items-center justify-between mono text-xs">
+                  <span className="text-white/70">{step.label}</span>
+                  <span className="font-bold text-white">{step.count} ({step.pct}%)</span>
+                </div>
+                <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-[#00ff9d] to-[#00d4ff]"
+                    style={{ width: `${step.pct}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Source Effectiveness */}
+        <div className="p-5 rounded-2xl bg-[#111622] border border-white/10 space-y-4">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+            <h3 className="font-bold text-sm text-white">Source Effectiveness & Accuracy</h3>
+            <span className="mono text-[11px] text-white/40">GitHub · LinkedIn · StackOverflow</span>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              { name: 'GitHub (Public Commits & Repos)', matchRate: 94.2, hires: 14, color: '#00ff9d' },
+              { name: 'LinkedIn (Profiles & Experience)', matchRate: 88.5, hires: 8, color: '#00d4ff' },
+              { name: 'StackOverflow (Top 2% Answers)', matchRate: 82.1, hires: 2, color: '#f59e0b' },
+            ].map((src, i) => (
+              <div key={i} className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-white">{src.name}</span>
+                  <span className="mono font-bold text-[#00ff9d]">{src.matchRate}% match</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${src.matchRate}%`, background: src.color }}
+                  />
+                </div>
+                <div className="mono text-[10px] text-white/40">{src.hires} successful placements this quarter</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

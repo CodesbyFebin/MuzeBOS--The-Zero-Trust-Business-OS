@@ -347,3 +347,15 @@ html:has(.mb-shell-nav) .os-side-toggle, html:has(.mb-shell-nav) .os-side-handle
   .mb-search-btn span, .mb-search-btn kbd { display:none; }
   .mb-icon-btn { min-width:40px;min-height:40px; }
 }
+/* AI Studio ports */
+.mb-studio { margin-top:20px; }
+.mb-studio-tabs { display:flex;gap:6px; }
+.mb-studio-list { list-style:none;margin:8px 0;padding:0; }
+.mb-studio-list li, .mb-studio-list li > a { display:flex;flex-direction:column;gap:2px;padding:8px;border-bottom:1px solid var(--mb-line);color:var(--mb-text); }
+.mb-studio-list li > a { padding:0;border:0; }
+.mb-studio-list li span:last-child { color:var(--mb-muted);font-size:11px; }
+.mb-studio-group h3 { font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mb-muted);margin:14px 0 2px; }
+.mb-terminal { background:var(--mb-bg);border:1px solid var(--mb-line);border-radius:8px;padding:10px;min-height:96px;font-family:var(--mb-mono);font-size:12px; }
+.mb-term-prompt { color:var(--mb-accent); }
+.mb-terminal-form { display:flex;gap:8px;margin-top:8px; }
+.mb-terminal-form input { flex:1;min-height:40px;font-family:var(--mb-mono); }

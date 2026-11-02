@@ -1,0 +1,284 @@
+import React, { useState } from 'react';
+import { Swarm, SwarmCategory, SandboxInstance } from '../types/metabos.ts';
+import {
+  Server,
+  Layers,
+  Cpu,
+  Shield,
+  Activity,
+  Plus,
+  Search,
+  ExternalLink,
+  CheckCircle2,
+  AlertTriangle,
+  Radio,
+  Sliders,
+  X,
+  Zap,
+} from 'lucide-react';
+
+interface SwarmRegistryProps {
+  swarms: Swarm[];
+  selectedSwarm: Swarm | null;
+  onSelectSwarm: (swarm: Swarm | null) => void;
+  onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
+}
+
+export const SwarmRegistry: React.FC<SwarmRegistryProps> = ({
+  swarms,
+  selectedSwarm,
+  onSelectSwarm,
+  onToast,
+}) => {
+  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showDeployModal, setShowDeployModal] = useState(false);
+  const [newAgentName, setNewAgentName] = useState('SWE-Worker-042');
+  const [newAgentCategory, setNewAgentCategory] = useState<SwarmCategory>('ENG');
+  const [newAgentProfile, setNewAgentProfile] = useState<'code-exec' | 'research' | 'api-light'>('code-exec');
+
+  const categories: (SwarmCategory | 'ALL')[] = [
+    'ALL',
+    'ENG',
+    'SALES',
+    'MKT',
+    'CS',
+    'FIN',
+    'LEG',
+    'HR',
+    'SEC',
+    'OPS',
+    'RSR',
+    'IT',
+  ];
+
+  const filteredSwarms = swarms.filter((s) => {
+    if (categoryFilter !== 'ALL' && s.primaryCategory !== categoryFilter && s.secondaryCategory !== categoryFilter) {
+      return false;
+    }
+    if (
+      searchQuery &&
+      !s.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !s.currentFocus.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  const handleDeployAgent = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowDeployModal(false);
+    onToast(`Spawned sandbox "${newAgentName}" in swarm namespace with Kata-fc isolation!`, 'success');
+  };
+
+  return (
+    <div className="space-y-6 max-w-[1400px] mx-auto">
+      {/* Top Header & Search Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-[#111622] border border-white/10">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white tracking-tight">Swarm & Sandbox Topology</h2>
+            <span className="mono text-[10px] px-2 py-0.5 rounded-full bg-[#00ff9d]/20 text-[#00ff9d] border border-[#00ff9d]/30 font-semibold">
+              K8S AGENT SANDBOX CRD v1.0.7
+            </span>
+          </div>
+          <p className="mono text-xs text-white/50 mt-1">
+            20 Autonomous Swarms · 500 Sandboxed Workers · Shared vLLM Scout Inference Cluster
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-[#0b0f18] border border-white/10 px-3 py-2 rounded-xl text-xs">
+            <Search className="w-3.5 h-3.5 text-white/40" />
+            <input
+              type="text"
+              placeholder="Search swarms or focus..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent outline-none text-white text-xs placeholder:text-white/30 w-44"
+            />
+          </div>
+
+          <button
+            onClick={() => setShowDeployModal(true)}
+            className="h-9 px-4 rounded-xl bg-white text-black font-bold text-xs mono flex items-center gap-1.5 hover:bg-[#00ff9d] transition shadow-lg"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Deploy Sandbox</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Category Filter Pills */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setCategoryFilter(cat)}
+            className={`px-3 py-1.5 rounded-xl mono text-xs font-semibold whitespace-nowrap transition ${
+              categoryFilter === cat
+                ? 'bg-[#00d4ff] text-black shadow-lg font-bold'
+                : 'bg-[#111622] text-white/60 hover:text-white border border-white/5'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Swarm Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredSwarms.map((s) => {
+          const isSelected = selectedSwarm?.id === s.id;
+
+          return (
+            <div
+              key={s.id}
+              onClick={() => onSelectSwarm(isSelected ? null : s)}
+              className={`p-5 rounded-2xl bg-[#111622] border cursor-pointer transition-all duration-200 relative overflow-hidden group ${
+                isSelected
+                  ? 'border-[#00ff9d] shadow-[0_0_25px_rgba(0,255,157,0.2)]'
+                  : 'border-white/10 hover:border-white/20'
+              }`}
+            >
+              <div
+                className="absolute top-0 right-0 w-24 h-24 blur-[30px] opacity-20 rounded-full"
+                style={{ background: s.color }}
+              />
+
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ background: s.color, boxShadow: `0 0 8px ${s.color}` }}
+                    />
+                    <span className="mono text-xs font-bold text-white/50">{s.namespace}</span>
+                  </div>
+                  <h3 className="text-base font-bold text-white mt-1 group-hover:text-[#00ff9d] transition">
+                    {s.name}
+                  </h3>
+                </div>
+
+                <div className="text-right mono">
+                  <div className="text-sm font-bold text-[#00ff9d]">{s.kpiHealth}%</div>
+                  <div className="text-[10px] text-white/40">KPI Health</div>
+                </div>
+              </div>
+
+              <div className="mt-3 p-2.5 rounded-xl bg-black/40 border border-white/5 mono text-xs text-white/70 leading-relaxed line-clamp-2">
+                {s.currentFocus}
+              </div>
+
+              {/* Specs & Hardware */}
+              <div className="mt-4 grid grid-cols-2 gap-2 mono text-xs">
+                <div className="p-2 rounded-lg bg-white/[0.03]">
+                  <div className="text-[10px] text-white/40">Leader Model</div>
+                  <div className="font-semibold text-white/90 text-[11px] truncate">{s.leaderModel}</div>
+                </div>
+                <div className="p-2 rounded-lg bg-white/[0.03]">
+                  <div className="text-[10px] text-white/40">Sandboxes</div>
+                  <div className="font-semibold text-[#00d4ff] text-[11px]">
+                    {s.activeWorkers} / {s.totalSandboxes} Active
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3 mono text-[11px] text-white/40">
+                <span>Latency: <strong className="text-white">{s.latencyMs}ms</strong></span>
+                <span>vLLM: <strong className="text-[#00ff9d]">{s.tokensPerSec} tok/s</strong></span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Deploy Agent Sandbox Modal */}
+      {showDeployModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg bg-[#111622] border border-white/10 rounded-2xl p-6 shadow-2xl relative space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div>
+                <h3 className="text-lg font-bold text-white">Deploy Agent Sandbox</h3>
+                <p className="mono text-xs text-white/50">K8s SandboxTemplate instance claim</p>
+              </div>
+              <button
+                onClick={() => setShowDeployModal(false)}
+                className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 text-white/70"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleDeployAgent} className="space-y-4 text-xs">
+              <div>
+                <label className="block mono text-white/60 mb-1 font-semibold">Worker Instance Name</label>
+                <input
+                  type="text"
+                  value={newAgentName}
+                  onChange={(e) => setNewAgentName(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-[#0b0f18] border border-white/10 text-white mono outline-none focus:border-[#00ff9d]"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block mono text-white/60 mb-1 font-semibold">Target Swarm Category</label>
+                  <select
+                    value={newAgentCategory}
+                    onChange={(e) => setNewAgentCategory(e.target.value as SwarmCategory)}
+                    className="w-full px-3 py-2 rounded-xl bg-[#0b0f18] border border-white/10 text-white mono outline-none"
+                  >
+                    {categories.filter((c) => c !== 'ALL').map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block mono text-white/60 mb-1 font-semibold">Execution Profile</label>
+                  <select
+                    value={newAgentProfile}
+                    onChange={(e) => setNewAgentProfile(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-xl bg-[#0b0f18] border border-white/10 text-white mono outline-none"
+                  >
+                    <option value="code-exec">code-exec (Kata-fc VM)</option>
+                    <option value="research">research (gVisor)</option>
+                    <option value="api-light">api-light (runc)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-black/50 border border-white/5 mono text-[11px] text-white/70 space-y-1">
+                <div>Isolation: <strong className="text-white">runtimeClassName: kata-fc</strong></div>
+                <div>Limits: <strong className="text-[#00ff9d]">1 vCPU / 1 GiB RAM</strong></div>
+                <div>Inference: <strong className="text-[#00d4ff]">http://vllm-scout.inference.svc:8000/v1</strong></div>
+                <div className="text-white/40">Egress: Metadata IP (169.254.169.254) blocked</div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setShowDeployModal(false)}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 mono"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#00ff9d] hover:bg-[#00e68d] text-black font-bold mono shadow-lg"
+                >
+                  Confirm Claim & Spawn
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

@@ -1,0 +1,229 @@
+import React, { useState } from 'react';
+import {
+  FileText,
+  Copy,
+  Check,
+  Cpu,
+  Layers,
+  Shield,
+  Server,
+  DollarSign,
+  ArrowRight,
+  ExternalLink,
+} from 'lucide-react';
+
+interface BlueprintDocsProps {
+  onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
+}
+
+export const BlueprintDocs: React.FC<BlueprintDocsProps> = ({ onToast }) => {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyCode = (id: string, code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedId(id);
+    onToast('YAML configuration snippet copied to clipboard!', 'info');
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const vllmYaml = `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-scout-pool
+  namespace: inference
+spec:
+  replicas: 16
+  template:
+    spec:
+      nodeSelector:
+        nvidia.com/gpu.product: "NVIDIA-H100-SXM5-80GB"
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.8.3
+        command:
+        - sh
+        - -c
+        - |
+          vllm serve meta-llama/Llama-4-Scout-17B-16E-Instruct \\
+            --quantization awq \\
+            --dtype float16 \\
+            --max-model-len 131072 \\
+            --gpu-memory-utilization 0.90 \\
+            --max-num-seqs 256 \\
+            --enable-prefix-caching \\
+            --port 8000
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+            cpu: "8"
+            memory: "64Gi"`;
+
+  const sandboxYaml = `apiVersion: extensions.agents.x-k8s.io/v1beta1
+kind: SandboxTemplate
+metadata:
+  name: swarm01-code-exec
+  namespace: swarm-01
+spec:
+  networkPolicyManagement: Managed
+  networkPolicy:
+    egress:
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: inference
+      ports: [{protocol: TCP, port: 8000}]
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: control-plane
+      ports: [{protocol: TCP, port: 8443}]
+    - to:
+      - ipBlock:
+          cidr: 0.0.0.0/0
+          except:
+          - 169.254.169.254/32
+          - 10.0.0.0/8
+          - 172.16.0.0/12
+          - 192.168.0.0/16
+      ports: [{protocol: TCP, port: 443}]
+  podTemplate:
+    spec:
+      runtimeClassName: kata-fc # VM isolation for LLM-generated code
+      automountServiceAccountToken: false
+      containers:
+      - name: worker
+        image: metabos/agent-worker:1.0
+        env:
+        - name: VLLM_ENDPOINT
+          value: "http://vllm-scout.inference.svc:8000/v1"
+        - name: LLM_MODEL
+          value: "meta-llama/Llama-4-Scout-17B-16E-Instruct"`;
+
+  return (
+    <div className="space-y-6 max-w-[1400px] mx-auto">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-[#111622] border border-white/10">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white tracking-tight">
+              MeTaBos Master Blueprint: 500 K8s Sandboxes on Meta AI Stack
+            </h2>
+            <span className="mono text-[10px] px-2 py-0.5 rounded-full bg-[#00ff9d]/20 text-[#00ff9d] border border-[#00ff9d]/30 font-semibold">
+              OCTOBER 2026 ARCHITECTURE
+            </span>
+          </div>
+          <p className="mono text-xs text-white/50 mt-1">
+            Self-hosted Llama 4 Maverick (400B) + Scout (109B) on vLLM with Kata-fc MicroVM isolation
+          </p>
+        </div>
+      </div>
+
+      {/* Model Tier Table */}
+      <div className="p-5 rounded-2xl bg-[#111622] border border-white/10 space-y-4">
+        <h3 className="text-base font-bold text-white flex items-center gap-2">
+          <Cpu className="w-4 h-4 text-[#00ff9d]" />
+          <span>1. Model Topology & GPU Allocations</span>
+        </h3>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-[#0b0f18] border-b border-white/10 mono text-white/40">
+              <tr>
+                <th className="p-3">Role</th>
+                <th className="p-3">Model</th>
+                <th className="p-3">Hardware per Replica</th>
+                <th className="p-3">Context Window</th>
+                <th className="p-3">Purpose</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5 mono text-white/80">
+              <tr>
+                <td className="p-3 font-bold text-white">Chief Operating Agent (1)</td>
+                <td className="p-3 text-[#00ff9d]">Llama 4 Maverick (400B FP8, TP=8)</td>
+                <td className="p-3">8× H200 SXM5 (dedicated)</td>
+                <td className="p-3">~1,000,000 tokens</td>
+                <td className="p-3 font-sans text-white/60">Executive governance, task routing, approval thresholds</td>
+              </tr>
+              <tr>
+                <td className="p-3 font-bold text-white">Swarm Leaders (20)</td>
+                <td className="p-3 text-[#00d4ff]">Llama 4 Scout (109B FP8, TP=2)</td>
+                <td className="p-3">2× H100 SXM5 per leader</td>
+                <td className="p-3">262,144 tokens</td>
+                <td className="p-3 font-sans text-white/60">Swarm-level task decomposition, sub-agent coordination</td>
+              </tr>
+              <tr>
+                <td className="p-3 font-bold text-white">Worker Inference Pool (Shared)</td>
+                <td className="p-3 text-[#8b5cf6]">Llama 4 Scout (109B AWQ INT4)</td>
+                <td className="p-3">16× 1-H100 replicas (vLLM)</td>
+                <td className="p-3">131,072 tokens</td>
+                <td className="p-3 font-sans text-white/60">Serves all 500 sandboxed worker pods concurrently (4,096 slots)</td>
+              </tr>
+              <tr>
+                <td className="p-3 font-bold text-white">Light Tasks</td>
+                <td className="p-3 text-white/70">Llama 3.1 8B Instruct (FP16)</td>
+                <td className="p-3">1× L4 per node</td>
+                <td className="p-3">32,768 tokens</td>
+                <td className="p-3 font-sans text-white/60">Fast classification, routing, regex extraction</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Code Snippets: vLLM Pool and K8s SandboxTemplate */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* vLLM Deployment */}
+        <div className="p-5 rounded-2xl bg-[#111622] border border-white/10 space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="font-bold text-xs text-white mono">vllm-scout-pool.yaml (16 Replicas)</h4>
+            <button
+              onClick={() => copyCode('vllm', vllmYaml)}
+              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 flex items-center gap-1 mono text-[11px]"
+            >
+              {copiedId === 'vllm' ? <Check className="w-3.5 h-3.5 text-[#00ff9d]" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedId === 'vllm' ? 'Copied' : 'Copy'}</span>
+            </button>
+          </div>
+          <pre className="p-3.5 rounded-xl bg-black/60 border border-white/5 font-mono text-[11px] text-white/80 overflow-x-auto leading-relaxed">
+            {vllmYaml}
+          </pre>
+        </div>
+
+        {/* K8s Agent Sandbox */}
+        <div className="p-5 rounded-2xl bg-[#111622] border border-white/10 space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="font-bold text-xs text-white mono">sandbox-template-kata.yaml</h4>
+            <button
+              onClick={() => copyCode('sandbox', sandboxYaml)}
+              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 flex items-center gap-1 mono text-[11px]"
+            >
+              {copiedId === 'sandbox' ? <Check className="w-3.5 h-3.5 text-[#00ff9d]" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedId === 'sandbox' ? 'Copied' : 'Copy'}</span>
+            </button>
+          </div>
+          <pre className="p-3.5 rounded-xl bg-black/60 border border-white/5 font-mono text-[11px] text-white/80 overflow-x-auto leading-relaxed">
+            {sandboxYaml}
+          </pre>
+        </div>
+      </div>
+
+      {/* Decision Flow Architecture Box */}
+      <div className="p-5 rounded-2xl bg-[#111622] border border-white/10 space-y-3">
+        <h4 className="font-bold text-sm text-white">Executive Governance Loop</h4>
+        <div className="p-4 rounded-xl bg-black/50 border border-white/5 font-mono text-xs text-white/80 leading-loose">
+          <div className="text-[#00ff9d] font-bold">Incoming Task</div>
+          <div>&nbsp;&nbsp;│</div>
+          <div>&nbsp;&nbsp;▼</div>
+          <div>Chief Operating Agent (Llama 4 Maverick) calculates:</div>
+          <div>&nbsp;&nbsp;• Impact Score (0 - 10)</div>
+          <div>&nbsp;&nbsp;• Risk Class (internal / external / financial / legal)</div>
+          <div>&nbsp;&nbsp;• Precedent Audit Record Check</div>
+          <div>&nbsp;&nbsp;│</div>
+          <div>&nbsp;&nbsp;├── <span className="text-[#00ff9d]">Impact &lt; 5.0</span> → Autonomous Dispatch to Swarm Leader (Executed)</div>
+          <div>&nbsp;&nbsp;├── <span className="text-[#f59e0b]">Impact 5.0 - 7.0</span> → Dispatched + Logged for Observer Agent Scrutiny</div>
+          <div>&nbsp;&nbsp;└── <span className="text-[#f43f5e]">Impact &gt; 7.0</span> → Create Approval Request → Escalated to Owner Console</div>
+        </div>
+      </div>
+    </div>
+  );
+};

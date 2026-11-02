@@ -5,6 +5,7 @@ import { OPERATOR_NAME } from '@/lib/operator';
 import type { AgentRun } from '@/lib/schemas';
 import { getAppearance } from '@/lib/appearance-server';
 import { treeFor } from '@/lib/appearance';
+import { WorkflowStream } from '@/components/metabos/StudioPorts';
 import { GovernedWorkflows } from '@/components/metabos/GovernedWorkflows';
 
 export const dynamic = 'force-dynamic';
@@ -33,7 +34,7 @@ export default async function WorkflowsPage(props: { searchParams?: Promise<{ wf
 
   // The canvas editor is a full-screen fixed surface, so the governed run
   // engine gets its own view on the same route instead of sitting under it.
-  if (searchParams?.view === 'governed') return <GovernedWorkflows />;
+  if (searchParams?.view === 'governed') return <><GovernedWorkflows /><div className="mb-console"><WorkflowStream /></div></>;
   return (
     <div>
       <WorkflowCanvas
