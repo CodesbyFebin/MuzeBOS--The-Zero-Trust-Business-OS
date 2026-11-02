@@ -58,6 +58,7 @@ const PAGES: PageEntry[] = [
   { file: 'workspace/builder/swarms/page.tsx', load: () => import('@/app/workspace/builder/swarms/page') },
   { file: 'workspace/builder/meta-server/page.tsx', load: () => import('@/app/workspace/builder/meta-server/page') },
   { file: 'workspace/builder/demo/page.tsx', load: () => import('@/app/workspace/builder/demo/page') },
+  { file: 'workspace/builder/business-open-server/page.tsx', load: () => import('@/app/workspace/builder/business-open-server/page') },
   { file: 'workspace/builder/agentverse/page.tsx', load: () => import('@/app/workspace/builder/agentverse/page') },
   { file: 'workspace/builder/agent-hub/page.tsx', load: () => import('@/app/workspace/builder/agent-hub/page') },
   { file: 'workspace/brain/writing/page.tsx', load: () => import('@/app/workspace/brain/writing/page') },
