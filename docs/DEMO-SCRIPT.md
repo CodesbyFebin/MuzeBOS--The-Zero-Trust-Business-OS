@@ -1,3 +1,23 @@
+# 3-minute judge demo (Demo mode)
+
+Run: `npm run build && MUZEBOS_DB=/tmp/demo.db PORT=4130 npm start`, create the owner at `/setup`, then open `/workspace/builder/demo`.
+
+| Time | Shot | On screen | Voiceover |
+|---|---|---|---|
+| 0:00–0:20 | Sanctum with MUSE fur | `/workspace/builder/agentverse` | "This is MuZe, a Meta AI business server for small businesses. MUSE drafts; you decide." |
+| 0:20–0:35 | Demo mode, step 1 | Click **Demo mode (3 min)**, **Start demo** | "Everything marked FIXTURE is a demo input. Everything else is a real record." |
+| 0:35–0:55 | Step 2 | Type the brand name, **Create workspace** | "I create an empty brand workspace. Nothing is seeded." |
+| 0:55–1:15 | Step 3 | **Insert FIXTURE lead** (or a real webhook message if configured) | "A WhatsApp lead arrives. With a live Meta test app this comes from the signed webhook." |
+| 1:15–1:40 | Step 4 | **Ask the agent to draft a reply**, edit it | "The agent drafts. In this mode it's a template so the demo is repeatable." |
+| 1:40–2:05 | Step 5 | Pending commit with diff | "The reply is a pending commit with a diff. Nothing has been sent." |
+| 2:05–2:30 | Step 6 | **Approve & dispatch** | "I approve. The approval is bound to the payload hash and goes through /api/dispatch. Without WhatsApp credentials it's held and says so." |
+| 2:30–2:50 | Step 7 | Activity feed + weekly report | "Every step is in the hash-chained evidence log and the weekly report." |
+| 2:50–3:00 | README architecture | Mermaid diagram | "Six layers, approval-gated agents, built for WhatsApp-first businesses in India." |
+
+Do not say "secure", "live", "production ready" or "autonomous". Say that Meta App Review has not been submitted.
+
+---
+
 # Demo script (about 6 minutes)
 
 Before you start: `npm run build && MUZEBOS_DB=/tmp/demo.db MUZEBOS_CLAW_DIR=/workspace/claw-local MUZEBOS_LOCAL_LLM_URL=http://127.0.0.1:8089/v1 MUZEBOS_LOCAL_GUARD_URL=http://127.0.0.1:8090/v1 PORT=4130 npm start`. Set up the owner at `/setup`. A fresh database shows "No records yet" everywhere, and that is expected.

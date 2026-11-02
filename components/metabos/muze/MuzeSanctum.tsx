@@ -24,6 +24,7 @@ export function MuzeSanctum({ pending, commits, workspaces, onOpen }: Props) {
           <button type="button" onClick={() => onOpen('commit-log')}>Open commit console</button>
           <button type="button" onClick={() => onOpen('pending-approvals')}>Pending approvals ({pending})</button>
           <Link className="mb-av-link" href="/workspace/brain/voice">Talk to MUSE</Link>
+          <Link className="mb-av-link" href="/workspace/builder/demo">Demo mode (3 min)</Link>
         </div>
       </div>
     </div>
