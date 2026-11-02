@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { contentCampaigns } from '@/lib/content-campaigns';
 import {
@@ -24,7 +25,7 @@ export async function GET() {
  * returns, so the very next render shows it in the queue.
  */
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => null);
+  const body = await readJsonBounded(request).catch(() => null);
   const validCampaignIds = new Set(contentCampaigns().map((c) => c.id));
 
   if (body && typeof body === 'object' && 'spec' in body) {

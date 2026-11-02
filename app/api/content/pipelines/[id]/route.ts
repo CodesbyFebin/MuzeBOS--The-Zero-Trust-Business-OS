@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { PipelineInputSchema, deletePipeline, getPipeline, updatePipeline, validatePipeline, type Pipeline } from '@/lib/content-pipelines';
 
@@ -17,7 +18,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
   const existing = getPipeline(params.id);
   if (!existing) return NextResponse.json({ error: `unknown pipeline: ${params.id}` }, { status: 404 });
 
-  const parsed = PipelineInputSchema.safeParse(await request.json().catch(() => null));
+  const parsed = PipelineInputSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const draft: Pipeline = { ...existing, ...parsed.data };

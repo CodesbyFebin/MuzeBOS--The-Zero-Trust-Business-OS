@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getDb } from '@/lib/data';
@@ -18,7 +19,7 @@ const Body = z.object({
 export async function POST(req: Request) {
   let body: z.infer<typeof Body>;
   try {
-    body = Body.parse(await req.json());
+    body = Body.parse(await readJsonBounded(req));
   } catch (e) {
     return NextResponse.json({ ok: false, error: String(e) }, { status: 400 });
   }

@@ -72,7 +72,7 @@ export const PipelineNodeSchema = z.object({
    *  generate/transform node — see splitBatchParam — everything else in
    *  params is passed straight through as the model's real parameters. */
   model: z.string().min(1).nullable().default(null),
-  params: z.record(ParamValueSchema).default({}),
+  params: z.record(z.string(), ParamValueSchema).default({}),
   aspectRatio: z.string().nullable().default(null),
   duration: z.number().nullable().default(null),
   prompt: z.string().nullable().default(null),

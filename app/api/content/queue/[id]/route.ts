@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { contentCampaigns } from '@/lib/content-campaigns';
 import {
@@ -40,7 +41,7 @@ export async function DELETE(_req: Request, props: { params: Promise<{ id: strin
  */
 export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const body = await request.json().catch(() => null);
+  const body = await readJsonBounded(request).catch(() => null);
   const parsed = PatchQueueTaskSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: 'A campaignId is required.' }, { status: 400 });

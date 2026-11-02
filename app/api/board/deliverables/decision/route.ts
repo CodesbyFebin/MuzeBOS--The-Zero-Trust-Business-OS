@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { deliverableDecisions } from '@/founderos/lib/decisions';
 import { getDb } from '@/lib/data';
@@ -26,7 +27,7 @@ const BATCH_MAX = 500;
 export async function POST(request: Request) {
   let body: unknown;
   try {
-    body = await request.json();
+    body = await readJsonBounded(request);
   } catch {
     return NextResponse.json({ error: 'invalid json' }, { status: 400 });
   }

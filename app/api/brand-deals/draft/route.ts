@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getBrandDeals, invalidateBrandDealsCache } from '@/lib/brand-deals';
@@ -40,7 +41,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   let body: { dealId: string; text: string };
   try {
-    body = z.object({ dealId: ID, text: z.string().min(1).max(20_000) }).parse(await req.json());
+    body = z.object({ dealId: ID, text: z.string().min(1).max(20_000) }).parse(await readJsonBounded(req));
   } catch (e) {
     return NextResponse.json({ ok: false, error: String(e) }, { status: 400 });
   }

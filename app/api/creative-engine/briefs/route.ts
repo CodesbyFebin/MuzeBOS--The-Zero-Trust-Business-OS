@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { buildBrief } from '@/lib/creative-engine/briefs';
@@ -11,7 +12,7 @@ const Body = z.object({ campaignId: z.string(), scriptId: z.string(), version: z
 
 /** A brief from an approved (or latest) script version. Deterministic, no model. */
 export async function POST(request: Request) {
-  const parsed = Body.safeParse(await request.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const campaign = readCampaign(parsed.data.campaignId);
   if (!campaign) return NextResponse.json({ ok: false, error: 'campaign not found' }, { status: 404 });

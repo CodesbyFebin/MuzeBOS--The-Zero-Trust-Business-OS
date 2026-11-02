@@ -96,9 +96,9 @@ export function view(store: BusinessStore, moduleId: string): ModuleView {
 }
 
 export const ActionSchema = z.discriminatedUnion('action', [
-  z.object({ action: z.literal('create'), data: z.record(z.unknown()) }).strict(),
-  z.object({ action: z.literal('update'), id: z.string().min(1).max(64), version: z.number().int().min(1), data: z.record(z.unknown()) }).strict(),
-  z.object({ action: z.literal('transition'), id: z.string().min(1).max(64), version: z.number().int().min(1), transition: z.string().min(1).max(40), input: z.record(z.unknown()).default({}) }).strict(),
+  z.object({ action: z.literal('create'), data: z.record(z.string(), z.unknown()) }).strict(),
+  z.object({ action: z.literal('update'), id: z.string().min(1).max(64), version: z.number().int().min(1), data: z.record(z.string(), z.unknown()) }).strict(),
+  z.object({ action: z.literal('transition'), id: z.string().min(1).max(64), version: z.number().int().min(1), transition: z.string().min(1).max(40), input: z.record(z.string(), z.unknown()).default({}) }).strict(),
 ]);
 export type ModuleAction = z.infer<typeof ActionSchema>;
 

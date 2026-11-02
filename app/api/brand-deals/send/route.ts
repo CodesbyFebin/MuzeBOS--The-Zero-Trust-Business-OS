@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getBrandDeals, invalidateBrandDealsCache } from '@/lib/brand-deals';
@@ -11,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   let dealId: string;
   try {
-    ({ dealId } = z.object({ dealId: z.string().regex(/^r-?\d+$/) }).parse(await req.json()));
+    ({ dealId } = z.object({ dealId: z.string().regex(/^r-?\d+$/) }).parse(await readJsonBounded(req)));
   } catch (e) {
     return NextResponse.json({ ok: false, error: String(e) }, { status: 400 });
   }

@@ -6,7 +6,7 @@ import { INTEL_STEPS, runLabIntel } from '@/lib/lab/intel';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const RunSchema = z.object({ steps: z.array(z.enum(INTEL_STEPS)).optional(), override: z.boolean().optional() });
+const RunSchema = z.object({ steps: z.array(z.enum(INTEL_STEPS)).max(1000).optional(), override: z.boolean().optional() });
 
 /**
  * POST /api/lab/intel — run the intelligence half of a cycle now (SPEC §10 phases 4-7):

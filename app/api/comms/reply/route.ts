@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { sendSlackMessage } from '@/lib/connectors/slack';
@@ -27,7 +28,7 @@ const ReplySchema = z.discriminatedUnion('source', [
 ]);
 
 export async function POST(request: Request) {
-  const parsed = ReplySchema.safeParse(await request.json().catch(() => null));
+  const parsed = ReplySchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

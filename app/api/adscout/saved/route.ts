@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { readSavedAds, saveAd, unsaveAd } from '@/lib/foreplay/saved';
@@ -25,14 +26,14 @@ const WallAdShape = z.object({
   daysRunning: z.number(),
   hook: z.string().nullable(),
   hookSource: z.enum(['spoken', 'text']).nullable(),
-  transcript: z.array(z.object({ t: z.number(), s: z.string() })),
+  transcript: z.array(z.object({ t: z.number(), s: z.string() })).max(1000),
   drivers: z.record(z.string(), z.number()),
   ctaType: z.string().nullable(),
   linkUrl: z.string().nullable(),
 });
 
 export async function POST(request: Request) {
-  const parsed = WallAdShape.safeParse(await request.json().catch(() => null));
+  const parsed = WallAdShape.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: 'a full ad snapshot is required' }, { status: 400 });
   return NextResponse.json({ ok: true, saved: saveAd(parsed.data as WallAd) });
 }
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
 const RemoveSchema = z.object({ adId: z.string().min(1) });
 
 export async function DELETE(request: Request) {
-  const parsed = RemoveSchema.safeParse(await request.json().catch(() => null));
+  const parsed = RemoveSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: 'adId required' }, { status: 400 });
   return NextResponse.json({ ok: true, saved: unsaveAd(parsed.data.adId) });
 }

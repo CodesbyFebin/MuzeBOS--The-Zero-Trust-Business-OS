@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -27,7 +28,7 @@ export async function GET(req: Request) {
 }
 export async function POST(req: Request) {
   try {
-    businessAccess(req); const c = cmd.parse(await req.json()); const s = businessStore();
+    businessAccess(req); const c = cmd.parse(await readJsonBounded(req)); const s = businessStore();
     if (c.action === 'remember') return NextResponse.json({ memory: remember(s, requireMember(s, req).id, c.memory) });
     if (c.action === 'agentDraft') requireMember(s, req);
     if (c.action === 'agentDraft') return NextResponse.json({ memory: agentDraft(s, c.role, c.memory) });

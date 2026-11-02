@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { readUserSkills, proposePlacement, deriveSkillName, toKebabCase, resolveSkillsDir } from '@/lib/skills-catalog';
 
@@ -11,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   let body: unknown;
   try {
-    body = await request.json();
+    body = await readJsonBounded(request);
   } catch {
     return NextResponse.json({ error: 'invalid JSON body' }, { status: 400 });
   }

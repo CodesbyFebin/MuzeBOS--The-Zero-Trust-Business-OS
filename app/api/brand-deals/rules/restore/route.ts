@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { BrandDealRulesSchema } from '@/lib/schemas';
@@ -9,7 +10,7 @@ export const dynamic = 'force-dynamic';
  *  restore is itself a new version (nothing is ever deleted), noted as
  *  "restore of vN". */
 export async function POST(request: Request) {
-  const body = (await request.json().catch(() => null)) as { versionId?: unknown } | null;
+  const body = (await readJsonBounded(request).catch(() => null)) as { versionId?: unknown } | null;
   if (typeof body?.versionId !== 'string') return NextResponse.json({ error: 'versionId required' }, { status: 400 });
   const db = getDb();
   const v = db.configVersions.get(body.versionId);

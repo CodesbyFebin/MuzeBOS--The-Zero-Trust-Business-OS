@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createDesignedAgent, readDesignedAgents } from '@/lib/wizard/designed';
@@ -18,7 +19,7 @@ const CreateSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const parsed = CreateSchema.safeParse(await request.json().catch(() => null));
+  const parsed = CreateSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: 'name, department and purpose are required' }, { status: 400 });
   const agent = createDesignedAgent({
     name: parsed.data.name,

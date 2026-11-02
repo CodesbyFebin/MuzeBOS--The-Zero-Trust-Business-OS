@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { contentCampaigns } from '@/lib/content-campaigns';
 import { QueueSpecInputSchema, addSpecTask } from '@/lib/content-production';
@@ -12,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * will be the Composer's "Queue production" footer once it lands.
  */
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => null);
+  const body = await readJsonBounded(request).catch(() => null);
   const parsed = QueueSpecInputSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: 'A tool, campaign, title, and spec model are required.' }, { status: 400 });

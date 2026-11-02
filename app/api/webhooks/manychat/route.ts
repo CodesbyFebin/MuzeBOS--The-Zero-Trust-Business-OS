@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { parseManyChatWebhook } from '@/lib/connectors/manychat-webhook';
@@ -29,7 +30,7 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  const raw = await request.json().catch(() => null);
+  const raw = await readJsonBounded(request).catch(() => null);
   const message = parseManyChatWebhook(raw);
   if (!message) {
     return NextResponse.json({ error: 'payload missing a subscriber id' }, { status: 400 });

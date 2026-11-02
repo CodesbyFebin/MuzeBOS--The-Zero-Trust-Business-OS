@@ -85,10 +85,10 @@ export function controlsIssue(error: ZodError): string {
   if (!issue) return 'That value is not allowed.';
   const key = String(issue.path[0] ?? '');
   const label = FIELD_LABEL[key as keyof ConsoleControls] ?? (key || 'That value');
-  if (issue.code === 'too_big' && issue.type === 'string') return `${label} is ${String(issue.maximum)} characters max`;
-  if (issue.code === 'too_big' && issue.type === 'array') return `${label}: ${String(issue.maximum)} max`;
+  if (issue.code === 'too_big' && issue.origin === 'string') return `${label} is ${String(issue.maximum)} characters max`;
+  if (issue.code === 'too_big' && issue.origin === 'array') return `${label}: ${String(issue.maximum)} max`;
   if (issue.code === 'too_big') return `${label} is ${String(issue.maximum)} max`;
-  if (issue.code === 'too_small' && issue.type !== 'string' && issue.type !== 'array') return `${label} is ${String(issue.minimum)} min`;
+  if (issue.code === 'too_small' && issue.origin !== 'string' && issue.origin !== 'array') return `${label} is ${String(issue.minimum)} min`;
   return `${label}: ${issue.message}`;
 }
 

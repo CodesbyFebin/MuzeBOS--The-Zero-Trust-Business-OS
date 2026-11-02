@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { INTEGRATIONS, connectKeysFor } from '@/lib/integrations-catalog';
@@ -28,7 +29,7 @@ function entryFor(slug: string) {
 export async function POST(req: Request) {
   let body: z.infer<typeof ConnectBody>;
   try {
-    body = ConnectBody.parse(await req.json());
+    body = ConnectBody.parse(await readJsonBounded(req));
   } catch {
     return NextResponse.json({ ok: false, error: 'bad body' }, { status: 400 });
   }
@@ -61,7 +62,7 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   let body: z.infer<typeof DisconnectBody>;
   try {
-    body = DisconnectBody.parse(await req.json());
+    body = DisconnectBody.parse(await readJsonBounded(req));
   } catch {
     return NextResponse.json({ ok: false, error: 'bad body' }, { status: 400 });
   }

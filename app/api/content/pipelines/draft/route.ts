@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { buildPipelinePrompt, parsePipelineDraft, runClaude } from './logic';
@@ -16,7 +17,7 @@ const DraftRequestSchema = z.object({ brief: z.string().min(1).max(4000) });
  * one retry — this route never fabricates a pipeline.
  */
 export async function POST(request: Request) {
-  const parsed = DraftRequestSchema.safeParse(await request.json().catch(() => null));
+  const parsed = DraftRequestSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'a brief is required' }, { status: 400 });
 
   const first = await runClaude(buildPipelinePrompt(parsed.data.brief));

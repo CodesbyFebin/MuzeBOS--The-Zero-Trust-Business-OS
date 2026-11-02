@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { BrandDealRulesSchema } from '@/lib/schemas';
@@ -22,7 +23,7 @@ export async function GET() {
  *  records a config version. The daemon picks the change up on its next
  *  cycle (about two minutes) without a restart. */
 export async function PUT(request: Request) {
-  const body = (await request.json().catch(() => null)) as { rules?: unknown; note?: unknown } | null;
+  const body = (await readJsonBounded(request).catch(() => null)) as { rules?: unknown; note?: unknown } | null;
   const parsed = BrandDealRulesSchema.partial().safeParse(body?.rules);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   if (Object.keys(parsed.data).length === 0) return NextResponse.json({ error: 'no rule fields in body' }, { status: 400 });

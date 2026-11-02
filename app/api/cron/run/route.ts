@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getDb } from '@/lib/data';
@@ -15,7 +16,7 @@ const Body = z.object({ cronId: z.string().min(1) });
  * recorded in cron_runs with trigger "manual", success or failure.
  */
 export async function POST(req: Request) {
-  const body = await req.json().catch(() => null);
+  const body = await readJsonBounded(req).catch(() => null);
   const refused = gateResponse('GLADOS_CRON', body);
   if (refused) return refused;
   const parsed = Body.safeParse(body);

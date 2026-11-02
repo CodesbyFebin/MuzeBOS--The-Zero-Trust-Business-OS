@@ -467,7 +467,7 @@ export const WorkflowStepSchema = z.object({
   // saved canvas position.
   ownerAgentId: z.string().min(1).nullable().optional(),
   kind: z.string().min(1).optional(),
-  config: z.record(z.unknown()).optional(),
+  config: z.record(z.string(), z.unknown()).optional(),
   pos: z.object({ x: z.number(), y: z.number() }).nullable().optional(),
 });
 
@@ -789,7 +789,7 @@ export const LabRunProgressSchema = z.object({
   statusMessage: z.string().nullable(),
   polledAt: z.string().nullable(),
   backoffUntil: z.string().nullable().optional(),
-  events: z.record(z.number()).nullable().optional(),
+  events: z.record(z.string(), z.number()).nullable().optional(),
 });
 /* ── end Content Lab v2 early block ── */
 
@@ -881,7 +881,7 @@ export const LabDissectionSchema = z.object({
   pillar: LabPillarSchema,
   ctaType: LabCtaTypeSchema,
   tension: LabTensionSchema.nullable(),
-  confidences: z.record(z.number().min(0).max(1)),
+  confidences: z.record(z.string(), z.number().min(0).max(1)),
   qualityNotes: z.string(),
   modelId: z.string(),
   promptVersion: z.string(),
@@ -1110,7 +1110,7 @@ export const LabSpendSchema = z.object({
   line: LabSpendLineSchema.optional(),
   reservedUsd: z.number().nullable().optional(),
   actualSource: z.enum(['provider', 'published_price', 'dry']).nullable().optional(),
-  events: z.record(z.number()).nullable().optional(),
+  events: z.record(z.string(), z.number()).nullable().optional(),
   settledAt: z.string().nullable().optional(),
 });
 
@@ -1240,7 +1240,7 @@ export const LabMeasureV2Schema = LabMeasureSchema.extend({
   savesPerView: z.number().nullable(),
   xActionScore: z.number().nullable(),
   followersAsOf: LabFollowersAsOfSchema.nullable(),
-  ages: z.record(LabAgeReadSchema),
+  ages: z.record(z.string(), LabAgeReadSchema),
 });
 export const LabControlRoleSchema = z.enum(['case', 'control']);
 export const LabControlStatusSchema = z.enum(['selected', 'transcribed', 'dissected', 'caption_only', 'failed']);
@@ -1338,7 +1338,7 @@ export const LabPredictionSchema = z.object({
   intervalLevel: z.number().nullable(),
   baseline7dViews: z.number().nullable(),
   baselineN: z.number().int().nullable(),
-  inputs: z.record(z.unknown()),
+  inputs: z.record(z.string(), z.unknown()),
   note: z.string(),
   payloadSha256: z.string().length(64),
   late: z.boolean(),
@@ -1375,7 +1375,7 @@ export const LabEvalSchema = z.object({
   logMae: z.number().nullable(), logMaeBaseline: z.number().nullable(), maeDeltaLo: z.number().nullable(), maeDeltaHi: z.number().nullable(),
   coverage: z.number().nullable(), coverageLo: z.number().nullable(), coverageHi: z.number().nullable(), coverageN: z.number().int(),
   prAuc: z.number().nullable(), prAucLo: z.number().nullable(), prAucHi: z.number().nullable(), baseRate: z.number().nullable(), positives: z.number().int(),
-  bandHits: z.record(z.object({ said: z.number().int(), hit: z.number().int() })),
+  bandHits: z.record(z.string(), z.object({ said: z.number().int(), hit: z.number().int() })),
   verdictForecast: LabVerdictSchema.nullable(), verdictRanking: LabVerdictSchema.nullable(), verdictClassifier: LabVerdictSchema.nullable(),
   dry: z.boolean(),
 });
@@ -1399,7 +1399,7 @@ export const LabRetentionSchema = z.object({
   avgWatchTimeMs: z.number().nullable(),
   totalWatchTimeMs: z.number().nullable(),
   skipRate: z.number().min(0).max(100).nullable(),
-  raw: z.record(z.unknown()),
+  raw: z.record(z.string(), z.unknown()),
   dry: z.boolean(),
 });
 export const LabTestKindSchema = z.enum(['trial_reels', 'yt_test_compare', 'self_experiment', 'planned_post']);
@@ -1441,7 +1441,7 @@ export const LabTestSchema = z.object({
   winnerArm: z.string().nullable(),
   observedSign: z.union([z.literal(1), z.literal(-1)]).nullable(),
   confirms: z.boolean().nullable(),
-  judgeDetail: z.record(z.unknown()),
+  judgeDetail: z.record(z.string(), z.unknown()),
   notes: z.string().max(1000),
   /** planned_post only: ISO week ('2026-W42'); the lab_tests.plan_week column (06 12). */
   planWeek: z.string().nullable().optional(),
@@ -1523,7 +1523,7 @@ export const LabForecastSchema = z.object({
   kind: LabForecastKindSchema,
   subject: z.string(),
   frozenAt: z.string(),
-  inputs: z.record(z.unknown()),
+  inputs: z.record(z.string(), z.unknown()),
   predicted: z.number(),
   lo: z.number().nullable(),
   hi: z.number().nullable(),

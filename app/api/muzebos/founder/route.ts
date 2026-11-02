@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
@@ -22,7 +23,7 @@ export async function GET(req: Request) {
 }
 export async function POST(req: Request) {
   try {
-    businessAccess(req); const c = cmd.parse(await req.json()); const s = businessStore();
+    businessAccess(req); const c = cmd.parse(await readJsonBounded(req)); const s = businessStore();
     if (c.action === 'setCash') return NextResponse.json({ cash: setCash(s, requireMember(s, req).id, { amount: c.amount, asOf: c.asOf }) });
     if (c.action === 'requestBrief') return NextResponse.json({ task: requestFounderBrief(s, { lane: c.lane, paidConsent: c.paidConsent }) });
     return NextResponse.json({ brief: readFounderBrief(s, c.taskId) });

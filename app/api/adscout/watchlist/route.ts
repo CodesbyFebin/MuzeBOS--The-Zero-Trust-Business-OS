@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createForeplayClient } from '@/lib/foreplay/client';
@@ -19,7 +20,7 @@ const AddSchema = z.union([
 ]);
 
 export async function POST(request: Request) {
-  const parsed = AddSchema.safeParse(await request.json().catch(() => null));
+  const parsed = AddSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: 'pass a domain, or a brandId + name' }, { status: 400 });
   }
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
 const RemoveSchema = z.object({ brandId: z.string().min(1) });
 
 export async function DELETE(request: Request) {
-  const parsed = RemoveSchema.safeParse(await request.json().catch(() => null));
+  const parsed = RemoveSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: 'brandId required' }, { status: 400 });
   return NextResponse.json({ ok: true, watchlist: removeWatchEntry(parsed.data.brandId) });
 }

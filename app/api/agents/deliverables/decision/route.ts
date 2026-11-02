@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getDb } from '@/lib/data';
@@ -18,7 +19,7 @@ const Body = z.object({
  * rejection needs a reason. Local write only; nothing is sent.
  */
 export async function POST(req: Request) {
-  const parsed = Body.safeParse(await req.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'runId and decision (approved|rejected) are required' }, { status: 400 });
   const db = getDb();
   const run = db.agentRuns.get(parsed.data.runId);

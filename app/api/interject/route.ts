@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
@@ -21,7 +22,7 @@ const Undo = z.object({ id: z.string().min(1) });
  * up). Answers `{ kind, id, href }`.
  */
 export async function POST(req: Request) {
-  const parsed = Body.safeParse(await req.json().catch(() => null));
+  const parsed = Body.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'text is required' }, { status: 400 });
   const route = routeInterject(parsed.data.text, realAgents.map((a) => ({ id: a.id, name: a.name })));
   if (!route) return NextResponse.json({ error: 'nothing to add' }, { status: 400 });
@@ -58,7 +59,7 @@ export async function POST(req: Request) {
 
 /** Undo (H-4): removes a task this composer created, within the toast's window. */
 export async function DELETE(req: Request) {
-  const parsed = Undo.safeParse(await req.json().catch(() => null));
+  const parsed = Undo.safeParse(await readJsonBounded(req).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'id is required' }, { status: 400 });
   const tasks = getDb().agentTasks;
   const task = tasks.get(parsed.data.id);

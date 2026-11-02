@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/data';
 import { createRuntime } from '@/lib/agents/runtime';
@@ -12,7 +13,7 @@ export async function GET() {
 export async function POST(req: Request) {
   let message = '';
   try {
-    const body = (await req.json()) as { message?: unknown };
+    const body = (await readJsonBounded(req)) as { message?: unknown };
     message = typeof body.message === 'string' ? body.message.trim() : '';
   } catch {
     // fall through to the empty-message rejection

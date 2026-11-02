@@ -18,7 +18,7 @@ const VentureSchema = z.object({
   detail: z.string(),
   brainTag: z.string().min(1),
   focus: z.array(z.string()),
-  areaAgents: z.record(z.array(z.string())),
+  areaAgents: z.record(z.string(), z.array(z.string())),
 });
 
 export function readVentures(file: string = dataPath('ventures.json')): Venture[] {

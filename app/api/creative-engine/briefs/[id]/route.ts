@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { mutateCampaign, readCampaigns } from '@/lib/creative-engine/store';
@@ -14,7 +15,7 @@ const Body = z.object({ status: z.enum(['draft', 'ready', 'sent']) });
  */
 export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
  const params = await props.params;
- const parsed = Body.safeParse(await request.json().catch(() => null));
+ const parsed = Body.safeParse(await readJsonBounded(request).catch(() => null));
  if (!parsed.success) return NextResponse.json({ ok: false, error: 'status must be draft, ready or sent' }, { status: 400 });
  const owner = readCampaigns().find((c) => c.briefs.some((b) => b.id === params.id));
  if (!owner) return NextResponse.json({ ok: false, error: 'brief not found' }, { status: 404 });

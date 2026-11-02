@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { SESSION_COOKIE } from '@/lib/auth-gate';
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
   }
 
   const parsed = z.object({ password: z.string().min(1).max(512) }).safeParse(
-    await req.json().catch(() => null),
+    await readJsonBounded(req).catch(() => null),
   );
   if (!parsed.success) return NextResponse.json({ error: 'bad request' }, { status: 400 });
 

@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { CapError } from '@/lib/creative-engine/generate';
@@ -26,7 +27,7 @@ const Body = z.object({
  */
 export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const parsed = Body.safeParse(await request.json().catch(() => ({})));
+  const parsed = Body.safeParse(await readJsonBounded(request).catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.message }, { status: 400 });
   const b = parsed.data;
   if (b.dryRunPlan) {

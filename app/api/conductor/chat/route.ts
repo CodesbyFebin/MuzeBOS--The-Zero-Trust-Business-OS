@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { paperclipCockpitThread, postCockpitMessage } from '@/founderos/lib/connectors/paperclip';
 
@@ -15,7 +16,7 @@ export async function GET() {
 export async function POST(req: Request) {
   let body: { message?: string };
   try {
-    body = (await req.json()) as typeof body;
+    body = (await readJsonBounded(req)) as typeof body;
   } catch {
     return NextResponse.json({ error: 'invalid JSON' }, { status: 400 });
   }

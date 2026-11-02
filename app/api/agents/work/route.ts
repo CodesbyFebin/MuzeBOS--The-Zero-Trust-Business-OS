@@ -1,3 +1,4 @@
+import { readJsonBounded } from '@/lib/bounded-body';
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
@@ -42,7 +43,7 @@ const CreateSchema = z.discriminatedUnion('kind', [
 ]);
 
 export async function POST(request: Request) {
-  const parsed = CreateSchema.safeParse(await request.json().catch(() => null));
+  const parsed = CreateSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   const db = getDb();
   const now = new Date().toISOString();
@@ -97,7 +98,7 @@ const PatchSchema = z.discriminatedUnion('kind', [
 ]);
 
 export async function PATCH(request: Request) {
-  const parsed = PatchSchema.safeParse(await request.json().catch(() => null));
+  const parsed = PatchSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   const db = getDb();
   const now = new Date().toISOString();
@@ -122,7 +123,7 @@ export async function PATCH(request: Request) {
 const DeleteSchema = z.object({ kind: z.enum(['task', 'cron']), id: z.string().min(1) });
 
 export async function DELETE(request: Request) {
-  const parsed = DeleteSchema.safeParse(await request.json().catch(() => null));
+  const parsed = DeleteSchema.safeParse(await readJsonBounded(request).catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   const db = getDb();
   if (parsed.data.kind === 'task') db.agentTasks.remove(parsed.data.id);
