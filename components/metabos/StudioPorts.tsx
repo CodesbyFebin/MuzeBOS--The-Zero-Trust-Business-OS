@@ -156,18 +156,41 @@ export function AiConsole() {
   );
 }
 
-type Snap = Inference & { budget: { attempts: number; reservedOutputTokens: number } };
+type Snap = Inference & { budget: { attempts: number; reservedOutputTokens: number; limits: { maxAttempts: number; maxTokens: number; updatedAt: string } } };
 /** Mission Control widgets from the dashboard reference, bound to the inference snapshot and bundled registry. */
 export function MissionWidgets() {
-  const [s] = useApi<Snap>('/api/inference');
+  const [s, reload] = useApi<Snap>('/api/inference');
   const roles = (library as { roles: Role[] }).roles.length;
   const tile = (id: string, label: string, body: React.ReactNode) => <div className="mb-panel mb-widget" data-testid={id}><span className="mb-widget-label">{label}</span>{body}</div>;
   return (
     <section className="mb-studio mb-widgets" aria-label="Operator widgets">
       {tile('w-jev', 'Jev queue', s.kind === 'ok' ? <h3>{s.data.counters.awaitingApproval} awaiting · {s.data.counters.running} running</h3> : <Status s={s} />)}
-      {tile('w-budget', 'Inference budget today', s.kind === 'ok' ? <h3>{s.data.budget.attempts} / 50 attempts · {s.data.budget.reservedOutputTokens.toLocaleString()} / 65,536 tokens</h3> : <Status s={s} />)}
+      {tile('w-budget', 'Inference budget today', s.kind === 'ok' ? <><h3>{s.data.budget.attempts} / {s.data.budget.limits.maxAttempts} attempts · {s.data.budget.reservedOutputTokens.toLocaleString()} / {s.data.budget.limits.maxTokens.toLocaleString()} tokens</h3><LimitEditor limits={s.data.budget.limits} onSaved={reload} /></> : <Status s={s} />)}
       {tile('w-agents', 'AI employees', <h3>{roles} definitions <Link className="mb-link" href="/workspace/brain/employees">Registry</Link></h3>)}
       {tile('w-voice', 'Voice input', <p className="mb-muted">Muse Voice is not connected or qualified, so voice input is off. When it is enabled it will only file drafts for Jev review.</p>)}
     </section>
+  );
+}
+
+/** Owner-only editor for the stored daily inference limits; the server enforces the role. */
+function LimitEditor({ limits, onSaved }: { limits: { maxAttempts: number; maxTokens: number }; onSaved: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [a, setA] = useState(String(limits.maxAttempts));
+  const [t, setT] = useState(String(limits.maxTokens));
+  const [msg, setMsg] = useState('');
+  if (!open) return <button type="button" className="mb-link" onClick={() => setOpen(true)}>Change limits</button>;
+  async function save(e: React.FormEvent) {
+    e.preventDefault(); setMsg('');
+    const r = await fetch('/api/inference', { method: 'POST', headers: { 'content-type': 'application/json', 'idempotency-key': crypto.randomUUID() }, body: JSON.stringify({ action: 'setLimits', maxAttempts: Number(a), maxTokens: Number(t) }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) setMsg(j.error ?? 'Could not save'); else { setOpen(false); onSaved(); }
+  }
+  return (
+    <form onSubmit={save} className="mb-limit-form" data-testid="limit-form">
+      <label>Attempts/day <input inputMode="numeric" value={a} onChange={(e) => setA(e.target.value)} /></label>
+      <label>Tokens/day <input inputMode="numeric" value={t} onChange={(e) => setT(e.target.value)} /></label>
+      <button className="mb-button mb-primary">Save</button>
+      {msg && <p role="status">{msg}</p>}
+    </form>
   );
 }

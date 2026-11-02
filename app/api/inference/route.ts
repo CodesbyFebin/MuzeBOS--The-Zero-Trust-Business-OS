@@ -18,6 +18,7 @@ const command = z.discriminatedUnion('action', [
   z.object({ action: z.literal('renewBrowser'), id, token: id }).strict(),
   z.object({ action: z.literal('completeBrowser'), id, token: id, output: z.string().max(100000), usage: z.unknown().optional() }).strict(),
   z.object({ action: z.literal('failBrowser'), id, token: id }).strict(),
+  z.object({ action: z.literal('setLimits'), maxAttempts: z.number().int(), maxTokens: z.number().int() }).strict(),
 ]);
 function failure(error: unknown) { return NextResponse.json({ error: error instanceof BusinessError ? error.message : error instanceof z.ZodError || error instanceof SyntaxError ? 'Invalid inference request' : 'Inference operation failed' }, { status: error instanceof BusinessError ? error.status : error instanceof z.ZodError || error instanceof SyntaxError ? 400 : 500, headers: { 'Cache-Control': 'no-store' } }); }
 export function GET(req: Request) {
@@ -34,6 +35,7 @@ export async function POST(req: Request) {
     const c = command.parse(JSON.parse(Buffer.concat(chunks).toString('utf8')));
     const business = businessStore(), store = new InferenceStore(business);
     const result = business.command(key, c, () => {
+      if (c.action === 'setLimits') { const { me } = memberRead(req); if (me.role !== 'owner') throw new BusinessError('Only the owner can change spend limits', 403); return store.setLimits(c.maxAttempts, c.maxTokens, me.id); }
       if (c.action === 'create') return store.create(c.data);
       if (c.action === 'approve') return store.approve(c.id, c.hash);
       if (c.action === 'cancel') return store.cancel(c.id);

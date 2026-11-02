@@ -26,7 +26,7 @@ export function ProviderPanel({ moduleId }: { moduleId: string }) {
     <p className="mb-muted">Store the name of an environment variable (for example MUZEBOS_…). The value is read on the server at test time and is never stored or shown.</p>
     <ul className="mb-help-list">{cfg.secrets.map((s) => <li key={s.key}><label>{s.label} <input aria-label={`${s.label} env reference`} value={refs[s.key] ?? ''} onChange={(e) => setRefs({ ...refs, [s.key]: e.target.value.toUpperCase() })} /></label> <span className="mb-badge">{s.isSet ? 'set' : 'not set'}</span> <button type="button" disabled={busy || refs[s.key] === s.ref} onClick={() => void post({ action: 'setRef', field: s.key, ref: refs[s.key] })}>Save reference</button></li>)}</ul>
     <button type="button" disabled={busy} onClick={() => void post({ action: 'test' })}>Test connection</button>
-    {shown && <p role="status" data-testid="provider-test">Last test ({new Date(shown.at).toLocaleString()}): <strong>{shown.status === 'not-configured' ? 'Not configured' : shown.status}</strong> — {shown.message}</p>}
+    {shown && <p role="status" data-testid="provider-test">Last test ({new Date(shown.at).toLocaleString()}): <strong>{shown.status === 'not-configured' ? 'Not connected' : shown.status}</strong> — {shown.message}</p>}
     {error && <p role="alert" className="mb-error">{error}</p>}
   </section>;
 }

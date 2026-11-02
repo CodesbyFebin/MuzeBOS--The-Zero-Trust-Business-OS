@@ -14,7 +14,7 @@ export async function run({ page, post, base, vp, assert }) {
   }
   const panel = page.getByTestId('provider-panel');
   await panel.getByRole('button', { name: 'Test connection' }).click();
-  await panel.getByTestId('provider-test').filter({ hasText: 'Not configured' }).waitFor();
+  await panel.getByTestId('provider-test').filter({ hasText: 'Not connected' }).waitFor();
   await panel.getByLabel('Access token env reference').fill('DATABASE_URL');
   await panel.getByRole('button', { name: 'Save reference' }).click();
   await panel.getByRole('alert').filter({ hasText: 'MUZEBOS_' }).waitFor();

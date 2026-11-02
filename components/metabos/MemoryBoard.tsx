@@ -7,7 +7,7 @@ export function MemoryBoard() {
   const [d, setD] = useState<{ memory: Mem[]; me: Me; layers: Record<string, string>; departments: string[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [f, setF] = useState({ layer: 'L2', scope: 'finance', text: '' }); const [task, setTask] = useState<string | null>(null);
-  const [ctx, setCtx] = useState({ role: 'finance', sessionId: 'demo', query: '' }); const [ctxOut, setCtxOut] = useState<{ entries: Mem[]; used: number; budget: number } | null>(null);
+  const [ctx, setCtx] = useState({ role: 'finance', sessionId: 'session-1', query: '' }); const [ctxOut, setCtxOut] = useState<{ entries: Mem[]; used: number; budget: number } | null>(null);
   const load = async () => { try { const r = await fetch('/api/metabos/memory'); const j = await r.json(); if (!r.ok) throw new Error(j.error); setD(j); } catch (e) { setError((e as Error).message); } };
   useEffect(() => { void load(); }, []);
   const run = (fn: () => Promise<unknown>) => async () => { setError(null); try { await fn(); await load(); } catch (e) { setError((e as Error).message); } };
