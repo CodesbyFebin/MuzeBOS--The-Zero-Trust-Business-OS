@@ -19,6 +19,10 @@ These repositories were studied during the event. MeTaBos code inspired by them 
 | lib/metabos/talk/core.ts | opt-out registry checked before send | DeskcommCRM |
 | lib/metabos/talk/service.ts | sentiment-triggered handoff with a briefing card; follow-up after silence | DeskcommCRM, oc8 (pattern only) |
 | lib/metabos/talk/service.ts | approve agent actions from a chat reply | open-agents-builder |
+| lib/metabos/brain/ops.ts | flow combinators (sequence, parallel, oneOf, forEach) plus an evaluator loop | open-agents-builder, awesome-adk-agents |
+| lib/metabos/brain/metering.ts | per-agent spend metering and monthly caps | oc8 (pattern only) |
+| lib/metabos/brain/ops.ts | tool risk tiers; high risk always gated | open-agents-builder |
+| lib/metabos/brain/ops.ts | counterparty risk memory with graded outcomes | crawlhive-brain (pattern only) |
 
 ## Adapted files
 None yet.

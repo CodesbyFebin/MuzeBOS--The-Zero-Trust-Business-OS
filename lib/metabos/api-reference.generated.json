@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 215,
+ "count": 216,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -333,6 +333,19 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/brain-ops",
+   "file": "app/api/brain-ops/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "Brain/Ops: agents with spend caps, flows that only propose, tool gates and counterparty risk.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
    "access": "session"
   },
   {

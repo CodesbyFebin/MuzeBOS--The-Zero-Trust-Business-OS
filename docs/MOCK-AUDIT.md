@@ -870,3 +870,10 @@ None of the raw hits shows mock data in default (real) mode. Every fixture path 
 - Sentiment is a fixed English/Hinglish lexicon rule, labelled as such in the UI. It is not a model.
 - Voice notes: transcript status is "Not connected — add META_MODEL_API_KEY" without a key; with a key the existing Muse Voice adapter still refuses (not qualified), and that message is stored.
 - tests/talk-copilot.test.ts uses a fake fetch (labelled MOCKED HTTP). It proves gating and request shape, not a live send.
+
+## Brain/Ops (feat/brain-ops)
+- Agent spend is summed from the `usage` block OpenRouter returns on each sent completion (cost in USD, stored as integer micro-USD). Calls with no reported cost are counted as unpriced, never estimated. No usage means "Usage unavailable".
+- The route shown when proposing is a preview; the adapter routes again at send time.
+- Flows run deterministic steps over real SQLite data. The only side effect is pending dispatches (rolled back if the run fails). Tool steps only check the registry gate; no tool executor exists.
+- Counterparty bands are a fixed rule over real invoices, disputes and human-recorded events, with the reasons shown. Not a model. People grade past bands as held/wrong.
+- tests/brain-ops.test.ts uses a fake fetch for the OpenRouter usage block (MOCKED HTTP).
