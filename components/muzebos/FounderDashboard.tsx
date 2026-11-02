@@ -18,7 +18,7 @@ export function FounderDashboard() {
         <p>Cash {d.cash ? `${inr(d.cash.amount)} as of ${d.cash.asOf}` : 'not set'} · collected {inr(d.avgCollected)}/mo · approved expenses {inr(d.avgExpenses)}/mo · net burn {inr(d.netBurn)}/mo</p>
         <input aria-label="Cash in rupees" type="number" placeholder="₹ cash today" value={c.amount} onChange={(e) => setC({ ...c, amount: e.target.value })} />
         <input aria-label="Cash as of" type="date" value={c.asOf} onChange={(e) => setC({ ...c, asOf: e.target.value })} />
-        <button onClick={run(() => post({ action: 'setCash', actorId: 'owner', amount: toPaise(c.amount), asOf: c.asOf }))}>Set cash (owner)</button></section>
+        <button onClick={run(() => post({ action: 'setCash', amount: toPaise(c.amount), asOf: c.asOf }))}>Set cash (owner)</button></section>
       <section className="mb-panel" aria-label="Recurring revenue"><h2>Recurring revenue (MRR proxy)</h2><p><strong>{inr(d.recurringRevenue)}/mo</strong> from {d.recurringCustomers} repeat customers</p><p className="mb-muted">{d.recurringNote}</p></section>
       <section className="mb-panel" aria-label="Receivables and pipeline"><h2>Receivables and pipeline</h2><p>Unpaid invoices {inr(d.receivables)} · claims waiting {inr(d.pendingExpenses)} · {d.pipeline.open} open deals, {inr(d.pipeline.weightedAmount)} weighted of {inr(d.pipeline.openAmount)}</p>
         <a href="/workspace/money/pipeline">Pipeline</a> · <a href="/workspace/money/expenses">Expenses</a></section>

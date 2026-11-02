@@ -174,6 +174,14 @@ const BRAIN_HACK: FeatureDefinition[] = [
   mk('memory', 'Layered Memory', 'Session, department, company and owner memory; agent and Muse notes stay drafts until a person promotes them.', 'brain'),
 ];
 
+/** Business OS pages added during the hackathon, by menu. */
+const OS_PAGES: Record<string, FeatureDefinition[]> = {
+  account: [
+    mk('sign-in', 'Sign in', 'Workspace setup, password sign-in and one-time sign-in links (local outbox).', 'account'),
+    mk('people', 'People and Roles', 'Team directory with roles, departments, permissions and open work; owners invite teammates.', 'account'),
+  ],
+};
+
 const LEGACY_ALIASES: Record<string, string[]> = {
   orders: ['/business', '/funnel', '/clients', '/brand-deals'],
   money: ['/finances', '/trading'],
@@ -194,6 +202,7 @@ function utilityMenu(key: string): Omit<MenuDefinition, 'number'> {
     summary: `Opens the existing screen at ${l.href}.`,
   }));
   if (key === 'developer') pages.push(META_WEBHOOK_STATUS, API_REFERENCE);
+  if (key === 'account') pages.push(...OS_PAGES.account.map((f) => ({ ...f, clusterId: cid })));
   return { id: key, label: key === 'upgrade' ? 'Upgrade' : u.label, route: `/workspace/${key}`, icon: u.icon, section: 'pinned', summary: u.summary, aliases: LEGACY_ALIASES[key] ?? [], clusters: [{ id: cid, label: 'Current destinations', pages }] };
 }
 

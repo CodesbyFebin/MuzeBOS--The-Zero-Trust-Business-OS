@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { businessStore, BusinessError } from '@/lib/muzebos/store';
 import { businessAccess } from '@/lib/muzebos/http';
+import { requireMember } from '@/lib/muzebos/biz/accounts';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 function fail(e: unknown) {
@@ -12,7 +13,7 @@ function fail(e: unknown) {
 const lane = { lane: z.enum(['meta', 'baseten']).default('meta'), paidConsent: z.boolean().default(false) };
 import { founderDashboard, setCash, requestFounderBrief, readFounderBrief } from '@/lib/muzebos/biz/dashboard';
 const cmd = z.discriminatedUnion('action', [
-  z.object({ action: z.literal('setCash'), actorId: z.string().max(64), amount: z.number(), asOf: z.string() }),
+  z.object({ action: z.literal('setCash'), amount: z.number(), asOf: z.string() }),
   z.object({ action: z.literal('requestBrief'), ...lane }),
   z.object({ action: z.literal('readBrief'), taskId: z.string().max(64) }),
 ]);
@@ -22,7 +23,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     businessAccess(req); const c = cmd.parse(await req.json()); const s = businessStore();
-    if (c.action === 'setCash') return NextResponse.json({ cash: setCash(s, c.actorId, { amount: c.amount, asOf: c.asOf }) });
+    if (c.action === 'setCash') return NextResponse.json({ cash: setCash(s, requireMember(s, req).id, { amount: c.amount, asOf: c.asOf }) });
     if (c.action === 'requestBrief') return NextResponse.json({ task: requestFounderBrief(s, { lane: c.lane, paidConsent: c.paidConsent }) });
     return NextResponse.json({ brief: readFounderBrief(s, c.taskId) });
   } catch (e) { return fail(e); }
