@@ -2559,7 +2559,7 @@
     "GET",
     "PUT"
    ],
-   "summary": "Agent runtime: local (default) or Rakazo. Rakazo bots are listed only when it is configured and reachable.",
+   "summary": "Rakazo /ready + bots/list are cached for 15 s per config so polling the panel does not hammer Rakazo. Writes (PUT) drop the cache.",
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": true,
