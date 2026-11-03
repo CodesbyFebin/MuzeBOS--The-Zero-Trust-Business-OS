@@ -46,3 +46,30 @@ public/content-media/ad-engine/
 /data/
 
 .env.inference
+
+# ── Build outputs, test artefacts and release packs (repo hygiene) ──
+/out/
+/build/
+/dist/
+/coverage/
+test-results/
+playwright-report/
+blob-report/
+/shots*/
+*.log
+npm-debug.log*
+!tests/fixtures/**/*.log
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.zip
+*.zip.part*
+*.tar
+*.tgz
+*.tar.gz
+/tmp/
+.eslintcache
+.vercel/
+.netlify/
+.env.inference.local
