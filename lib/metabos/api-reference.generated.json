@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 248,
+ "count": 249,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -1575,6 +1575,18 @@
     "GET"
    ],
    "summary": "The comms feed walks live IMAP — cap it so a pinned dossier never hangs.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/home",
+   "file": "app/api/home/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Read-only summary for the MuZe home page. Member-only.",
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
