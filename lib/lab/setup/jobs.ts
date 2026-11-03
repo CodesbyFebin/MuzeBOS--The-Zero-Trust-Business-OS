@@ -34,7 +34,7 @@ export type JobState = LabJobState;
 /** Results of jobs earlier in this tick, plus what the tick read before deciding (09.5.3). */
 export type TickSoFar = { ran: Partial<Record<LabJobId, JobResult>>; config?: Partial<Record<LabJobId, JobConfig>>; tz?: string; env?: Record<string, string | undefined> };
 /** `scheduled` is false for Run now (`--manual`, 09.5.4); `batchId` tags the paid runs a job starts (09.4.2). */
-export type JobCtx = { store: LabStore; now: Date; scheduled: boolean; dry: boolean; batchId?: string | null; /** Run now after the CapDialog: pass the cap once (manual only, never scheduled) */ override?: boolean };
+export type JobCtx = { store: LabStore; now: Date; scheduled: boolean; dry: boolean; batchId?: string | null; /** Run now after the CapDialog: pass the cap once (manual only, never scheduled) */ override?: boolean; /** eval bootstrap resample count for the ledger job (tests only; default 2000) */ bootstrapB?: number };
 export type JobResult = { ok: boolean; detail: string; items?: number };
 
 export type LabJob = {
@@ -236,6 +236,8 @@ export type TickOpts = {
   batchId?: string | null;
   /** --override: pass a cap once (only with --manual, from the CapDialog) */
   override?: boolean;
+  /** eval bootstrap resample count passed to the ledger job (tests only; default 2000) */
+  bootstrapB?: number;
   dry: boolean;
   /** tests inject jobs, the pause probe, the lock file and the env */
   jobs?: readonly LabJob[];
@@ -274,7 +276,7 @@ export async function runTick(store: LabStore, opts: TickOpts): Promise<TickResu
     const tick: TickSoFar = { ran: out.ran, config, tz: labTz(env), env };
     const blockedLines = new Set<LabSpendLine>();
     let batchId = opts.batchId ?? null;
-    const ctx: JobCtx = { store, now, scheduled: !opts.manual, dry: opts.dry, batchId, override: Boolean(opts.override && opts.manual) };
+    const ctx: JobCtx = { store, now, scheduled: !opts.manual, dry: opts.dry, batchId, override: Boolean(opts.override && opts.manual), bootstrapB: opts.bootstrapB };
     for (const j of jobs) {
       if (opts.only?.length && !opts.only.includes(j.id)) continue;
       if (j.pauseScope === 'radar' && radarPaused) {

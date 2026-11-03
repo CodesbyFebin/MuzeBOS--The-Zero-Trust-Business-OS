@@ -55,7 +55,7 @@ describe('AC-08-17: the dry network guard', () => {
     db.exec(LAB_DDL);
     const store = labStore(db);
     seedLabFixtures(store, new Date('2026-10-12T03:00:00Z'));
-    const res = await runTick(store, { now: new Date('2026-10-12T04:00:00Z'), dry: true, force: true, lockFile: null });
+    const res = await runTick(store, { now: new Date('2026-10-12T04:00:00Z'), dry: true, force: true, lockFile: null, bootstrapB: 200 });
     expect(calls).toEqual([]);
     const details = Object.values(res.ran).map((r) => r!.detail);
     expect(details.some((d) => /Dry run: no network call/.test(d))).toBe(false);

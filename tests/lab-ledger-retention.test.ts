@@ -103,7 +103,7 @@ describe('retentionDue and the cycle (06 9.2, 7.4, 14)', () => {
     });
     const s = memStore();
     seedLabFixtures(s, new Date(NOW));
-    const { runs } = await runLedgerCycle(s, { now: new Date(NOW), dry: true });
+    const { runs } = await runLedgerCycle(s, { now: new Date(NOW), dry: true, bootstrapB: 200 });
     expect(calls).toEqual([]);
     expect(google.calls).toBe(0);
     expect(runs.map((r) => r.kind).sort()).toEqual(['backtest', 'grade', 'oauth_refresh', 'retention', 'retention']);
