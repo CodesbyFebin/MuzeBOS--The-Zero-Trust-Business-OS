@@ -4,6 +4,7 @@
  * Nothing here invents numbers: a value we cannot read is null and the UI shows an empty or "Unknown" state.
  */
 import { isMuse } from './muse-gate';
+import { verifyAuditCached } from '../audit-cache';
 import type { BusinessStore } from '../store';
 import { listDrafts } from '../b3/agent-run';
 import { queue } from '../ai/jev';
@@ -48,7 +49,7 @@ export function sanctumReceipts(s: BusinessStore, env: Record<string, string | u
 
 /** R0–R6 trust stack. Layers we have no attestation for say so; only R6 is checked against the real chain. */
 export function trustStack(s: BusinessStore, env: Record<string, string | undefined>) {
-  const valid = s.verifyAudit(); const total = s.evidence().length;
+  const valid = verifyAuditCached(s); const total = s.evidence().length;
   const has = (k: string) => !!env[k]?.trim();
   return [
     { id: 'R0', name: 'Silicon root of trust', state: 'not_attested', detail: 'No hardware attestation report is read by this server.' },

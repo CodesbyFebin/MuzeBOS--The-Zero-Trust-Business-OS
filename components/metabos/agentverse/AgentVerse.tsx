@@ -29,6 +29,8 @@ export function AgentVerse() {
   const [d, setD] = useState<Data | null>(null); const [err, setErr] = useState(''); const [note, setNote] = useState('');
   const [mode, setMode] = useState<'personal' | 'business'>('business'); const [ws, setWs] = useState<string>('home');
   const [chan, setChan] = useState('sanctum'); const [sel, setSel] = useState<string | null>(null); const [tab, setTab] = useState<'logs' | 'diffs' | 'preview'>('diffs');
+  // Deep link from the MuZe home Meta products tile: ?chan=meta-status.
+  useEffect(() => { if (new URLSearchParams(window.location.search).get('chan') === 'meta-status') setChan('meta-status'); }, []);
   const [k, setK] = useState(false); const [q, setQ] = useState(''); const [hits, setHits] = useState<{ type: string; id: string; label: string }[]>([]);
   const [newWs, setNewWs] = useState(''); const [creating, setCreating] = useState(false); const [busy, setBusy] = useState(false);
   const [drafts, setDrafts] = useState<Record<string, string>>({}); const [editing, setEditing] = useState<string | null>(null);
