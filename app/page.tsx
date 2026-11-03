@@ -8,5 +8,5 @@ export const dynamic = 'force-dynamic';
 /** MuZe home: companion + voice bar first, then one tile per feature (real counts or empty states), then mission control. */
 export default function HomePage() {
   if (BRAND.id === 'glados') return <Home6Console />;
-  return <><MuZeHome /><HomeTiles /><MissionControl /><div className="mb-console"><MissionWidgets /><ExecutiveCockpit /></div></>;
+  return <><MuZeHome /><HomeTiles /><MissionControl voice={false} /><div className="mb-console"><MissionWidgets /><ExecutiveCockpit /></div></>;
 }

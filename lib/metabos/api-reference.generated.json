@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 249,
+ "count": 251,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -870,6 +870,31 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/community",
+   "file": "app/api/community/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/community/stream",
+   "file": "app/api/community/stream/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "SSE: polls SQLite every 400 ms and sends the community revision when it changes; the client refetches. Closes after 5 minutes.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
    "access": "session"
   },
   {

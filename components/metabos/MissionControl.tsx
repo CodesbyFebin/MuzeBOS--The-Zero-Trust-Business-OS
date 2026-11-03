@@ -11,7 +11,8 @@ import type { MissionSnapshot } from '@/lib/metabos/mission';
 import { WORKSPACE_CATEGORIES } from '@/lib/metabos/navigation';
 const amount=(n:number)=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR'}).format(n/100);
 const date=(s:string)=>new Date(s).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-export function MissionControl() {
+/** voice=false hides the built-in voice assistant (the MuZe home already shows the companion; one fur on screen). */
+export function MissionControl({ voice = true }: { voice?: boolean } = {}) {
  const [data,setData]=useState<MissionSnapshot|null>(null);const [error,setError]=useState('');const [notice,setNotice]=useState('');const [busy,setBusy]=useState(false);const [refreshing,setRefreshing]=useState(false);const [filter,setFilter]=useState<'all'|'today'|'overdue'>('all');const [tick,setTick]=useState(()=>Date.now());
  useEffect(()=>{const t=setInterval(()=>setTick(Date.now()),10000);return()=>clearInterval(t);},[]);
  const refresh=useCallback(async(signal?:AbortSignal)=>{
@@ -44,7 +45,7 @@ export function MissionControl() {
  const stale=!!data&&tick-Date.parse(data.asOf)>60_000;
  const shown=data?data.todo.filter(t=>filter==='all'||(filter==='overdue'?t.overdue:t.dueToday)):[];
  const unknown=data&&Object.values(data.sources).some(s=>s!=='available');
- return <div className="mb-console mb-mission mb-v3" data-design="v3"><header className="mb-heading"><div><span className="mb-eyebrow">FOUNDER HQ / OBSERVE · REVIEW · ACT</span><h1>Mission Control</h1><p>Your orders, money, conversations and stock. One operational view.</p></div><div className="mb-live-state"><span className={`mb-badge ${error?'mb-state-warning':''}`}><span className="mb-dot"/>{error?'UPDATE FAILED':stale?'STALE':refreshing?'UPDATING':'AUTO-REFRESH · 20s'}</span><small>{data?`Last received ${date(data.asOf)}`:'Waiting for local status'}</small><button aria-label="Refresh mission status" onClick={()=>refresh().catch(e=>setError(e.message))}><RefreshCw size={13}/></button></div></header><VoiceAssistant/>
+ return <div className="mb-console mb-mission mb-v3" data-design="v3"><header className="mb-heading"><div><span className="mb-eyebrow">FOUNDER HQ / OBSERVE · REVIEW · ACT</span><h1>Mission Control</h1><p>Your orders, money, conversations and stock. One operational view.</p></div><div className="mb-live-state"><span className={`mb-badge ${error?'mb-state-warning':''}`}><span className="mb-dot"/>{error?'UPDATE FAILED':stale?'STALE':refreshing?'UPDATING':'AUTO-REFRESH · 20s'}</span><small>{data?`Last received ${date(data.asOf)}`:'Waiting for local status'}</small><button aria-label="Refresh mission status" onClick={()=>refresh().catch(e=>setError(e.message))}><RefreshCw size={13}/></button></div></header>{voice&&<VoiceAssistant/>}
  {stale&&!error&&<div role="alert" className="mb-alert" data-stale>Data is stale: last received {date(data!.asOf)}. Refresh to update.</div>}{error&&<div role="alert" className="mb-alert">{error}{data&&' · Showing the last received snapshot. Its timestamp has not changed.'}</div>}{notice&&<div role="status" className="mb-notice"><Check size={14}/>{notice}</div>}
  {!data?<div className="mb-panel mb-empty">{error?'Status unavailable. Retry to reconnect.':'Reading business records, tasks and connector status…'}</div>:<>
  {unknown&&<div className="mb-notice">Some sources are unavailable or excluded because inherited preview mode is on. No sample tasks or connector counts are used here.</div>}

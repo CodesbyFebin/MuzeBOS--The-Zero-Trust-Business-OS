@@ -834,3 +834,43 @@ body.mb-muze-full .mb-bos-rail,body.mb-muze-full .mb-console{display:none}
 .mb-home-stat { display:flex; flex-direction:column; } .mb-home-stat b { font-size:22px; color:var(--mb-accent); } .mb-home-stat span { font-size:12px; color:var(--mb-text2); }
 .mb-home-empty, .mb-home-note { color:var(--mb-text2); font-size:13px; margin:6px 0 0; }
 .mb-home-trust { list-style:none; padding:0 !important; columns:2; }
+/* Community server (feat/community-server). Layout ideas from issam-seghir/discord-clone (MIT). */
+.mb-sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.mb-cs { display:grid; grid-template-columns:72px 240px 1fr; min-height:560px; background:var(--mb-bg); border:1px solid var(--mb-line); border-radius:10px; overflow:hidden; color:var(--mb-text); }
+.mb-cs button { min-height:44px; min-width:44px; background:var(--mb-bg); color:var(--mb-text); border:1px solid var(--mb-line2); border-radius:8px; padding:0 12px; cursor:pointer; font:inherit; }
+.mb-cs button:focus-visible, .mb-cs input:focus-visible, .mb-cs select:focus-visible { outline:2px solid var(--mb-accent); outline-offset:2px; }
+.mb-cs button:disabled { opacity:.6; cursor:not-allowed; }
+.mb-cs ul, .mb-cs ol { list-style:none; margin:0; padding:0; }
+.mb-cs-servers { background:#050505; padding:12px 0; display:flex; flex-direction:column; align-items:center; gap:8px; border-right:1px solid var(--mb-line); }
+.mb-cs-servers ul { display:flex; flex-direction:column; gap:8px; }
+.mb-cs .mb-cs-sv { width:48px; height:48px; border-radius:24px; padding:0; font-weight:700; transition:border-radius .15s; }
+.mb-cs .mb-cs-sv[aria-current=true], .mb-cs .mb-cs-sv:hover { border-radius:14px; background:var(--mb-accent); color:#0A0A0A; border-color:var(--mb-accent); }
+.mb-cs .mb-cs-add { color:var(--mb-accent); font-size:22px; }
+.mb-cs-side { background:var(--mb-panel); border-right:1px solid var(--mb-line); padding:12px; overflow:auto; }
+.mb-cs-svname { margin:0 0 12px; font-size:15px; padding-bottom:10px; border-bottom:1px solid var(--mb-line); }
+.mb-cs-sechead { display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; font-size:11px; letter-spacing:.06em; color:var(--mb-text2); margin-top:12px; }
+.mb-cs .mb-cs-ch { width:100%; text-align:left; border-color:transparent; color:var(--mb-text2); }
+.mb-cs .mb-cs-ch[aria-current=true] { color:var(--mb-text); background:var(--mb-accent-dim); border-color:var(--mb-accent); }
+.mb-cs-none { font-size:12px; margin:4px 0; }
+.mb-cs-live { font-size:12px; margin-top:16px; }
+.mb-cs-chat { display:flex; flex-direction:column; min-width:0; }
+.mb-cs-head { display:flex; gap:8px; align-items:center; padding:8px 14px; border-bottom:1px solid var(--mb-line); }
+.mb-cs-head h3 { margin:0; flex:1; font-size:15px; }
+.mb-cs-threads { padding:8px 14px; display:flex; flex-wrap:wrap; gap:6px; border-bottom:1px solid var(--mb-line); }
+.mb-cs-msgs { flex:1; overflow:auto; padding:14px; display:flex; flex-direction:column; gap:12px; max-height:520px; }
+.mb-cs-welcome { padding:8px 0 16px; }
+.mb-cs-hash { width:64px; height:64px; border-radius:32px; background:var(--mb-raised); border:2px solid var(--mb-accent); display:flex; align-items:center; justify-content:center; font-size:34px; color:var(--mb-accent); }
+.mb-cs-msg { display:flex; gap:10px; }
+.mb-cs-avatar { flex:0 0 36px; height:36px; border-radius:18px; background:var(--mb-raised); border:1px solid var(--mb-line2); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; }
+.mb-cs-agent .mb-cs-avatar, .mb-cs-system .mb-cs-avatar { border-color:var(--mb-accent); color:var(--mb-accent); }
+.mb-cs-body { min-width:0; flex:1; } .mb-cs-body p { margin:2px 0; overflow-wrap:anywhere; }
+.mb-cs-meta time { color:var(--mb-text2); font-size:12px; margin-left:4px; }
+.mb-cs-badge { font-size:11px; border:1px solid var(--mb-accent); color:var(--mb-accent); border-radius:4px; padding:0 4px; margin-left:4px; }
+.mb-cs-disp { font-size:12px; color:var(--mb-text2); }
+.mb-cs-acts { display:flex; gap:6px; margin-top:4px; }
+.mb-cs-meta-form, .mb-cs-body form { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:6px; }
+.mb-cs input, .mb-cs select { min-height:44px; background:#050505; color:var(--mb-text); border:1px solid var(--mb-line2); border-radius:8px; padding:0 10px; font:inherit; }
+.mb-cs-input { display:flex; gap:8px; padding:10px 14px; border-top:1px solid var(--mb-line); } .mb-cs-input input { flex:1; }
+.mb-cs-empty { padding:32px; grid-column:2 / -1; }
+.mb-cs-sys { margin:20px 0 8px; font-size:14px; color:var(--mb-text2); }
+@media (max-width:760px) { .mb-cs { grid-template-columns:64px 1fr; } .mb-cs-chat { grid-column:1 / -1; } }

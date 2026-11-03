@@ -123,3 +123,32 @@ hard-coded status line, count, FPS figure or capability claim in it; guide text 
 ## Doop (design canvas, ideas only)
 - Source: https://github.com/kgoedecke/doop. **GNU AGPL-3.0** (LICENSE read at commit a3749d9; not MIT).
 - Use: ideas only (infinite canvas of live HTML frames, agent tools to create, write and screenshot). No Doop code is copied. MuZe's canvas (`lib/metabos/canvas/*`, `components/metabos/bos/Canvas.tsx`) was written from scratch. Doop's hosted MCP (https://doop.design/mcp) is listed in the MCP directory as an external service you authorize yourself; MuZe never calls it.
+
+## discord-clone (community server UI patterns)
+- Source: https://github.com/issam-seghir/discord-clone at commit 665bea4 (2026-08-15). MIT licence, text below.
+- Adapted (rewritten, not copied verbatim): the server rail, channel sections by type, chat header, "Welcome to #channel" empty state, message item layout with role badge and edit/delete, and the ADMIN/MODERATOR/GUEST role model (mapped to owner/manager/member, plus an `agent` role).
+- Dropped: Clerk auth, Prisma/Postgres schema, Socket.io, LiveKit voice/video, UploadThing files, direct messages, modals, shadcn/tailwind styling, sample data and env/services. MuZe additions: SQLite tables (`lib/metabos/community/store.ts`), threads, SSE live updates, agent posts, Meta sends via Jev with two reviewers (dry run by default), evidence rows.
+
+```
+MIT License
+
+Copyright (c) 2023 Issam Seghir
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```

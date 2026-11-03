@@ -64,6 +64,8 @@ const ROUTES: RouteEntry[] = [
   { route: 'canvas/comments', load: () => import('@/app/api/canvas/comments/route'), url: 'http://localhost/api/canvas/comments' },
   { route: 'canvas/export', load: () => import('@/app/api/canvas/export/route'), url: 'http://localhost/api/canvas/export' },
   { route: 'canvas/stream', load: () => import('@/app/api/canvas/stream/route'), url: 'http://localhost/api/canvas/stream' },
+  { route: 'community', load: () => import('@/app/api/community/route'), url: 'http://localhost/api/community' },
+  { route: 'community/stream', load: () => import('@/app/api/community/stream/route'), url: 'http://localhost/api/community/stream' },
   { route: 'canvas/mcp', load: () => import('@/app/api/canvas/mcp/route'), url: 'http://localhost/api/canvas/mcp' },
   { route: 'agentverse', load: () => import('@/app/api/agentverse/route'), url: 'http://localhost/api/agentverse' },
   { route: 'meta', load: () => import('@/app/api/meta/route'), url: 'http://localhost/api/meta' },
@@ -208,7 +210,7 @@ function discoverGetRoutes(dir: string, base = ''): string[] {
 }
 
 /** Routes that hold business records: a signed-out GET must be refused (401), never 200. */
-const MEMBER_ONLY = new Set(['home', 'metabos/hubs/[hub]', 'muse/catalog', 'metabos/command-center', 'metabos/overdue', 'ai', 'ai/budget', 'ai/local', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops', 'data', 'b3/mcp', 'b3/pipelines', 'b3/social', 'b3/swarms', 'b3/writing', 'hub', 'server', 'agentverse', 'meta', 'demo', 'bos', 'board', 'board/status', 'board/issues', 'runtime', 'canvas', 'canvas/comments', 'canvas/export', 'canvas/stream', 'canvas/mcp', 'metabos/arena']);
+const MEMBER_ONLY = new Set(['home', 'metabos/hubs/[hub]', 'muse/catalog', 'metabos/command-center', 'metabos/overdue', 'ai', 'ai/budget', 'ai/local', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops', 'data', 'b3/mcp', 'b3/pipelines', 'b3/social', 'b3/swarms', 'b3/writing', 'hub', 'server', 'agentverse', 'meta', 'demo', 'bos', 'board', 'board/status', 'board/issues', 'runtime', 'canvas', 'canvas/comments', 'canvas/export', 'canvas/stream', 'canvas/mcp', 'metabos/arena', 'community', 'community/stream']);
 describe('platform smoke — every GET API route answers 200 with JSON', () => {
   test.each(ROUTES)('GET /api/$route', async ({ route, load, url, params }) => {
     const mod = await load();
