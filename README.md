@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/assets/muzebos-banner.png" alt="MuzeBOS banner" width="100%"></p>
+
 # 🜂 MuzeBOS — The Zero-Trust Business OS
 
 > **Your business, on your machine. Every action logged. Nothing runs without your approval.**
