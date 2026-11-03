@@ -43,6 +43,12 @@ export function propose(s: BusinessStore, actor: string, channel: Channel, paylo
   });
   return row(s, id);
 }
+/** Dispatches that must clear the two-reviewer gate (/api/bos museReview) rather than a single decide. Meta lead replies are marked here. */
+const ensureTwo = (s: BusinessStore) => s.db.exec('CREATE TABLE IF NOT EXISTS mb_dispatch_two_review(dispatchId TEXT PRIMARY KEY, reason TEXT NOT NULL, createdAt TEXT NOT NULL)');
+export function markTwoReviewer(s: BusinessStore, id: string, reason: string) {
+  ensureTwo(s); s.transact(() => { s.db.prepare('INSERT OR IGNORE INTO mb_dispatch_two_review VALUES(?,?,?)').run(id, reason, new Date().toISOString()); s.appendEvidence('dispatch.two-review.required', id, reason); });
+}
+export function needsTwoReviewersMarked(s: BusinessStore, id: string) { ensureTwo(s); return !!s.db.prepare('SELECT 1 FROM mb_dispatch_two_review WHERE dispatchId=?').get(id); }
 export function decide(s: BusinessStore, approver: string, id: string, hash: string, approve: boolean): Dispatch {
   const d = row(s, id);
   if (d.status !== 'pending') throw new BusinessError(`Dispatch is ${d.status}`, 409);

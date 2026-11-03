@@ -5,7 +5,7 @@
 import { createCipheriv, createDecipheriv, randomBytes, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { BusinessError, type BusinessStore } from '../store';
-import { propose as proposeDispatch } from '../dispatch/service';
+import { listDispatches, markTwoReviewer, propose as proposeDispatch } from '../dispatch/service';
 import { ensureTalk } from '../talk/core';
 import { propose as jevPropose, queue } from '../ai/jev';
 import { missingEnv, type Env } from '../dispatch/adapters';
@@ -138,7 +138,8 @@ export function proposeLeadReply(s: BusinessStore, actor: string, conversationId
   if (!c) throw new BusinessError('Conversation not found', 404);
   if (c.channel !== 'whatsapp' && c.channel !== 'instagram') throw new BusinessError('Not connected', 424);
   const d = proposeDispatch(s, actor, c.channel, { to: c.address, body: z.string().trim().min(1).max(4096).parse(body) });
-  return { dispatchId: d.id, status: d.status };
+  markTwoReviewer(s, d.id, `Meta lead reply for ${conversationId} by ${actor}: needs two different reviewers, then /api/dispatch`);
+  return { dispatchId: d.id, status: d.status, review: 'two-reviewer' as const };
 }
 
 // (2) Best-time slots from real Insights rows only. Empty when none.
@@ -225,5 +226,22 @@ export async function tokenHealth(s: BusinessStore, env: Env, f: typeof fetch = 
 
 export function metaOverview(s: BusinessStore, env: Env) {
   return { live: liveWiring(env), buildOrder: buildOrder(s, env), scopes: SCOPES, appReview: 'Not submitted — Meta App Review is required for every scope above and usually takes weeks.', oauthReady: has(env, 'META_APP_ID') && has(env, 'META_OAUTH_REDIRECT_URI') && has(env, 'MUZEBOS_TOKEN_KEY'),
-    tenants: tenants(s), leads: leads(s), calendar: calendar(s), catalog: catalog(s, env), report: weeklyReport(s), pixel: pixelChecklist(s, env) };
+    tenants: tenants(s), leads: leads(s), calendar: calendar(s), catalog: catalog(s, env), report: weeklyReport(s), pixel: pixelChecklist(s, env), board: metaBoardState(s, env) };
+}
+
+/** Real state for the board's meta-graph and webhooks tiles. Counts and timestamps only; no token or secret value leaves this function. */
+export function metaBoardState(s: BusinessStore, env: Env, at = Date.now()) {
+  ensureMeta(s);
+  const tok = s.db.prepare('SELECT COUNT(*) n, MIN(expiresAt) soonest FROM mb_meta_tokens').get() as { n: number; soonest: string | null };
+  const envToken = ['MUZEBOS_META_PAGE_ACCESS_TOKEN', 'MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN', 'MUZEBOS_INSTAGRAM_ACCESS_TOKEN'].some((k) => has(env, k));
+  const hasDeliveries = !!s.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='mb_webhook_deliveries'").get();
+  const wh = hasDeliveries ? s.db.prepare('SELECT COUNT(*) n, MAX(receivedAt) last FROM mb_webhook_deliveries').get() as { n: number; last: string | null } : { n: 0, last: null };
+  const meta = listDispatches(s).filter((d) => d.channel === 'whatsapp' || d.channel === 'instagram');
+  const expired = tok.soonest ? Date.parse(tok.soonest) < at : false;
+  const graph = !tok.n && !envToken ? 'empty' as const : expired ? 'expired' as const : metaDryRun(env) ? 'dry run' as const : 'connected' as const;
+  return {
+    graph: { state: graph, version: GRAPH_VERSION, oauthTokens: tok.n, envToken, soonestExpiry: tok.soonest },
+    webhooks: { state: has(env, 'META_APP_SECRET') ? (wh.n ? 'receiving' as const : 'waiting' as const) : 'not configured' as const, deliveries: wh.n, lastReceivedAt: wh.last, verifyToken: has(env, 'META_VERIFY_TOKEN') },
+    publish: { dryRun: metaDryRun(env), pending: meta.filter((d) => d.status === 'pending').length, approved: meta.filter((d) => d.status === 'approved').length, sent: meta.filter((d) => d.status === 'sent').length },
+  };
 }

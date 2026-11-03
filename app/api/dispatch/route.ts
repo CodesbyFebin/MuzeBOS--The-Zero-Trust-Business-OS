@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const b = Body.parse(JSON.parse(text));
     if (b.action === 'propose') { requirePermission(me, 'expense.submit'); return NextResponse.json({ dispatch: propose(s, me.id, b.channel, b.payload) }); }
     requirePermission(me, 'jev.decide');
-    if (b.action === 'decide' && b.approve && isMuseDispatch(s, b.id)) throw new BusinessError('MUSE sends need two different reviewers via /api/bos (museReview)', 409);
+    if (b.action === 'decide' && b.approve && isMuseDispatch(s, b.id)) throw new BusinessError('This send needs two different reviewers via /api/bos (museReview)', 409);
     if (b.action === 'decide') return NextResponse.json({ dispatch: decide(s, me.id, b.id, b.payloadHash, b.approve) });
     const key = req.headers.get('idempotency-key') ?? '';
     return NextResponse.json({ dispatch: await dispatch(s, b.id, b.payloadHash, key, { env: process.env, fetch: (u, i) => fetch(u, i) }) });
