@@ -797,3 +797,11 @@ body.mb-muze-full .mb-bos-rail,body.mb-muze-full .mb-console{display:none}
 .mb-muze-roam .mb-muze-roam-tools button{min-height:46px;height:46px}
 .mb-muse-home button,.mb-muse-home select,.mb-muse-home input,.mb-muse-home textarea{min-height:44px;background:#0A0A0A;color:#f5f5f5;border:1px solid #FF2A2A;border-radius:8px;padding:.3rem .7rem}
 .mb-muse-home button{cursor:pointer;margin-right:.4rem}.mb-muse-home label{display:block;margin:.4rem 0}
+
+/* Trust plane: independent ledger attestation (hash-commitment, not ZK). */
+.mb-ledger-tile { background: #0A0A0A; border: 1px solid #FF2A2A; color: #fff; padding: .6rem .75rem; }
+.mb-ledger-tile dd { color: #FF2A2A; font-weight: 700; }
+.mb-ledger-tile[data-attested='no'] dd { color: #9a9a9a; }
+.mb-ledger-tile small { display: block; opacity: .8; }
+.mb-ledger-tile a { color: #FF2A2A; }
+.mb-bos-stack li[data-state='attested_hash_commitment'] em { color: #FF2A2A; }

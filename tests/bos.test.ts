@@ -33,7 +33,7 @@ describe('Business Open Server on a fresh store', () => {
     await expect(dispatch(s, d.id, d.payloadHash, crypto.randomUUID(), { env, fetch: async () => { called = true; return new Response('{}'); } })).rejects.toThrow(/Dry run/);
     expect(called).toBe(false);
     const r = sanctumReceipts(s, env); expect(r.dryRun).toBe(true); expect(r.evidence.map((e) => e.action)).toEqual(['dispatch.dry-run', 'dispatch.approved', 'dispatch.proposed']);
-    expect(pipeline(s).find((p) => p.id === 'sandbox')!.count).toBe(1); expect(trustStack(s, env).find((l) => l.id === 'R6')!.state).toBe('chain_verified');
+    expect(pipeline(s).find((p) => p.id === 'sandbox')!.count).toBe(1); expect(trustStack(s, env).find((l) => l.id === 'R6')!.state).toMatch(/^(chain_verified|attested_hash_commitment)$/);
   });
 });
 import { discord, operator, review } from '@/lib/metabos/bos/operator';

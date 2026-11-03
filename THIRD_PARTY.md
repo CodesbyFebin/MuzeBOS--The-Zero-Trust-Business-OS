@@ -104,3 +104,9 @@ Ideas taken: a full-viewport overlay with pointer-events off except the MuZe han
 `components/metabos/muse/MuZeRoam.tsx`, `components/metabos/muse/MuZeHome.tsx` and `lib/metabos/muse/roam.ts`, on the repo's own
 three.js 0.169 fur engine (`lib/metabos/fur-sim`). Not copied: the r128 renderer, the file's operator-mode rail/panels and every
 hard-coded status line, count, FPS figure or capability claim in it; guide text here comes only from the target element.
+
+## Trust plane: AGENeT v2 and musebreak-core (owner's pre-existing work)
+- `tools/agenet-verify` (Rust) is a small, new verifier crate written for this repo. Its SHA-256 hash-chain checking approach is taken from the owner's earlier, pre-existing **AGENeT v2** prototype (Rust: SHA-256, Merkle, Ed25519), which is not vendored here; only `sha2`, `serde` and `serde_json` (MIT/Apache-2.0) are used.
+- The "hash-commitment, not ZK" labelling and trust-plane framing come from the owner's pre-existing **musebreak-core** project: https://github.com/CodesbyFebin/musebreak-core
+- Both are hash-commitment checks. Neither is a zero-knowledge proof.
+- Reviewed but not copied: the owner's earlier AGENeT Next.js snapshot (`src/lib/agenet/evidence.ts`, `/api/evidence/prove`) from the t120 inputs. Its single-server design did not fit an independent check, so no code was taken.

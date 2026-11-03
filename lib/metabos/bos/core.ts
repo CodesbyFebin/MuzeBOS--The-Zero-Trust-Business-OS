@@ -4,6 +4,7 @@
  * Nothing here invents numbers: a value we cannot read is null and the UI shows an empty or "Unknown" state.
  */
 import type { BusinessStore } from '../store';
+import { attestChain, exportChain, type Attestation } from '../evidence-export';
 import { listDrafts } from '../b3/agent-run';
 import { queue } from '../ai/jev';
 import { listDispatches } from '../dispatch/service';
@@ -46,8 +47,9 @@ export function sanctumReceipts(s: BusinessStore, env: Record<string, string | u
 }
 
 /** R0–R6 trust stack. Layers we have no attestation for say so; only R6 is checked against the real chain. */
-export function trustStack(s: BusinessStore, env: Record<string, string | undefined>) {
+export function trustStack(s: BusinessStore, env: Record<string, string | undefined>, attestation?: Attestation) {
   const valid = s.verifyAudit(); const total = s.evidence().length;
+  const att = attestation ?? (total > 0 && valid ? attestChain(exportChain(s.evidence()), env) : null);
   const has = (k: string) => !!env[k]?.trim();
   return [
     { id: 'R0', name: 'Silicon root of trust', state: 'not_attested', detail: 'No hardware attestation report is read by this server.' },
@@ -56,7 +58,9 @@ export function trustStack(s: BusinessStore, env: Record<string, string | undefi
     { id: 'R3', name: 'Tool sandbox', state: has('MUZEBOS_YAO_BASE_URL') ? 'configured' : 'not_configured', detail: has('MUZEBOS_YAO_BASE_URL') ? 'Yao sandbox URL set (env present; not a health check).' : 'Not configured — set MUZEBOS_YAO_BASE_URL.' },
     { id: 'R4', name: 'Signed receipts', state: 'not_attested', detail: 'Evidence rows are SHA-256 hash-chained; no post-quantum signature is applied.' },
     { id: 'R5', name: 'Approval gate (Jev)', state: 'enforced_in_code', detail: 'Every external send needs a Jev decision with the exact payload hash before /api/dispatch.' },
-    { id: 'R6', name: 'Evidence chain', state: total === 0 ? 'empty' : valid ? 'chain_verified' : 'chain_broken', detail: total === 0 ? 'No evidence recorded yet.' : `${total} rows; hash chain ${valid ? 'verified on this request' : 'BROKEN'}.` },
+    { id: 'R6', name: 'Evidence chain', state: total === 0 ? 'empty' : !valid ? 'chain_broken' : att?.state === 'attested' ? 'attested_hash_commitment' : att?.state === 'failed' ? 'chain_broken' : 'chain_verified',
+      detail: total === 0 ? 'No evidence recorded yet.' : !valid ? `${total} rows; hash chain BROKEN.` : att?.state === 'attested' ? `${total} rows; recomputed independently by agenet-verify (Rust). Hash-commitment, not ZK.` : att?.state === 'failed' ? `${total} rows; independent verifier disagreed at seq ${att.firstBrokenSeq ?? '?'}.` : `${total} rows; hash chain verified on this request. Not attested: ${att && 'reason' in att ? att.reason : 'independent verifier not run.'}`,
+      attestation: att },
   ];
 }
 
@@ -75,5 +79,5 @@ export function pipeline(s: BusinessStore) {
 
 export function hq(s: BusinessStore) {
   const ds = listDispatches(s); const q = queue(s);
-  return { jevWaiting: q.filter((r) => r.status === 'awaiting_approval').length, dispatchPending: ds.filter((d) => d.status === 'pending').length, dispatchSent: ds.filter((d) => d.status === 'sent').length, evidenceRows: s.evidence().length, chainValid: s.verifyAudit() };
+  return { jevWaiting: q.filter((r) => r.status === 'awaiting_approval').length, dispatchPending: ds.filter((d) => d.status === 'pending').length, dispatchSent: ds.filter((d) => d.status === 'sent').length, evidenceRows: s.evidence().length, chainValid: s.verifyAudit(), evidenceHead: s.evidence().at(-1)?.hash ?? null };
 }
