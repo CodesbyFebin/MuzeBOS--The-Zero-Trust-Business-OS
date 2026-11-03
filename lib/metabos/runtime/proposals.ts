@@ -1,6 +1,6 @@
 /**
  * Inbound send proposals from Rakazo bots. A bot calls MuZe's propose_send (OpenAPI tool source); MuZe turns it
- * into a pending /api/dispatch record marked "[MUSE plan]", so the existing two-reviewer gate (muse-gate.ts) applies:
+ * into a pending /api/dispatch record with marker "muse:rakazo:<botId>" (a DB column, never the message body), so the existing two-reviewer gate (muse-gate.ts) applies:
  * Reviewer A signs, a different Reviewer B approves, and only then can /api/dispatch run it (DRY_RUN on by default
  * for Meta channels). The bot never sends directly. Evidence rows are written for every proposal.
  */
@@ -8,7 +8,7 @@ import { timingSafeEqual, createHash } from 'node:crypto';
 import { z } from 'zod';
 import type { BusinessStore } from '../store';
 import { BusinessError } from '../store';
-import { propose } from '../dispatch/service';
+import { propose, MARKER } from '../dispatch/service';
 export const ProposeSend = z.discriminatedUnion('channel', [
   z.object({ channel: z.literal('whatsapp'), botId: z.string().min(1).max(64), botName: z.string().max(80).default(''), to: z.string().max(20), body: z.string().min(1).max(3800) }).strict(),
   z.object({ channel: z.literal('email'), botId: z.string().min(1).max(64), botName: z.string().max(80).default(''), to: z.string().max(200), subject: z.string().min(1).max(160), body: z.string().min(1).max(19000) }).strict(),
@@ -20,9 +20,10 @@ export function checkSecret(env: Record<string, string | undefined>, presented: 
   if (!presented || !timingSafeEqual(digest(presented), digest(want))) throw new BusinessError('Unauthorized', 401);
 }
 export function proposeFromRakazo(s: BusinessStore, raw: unknown) {
-  const p = ProposeSend.parse(raw); const tag = `[MUSE plan] [rakazo:${p.botId}]`;
-  const d = p.channel === 'whatsapp' ? propose(s, `rakazo:${p.botId}`, 'whatsapp', { to: p.to, body: `${tag} ${p.body}` })
-    : propose(s, `rakazo:${p.botId}`, 'email', { to: p.to, subject: p.subject, body: `${tag} ${p.body}` });
+  const p = ProposeSend.parse(raw); const marker = `muse:rakazo:${p.botId}`;
+  if (!MARKER.test(marker)) throw new BusinessError('Invalid botId', 422);
+  const d = p.channel === 'whatsapp' ? propose(s, `rakazo:${p.botId}`, 'whatsapp', { to: p.to, body: p.body }, marker)
+    : propose(s, `rakazo:${p.botId}`, 'email', { to: p.to, subject: p.subject, body: p.body }, marker);
   s.transact(() => s.appendEvidence('runtime.rakazo.proposal', d.id, JSON.stringify({ botId: p.botId, botName: p.botName, channel: p.channel, payloadHash: d.payloadHash.slice(0, 12), needs: 'two reviewers' })));
   return { dispatchId: d.id, status: d.status, payloadHash: d.payloadHash, next: 'Two different reviewers must approve in Sanctum before /api/dispatch can run it.' };
 }

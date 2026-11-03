@@ -3,6 +3,7 @@
  * verification pipeline. Everything is derived from real records (agent drafts, Jev runs, dispatches, the evidence chain).
  * Nothing here invents numbers: a value we cannot read is null and the UI shows an empty or "Unknown" state.
  */
+import { isMuse } from './muse-gate';
 import type { BusinessStore } from '../store';
 import { listDrafts } from '../b3/agent-run';
 import { queue } from '../ai/jev';
@@ -39,10 +40,10 @@ export function office(s: BusinessStore, now = Date.now()) {
 
 /** Sanctum receipts: dispatches proposed from Sanctum plus their evidence rows. */
 export function sanctumReceipts(s: BusinessStore, env: Record<string, string | undefined>) {
-  const ds = listDispatches(s).filter((d) => (d.payload as { body?: string; subject?: string })?.body?.startsWith?.('[MUSE plan]') || String((d.payload as { subject?: string })?.subject ?? '').startsWith('[MUSE plan]'));
+  const ds = listDispatches(s).filter(isMuse);
   const ids = new Set(ds.map((d) => d.id));
   const ev = s.evidence().filter((e) => ids.has(e.target)).reverse().slice(0, 100).map((e) => ({ seq: e.seq, action: e.action, target: e.target, detail: e.detail.slice(0, 200), at: e.createdAt, hash: e.hash.slice(0, 16) }));
-  return { dryRun: metaDryRun(env), dispatches: ds.map((d) => ({ id: d.id, channel: d.channel, status: d.status, payloadHash: d.payloadHash, createdAt: d.createdAt, providerStatus: d.providerStatus, reviewers: reviewers(s, d.id) })), evidence: ev };
+  return { dryRun: metaDryRun(env), dispatches: ds.map((d) => ({ id: d.id, channel: d.channel, status: d.status, payloadHash: d.payloadHash, createdAt: d.createdAt, providerStatus: d.providerStatus, marker: d.marker, reviewers: reviewers(s, d.id) })), evidence: ev };
 }
 
 /** R0–R6 trust stack. Layers we have no attestation for say so; only R6 is checked against the real chain. */

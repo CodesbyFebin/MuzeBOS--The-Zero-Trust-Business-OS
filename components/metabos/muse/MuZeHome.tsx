@@ -1,7 +1,7 @@
 'use client';
 /**
  * MuZe on the home page: voice/typed assistant, the roaming guide, and the same two-reviewer send path as Sanctum.
- * Drafting a send here proposes a real dispatch (/api/dispatch propose, "[MUSE plan]" body), then needs reviewer A and a
+ * Drafting a send here proposes a real dispatch (/api/dispatch propose, marker "muse"), then needs reviewer A and a
  * different reviewer B via /api/bos museReview before /api/dispatch dispatch (DRY_RUN unless configured). No fake rows.
  */
 import { useState } from 'react';
@@ -14,7 +14,7 @@ export function MuZeHome() {
   const [d, setD] = useState<D | null>(null); const [note, setNote] = useState<string | null>(null); const [busy, setBusy] = useState(false);
   const text = draft?.text ?? own.trim();
   const propose = async (e: React.FormEvent) => { e.preventDefault(); setBusy(true); setNote(null);
-    try { const j = await post('/api/dispatch', { action: 'propose', channel: draft?.channel ?? channel, payload: { to: to.trim(), body: `[MUSE plan] ${text}`.slice(0, 1000) } }); setD(j.dispatch); setDraft(null); setOwn(''); setNote('Proposed. Reviewer A signs, then a different reviewer B.'); }
+    try { const j = await post('/api/dispatch', { action: 'propose', channel: draft?.channel ?? channel, payload: { to: to.trim(), body: text.slice(0, 1000) }, marker: 'muse' }); setD(j.dispatch); setDraft(null); setOwn(''); setNote('Proposed. Reviewer A signs, then a different reviewer B.'); }
     catch (x) { setNote(x instanceof Error ? x.message : String(x)); } finally { setBusy(false); } };
   const act = async (what: 'approve' | 'reject' | 'send') => { if (!d) return; setBusy(true);
     try { if (what === 'send') { const j = await post('/api/dispatch', { action: 'dispatch', id: d.id, payloadHash: d.payloadHash }, { 'idempotency-key': crypto.randomUUID() }); setD(j.dispatch ?? { ...d, status: 'sent' }); setNote(j.dryRun ? 'Dispatched in DRY_RUN: nothing left this server.' : `Dispatch status: ${j.dispatch?.status ?? 'unknown'}.`); }

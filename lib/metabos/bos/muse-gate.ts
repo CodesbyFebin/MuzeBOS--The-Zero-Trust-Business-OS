@@ -1,15 +1,19 @@
 /**
- * Two-reviewer gate for MUSE sends. A MUSE dispatch ("[MUSE plan]" body) cannot be approved by a single /api/dispatch decide:
+ * Two-reviewer gate for MUSE sends. A MUSE dispatch (marker column "muse…"; legacy rows: "[MUSE plan]" body prefix) cannot be approved by a single /api/dispatch decide:
  * Reviewer A signs, a different Reviewer B signs, and only then is the dispatch approved. One reject rejects it.
  */
 import { z } from 'zod';
 import { BusinessError, type BusinessStore } from '../store';
-import { decide, listDispatches } from '../dispatch/service';
+import { decide, listDispatches, type Dispatch } from '../dispatch/service';
 import { reviewers } from './operator';
 export const MuseReviewInput = z.object({ dispatchId: z.string().uuid(), payloadHash: z.string().regex(/^[0-9a-f]{64}$/), approve: z.boolean() }).strict();
 const ensure = (s: BusinessStore) => s.db.exec('CREATE TABLE IF NOT EXISTS mb_bos_reviews(runId TEXT NOT NULL, reviewer TEXT NOT NULL, payloadHash TEXT NOT NULL, createdAt TEXT NOT NULL, PRIMARY KEY(runId, reviewer))');
 export function isMuseDispatch(s: BusinessStore, id: string) {
-  const d = listDispatches(s).find((x) => x.id === id); if (!d) return false;
+  const d = listDispatches(s).find((x) => x.id === id); return d ? isMuse(d) : false;
+}
+/** MUSE marker lives in mb_dispatches.marker; rows from before the column existed carried it as a body prefix. */
+export function isMuse(d: Dispatch) {
+  if (d.marker?.startsWith('muse')) return true;
   const p = d.payload as { body?: unknown; subject?: unknown };
   return String(p?.body ?? '').startsWith('[MUSE plan]') || String(p?.subject ?? '').startsWith('[MUSE plan]');
 }

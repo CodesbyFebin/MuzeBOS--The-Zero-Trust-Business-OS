@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const Channel = z.enum(['whatsapp', 'instagram', 'email', 'payment-link', 'completion', 'tool-call']);
 const Body = z.discriminatedUnion('action', [
-  z.object({ action: z.literal('propose'), channel: Channel, payload: z.record(z.string(), z.unknown()) }).strict(),
+  z.object({ action: z.literal('propose'), channel: Channel, payload: z.record(z.string(), z.unknown()), marker: z.literal('muse').optional() }).strict(),
   z.object({ action: z.literal('decide'), id: z.string().uuid(), payloadHash: z.string().regex(/^[0-9a-f]{64}$/), approve: z.boolean() }).strict(),
   z.object({ action: z.literal('dispatch'), id: z.string().uuid(), payloadHash: z.string().regex(/^[0-9a-f]{64}$/) }).strict(),
 ]);
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     if (!req.headers.get('content-type')?.toLowerCase().startsWith('application/json')) throw new BusinessError('JSON content type required', 415);
     const text = await req.text(); if (text.length > 32_000) throw new BusinessError('Request too large', 413);
     const b = Body.parse(JSON.parse(text));
-    if (b.action === 'propose') { requirePermission(me, 'expense.submit'); return NextResponse.json({ dispatch: propose(s, me.id, b.channel, b.payload) }); }
+    if (b.action === 'propose') { requirePermission(me, 'expense.submit'); return NextResponse.json({ dispatch: propose(s, me.id, b.channel, b.payload, b.marker ?? null) }); }
     requirePermission(me, 'jev.decide');
     if (b.action === 'decide' && b.approve && isMuseDispatch(s, b.id)) throw new BusinessError('MUSE sends need two different reviewers via /api/bos (museReview)', 409);
     if (b.action === 'decide') return NextResponse.json({ dispatch: decide(s, me.id, b.id, b.payloadHash, b.approve) });
