@@ -115,3 +115,11 @@ hard-coded status line, count, FPS figure or capability claim in it; guide text 
 - **Source:** the owner's own pre-existing file, "METABOS × MuZe — Hackathon-Ready Sovereign Business OS & Meta AI 3D GPU-Fur Companion" (single HTML file, sha256 prefix `dab19dd743e9f390`). It is the user's code, not a third-party library. Used only as a layout and feature reference. No code was copied.
 - **What was used:** the "Humans and agents, in one place" panel, rebuilt as `components/metabos/bos/Issues.tsx` with a real SQLite table (`mb_issues`) and evidence rows. Assignees must already have an Agent Office desk. The "28/28 systems wired" pill, rebuilt as a summary of real board status counts. The "Meta AI model substrate" strip, rebuilt as the real status of the AI board tiles.
 - **What was not used:** its inlined three.js r128 bundle (the repo's own three.js and MUSE avatar stay as they are). Its fixed figures: MRR $248,500, 194 orders, 148 tok/s, Gen v2.4 / 94.8% fitness, 142 pheromone trails, 60K strands, 78% VRAM, 4h 34m uptime and the "0 delayed" counter. Also its model-routing click (no router backend), "Evolve System" and "Judge Pitch" buttons, the static Stigmergy channel list and the scene backdrops. Builder, MUSE Sanctum, Jev queue, receipts, Discord view, Fur Lab and Skill Forge were already in MuzeBOS.
+
+## Rakazo (agent runtime integration, feat/rakazo-canvas)
+- Source: https://github.com/elie222/rakazo, Apache-2.0 (LICENSE read at commit 6bba136).
+- Use: MuZe calls a separately run Rakazo server over HTTP (`lib/metabos/runtime/rakazo.ts`). No Rakazo code is copied or vendored. The procedure names and auth model were read from its source.
+
+## Doop (design canvas, ideas only)
+- Source: https://github.com/kgoedecke/doop. **GNU AGPL-3.0** (LICENSE read at commit a3749d9; not MIT).
+- Use: ideas only (infinite canvas of live HTML frames, agent tools to create, write and screenshot). No Doop code is copied. MuZe's canvas (`lib/metabos/canvas/*`, `components/metabos/bos/Canvas.tsx`) was written from scratch. Doop's hosted MCP (https://doop.design/mcp) is listed in the MCP directory as an external service you authorize yourself; MuZe never calls it.

@@ -810,3 +810,10 @@ body.mb-muze-full .mb-bos-rail,body.mb-muze-full .mb-console{display:none}
 .mb-board-sum{border:1px solid #FF2A2A;background:#0A0A0A;padding:.6rem .8rem;margin:.6rem 0}.mb-board-models{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
 .mb-issues-form{display:flex;flex-wrap:wrap;gap:.6rem;align-items:end}.mb-issues-form input,.mb-issues-form select,.mb-issues select{min-height:44px;background:#0A0A0A;color:#fff;border:1px solid #FF2A2A}
 .mb-issues-form button{min-height:44px;min-width:44px;background:#FF2A2A;color:#0A0A0A;border:0;font-weight:700}.mb-issues{list-style:none;padding:0}.mb-issues li{border-bottom:1px solid #3a0d0d;padding:.5rem 0;display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+.mb-canvas-tools{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:.5rem 0}.mb-canvas-tools button,.mb-canvas-tools a{min-height:44px;min-width:44px;background:#0A0A0A;color:#fff;border:1px solid #FF2A2A;padding:0 .7rem;display:inline-flex;align-items:center}
+.mb-canvas-tools button[aria-pressed="true"]{background:#FF2A2A;color:#0A0A0A;font-weight:700}.mb-canvas-tools button:disabled{border-style:dotted;color:#fff}
+.mb-canvas{position:relative;height:520px;overflow:hidden;border:1px solid #FF2A2A;background:#0A0A0A;background-image:radial-gradient(#3a0d0d 1px,transparent 1px);background-size:24px 24px;touch-action:none;cursor:grab}
+.mb-canvas-plane{position:absolute;left:0;top:0;transform-origin:0 0}.mb-frame{position:absolute;border:1px solid #FF2A2A;background:#0A0A0A}.mb-frame.is-sel{outline:3px solid #FF2A2A}
+.mb-frame-head{display:block;width:100%;min-height:44px;text-align:left;background:#0A0A0A;color:#fff;border:0;border-bottom:1px solid #FF2A2A;padding:0 .6rem}.mb-frame iframe{display:block;border:0;background:#fff}
+.mb-frame-empty{display:flex;align-items:center;justify-content:center;color:#fff;padding:1rem}.mb-canvas-empty{position:absolute;inset:auto 0 45% 0;text-align:center;color:#fff}
+.mb-canvas-side{border:1px solid #FF2A2A;padding:.8rem;margin-top:.8rem}.mb-canvas-side textarea{width:100%;background:#0A0A0A;color:#fff;border:1px solid #FF2A2A;font-family:monospace}

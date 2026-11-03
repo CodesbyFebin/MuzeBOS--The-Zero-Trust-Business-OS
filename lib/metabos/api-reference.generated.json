@@ -1,6 +1,6 @@
 {
  "source": "app/api",
- "count": 238,
+ "count": 248,
  "routes": [
   {
    "path": "/api/adscout/ask",
@@ -648,6 +648,94 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/canvas",
+   "file": "app/api/canvas/route.ts",
+   "methods": [
+    "GET",
+    "POST",
+    "PATCH"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/canvas/comments",
+   "file": "app/api/canvas/comments/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/canvas/export",
+   "file": "app/api/canvas/export/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "HTML export. PNG export is rendered in the browser (Canvas.tsx) or via the screenshot_frame MCP tool.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/canvas/generate",
+   "file": "app/api/canvas/generate/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/canvas/mcp",
+   "file": "app/api/canvas/mcp/route.ts",
+   "methods": [
+    "GET",
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/canvas/ready",
+   "file": "app/api/canvas/ready/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/canvas/stream",
+   "file": "app/api/canvas/stream/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "SSE: polls SQLite every 400 ms and sends the frames when anything changed. Closes after 5 minutes; EventSource reconnects.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
    "access": "session"
   },
   {
@@ -2425,6 +2513,43 @@
    "idempotencyKey": false,
    "originCheck": false,
    "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/runtime",
+   "file": "app/api/runtime/route.ts",
+   "methods": [
+    "GET",
+    "PUT"
+   ],
+   "summary": "Agent runtime: local (default) or Rakazo. Rakazo bots are listed only when it is configured and reachable.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
+   "access": "session"
+  },
+  {
+   "path": "/api/runtime/rakazo/openapi.json",
+   "file": "app/api/runtime/rakazo/openapi.json/route.ts",
+   "methods": [
+    "GET"
+   ],
+   "summary": "Public OpenAPI document for the propose_send tool source (no secrets in it).",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": false,
+   "access": "session"
+  },
+  {
+   "path": "/api/runtime/rakazo/propose",
+   "file": "app/api/runtime/rakazo/propose/route.ts",
+   "methods": [
+    "POST"
+   ],
+   "summary": "Rakazo bots propose sends here (shared-secret header). Creates a pending two-reviewer dispatch; never sends.",
+   "idempotencyKey": false,
+   "originCheck": false,
+   "schemaValidated": true,
    "access": "session"
   },
   {

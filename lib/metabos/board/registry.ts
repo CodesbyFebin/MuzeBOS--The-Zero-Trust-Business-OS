@@ -8,6 +8,7 @@ import { metaDryRun, GRAPH_VERSION } from '../meta/graph';
 import { listDispatches } from '../dispatch/service';
 import { queue } from '../ai/jev';
 import { loadCatalog, connectionLabel } from '../muse-catalog';
+import { rakazoConfig } from '../runtime/rakazo';
 
 export type TileStatus = 'ok' | 'down' | 'not configured' | 'dry run';
 export type TileResult = { id: string; status: TileStatus; latencyMs: number | null; detail: string; metrics: { label: string; value: number | string }[]; checkedAt: string };
@@ -50,6 +51,9 @@ export const TILES: TileDef[] = [
     const tok = c.env.MUZEBOS_META_PAGE_ACCESS_TOKEN?.trim() || c.env.MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN?.trim() || c.env.MUZEBOS_INSTAGRAM_ACCESS_TOKEN?.trim();
     if (!tok) return nc('No Meta access token set.'); if (metaDryRun(c.env)) return { status: 'dry run', latencyMs: null, detail: 'Test mode on (MUZEBOS_META_DRY_RUN). Sends are not delivered; no Graph call made.', metrics: [{ label: 'Graph', value: GRAPH_VERSION }] };
     return { ...pinged(await ping(c, `https://graph.facebook.com/${GRAPH_VERSION}/me?fields=id`, { authorization: `Bearer ${tok}` }), 'Token accepted.'), metrics: [{ label: 'Graph', value: GRAPH_VERSION }] }; } },
+  { id: 'rakazo', group: 'AI', name: 'Rakazo runtime', checks: 'RAKAZO_URL and RAKAZO_API_KEY present, then GET <RAKAZO_URL>/ready (database and degraded check). No bot data is read here.', run: async (c) => {
+    const cfg = rakazoConfig(c.env); if (!cfg) return nc('Rakazo not configured — add RAKAZO_URL and RAKAZO_API_KEY.');
+    return pinged(await ping(c, `${cfg.url}/ready`), 'Rakazo /ready answered OK.'); } },
   { id: 'mcp', group: 'MCP', name: 'MCP servers', checks: 'Reads the MCP directory and each entry\'s connection state from env.', run: (c) => {
     const cat = loadCatalog().entries.filter((e) => e.kind === 'mcp'); const labels = cat.map((e) => connectionLabel(e, c.env));
     const built = labels.filter((l) => l.startsWith('Built in')).length; const blocked = labels.filter((l) => l.startsWith('Blocked')).length;

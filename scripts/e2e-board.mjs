@@ -24,7 +24,7 @@ await p.screenshot({ path: `${out}/board.png`, fullPage: true }); await audit('b
 await p.getByTestId('tile-ledger').evaluate((e) => e.scrollIntoView({ block: 'center' })); await p.getByTestId('tile-ledger').getByRole('button', { name: /Ask MuZe about/ }).click(); const g = p.getByTestId('muze-roam-guide'); await g.waitFor({ timeout: 10000 }); console.log('roam →', await g.textContent());
 await p.screenshot({ path: `${out}/board-roam.png` });
 await p.getByRole('button', { name: 'Edit board' }).click(); await p.getByRole('button', { name: 'Move Jev queue earlier' }).waitFor();
-for (let i = 0; i < 9; i++) { const m = p.getByRole('button', { name: 'Move Jev queue earlier' }); await m.press('Enter'); /* keyboard path: MuZe parks over the guided tile by design */ }
+for (let i = 0; i < 10; i++) { const m = p.getByRole('button', { name: 'Move Jev queue earlier' }); await m.press('Enter'); /* keyboard path: MuZe parks over the guided tile by design */ }
 await p.getByTestId('tile-stripe').getByRole('button', { name: 'Hide' }).press('Enter'); await p.getByTestId('tile-jev').getByLabel('Size').selectOption('lg');
 await p.screenshot({ path: `${out}/board-edit.png`, fullPage: true }); await audit('board edit');
 await p.getByRole('button', { name: 'Save layout' }).press('Enter'); await p.getByText('Layout saved.').waitFor();
