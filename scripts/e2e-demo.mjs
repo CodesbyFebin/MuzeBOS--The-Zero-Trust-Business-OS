@@ -24,8 +24,11 @@ await p.getByLabel(/Your brand name/).fill('Kochi Ewaste'); await shot('demo-2-w
 await p.getByRole('button', { name: /FIXTURE lead/ }).click(); await p.getByText(/do you do pickups/).waitFor(); await shot('demo-3-fixture-lead');
 await p.getByRole('button', { name: /draft a reply/ }).click(); await p.getByText('TEMPLATE — not model output').waitFor(); await shot('demo-4-draft');
 await p.getByRole('button', { name: 'Propose as commit' }).click(); await p.getByText(/PENDING/).waitFor(); await shot('demo-5-pending-commit');
-await p.getByRole('button', { name: /Approve/ }).click(); const o = p.getByTestId('demo-outcome'); await o.waitFor({ timeout: 20000 });
-const ot = await o.innerText(); console.log('outcome', ot); assert.match(ot, /held|not sent|Not connected|sent/i); await shot('demo-6-dispatch-evidence');
+await p.getByRole('button', { name: 'Approve without dispatch' }).click(); const o = p.getByTestId('demo-outcome'); await o.waitFor({ timeout: 20000 });
+const ot = await o.innerText(); console.log('outcome', ot); assert.equal(ot, 'Approved. No dispatch was attempted.');
+const bundle = await p.request.get(base + '/api/evidence?format=bundle');
+assert.equal(bundle.status(), 200);
+assert.match(bundle.headers()['content-disposition'], /metabos-evidence-bundle\.json/); await shot('demo-6-dispatch-evidence');
 await p.setViewportSize({ width: 390, height: 844 }); await shot('demo-7-mobile');
 console.log(JSON.stringify(audits, null, 1)); console.log('page errors', errs.length, errs.slice(0, 3)); assert.equal(errs.length, 0);
 console.log('E2E DEMO OK'); await b.close();

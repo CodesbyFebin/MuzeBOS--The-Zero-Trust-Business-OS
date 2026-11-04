@@ -10,7 +10,7 @@ type Lead = { name: string; body: string; fixture: boolean };
 type Commit = { id: string; kind: string; title: string; diff: string[]; status: string; dispatchId: string | null };
 type Feed = { seq: number; kind: string; action: string; detail: string; at: string };
 type Report = { evidenceRows: number; chainValid: boolean; inbound: number; dispatchesSent: number; jev: { proposed: number; waiting: number } };
-const STEPS = ['MUSE greets', 'Brand workspace', 'Lead arrives', 'Agent drafts', 'Pending commit', 'You approve', 'Evidence & report'];
+const STEPS = ['MUSE greets', 'Brand workspace', 'Lead arrives', 'Agent drafts', 'Pending commit', 'You decide', 'Evidence & report'];
 const j = async (u: string, init?: RequestInit) => { const r = await fetch(u, init); const b = await r.json().catch(() => ({})); return { ok: r.ok, status: r.status, b }; };
 const post = (u: string, body: unknown, h: Record<string, string> = {}) => j(u, { method: 'POST', headers: { 'content-type': 'application/json', ...h }, body: JSON.stringify(body) });
 
@@ -32,19 +32,36 @@ export function JudgeDemo() {
     setDisp({ id: r.dispatchId, hash: r.payloadHash });
     const o = await j('/api/agentverse'); setCommit((o.b.commits as Commit[] | undefined)?.find((c) => c.dispatchId === r.dispatchId) ?? null); setStep(5);
   });
-  const approve = () => run(async () => {
-    if (!disp) return; must(await post('/api/dispatch', { action: 'decide', id: disp.id, payloadHash: disp.hash, approve: true }));
+  const loadEvidence = async () => {
+    const o = await j('/api/agentverse');
+    setFeed(((o.b.feed as Feed[]) ?? []).slice(0, 8));
+    const m = await j('/api/meta');
+    setReport(m.b.report ?? null);
+  };
+  const decide = (decision: 'reject' | 'approve' | 'dispatch') => run(async () => {
+    if (!disp) return;
+    must(await post('/api/dispatch', { action: 'decide', id: disp.id, payloadHash: disp.hash, approve: decision !== 'reject' }));
+    if (decision !== 'dispatch') {
+      setOutcome(decision === 'reject' ? 'Rejected. No dispatch was attempted.' : 'Approved. No dispatch was attempted.');
+      setStep(6);
+      await loadEvidence();
+      return;
+    }
     const r = await post('/api/dispatch', { action: 'dispatch', id: disp.id, payloadHash: disp.hash }, { 'idempotency-key': crypto.randomUUID() });
     if (r.ok) setOutcome(`Dispatch status: ${r.b.dispatch?.status} (HTTP ${r.b.dispatch?.providerStatus ?? '—'} from the provider)`);
-    else { setOutcome(`Approved, then held — not sent: ${r.b.error ?? r.status}`); await post('/api/demo', { action: 'held', dispatchId: disp.id, reason: String(r.b.error ?? r.status) }); }
-    const o = await j('/api/agentverse'); setFeed(((o.b.feed as Feed[]) ?? []).slice(0, 8)); const m = await j('/api/meta'); setReport(m.b.report ?? null); setStep(6);
+    else {
+      setOutcome(`Approved, then held — not sent: ${r.b.error ?? r.status}`);
+    }
+    setStep(6);
+    if (!r.ok) await post('/api/demo', { action: 'held', dispatchId: disp.id, reason: String(r.b.error ?? r.status) });
+    await loadEvidence();
   });
 
   return (
     <section className="mb-console mb-demo" data-testid="judge-demo" aria-label="Judge demo mode">
       <header className="mb-demo-head">
         <p className="mb-eyebrow">DEMO MODE · ABOUT 3 MINUTES</p>
-        <h1>One message in, one approved reply out</h1>
+        <h1>One draft, one decision, a trail you can verify</h1>
         <p className="mb-muted">Items marked <span className="mb-demo-fx">FIXTURE</span> are demo inputs, not real customers or model output. Everything else is a real record in this server.</p>
       </header>
       <ol className="mb-demo-steps" aria-label="Demo steps">{STEPS.map((s, i) => <li key={s} aria-current={i === step ? 'step' : undefined} className={i < step ? 'done' : i === step ? 'on' : ''}>{i + 1}. {s}</li>)}</ol>
@@ -67,12 +84,17 @@ export function JudgeDemo() {
             <button type="button" onClick={propose} disabled={busy || !draft.trim()}>Propose as commit</button></>}</>}
         {step === 5 && <><p>The reply is now a <b>PENDING</b> commit. Nothing has been sent.</p>
           {commit ? <pre className="mb-av-diff" aria-label="Commit diff">{commit.diff.join('\n')}</pre> : <p className="mb-muted">Commit not found in the log yet.</p>}
-          <button type="button" onClick={approve} disabled={busy}>Approve &amp; dispatch</button></>}
+          {disp && <div>Proposed payload SHA-256<pre className="mb-av-diff">{disp.hash}</pre></div>}
+          <button type="button" onClick={() => decide('reject')} disabled={busy}>Reject proposal</button>{' '}
+          <button type="button" onClick={() => decide('approve')} disabled={busy}>Approve without dispatch</button>{' '}
+          {leadInfo?.fixture === false && <button type="button" onClick={() => decide('dispatch')} disabled={busy}>Approve &amp; dispatch</button>}</>}
         {step === 6 && <><p data-testid="demo-outcome"><b>{outcome}</b></p>
           <h2>Activity feed (latest evidence)</h2>
           {feed.length ? <ul className="mb-demo-feed">{feed.map((f) => <li key={f.seq}><code>#{f.seq} {f.action}</code> {f.detail}</li>)}</ul> : <p className="mb-muted">No feed entries.</p>}
           <h2>Weekly report</h2>
           {report ? <p>Evidence rows {report.evidenceRows} · chain {report.chainValid ? 'valid' : 'INVALID'} · Jev proposed {report.jev.proposed} · dispatches sent {report.dispatchesSent}</p> : <p className="mb-muted">Report unavailable.</p>}
+          <p><a href="/api/evidence?format=bundle">Download evidence bundle</a>. The bundle contains the workspace audit history. Review it before sharing.</p>
+          <p>From the repository, run <code>npm run evidence:verify -- &lt;bundle-path&gt;</code> to check it offline. Compare the root against a separately trusted copy to establish provenance.</p>
           <a href="/workspace/builder/agentverse">Open the AgentVerse console</a></>}
       </div>
     </section>
