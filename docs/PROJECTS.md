@@ -1,6 +1,8 @@
 # Project board
 
-Updated: 2026-10-29
+Updated: 2026-11-04
+
+MuZe release wiring: run `node --import tsx scripts/audit-workspace.ts` for the live registry-to-channel map. See [unified source comparison](projects/muze-unified/COMPARISON.md) for integration boundaries.
 
 ## MeTaBos commerce and reference UI
 
@@ -125,7 +127,7 @@ Submission remains blocked; a 100/100 readiness claim is unsupported.
 - Restore the 56px rail, 248px secondary panel and 52px topbar from PR #46 on top of PR #57.
 - Keep all 18 destinations, Brain pinned above category clusters, command search, real notifications, details drawer and mobile tabs.
 - Remove later shell CSS overrides and the automatic opening intro; preserve page-level v3 design and newer backend functionality.
-- Typecheck, production build, 12 shell tests and desktop/mobile browser checks passed. Full suite: 5,350 passed, 2 Lab timeouts, 9 skipped; see `docs/PR46-SHELL-RESTORATION.md`. Prepared as a draft restoration PR; no stacked PRs merged by this work.
+- Typecheck, production build, 12 shell tests and desktop/mobile browser checks passed. Full suite: 5,350 passed, 2 Lab timeouts, 9 skipped; see `docs/archive/PR46-SHELL-RESTORATION.md`. Prepared as a draft restoration PR; no stacked PRs merged by this work.
 
 ## Arena workspace — 2026-10-29
 
@@ -141,3 +143,39 @@ Submission remains blocked; a 100/100 readiness claim is unsupported.
 - Qualification and known inherited failures are recorded in `docs/arena/VERIFICATION.md`. Prepared on an isolated branch above PR #59, without a default-branch merge or deployment.
 
 - Final 3D qualification: types/build/43 focused tests and production desktop/mobile browser checks passed. Full suite: 5,361 passed, 2 inherited Lab timeouts, 9 skipped. Muse Code SDK integration is documented as planned, not executed.
+
+
+## Private evidence and ZK source review — 2026-11-03
+
+| Area | State |
+| --- | --- |
+| Ente / Union / Tachyon sparse clones, revisions and license review | Recorded in docs/projects/private-evidence/sources.json |
+| Browser-side encrypted full-chain download | Implemented; passwords never sent to the export API |
+| Portable bundles, event inclusion paths and offline CLI | Implemented; no ZK or signature claims |
+| Existing member / finance.read export gates | Retained and tested |
+| Upstream source or native prover import | None; original platform-crypto implementation |
+| Verification | 5,535 passed / 9 skipped; typecheck, production build and HTTP smoke passed |
+
+- [x] Clone and inspect the requested upstream source subsets and licensing.
+- [x] Add useful privacy and portable evidence-verification capabilities.
+- [x] Qualify the reviewed integration for main; GitHub merge history records publication.
+
+## Complete open-PR integration — 2026-11-03
+
+- All 13 observed open PR heads reconciled on local `codex/integrate-all-20261103`.
+- Fixed integration approval gates, member-ID ownership, workspace-scoped Board caches, outgoing community payloads and smoke/API references.
+- Remote publication remains blocked by automatic approval review pending explicit push authorization; main and the GitHub PR list are unchanged.
+- Current validation and remaining production/owner gates: [INTEGRATION-READINESS-20261103.md](INTEGRATION-READINESS-20261103.md). No 100/100 readiness claim.
+
+- [x] Reconcile the observed PR dependency stack and preserve newer missions/goals.
+- [x] Repair integration security and regression findings.
+- [ ] ! Publish the reviewed integration branch, pass GitHub Node/Rust CI and merge.
+- [ ] Complete live-provider, production and submission evidence listed in the integration report.
+
+## Unified MuZe / Argon companion — 2026-11-03
+
+- Integrated the supplied Argon control surface with the qualified MuzeBOS backend on local `codex/muze-argon-unified-20261103`.
+- Selected qw dashboard patterns; excluded simulated telemetry and weaker duplicate backend APIs.
+- Shared roaming guide, isolated local controls, real workspace/worker state and bounded approval drafts use one existing queue.
+- Comparison, operating instructions and remaining gates: [Unified MuZe](projects/muze-unified/COMPARISON.md).
+- The newly supplied production-workspace tar failed to upload and has not been compared. Remote publication remains pending explicit push approval.

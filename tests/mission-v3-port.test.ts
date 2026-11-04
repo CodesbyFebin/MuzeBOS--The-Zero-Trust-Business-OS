@@ -23,11 +23,12 @@ describe('Mission Control v3 port', () => {
 
 import { readFileSync as rf } from 'node:fs';
 import { test as t2, expect as e2 } from 'vitest';
-t2('restored shell retains PR46 geometry while v3 remains a page-level design', () => {
+t2('neutral shell retains its geometry while v3 remains a page-level design', () => {
   const css = rf('app/metabos.css', 'utf8');
   const layer = css.slice(css.indexOf('Mission Control v3 shell layer'));
   e2(layer).toContain('restored to PR #46');
-  e2(layer).not.toContain('--mb-blue:#8a8a8a');
+  // The restored shell owns these dimensions; later feature styles must not override them.
+  for (const token of ['--mb-rail-w:', '--mb-panel-w:', '--mb-topbar-h:', '--mb-tab-h:']) e2(layer).not.toContain(token);
   for (const token of ['--mb-rail-w:56px', '--mb-panel-w:248px', '--mb-topbar-h:52px', '--mb-tab-h:62px']) e2(css).toContain(token);
   e2(css).toContain('.mb-v3 .mb-panel');
   e2(rf('components/Sidebar.tsx', 'utf8')).not.toContain('<OpeningIntro');

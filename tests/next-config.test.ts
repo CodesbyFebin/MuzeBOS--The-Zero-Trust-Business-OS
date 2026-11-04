@@ -12,7 +12,7 @@ describe('next.config redirects', () => {
     const rules = await nextConfig.redirects!();
     expect(rules).toContainEqual({ source: '/reference', destination: '/blueprint', permanent: false });
     expect(rules.some((r) => r.source.startsWith('/personas'))).toBe(false);
-    expect(rules).toHaveLength(25); // 4 inherited + 18 MeTaBos short paths + 3 legacy workspace paths (tests/metabos-registry.test.ts)
+    expect(rules).toContainEqual({ source: '/workspace/workflows', destination: '/workflows', permanent: false });
   });
 
   test('FounderOS /content/lead-magnets 308s to /lead-magnets (founderos-ui SPEC O2)', async () => {

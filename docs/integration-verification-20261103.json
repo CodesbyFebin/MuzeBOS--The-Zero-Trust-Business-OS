@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-03",
+  "node": "22.23.4",
+  "baseCommit": "5d6ab8f2376c9dc121a270adacef3f2d7a11beec",
+  "reviewedPullRequests": 13,
+  "allReviewedHeadsAreAncestors": true,
+  "remotePublished": false,
+  "githubMerged": false,
+  "tests": {
+    "filesPassed": 445,
+    "passed": 5610,
+    "skipped": 9,
+    "failed": 0
+  },
+  "typecheck": "passed",
+  "productionBuild": "passed",
+  "buildWarnings": [
+    "Inherited @miosa/sdk dynamic dependency warning"
+  ],
+  "productionDependencyAdvisories": 0,
+  "productionHttpSmoke": {
+    "result": "passed",
+    "evidenceCount": 13,
+    "twoAuthenticatedReviewers": true,
+    "dryRunDeliveryBlocked": true,
+    "browserInteraction": false,
+    "liveProviderCalls": false
+  },
+  "rustTests": "not run locally: Cargo unavailable; dedicated CI job added, not yet published",
+  "browserTests": "not run: Chromium download failed",
+  "qualificationHostWorkaround": "Scratch-only RSS fallback for missing uv_resident_set_memory interface; not shipped in app startup",
+  "logsSha256": {
+    "vitest-final.log": "c3cd57714289066a883074e410ebb0de64f52b4886d4e88b034ca82cc97970f3",
+    "typecheck-final.log": "fc6f9ce7157b05969bb199586cd503bcf065776afa6aae206f6a748b6d90b9f5",
+    "build-final.log": "f219e57360f5be088851d1004b827460d543e8f6da81ff57b64395f17ea36440",
+    "http-smoke-final.log": "bed38368357e2dd6b8c975f65a8a82cb792262df48fccb806a95cd358279b8c9",
+    "regression-final.log": "2c086b3fca227662576150855fb7e03a0317d3262a2ec40acdde1e72ac1f132d",
+    "audit.json": "ec6b4e762565ab167d9c1ad7438692cf14f416bc511bec5f798e7ac07c6e99a6",
+    "browser-install-final.log": "7048e849e052ab792fafc71462ced527fea2df15668ff01e663bb13efc3ee324"
+  }
+}

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import type { FeatureDefinition } from '@/lib/metabos/registry';
+import { menuById, type FeatureDefinition } from '@/lib/metabos/registry';
 import { businessStore } from '@/lib/metabos/store';
 import { infraReport, type InfraReport } from '@/lib/metabos/infra';
 import { StatusBadge } from '@/components/metabos/StatusBadge';
@@ -16,6 +16,6 @@ export function InfraWorkspace({ feature }: { feature: FeatureDefinition }) {
     {r?.tables.map((t) => <section key={t.title} className="mb-panel"><h2>{t.title}</h2>{t.rows.length === 0 ? <p className="mb-muted">Nothing recorded yet.</p> :
       <div className="mb-table-wrap" style={{ overflowX: 'auto' }}><table><thead><tr>{t.columns.map((c) => <th key={c}>{c}</th>)}</tr></thead><tbody>{t.rows.map((row, i) => <tr key={i}>{row.map((v, j) => <td key={j} style={{ wordBreak: 'break-all' }}>{String(v)}</td>)}</tr>)}</tbody></table></div>}</section>)}
     {r && <section className="mb-panel"><h2>Limits</h2><ul className="mb-help-list">{r.limits.map((l) => <li key={l}>{l}</li>)}</ul></section>}
-    <Link className="mb-link" href={`/workspace/${feature.menuId}`}><ArrowLeft size={13} /> Back</Link>
+    <Link className="mb-link" href={menuById(feature.menuId)?.route ?? "/"}><ArrowLeft size={13} /> Back</Link>
   </div>;
 }

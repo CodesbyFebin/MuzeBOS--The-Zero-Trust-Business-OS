@@ -1,3 +1,4 @@
+import { MuZeRoam } from '@/components/metabos/muse/MuZeRoam';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
@@ -131,6 +132,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <CommandPalette commands={buildCommands(off)} ui={ui} off={off} />
             {/* Notion-style agent dock — the Wizard, aware of the current screen */}
             <ConductorPanel ui={ui} />
+            <MuZeRoam />
           </ShellOnly>
         </ToastProvider>
       </body>

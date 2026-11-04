@@ -1,0 +1,340 @@
+  <!-- ===================== ARGON FRAME (resizable window) ===================== -->
+  <div id="argon-frame" data-mode="free" data-dragging="0" data-resizing="0">
+
+    <!-- Chrome bar: drag handle + the one and only feature icon (the gear) -->
+    <header id="argon-chrome" title="Drag to move · double-click to toggle size">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <div class="brand-name" id="brand-name" data-i18n="app.name">Argon</div>
+          <div class="brand-sub" id="brand-sub" data-i18n="app.tagline">Your vibe companion</div>
+        </div>
+      </div>
+
+      <div class="status-chip" id="status-chip" data-state="vibing" role="status" aria-live="polite">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="status-text">Argon is vibing</span>
+      </div>
+
+      <button type="button" id="deck-btn" class="icon-btn" aria-label="Argon control deck" aria-expanded="false">
+        <span class="gear-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.63.68 1.1 1.51 1H21a2 2 0 1 1 0 4h-.09c-.83 0-1.37.47-1.51 1z"/>
+          </svg>
+        </span>
+      </button>
+    </header>
+
+    <!-- Viewport: 3D scene + transient speech bubble -->
+    <div id="argon-viewport">
+      <div id="canvas-container" aria-label="Argon 3D creature"></div>
+
+      <div id="argon-bubble" role="status" aria-live="polite">
+        <div class="bubble-head">
+          <span class="bubble-tag" id="bubble-tag">Argon</span>
+          <div class="eq off" id="voice-eq" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <button type="button" class="bubble-close" id="bubble-close" aria-label="Dismiss">✕</button>
+        </div>
+        <div class="bubble-text" id="bubble-text"></div>
+      </div>
+
+      <div id="toast" role="status" aria-live="polite"></div>
+
+      <!-- Tiny-mode badge -->
+      <div id="tiny-badge" style="display:none;position:absolute;inset-block-end:10px;inset-inline:0;text-align:center;font-size:16px;pointer-events:none;">✨</div>
+
+      <!-- ============ CONTROL DECK — every feature lives behind the gear ============ -->
+      <div id="deck" aria-hidden="true">
+        <div class="deck-head">
+          <div class="deck-title">
+            <span id="deck-title-text" data-i18n="deck.title">Argon Control Deck</span>
+            <small id="deck-sub-text" data-i18n="deck.subtitle">Every capability, one gear</small>
+          </div>
+          <button type="button" class="icon-btn" id="deck-fullscreen" aria-label="Toggle fullscreen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          </button>
+          <button type="button" class="icon-btn" id="deck-close" aria-label="Close control deck">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div class="deck-body">
+          <nav class="deck-nav" id="deck-nav" role="tablist" aria-label="Control deck sections"></nav>
+          <div class="deck-panes" id="deck-panes">
+
+            <!-- ---------- ASSISTANT ---------- -->
+            <section class="pane active" id="pane-assistant" data-pane="assistant">
+              <div class="card" style="display:flex;flex-direction:column;gap:10px">
+                <div class="card-title">
+                  <span data-i18n="assistant.log">Transcript</span>
+                  <span class="hint" id="assistant-engine-hint">local brain · 40 skills</span>
+                </div>
+                <div class="chat-log" id="chat-log"></div>
+                <div class="chip-row" id="chip-row"></div>
+                <form class="composer" id="chat-form" autocomplete="off">
+                  <input type="text" id="chat-input" data-i18n-ph="assistant.placeholder" placeholder="Ask Argon anything…" aria-label="Message Argon" />
+                  <button type="button" class="icon-btn mic-btn" id="mic-btn" aria-label="Voice input">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                  </button>
+                  <button type="button" class="icon-btn" id="live-btn" aria-label="Hands-free live mode">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+                  </button>
+                  <button type="submit" class="send" id="send-btn" aria-label="Send">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  </button>
+                </form>
+              </div>
+
+              <div class="card">
+                <div class="card-title"><span data-i18n="assistant.mood">Mood</span><span class="hint" id="mood-hint"></span></div>
+                <div class="mood-strip" id="mood-strip"></div>
+                <div class="row" style="margin-block-start:11px">
+                  <span class="row-label" data-i18n="assistant.vibe">Vibe energy</span>
+                  <input type="range" id="vibe-slider" min="0" max="100" step="1" value="60" />
+                  <span class="row-val" id="vibe-val">60%</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- ---------- SKILLS ---------- -->
+            <section class="pane" id="pane-skills" data-pane="skills">
+              <div class="card">
+                <div class="card-title">
+                  <span data-i18n="skills.title">Skills &amp; Tools</span>
+                  <span class="hint" id="skills-count"></span>
+                </div>
+                <div class="note" data-i18n="skills.note">Argon is the heart of the system — every skill below is a real tool it can call on itself. Type a command, or press Run to fire it directly.</div>
+                <div class="skill-grid" id="skill-grid" style="margin-block-start:11px"></div>
+              </div>
+              <div class="card">
+                <div class="card-title"><span data-i18n="skills.trace">Orchestration trace</span><span class="hint" id="trace-hint"></span></div>
+                <div class="tool-call-log" id="tool-log"></div>
+              </div>
+            </section>
+
+            <!-- ---------- MUSIC ---------- -->
+            <section class="pane" id="pane-music" data-pane="music">
+              <div class="player">
+                <div class="viz" id="viz" aria-hidden="true"></div>
+                <div class="player-main">
+                  <div class="player-title" id="music-title">Nothing playing</div>
+                  <div class="player-sub" id="music-sub">Pick a station and press play</div>
+                  <div class="player-ctl">
+                    <button type="button" class="round-btn" id="music-prev" aria-label="Previous track">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" x2="5" y1="19" y2="5"/></svg>
+                    </button>
+                    <button type="button" class="play-btn" id="music-play" aria-label="Play or pause">
+                      <svg id="music-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                    </button>
+                    <button type="button" class="round-btn" id="music-next" aria-label="Next track">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg>
+                    </button>
+                    <button type="button" class="pill" id="music-dj">🎛 Auto-DJ</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-title"><span data-i18n="music.mix">Mix</span></div>
+                <div class="row">
+                  <span class="row-label" data-i18n="music.volume">Volume</span>
+                  <input type="range" id="music-vol" min="0" max="100" step="1" value="55" />
+                  <span class="row-val" id="music-vol-val">55%</span>
+                </div>
+                <div class="row">
+                  <span class="row-label" data-i18n="music.tempo">Tempo</span>
+                  <input type="range" id="music-bpm" min="50" max="150" step="1" value="82" />
+                  <span class="row-val" id="music-bpm-val">82 BPM</span>
+                </div>
+                <div class="row">
+                  <span class="row-label" data-i18n="music.reverb">Space</span>
+                  <input type="range" id="music-reverb" min="0" max="100" step="1" value="40" />
+                  <span class="row-val" id="music-reverb-val">40%</span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-title"><span data-i18n="music.stations">Stations</span><span class="hint" id="stations-hint"></span></div>
+                <div class="station-list" id="station-list"></div>
+                <div class="btn-group" style="margin-block-start:10px">
+                  <button type="button" class="btn sm" id="music-local-btn">📂 Play a local file</button>
+                  <input type="file" id="music-file" accept="audio/*" class="sr-only" />
+                </div>
+              </div>
+            </section>
+
+            <!-- ---------- VOICE ---------- -->
+            <section class="pane" id="pane-voice" data-pane="voice">
+              <div class="card">
+                <div class="card-title"><span data-i18n="voice.title">Voice link</span><span class="hint" id="voice-support-hint"></span></div>
+                <div class="row">
+                  <span class="row-label" data-i18n="voice.micLevel">Mic level</span>
+                  <div class="meter" id="mic-meter" style="flex:1 1 auto"><i></i></div>
+                </div>
+                <div class="btn-group" style="margin-block-start:11px">
+                  <button type="button" class="btn" id="voice-listen-btn">🎙 Listen once</button>
+                  <button type="button" class="btn" id="voice-live-btn">🔁 Hands-free</button>
+                  <button type="button" class="btn" id="voice-test-btn">🔊 Test voice</button>
+                </div>
+                <div class="note" id="voice-note" style="margin-block-start:10px"></div>
+              </div>
+
+              <div class="card">
+                <div class="card-title"><span data-i18n="voice.speech">Speech</span></div>
+                <div class="row">
+                  <span class="row-label" data-i18n="voice.tts">Argon speaks</span>
+                  <div class="switch" id="sw-tts" role="switch" tabindex="0" aria-checked="true"></div>
+                </div>
+                <div class="row">
+                  <span class="row-label" data-i18n="voice.rate">Speed</span>
+                  <input type="range" id="voice-rate" min="0.5" max="1.8" step="0.05" value="1" />
+                  <span class="row-val" id="voice-rate-val">1.00×</span>
+                </div>
+                <div class="row">
+                  <span class="row-label" data-i18n="voice.pitch">Pitch</span>
+                  <input type="range" id="voice-pitch" min="0.5" max="1.8" step="0.05" value="1.15" />
+                  <span class="row-val" id="voice-pitch-val">1.15</span>
+                </div>
+                <div class="row">
+                  <span class="row-label" data-i18n="voice.haptics">Haptics</span>
+                  <div class="switch" id="sw-haptics" role="switch" tabindex="0" aria-checked="true"></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-title"><span data-i18n="language.title">Language</span><span class="hint" id="lang-hint"></span></div>
+                <div class="btn-group" id="lang-row"></div>
+              </div>
+            </section>
+
+            <!-- ---------- LANGUAGE ---------- -->
+            <section class="pane" id="pane-language" data-pane="language">
+              <div class="card">
+                <div class="card-title"><span data-i18n="language.title">Language</span><span class="hint" id="lang-hint2"></span></div>
+                <div class="lang-grid" id="lang-grid"></div>
+              </div>
+              <div class="card">
+                <div class="card-title"><span data-i18n="language.preview">Preview</span></div>
+                <div class="note" id="lang-preview"></div>
+              </div>
+            </section>
+
+            <!-- ---------- SCENE ---------- -->
+            <section class="pane" id="pane-scene" data-pane="scene">
+              <div class="card">
+                <div class="card-title"><span data-i18n="scene.coat">Fur coat</span><span class="hint" id="coat-hint"></span></div>
+                <div class="coat-grid" id="coat-grid"></div>
+              </div>
+              <div class="card">
+                <div class="card-title"><span data-i18n="scene.coatParams">Coat parameters</span></div>
+                <div class="row">
+                  <span class="row-label" data-i18n="scene.length">Length</span>
+                  <input type="range" id="fur-length" min="0.06" max="0.62" step="0.01" value="0.32" />
+                  <span class="row-val" id="fur-length-val"></span>
+                </div>
+                <div class="row">
+                  <span class="row-label" data-i18n="scene.density">Density</span>
+                  <input type="range" id="fur-density" min="0.12" max="1" step="0.01" value="0.82" />
+                  <span class="row-val" id="fur-density-val"></span>
+                </div>
+                <div class="row">
+                  <span class="row-label" data-i18n="scene.curl">Curl</span>
+                  <input type="range" id="fur-curl" min="0" max="1" step="0.01" value="0.25" />
+                  <span class="row-val" id="fur-curl-val"></span>
+                </div>
+                <div class="row">
+                  <span class="row-label" data-i18n="scene.clump">Clumping</span>
+                  <input type="range" id="fur-clump" min="0" max="1" step="0.01" value="0.36" />
+                  <span class="row-val" id="fur-clump-val"></span>
+                </div>
+                <div class="swatch-row" style="margin-block-start:11px">
+                  <div>
+                    <div style="font-size:10.5px;color:var(--txt-3);margin-block-end:5px" data-i18n="scene.root">Root</div>
+                    <input type="color" class="sw" id="fur-root" value="#5e2bff" />
+                  </div>
+                  <div>
+                    <div style="font-size:10.5px;color:var(--txt-3);margin-block-end:5px" data-i18n="scene.tip">Tip</div>
+                    <input type="color" class="sw" id="fur-tip" value="#ff9ec7" />
+                  </div>
+                  <div>
+                    <div style="font-size:10.5px;color:var(--txt-3);margin-block-end:5px" data-i18n="scene.rim">Rim</div>
+                    <input type="color" class="sw" id="fur-rim" value="#c4b5fd" />
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-title"><span data-i18n="scene.render">Rendering</span></div>
+                <div class="row">
+                  <span class="row-label" data-i18n="scene.gpuFur">60k GPU fur</span>
+                  <div class="switch" id="sw-gpufur" role="switch" tabindex="0" aria-checked="true"></div>
+                </div>
+                <div class="row">
+                  <span class="row-label" data-i18n="scene.backdrop">Backdrop</span>
+                  <div class="btn-group" id="backdrop-group"></div>
+                </div>
+                <div class="btn-group" style="margin-block-start:10px">
+                  <button type="button" class="btn sm" id="scene-reset-btn">↺ Reset camera</button>
+                  <button type="button" class="btn sm" id="scene-boop-btn">💫 Boop</button>
+                  <button type="button" class="btn sm" id="scene-dance-btn">🕺 Dance</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ---------- SYSTEM ---------- -->
+            <section class="pane" id="pane-system" data-pane="system">
+              <div class="card">
+                <div class="card-title"><span data-i18n="system.window">Window</span><span class="hint" id="window-hint"></span></div>
+                <div class="size-grid" id="size-grid"></div>
+                <div class="btn-group" style="margin-block-start:10px">
+                  <button type="button" class="btn sm" id="sys-fullscreen">⛶ Fullscreen</button>
+                  <button type="button" class="btn sm" id="sys-reset-window">↺ Reset layout</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-title"><span data-i18n="system.behaviour">Behaviour</span></div>
+                <div class="row">
+                  <span class="row-label" data-i18n="system.reduceMotion">Reduce motion</span>
+                  <div class="switch" id="sw-motion" role="switch" tabindex="0" aria-checked="false"></div>
+                </div>
+                <div class="row">
+                  <span class="row-label" data-i18n="system.autoDJ">Auto-DJ with mood</span>
+                  <div class="switch" id="sw-autodj" role="switch" tabindex="0" aria-checked="false"></div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-title"><span data-i18n="system.telemetry">Telemetry</span></div>
+                <dl class="kv" id="telemetry"></dl>
+                <div class="btn-group" style="margin-block-start:11px">
+                  <button type="button" class="btn sm" id="sys-export">⬇ Export settings</button>
+                  <button type="button" class="btn sm danger" id="sys-reset">⟲ Reset everything</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-title"><span data-i18n="system.about">About</span></div>
+                <div class="note" id="about-note"></div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resize handles -->
+    <div class="rz rz-n" data-rz="n"></div>
+    <div class="rz rz-s" data-rz="s"></div>
+    <div class="rz rz-w" data-rz="w"></div>
+    <div class="rz rz-e" data-rz="e"></div>
+    <div class="rz rz-nw" data-rz="nw"></div>
+    <div class="rz rz-ne" data-rz="ne"></div>
+    <div class="rz rz-sw" data-rz="sw"></div>
+    <div class="rz rz-se" data-rz="se"></div>
+  </div>
+
+  <div id="boot-error">
+    <div>
+      <h2>Argon could not start</h2>
+      <p id="boot-error-msg">Your browser blocked WebGL. Try enabling hardware acceleration, or open Argon in a recent Chrome, Edge, Firefox or Safari.</p>
+    </div>
+  </div>

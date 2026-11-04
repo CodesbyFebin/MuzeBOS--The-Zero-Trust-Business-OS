@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { MuZeVoice } from '@/components/metabos/muse/MuZeVoice';
 import type { BosView } from '@/lib/metabos/muse/voice';
-export type SanctumData = { dryRun: boolean; dispatches: { id: string; channel: string; status: string; payloadHash: string; createdAt: string; providerStatus: number | null; reviewers?: string[] }[]; evidence: { seq: number; action: string; target: string; detail: string; at: string; hash: string }[] };
+export type SanctumData = { dryRun: boolean; dispatches: { id: string; channel: string; status: string; payloadHash: string; createdAt: string; providerStatus: number | null; marker?: string | null; reviewers?: string[] }[]; evidence: { seq: number; action: string; target: string; detail: string; at: string; hash: string }[] };
 type Plan = { text: string; source: string } | null;
 type SR = { lang: string; interimResults: boolean; onresult: (e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void; onend: () => void; onerror: () => void; start(): void; stop(): void };
 const post = async (url: string, body: unknown, headers: Record<string, string> = {}) => { const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error ?? `HTTP ${r.status}`); return j; };
@@ -16,7 +16,7 @@ export function Sanctum({ data, onChange, onView }: { data: SanctumData; onChang
   const [plan, setPlan] = useState<Plan>(null); const [note, setNote] = useState<string | null>(null); const [to, setTo] = useState(''); const [channel, setChannel] = useState<'whatsapp' | 'instagram'>('whatsapp');
   const useTyped = () => setPlan({ text: cmd.trim(), source: 'typed by you (no model)' });
   const propose = async () => { if (!plan) return; setBusy(true); setNote(null);
-    try { await post('/api/dispatch', { action: 'propose', channel, payload: { to: to.trim(), body: `[MUSE plan] ${plan.text}`.slice(0, 1000) } }); setNote('Proposed. It waits for a Jev decision below.'); setPlan(null); onChange(); }
+    try { await post('/api/dispatch', { action: 'propose', channel, payload: { to: to.trim(), body: plan.text.slice(0, 1000) }, marker: 'muse' }); setNote('Proposed. It waits for a Jev decision below.'); setPlan(null); onChange(); }
     catch (e) { setNote(`Not proposed: ${e instanceof Error ? e.message : 'error'}`); } finally { setBusy(false); } };
   const act = async (d: SanctumData['dispatches'][number], what: 'approve' | 'reject' | 'send') => { setBusy(true); setNote(null);
     try { if (what === 'send') await post('/api/dispatch', { action: 'dispatch', id: d.id, payloadHash: d.payloadHash }, { 'idempotency-key': crypto.randomUUID() });
@@ -34,7 +34,7 @@ export function Sanctum({ data, onChange, onView }: { data: SanctumData; onChang
         <label htmlFor="bos-to">Recipient</label><input id="bos-to" value={to} onChange={(e) => setTo(e.target.value)} placeholder={channel === 'whatsapp' ? '+91…' : 'IGSID'} required />
         <button type="submit" disabled={busy}>Send to Jev</button></div></form>}
     <h3>Jev queue (Sanctum)</h3>
-    {data.dispatches.length === 0 ? <p className="mb-muted">Nothing proposed from Sanctum yet.</p> : <ul className="mb-bos-jev">{data.dispatches.map((d) => <li key={d.id}><code>{d.channel}</code> <b>{d.status}</b> <code>{d.payloadHash.slice(0, 12)}</code>
+    {data.dispatches.length === 0 ? <p className="mb-muted">Nothing proposed from Sanctum yet.</p> : <ul className="mb-bos-jev">{data.dispatches.map((d) => <li key={d.id}><code>{d.channel}</code> <b>{d.status}</b>{d.marker?.startsWith('muse:rakazo:') ? <> <span className="mb-muted">from Rakazo bot {d.marker.slice(12)}</span></> : null} <code>{d.payloadHash.slice(0, 12)}</code>
       {d.status === 'pending' && <><button type="button" disabled={busy} onClick={() => act(d, 'approve')}>{(d.reviewers?.length ?? 0) === 0 ? 'Sign as reviewer A' : 'Sign as reviewer B'}</button> <span className="mb-muted">{d.reviewers?.length ? `Signed: ${d.reviewers.join(', ')}` : 'No reviewers yet'}</span><button type="button" disabled={busy} onClick={() => act(d, 'reject')}>Reject</button></>}
       {d.status === 'approved' && <button type="button" disabled={busy} onClick={() => act(d, 'send')}>Dispatch</button>}</li>)}</ul>}
     <h3>Receipts (evidence chain)</h3>

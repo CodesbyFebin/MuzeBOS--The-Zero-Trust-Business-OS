@@ -5,12 +5,15 @@
  * be booped or dragged, and can open a pure-black fullscreen mode. Uses the repo's three.js 0.169 fur engine (MuseFurSimulator,
  * compact). prefers-reduced-motion: no flight animation, no dance spin. Idea from the owner's pre-existing Operator Mode HTML.
  */
+import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MuseFurSimulator, type MuseFurHandle } from './MuseFurSimulator';
 import { DEFAULT_COAT, type CoatPresetId } from '@/lib/metabos/fur-sim/presets';
 import { ROAM_EVENT, flyTarget, guideTextFor, type RoamEvent } from '@/lib/metabos/muse/roam';
+const CompanionConsole = dynamic(() => import('../companion/CompanionConsole').then(m => m.CompanionConsole), { ssr: false });
 const SIZE = 96;
 export function MuZeRoam({ homeSelector }: { homeSelector?: string }) {
+  const [brainOpen, setBrainOpen] = useState(false);
   const fur = useRef<MuseFurHandle>(null); const [coat, setCoat] = useState<CoatPresetId>(DEFAULT_COAT);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null); const [guide, setGuide] = useState<string | null>(null);
   const [dancing, setDancing] = useState(false); const [full, setFull] = useState(false); const drag = useRef<{ dx: number; dy: number; moved: boolean } | null>(null);
@@ -34,9 +37,10 @@ export function MuZeRoam({ homeSelector }: { homeSelector?: string }) {
   return <div className="mb-muze-roam" data-testid="muze-roam">
     {pos && <div className={`mb-muze-roam-handle${dancing ? ' is-dancing' : ''}`} style={{ transform: `translate(${pos.x}px, ${pos.y}px)` }} data-testid="muze-roam-handle" data-x={pos.x} data-y={pos.y}>
       <div className="mb-muze-roam-body" title="Drag to move MuZe" onPointerDown={down} onPointerMove={move} onPointerUp={up}>
-        <MuseFurSimulator ref={fur} compact state="idle" coat={coat} onCoatChange={setCoat} size={SIZE} />
+        {!brainOpen && <MuseFurSimulator ref={fur} compact state="idle" coat={coat} onCoatChange={setCoat} size={SIZE} />}
       </div>
       <div className="mb-muze-roam-tools">
+        <button type="button" aria-expanded={brainOpen} onClick={() => setBrainOpen(v => !v)}>MuZe brain</button>
         <button type="button" onClick={() => fur.current?.triggerBoop()}>Boop</button>
         <button type="button" onClick={() => { setDancing(true); fur.current?.triggerBoop(); setTimeout(() => setDancing(false), 1200); }}>Dance</button>
         <button type="button" aria-pressed={full} onClick={() => void toggleFull()}>{full ? 'Exit fullscreen' : 'Fullscreen'}</button>
@@ -44,5 +48,6 @@ export function MuZeRoam({ homeSelector }: { homeSelector?: string }) {
       </div>
       {guide && <p className="mb-muze-roam-guide" role="status" data-testid="muze-roam-guide">{guide}</p>}
     </div>}
+    {brainOpen && <CompanionConsole onClose={() => setBrainOpen(false)} />}
   </div>;
 }

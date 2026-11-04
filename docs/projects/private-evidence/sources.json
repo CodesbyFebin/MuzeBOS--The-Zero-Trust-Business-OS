@@ -1,0 +1,89 @@
+{
+  "reviewedOn": "2026-11-03",
+  "topic": "https://github.com/topics/zk",
+  "sources": [
+    {
+      "repository": "ente/ente",
+      "commit": "25445215f5b7f92d54729a327a4ac4dd5df6792d",
+      "license_observed": "AGPL-3.0",
+      "cloned": "shallow sparse checkout; selected review paths, not a whole-codebase audit",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "d2af70e256ff732ddc002cd3f6937fa8deb1bb9f46fd130d4f5bb418b7a608fc"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+        },
+        {
+          "path": "architecture/README.md",
+          "sha256": "bb93e4ee5b72729d56a3215b8cfcf0ad771a62c5f5560dc2ca7635e7fc2af83a"
+        }
+      ],
+      "code_copied": false
+    },
+    {
+      "repository": "unionlabs/union",
+      "commit": "031785bb6dc6b957c624e62bc64c184409c97d7b",
+      "license_observed": "Root Apache-2.0 / MIT files; component terms must be checked",
+      "cloned": "shallow sparse checkout; selected review paths, not a whole-codebase audit",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "b3d9bd809fb8af74a0a65c0b0a49c7816df3f97991e0bc5e0f81c879766c62c1"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "sha256": "b556471df3344dd337063e26de28153e63369af22912ad5b3135a5eeecf204e9"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "f95bfe1ef4513631ac2043fc5c543fd866a220fcf72f69581fc629ae01dd32ed"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "cc46ff097453902abcd8069c0e353fe0e0c08b3bbd14ffb33f7beabf72bf7542"
+        },
+        {
+          "path": "lib/ics23/src/verify.rs",
+          "sha256": "5992ba8e54e23d065db654c3202f5e0a2eebd801cbcbe8a341e32d1b4992aa7a"
+        },
+        {
+          "path": "lib/ics23/Cargo.toml",
+          "sha256": "02378059136f657d93f414e37e6142577f0ea0bf1add5352b7ba35d4e76bf651"
+        }
+      ],
+      "code_copied": false
+    },
+    {
+      "repository": "kroma-network/tachyon",
+      "commit": "e7b13063c6f110b9851655cca740ee62ffb41137",
+      "license_observed": "MIT root; reviewed Merkle headers point to LICENSE.lambdaworks (Apache-2.0-style)",
+      "cloned": "shallow sparse checkout; selected review paths, not a whole-codebase audit",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "5578247eb2d594b483c5c291d8bd0f10b1a54bcc93fbfb8813e84522234a918f"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "f3d0e8ddd918f36cfa870683dbc5b992c1f792119a918b876407677eae88d509"
+        },
+        {
+          "path": "LICENSE.lambdaworks",
+          "sha256": "5a5103e20bb3804c9909631bd2422ea94ac428db91459f4a2e2ef9721a197cfe"
+        },
+        {
+          "path": "tachyon/crypto/commitments/merkle_tree/binary_merkle_tree/binary_merkle_proof.h",
+          "sha256": "899c66ef5affafb30edffbcc323a7b47a08e8a9e6c76f4a1df609793e86c4586"
+        },
+        {
+          "path": "tachyon/crypto/commitments/merkle_tree/binary_merkle_tree/binary_merkle_hasher.h",
+          "sha256": "8b2f12dcc61a9ee604bd17875862aa228c7186272aab97e283a297033e658b91"
+        }
+      ],
+      "code_copied": false
+    }
+  ]
+}

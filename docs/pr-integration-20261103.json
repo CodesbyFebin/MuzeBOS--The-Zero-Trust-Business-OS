@@ -1,0 +1,122 @@
+{
+  "date": "2026-11-03",
+  "pullRequests": [
+    {
+      "number": 89,
+      "title": "feat(meta): two-reviewer gate for Meta lead replies + board state",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/89",
+      "head": "feat/meta-phase23-port",
+      "headSha": "a74d56acdedae84ad9e0bfda0788dfd51efe301b",
+      "base": "main",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 88,
+      "title": "ci: drop removed vitest --minWorkers flag; regenerate API reference",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/88",
+      "head": "ci/node-fix",
+      "headSha": "4e43fdcf01f5afc1416d2a7bc7f3def11fe20dfe",
+      "base": "main",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 87,
+      "title": "docs: add README banner",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/87",
+      "head": "docs/readme-banner",
+      "headSha": "92032ff27a9151922d6c4b870e30e415d9523024",
+      "base": "main",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 86,
+      "title": "feat(community): Discord-style community server in Channels (draft)",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/86",
+      "head": "feat/community-server",
+      "headSha": "0c1aceff121ac092a0f043ff8388c9274e869792",
+      "base": "feat/muze-home",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 85,
+      "title": "fix(lab): repair 4 failing lab vitest files (Node 20 globSync, O(N²) ledger cellSample)",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/85",
+      "head": "fix/lab-vitest-failures",
+      "headSha": "94271a2bca9d81779221db86af560410ea8d7304",
+      "base": "main",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 84,
+      "title": "Trust plane: independent Rust verification of the evidence chain (hash-commitment, not ZK)",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/84",
+      "head": "feat/trust-plane-agenet",
+      "headSha": "6f2e86a23b4135ef80d2cf52c03e764d0a6e043f",
+      "base": "main",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 83,
+      "title": "chore(repo): hygiene pass and repo audit (7/12 readiness)",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/83",
+      "head": "chore/repo-hygiene",
+      "headSha": "64131770d1ee28ec6c87dfd584d5fca9571452d2",
+      "base": "feat/muze-home",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 82,
+      "title": "MuZe home: one tile per feature, real counts, guided tour",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/82",
+      "head": "feat/muze-home",
+      "headSha": "ec80ea7f624f4c861dbb8e7b99c52ce8c85e28ca",
+      "base": "feat/rakazo-canvas",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 81,
+      "title": "Rakazo agent runtime + Doop-style design canvas (draft)",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/81",
+      "head": "feat/rakazo-canvas",
+      "headSha": "ce25d6150fd706b24ff1959b71891d4bd5d78da6",
+      "base": "feat/hackathon-ready",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 80,
+      "title": "Add private evidence exports and offline audit verification",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/80",
+      "head": "codex/private-evidence-20261103",
+      "headSha": "a5533c5d2432855279a9ecacac9463ba6187c53b",
+      "base": "main",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 79,
+      "title": "feat(bos): Issues panel and board summary from hackathon reference",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/79",
+      "head": "feat/hackathon-ready",
+      "headSha": "bd4a2bf8fdca5349fe73002e359e2c8723d0e2b3",
+      "base": "feat/homarr-board",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 78,
+      "title": "feat(board): service board with real health checks and saved layout",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/78",
+      "head": "feat/homarr-board",
+      "headSha": "1a02b6b2db0df4b47b640dd00bd53647f1fea745",
+      "base": "main",
+      "handling": "Integrated locally; GitHub publication blocked pending explicit push approval"
+    },
+    {
+      "number": 24,
+      "title": "Hackathon: lead/worker missions + goals & check-ins (stacked on #22)",
+      "url": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/24",
+      "head": "feat/hackathon-missions-goals",
+      "headSha": "4c67c20e2784f5585344e7f77a70db5cdb3072a7",
+      "base": "main",
+      "handling": "Historical implementation superseded on main; ancestry reconciled retaining newer approval-gated code"
+    }
+  ]
+}

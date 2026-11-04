@@ -1,0 +1,38 @@
+{
+  "format": "metabos-evidence-chain/v1",
+  "exportedAt": "2026-11-03T00:46:06.395Z",
+  "genesis": "GENESIS",
+  "hashing": "hash = sha256_hex(JSON.stringify({action,target,detail,createdAt,previousHash})); first previousHash = \"GENESIS\"",
+  "method": "hash-commitment, not ZK",
+  "headHash": "991909c8fd857102404f1436dc100c08f561907e829d431807692e47ec77639f",
+  "count": 3,
+  "entries": [
+    {
+      "seq": 1,
+      "action": "dispatch.proposed",
+      "target": "680a6ea9-53fd-456d-b02b-525bb1dc06ad",
+      "detail": "whatsapp proposed by owner; payload b1f060d33669; awaiting Jev approval",
+      "createdAt": "2026-11-03T00:46:06.395Z",
+      "previousHash": "GENESIS",
+      "hash": "aa5183c16227e9a80fe59b2acd046f258de9df0200335abe57eee0c78fd5ffc6"
+    },
+    {
+      "seq": 2,
+      "action": "dispatch.approved",
+      "target": "680a6ea9-53fd-456d-b02b-525bb1dc06ad",
+      "detail": "Jev approved payload b1f060d33669 (owner)",
+      "createdAt": "2026-11-03T00:46:06.395Z",
+      "previousHash": "aa5183c16227e9a80fe59b2acd046f258de9df0200335abe57eee0c78fd5ffc6",
+      "hash": "ca7fb76c2467a65ccf28d0d2b9254ce7d4d4e7e161216488e0936712eaff6b1d"
+    },
+    {
+      "seq": 3,
+      "action": "dispatch.proposed",
+      "target": "575e6ac8-3041-4ba1-95ad-edc80e4844d8",
+      "detail": "whatsapp proposed by owner; payload 207b257dc9b4; awaiting Jev approval",
+      "createdAt": "2026-11-03T00:46:06.395Z",
+      "previousHash": "ca7fb76c2467a65ccf28d0d2b9254ce7d4d4e7e161216488e0936712eaff6b1d",
+      "hash": "991909c8fd857102404f1436dc100c08f561907e829d431807692e47ec77639f"
+    }
+  ]
+}

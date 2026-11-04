@@ -65,10 +65,31 @@ function cellOf(data: AsOfData, p: LabPost): string {
 }
 
 /** 04 3.2 sample at 168 h for a cell: earlier posts within 90 days, newest 30 with a value. */
+const cellIndexMemo = new WeakMap<AsOfData, Map<string, { p: LabPost; t: number }[]>>();
+/**
+ * Posts with a postedAt grouped by 04 cell, each group newest first (same comparator and stable
+ * order as a sort over data.posts), built once per as-of view. cellSample used to rescan and
+ * re-parse every post for every target, which made a backtest over the fixture world quadratic.
+ */
+function cellIndex(data: AsOfData): Map<string, { p: LabPost; t: number }[]> {
+  let idx = cellIndexMemo.get(data);
+  if (idx) return idx;
+  idx = new Map();
+  for (const p of data.posts) {
+    if (!p.postedAt) continue;
+    const k = cellOf(data, p);
+    const list = idx.get(k);
+    const e = { p, t: Date.parse(p.postedAt) };
+    if (list) list.push(e);
+    else idx.set(k, [e]);
+  }
+  for (const list of idx.values()) list.sort((a, b) => (a.p.postedAt! < b.p.postedAt! ? 1 : a.p.postedAt! > b.p.postedAt! ? -1 : 0));
+  cellIndexMemo.set(data, idx);
+  return idx;
+}
+
 function cellSample(data: AsOfData, key: string, before: number): { y: number[]; views: number[] } {
-  const rows = data.posts
-    .filter((p) => p.postedAt && Date.parse(p.postedAt) < before && Date.parse(p.postedAt) >= before - 90 * DAY && cellOf(data, p) === key)
-    .sort((a, b) => (a.postedAt! < b.postedAt! ? 1 : a.postedAt! > b.postedAt! ? -1 : 0));
+  const rows = (cellIndex(data).get(key) ?? []).filter((e) => e.t < before && e.t >= before - 90 * DAY).map((e) => e.p);
   const y: number[] = [];
   const views: number[] = [];
   for (const p of rows) {

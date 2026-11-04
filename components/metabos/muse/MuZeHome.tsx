@@ -1,12 +1,11 @@
 'use client';
 /**
  * MuZe on the home page: voice/typed assistant, the roaming guide, and the same two-reviewer send path as Sanctum.
- * Drafting a send here proposes a real dispatch (/api/dispatch propose, "[MUSE plan]" body), then needs reviewer A and a
+ * Drafting a send here proposes a real dispatch (/api/dispatch propose, marker "muse"), then needs reviewer A and a
  * different reviewer B via /api/bos museReview before /api/dispatch dispatch (DRY_RUN unless configured). No fake rows.
  */
 import { useState } from 'react';
 import { MuZeVoice, type MuZeDraft } from './MuZeVoice';
-import { MuZeRoam } from './MuZeRoam';
 type D = { id: string; payloadHash: string; status: string; channel: string };
 const post = async (url: string, body: unknown, headers: Record<string, string> = {}) => { const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error ?? `HTTP ${r.status}`); return j; };
 export function MuZeHome() {
@@ -14,14 +13,13 @@ export function MuZeHome() {
   const [d, setD] = useState<D | null>(null); const [note, setNote] = useState<string | null>(null); const [busy, setBusy] = useState(false);
   const text = draft?.text ?? own.trim();
   const propose = async (e: React.FormEvent) => { e.preventDefault(); setBusy(true); setNote(null);
-    try { const j = await post('/api/dispatch', { action: 'propose', channel: draft?.channel ?? channel, payload: { to: to.trim(), body: `[MUSE plan] ${text}`.slice(0, 1000) } }); setD(j.dispatch); setDraft(null); setOwn(''); setNote('Proposed. Reviewer A signs, then a different reviewer B.'); }
+    try { const j = await post('/api/dispatch', { action: 'propose', channel: draft?.channel ?? channel, payload: { to: to.trim(), body: text.slice(0, 1000) }, marker: 'muse' }); setD(j.dispatch); setDraft(null); setOwn(''); setNote('Proposed. Reviewer A signs, then a different reviewer B.'); }
     catch (x) { setNote(x instanceof Error ? x.message : String(x)); } finally { setBusy(false); } };
   const act = async (what: 'approve' | 'reject' | 'send') => { if (!d) return; setBusy(true);
     try { if (what === 'send') { const j = await post('/api/dispatch', { action: 'dispatch', id: d.id, payloadHash: d.payloadHash }, { 'idempotency-key': crypto.randomUUID() }); setD(j.dispatch ?? { ...d, status: 'sent' }); setNote(j.dryRun ? 'Dispatched in DRY_RUN: nothing left this server.' : `Dispatch status: ${j.dispatch?.status ?? 'unknown'}.`); }
       else { const j = await post('/api/bos', { action: 'museReview', input: { dispatchId: d.id, payloadHash: d.payloadHash, approve: what === 'approve' } }); if (j.dispatch) setD(j.dispatch); setNote(what === 'reject' ? 'Rejected.' : j.dispatch?.status === 'approved' ? 'Second reviewer signed. Approved; ready to dispatch.' : 'Reviewer A signed. A different reviewer must sign next.'); } }
     catch (x) { setNote(x instanceof Error ? x.message : String(x)); } finally { setBusy(false); } };
   return <section className="mb-muse-home" aria-label="MuZe assistant" data-testid="muze-home"><h2>MuZe</h2>
-    <MuZeRoam homeSelector='[data-testid="muze-home"] h2' />
     <MuZeVoice size={200} onDraft={setDraft} />
     {!d && <form className="mb-muse-voice-form" onSubmit={propose} aria-label="Send through two-reviewer approval" data-testid="muze-home-send">
       {draft ? <p><strong>MuZe draft</strong> ({draft.source}): {draft.text}</p>
