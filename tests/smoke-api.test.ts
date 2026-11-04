@@ -47,6 +47,8 @@ const ROUTES: RouteEntry[] = [
   { route: 'metabos/auth', load: () => import('@/app/api/metabos/auth/route'), url: 'http://localhost/api/metabos/auth' },
   { route: 'metabos/founder', load: () => import('@/app/api/metabos/founder/route'), url: 'http://localhost/api/metabos/founder' },
   { route: 'analytics', load: () => import('@/app/api/analytics/route'), url: 'http://localhost/api/analytics' },
+  { route: 'evidence/export', load: () => import('@/app/api/evidence/export/route'), url: 'http://localhost/api/evidence/export' },
+  { route: 'companion', load: () => import('@/app/api/companion/route'), url: 'http://localhost/api/companion' },
   { route: 'evidence', load: () => import('@/app/api/evidence/route'), url: 'http://localhost/api/evidence' },
   { route: 'b3/mcp', load: () => import('@/app/api/b3/mcp/route'), url: 'http://localhost/api/b3/mcp' },
   { route: 'b3/pipelines', load: () => import('@/app/api/b3/pipelines/route'), url: 'http://localhost/api/b3/pipelines' },
@@ -54,6 +56,19 @@ const ROUTES: RouteEntry[] = [
   { route: 'b3/swarms', load: () => import('@/app/api/b3/swarms/route'), url: 'http://localhost/api/b3/swarms' },
   { route: 'b3/writing', load: () => import('@/app/api/b3/writing/route'), url: 'http://localhost/api/b3/writing' },
   { route: 'bos', load: () => import('@/app/api/bos/route'), url: 'http://localhost/api/bos' },
+  { route: 'board', load: () => import('@/app/api/board/route'), url: 'http://localhost/api/board' },
+  { route: 'board/status', load: () => import('@/app/api/board/status/route'), url: 'http://localhost/api/board/status' },
+  { route: 'board/issues', load: () => import('@/app/api/board/issues/route'), url: 'http://localhost/api/board/issues' },
+  { route: 'runtime', load: () => import('@/app/api/runtime/route'), url: 'http://localhost/api/runtime' },
+  { route: 'runtime/rakazo/openapi.json', load: () => import('@/app/api/runtime/rakazo/openapi.json/route'), url: 'http://localhost/api/runtime/rakazo/openapi.json' },
+  { route: 'canvas', load: () => import('@/app/api/canvas/route'), url: 'http://localhost/api/canvas' },
+  { route: 'home', load: () => import('@/app/api/home/route'), url: 'http://localhost/api/home' },
+  { route: 'canvas/comments', load: () => import('@/app/api/canvas/comments/route'), url: 'http://localhost/api/canvas/comments' },
+  { route: 'canvas/export', load: () => import('@/app/api/canvas/export/route'), url: 'http://localhost/api/canvas/export' },
+  { route: 'canvas/stream', load: () => import('@/app/api/canvas/stream/route'), url: 'http://localhost/api/canvas/stream' },
+  { route: 'community', load: () => import('@/app/api/community/route'), url: 'http://localhost/api/community' },
+  { route: 'community/stream', load: () => import('@/app/api/community/stream/route'), url: 'http://localhost/api/community/stream' },
+  { route: 'canvas/mcp', load: () => import('@/app/api/canvas/mcp/route'), url: 'http://localhost/api/canvas/mcp' },
   { route: 'agentverse', load: () => import('@/app/api/agentverse/route'), url: 'http://localhost/api/agentverse' },
   { route: 'meta', load: () => import('@/app/api/meta/route'), url: 'http://localhost/api/meta' },
   { route: 'hub', load: () => import('@/app/api/hub/route'), url: 'http://localhost/api/hub' },
@@ -197,7 +212,7 @@ function discoverGetRoutes(dir: string, base = ''): string[] {
 }
 
 /** Routes that hold business records: a signed-out GET must be refused (401), never 200. */
-const MEMBER_ONLY = new Set(['metabos/hubs/[hub]', 'muse/catalog', 'metabos/command-center', 'metabos/overdue', 'ai', 'ai/budget', 'ai/local', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops', 'data', 'b3/mcp', 'b3/pipelines', 'b3/social', 'b3/swarms', 'b3/writing', 'hub', 'server', 'agentverse', 'meta', 'demo', 'bos', 'metabos/arena']);
+const MEMBER_ONLY = new Set(['companion', 'evidence/export', 'home', 'metabos/hubs/[hub]', 'muse/catalog', 'metabos/command-center', 'metabos/overdue', 'ai', 'ai/budget', 'ai/local', 'analytics', 'bookings', 'brain-templates', 'business', 'evidence', 'inference', 'infra/[page]', 'mission-control', 'mission-control/layout', 'modules/[module]', 'metabos/chief-of-staff', 'metabos/expenses', 'metabos/founder', 'metabos/goals', 'metabos/memory', 'metabos/missions', 'metabos/pipeline', 'metabos/walls', 'providers/[module]', 'workflow-runs', 'dispatch', 'passkeys', 'talk', 'brain-ops', 'data', 'b3/mcp', 'b3/pipelines', 'b3/social', 'b3/swarms', 'b3/writing', 'hub', 'server', 'agentverse', 'meta', 'demo', 'bos', 'board', 'board/status', 'board/issues', 'runtime', 'canvas', 'canvas/comments', 'canvas/export', 'canvas/stream', 'canvas/mcp', 'metabos/arena', 'community', 'community/stream']);
 describe('platform smoke — every GET API route answers 200 with JSON', () => {
   test.each(ROUTES)('GET /api/$route', async ({ route, load, url, params }) => {
     const mod = await load();

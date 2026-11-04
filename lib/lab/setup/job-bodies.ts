@@ -134,7 +134,7 @@ export async function ledgerEarlyBody(ctx: JobCtx): Promise<JobResult> {
   return ok(`${r.frozen} early forecasts frozen`, r.frozen);
 }
 export async function ledgerBody(ctx: JobCtx): Promise<JobResult> {
-  const r = await runLedgerCycle(ctx.store, { now: ctx.now, dry: ctx.dry });
+  const r = await runLedgerCycle(ctx.store, { now: ctx.now, dry: ctx.dry, bootstrapB: ctx.bootstrapB });
   return ok(`${r.runs.length} ledger steps`, r.runs.length);
 }
 

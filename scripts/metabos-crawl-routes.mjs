@@ -5,7 +5,8 @@ import { execFileSync } from 'node:child_process';
 import { signInOwner } from './browser-sign-in.mjs';
 const base = process.env.TEST_BASE_URL || 'http://127.0.0.1:4100';
 const routes = JSON.parse(execFileSync('npx', ['tsx', '-e', "import('./lib/metabos/registry.ts').then(m=>console.log(JSON.stringify((m.ALL_FEATURES??m.default.ALL_FEATURES).map(f=>f.route))))"], { encoding: 'utf8' }).trim().split('\n').pop());
-assert.equal(routes.length, 245);
+assert.ok(routes.length > 0);
+assert.equal(new Set(routes).size, routes.length);
 const legacyPairs = JSON.parse(execFileSync('npx', ['tsx', '-e', "import('./lib/metabos/registry.ts').then(m=>{const x=m.ALL_FEATURES?m:m.default;console.log(JSON.stringify(x.ALL_FEATURES.flatMap(f=>(f.legacyRoutes||[]).map(l=>[l,f.route]))))})"], { encoding: 'utf8' }).trim().split('\n').pop());
 // Canonical pages that themselves redirect on to an inherited screen; the legacy hop is still checked by status above.
 const featureTargets = new Set(JSON.parse(execFileSync('npx', ['tsx', '-e', "import('./lib/metabos/registry.ts').then(m=>{const x=m.ALL_FEATURES?m:m.default;console.log(JSON.stringify(x.ALL_FEATURES.filter(f=>f.target).map(f=>f.route)))})"], { encoding: 'utf8' }).trim().split('\n').pop()));

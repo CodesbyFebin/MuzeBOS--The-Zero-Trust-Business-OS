@@ -104,3 +104,72 @@ Ideas taken: a full-viewport overlay with pointer-events off except the MuZe han
 `components/metabos/muse/MuZeRoam.tsx`, `components/metabos/muse/MuZeHome.tsx` and `lib/metabos/muse/roam.ts`, on the repo's own
 three.js 0.169 fur engine (`lib/metabos/fur-sim`). Not copied: the r128 renderer, the file's operator-mode rail/panels and every
 hard-coded status line, count, FPS figure or capability claim in it; guide text here comes only from the target element.
+
+## Board (feat/homarr-board)
+
+- **Homarr** (https://homarr.dev, Apache-2.0): used for ideas only (a dashboard of service tiles with live status and a drag-to-arrange layout). No Homarr code, assets or text are copied; `lib/metabos/board/*` and `components/metabos/bos/Board.tsx` are written for this repo.
+- **"METABOS × MuZe · Sovereign Business OS" HTML** (the owner's own pre-existing code, shared on 3 Nov 2026): used as a layout and feature reference for the Jev queue, receipts and contribution-ledger panels. Its inlined three.js r128 bundle and its fixed figures (MRR, orders, tok/s, fitness, pheromone trails) are not used; the board reads real records, and the fur renderer stays on the repo's own three.js dependency.
+
+## Issues panel and board summary (feat/hackathon-ready)
+
+- **Source:** the owner's own pre-existing file, "METABOS × MuZe — Hackathon-Ready Sovereign Business OS & Meta AI 3D GPU-Fur Companion" (single HTML file, sha256 prefix `dab19dd743e9f390`). It is the user's code, not a third-party library. Used only as a layout and feature reference. No code was copied.
+- **What was used:** the "Humans and agents, in one place" panel, rebuilt as `components/metabos/bos/Issues.tsx` with a real SQLite table (`mb_issues`) and evidence rows. Assignees must already have an Agent Office desk. The "28/28 systems wired" pill, rebuilt as a summary of real board status counts. The "Meta AI model substrate" strip, rebuilt as the real status of the AI board tiles.
+- **What was not used:** its inlined three.js r128 bundle (the repo's own three.js and MUSE avatar stay as they are). Its fixed figures: MRR $248,500, 194 orders, 148 tok/s, Gen v2.4 / 94.8% fitness, 142 pheromone trails, 60K strands, 78% VRAM, 4h 34m uptime and the "0 delayed" counter. Also its model-routing click (no router backend), "Evolve System" and "Judge Pitch" buttons, the static Stigmergy channel list and the scene backdrops. Builder, MUSE Sanctum, Jev queue, receipts, Discord view, Fur Lab and Skill Forge were already in MuzeBOS.
+
+## Rakazo (agent runtime integration, feat/rakazo-canvas)
+- Source: https://github.com/elie222/rakazo, Apache-2.0 (LICENSE read at commit 6bba136).
+- Use: MuZe calls a separately run Rakazo server over HTTP (`lib/metabos/runtime/rakazo.ts`). No Rakazo code is copied or vendored. The procedure names and auth model were read from its source.
+
+## Doop (design canvas, ideas only)
+- Source: https://github.com/kgoedecke/doop. **GNU AGPL-3.0** (LICENSE read at commit a3749d9; not MIT).
+- Use: ideas only (infinite canvas of live HTML frames, agent tools to create, write and screenshot). No Doop code is copied. MuZe's canvas (`lib/metabos/canvas/*`, `components/metabos/bos/Canvas.tsx`) was written from scratch. Doop's hosted MCP (https://doop.design/mcp) is listed in the MCP directory as an external service you authorize yourself; MuZe never calls it.
+
+## discord-clone (community server UI patterns)
+- Source: https://github.com/issam-seghir/discord-clone at commit 665bea4 (2026-08-15). MIT licence, text below.
+- Adapted (rewritten, not copied verbatim): the server rail, channel sections by type, chat header, "Welcome to #channel" empty state, message item layout with role badge and edit/delete, and the ADMIN/MODERATOR/GUEST role model (mapped to owner/manager/member, plus an `agent` role).
+- Dropped: Clerk auth, Prisma/Postgres schema, Socket.io, LiveKit voice/video, UploadThing files, direct messages, modals, shadcn/tailwind styling, sample data and env/services. MuZe additions: SQLite tables (`lib/metabos/community/store.ts`), threads, SSE live updates, agent posts, Meta sends via Jev with two reviewers (dry run by default), evidence rows.
+
+```
+MIT License
+
+Copyright (c) 2023 Issam Seghir
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+## Trust plane: AGENeT v2 and musebreak-core (owner's pre-existing work)
+- `tools/agenet-verify` (Rust) is a small, new verifier crate written for this repo. Its SHA-256 hash-chain checking approach is taken from the owner's earlier, pre-existing **AGENeT v2** prototype (Rust: SHA-256, Merkle, Ed25519), which is not vendored here; only `sha2`, `serde` and `serde_json` (MIT/Apache-2.0) are used.
+- The "hash-commitment, not ZK" labelling and trust-plane framing come from the owner's pre-existing **musebreak-core** project: https://github.com/CodesbyFebin/musebreak-core
+- Both are hash-commitment checks. Neither is a zero-knowledge proof.
+- Reviewed but not copied: the owner's earlier AGENeT Next.js snapshot (`src/lib/agenet/evidence.ts`, `/api/evidence/prove`) from the t120 inputs. Its single-server design did not fit an independent check, so no code was taken.
+
+## Unified MuZe / supplied Argon and qw sources (2026-11-03)
+
+- The user supplied `argon-source.zip`, `argon.html`, and `qw.tar` as their own
+  existing project sources. Argon's modular companion implementation is retained
+  in `vendor/argon`, with its embedded three.js notice and font assets preserved.
+  The new hosted bridge and assembler are MuzeBOS integration code.
+- Argon bundles three.js r128 separately from the host renderer; it runs only in
+  an opaque-origin sandbox frame. Its original standalone README is retained as
+  source documentation; hosted permission limits are documented separately.
+- qw's grouped dashboard and companion-control patterns were used as references.
+  No qw Prisma backend, seeded business metrics, copied third-party prototype
+  tree, tool-results, database or Git metadata was imported into this application.
+- Source checksums and decisions: `docs/projects/muze-unified/sources.json` and
+  `COMPARISON.md`. All supplied sources predate this integration; no hackathon
+  originality or license ownership is inferred beyond the user's supplied work.

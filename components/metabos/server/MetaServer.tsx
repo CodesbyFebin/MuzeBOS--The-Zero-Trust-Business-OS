@@ -1,5 +1,5 @@
 'use client';
-/** MeTa Server — one Discord-style shell over MeTaBos. Business servers list every registry page as a
+/** MeTa Server — one Discord-style shell over MuZe. Business servers list every registry page as a
  *  channel (links/embeds the real page), swarm servers embed the Agent Hub, and #commits is the
  *  "git for agents" log over Jev, drafts, dispatches and the evidence chain. Ideas from the owner's
  *  prototypes; rebuilt with no copied code, CDN assets or mock data. */
@@ -59,7 +59,7 @@ export function MetaServer() {
       <button type="button" className="mb-srv-icon" aria-current={server === 'suite' ? 'true' : undefined} aria-label={`Meta Suite${pendingFor('suite') ? `, ${pendingFor('suite')} waiting in Jev` : ''}`} title="Meta Suite" onClick={() => { pick('suite'); setChan('suite:facebook'); }}>MS{pendingFor('suite') > 0 && <span className="mb-hub-badge" aria-hidden="true">{pendingFor('suite')}</span>}</button>
       <hr aria-hidden="true" />
       {d?.swarms.map((s) => <button key={s.name} type="button" className="mb-srv-icon is-swarm" aria-current={swarm === s.name ? 'true' : undefined} aria-label={`${s.name} swarm: ${s.agents} agents, ${s.pending} waiting in Jev`} title={s.name} onClick={() => pick(`swarm:${s.name}`)}>{acr(s.name)}{s.pending > 0 && <span className="mb-hub-badge" aria-hidden="true">{s.pending}</span>}</button>)}
-      <p className="mb-srv-note">Arena joins when #59 merges.</p>
+      <p className="mb-srv-note"><a href="/workspace/brain/arena">Open Arena</a></p>
     </nav>
     {swarm ? <div className="mb-srv-swarm"><AgentHub swarm={swarm} embedded /></div> : <>
     <aside id="mb-srv-side" className="mb-srv-side" aria-label="Channels">

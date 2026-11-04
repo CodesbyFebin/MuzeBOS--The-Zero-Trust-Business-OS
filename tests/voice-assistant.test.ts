@@ -60,6 +60,7 @@ describe('answers come from the DB', () => {
   });
   it('rules parse common commands without a model', () => {
     expect(ruleIntent('Hey MeTaBos, create a task to call the supplier')).toEqual({ tool: 'create_task', args: { title: 'call the supplier' } });
+    expect(ruleIntent('Hey MuZe, create a task to call the supplier')).toEqual({ tool: 'create_task', args: { title: 'call the supplier' } });
     expect(ruleIntent('Hey meta, boss, what is the status today?')?.tool).toBe('get_status'); // live STT spelling
     expect(ruleIntent('draft a message to Ravi: stock arrives Friday')).toEqual({ tool: 'draft_message', args: { to: 'Ravi', body: 'stock arrives Friday' } });
   });

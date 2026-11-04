@@ -35,7 +35,8 @@
     "docs:build": "node scripts/build-project-site.mjs",
     "repo:metadata": "node scripts/update-repository-metadata.mjs",
     "hackathon:demo": "node --import tsx scripts/hackathon-demo.ts",
-    "demo:agent": "node --import tsx scripts/hackathon-demo.ts"
+    "demo:agent": "node --import tsx scripts/hackathon-demo.ts",
+    "evidence:verify": "node --import tsx scripts/verify-evidence.ts"
   },
   "dependencies": {
     "@miosa/sdk": "^3.2.5",
@@ -96,5 +97,8 @@
   },
   "overrides": {
     "postcss": "$postcss"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

@@ -16,6 +16,7 @@ const ROUTES: { route: string; perm: string | null; url: string; params: Record<
   { route: 'analytics', perm: 'finance.read', url: 'analytics', params: {}, load: () => import('@/app/api/analytics/route') },
   { route: 'business', perm: 'finance.read', url: 'business', params: {}, load: () => import('@/app/api/business/route') },
   { route: 'evidence', perm: 'finance.read', url: 'evidence', params: {}, load: () => import('@/app/api/evidence/route') },
+  { route: 'companion', perm: 'finance.read', url: 'companion', params: {}, load: () => import('@/app/api/companion/route') },
   { route: 'inference', perm: 'finance.read', url: 'inference', params: {}, load: () => import('@/app/api/inference/route') },
   { route: 'infra/[page]', perm: 'finance.read', url: 'infra/system.telemetry-and-logs', params: { page: 'system.telemetry-and-logs' }, load: () => import('@/app/api/infra/[page]/route') },
   { route: 'mission-control', perm: 'finance.read', url: 'mission-control', params: {}, load: () => import('@/app/api/mission-control/route') },

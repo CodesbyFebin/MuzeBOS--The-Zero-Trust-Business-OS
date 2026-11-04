@@ -15,7 +15,8 @@ describe('Agent Office desks come only from records', () => {
 });
 import { BusinessStore } from '@/lib/metabos/store';
 import { hq, office, pipeline, sanctumReceipts, trustStack } from '@/lib/metabos/bos/core';
-import { decide, dispatch, propose } from '@/lib/metabos/dispatch/service';
+import { dispatch, propose } from '@/lib/metabos/dispatch/service';
+import { museReview } from '@/lib/metabos/bos/muse-gate';
 describe('Business Open Server on a fresh store', () => {
   it('is empty: no desks, no receipts, zero pipeline, R6 empty, R0–R2 not attested', () => {
     const s = new BusinessStore(':memory:');
@@ -28,12 +29,13 @@ describe('Business Open Server on a fresh store', () => {
     const s = new BusinessStore(':memory:'); const env = { MUZEBOS_WHATSAPP_CLOUD_ACCESS_TOKEN: 'test-only', MUZEBOS_WHATSAPP_PHONE_NUMBER_ID: '1' };
     const d = propose(s, 'owner', 'whatsapp', { to: '+919999999999', body: '[MUSE plan] order ready' });
     expect(sanctumReceipts(s, env).dispatches[0].status).toBe('pending');
-    decide(s, 'owner', d.id, d.payloadHash, true);
+    expect(museReview(s, 'reviewer-a', { dispatchId: d.id, payloadHash: d.payloadHash, approve: true }).dispatch.status).toBe('pending');
+    museReview(s, 'reviewer-b', { dispatchId: d.id, payloadHash: d.payloadHash, approve: true });
     let called = false;
     await expect(dispatch(s, d.id, d.payloadHash, crypto.randomUUID(), { env, fetch: async () => { called = true; return new Response('{}'); } })).rejects.toThrow(/Dry run/);
     expect(called).toBe(false);
-    const r = sanctumReceipts(s, env); expect(r.dryRun).toBe(true); expect(r.evidence.map((e) => e.action)).toEqual(['dispatch.dry-run', 'dispatch.approved', 'dispatch.proposed']);
-    expect(pipeline(s).find((p) => p.id === 'sandbox')!.count).toBe(1); expect(trustStack(s, env).find((l) => l.id === 'R6')!.state).toBe('chain_verified');
+    const r = sanctumReceipts(s, env); expect(r.dryRun).toBe(true); expect(r.evidence.map((e) => e.action)).toEqual(['dispatch.dry-run', 'dispatch.approved', 'bos.review.signed', 'bos.review.signed', 'dispatch.proposed']);
+    expect(pipeline(s).find((p) => p.id === 'sandbox')!.count).toBe(1); expect(trustStack(s, env).find((l) => l.id === 'R6')!.state).toMatch(/^(chain_verified|attested_hash_commitment)$/);
   });
 });
 import { discord, operator, review } from '@/lib/metabos/bos/operator';

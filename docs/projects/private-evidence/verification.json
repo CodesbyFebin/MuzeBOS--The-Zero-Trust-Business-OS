@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-03",
+  "baseCommit": "5d6ab8f2376c9dc121a270adacef3f2d7a11beec",
+  "tests": {
+    "filesPassed": 437,
+    "passed": 5535,
+    "skipped": 9,
+    "newTests": 32
+  },
+  "typecheck": "passed",
+  "productionBuild": "passed; NEXT_DIST_DIR=.next-evidence; Node 22; 4 GiB heap",
+  "httpSmoke": {
+    "result": "PASS",
+    "checks": [
+      "production Next.js server",
+      "real workspace session",
+      "anonymous export refused",
+      "real SQLite audit events",
+      "authorized full-chain HTTP bundle",
+      "authorized inclusion proof",
+      "production HTML contains export UI",
+      "platform Web Crypto roundtrip"
+    ],
+    "browserInteraction": false,
+    "externalServices": false,
+    "recordCount": 2
+  },
+  "hostNotes": [
+    "RSS interface absent; scratch-only V8 heap/RSS fallback used, not included in application startup",
+    "First 2 GiB build heap exhausted; clean build with 4 GiB heap passed",
+    "No physical browser interaction, native prover build, external provider connection or independent cryptographic audit"
+  ],
+  "logsSha256": {
+    "private-tests-final.log": "ac261449eb2e5d0d305da47cd41eae7c7d967dabdd55c882ec38bb3a9e35f7da",
+    "private-focused-final.log": "c758550349d68afdfe2969379e2d49d3f3ecd08d109259027d2b4956c3e689b0",
+    "private-typecheck-final.log": "ba1d5276d83685a07a7d156f1a0217d288e0d53cee572339d0cc44a4e2095162",
+    "private-build-clean.log": "ba94a5c5e196854d4a6c5ec8011aab581c7a8f1195d0c16f19e53e753d17afcc",
+    "private-http.log": "4062a67831e9620c78363512ca22909ff304663983c16f9e8bd3e8ecffecd34b",
+    "private-baseline.log": "63e9fa1d9a7a03970f2084ecb4a52b91cab79324d3ba79b1fbddb7a936b0f33f"
+  },
+  "githubQualification": {
+    "firstRun": "https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/actions/runs/41531562917",
+    "result": "existing fixture timeouts; new evidence tests passed",
+    "adjustment": "bounded 90-second test / 60-second hook budgets for shared runners; assertions retained; no retries or skips added"
+  }
+}

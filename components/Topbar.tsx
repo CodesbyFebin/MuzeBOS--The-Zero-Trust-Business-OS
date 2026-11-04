@@ -65,7 +65,7 @@ export function Topbar({ ui = 'classic' }: { ui?: UiStyle } = {}) {
     return (
       <div className="os-topbar g-topbar" data-g="GTopbar" data-scrolled={scrolled || undefined}>
         <div className="g-crumb">
-          <span>{BRAND.name.toLowerCase()}</span>
+          <span>{BRAND.wordmark}</span>
           <span aria-hidden className="g-crumb-sep">
             /
           </span>
@@ -97,7 +97,7 @@ export function Topbar({ ui = 'classic' }: { ui?: UiStyle } = {}) {
       data-route={pathname.startsWith('/adpilot') ? 'adpilot' : undefined}
     >
       <div className="flex items-center gap-[7px] whitespace-nowrap font-mono text-[12.5px] tracking-[0.04em] text-os-dim">
-        <span>{BRAND.name.toLowerCase()}</span>
+        <span>{BRAND.wordmark}</span>
         <span className="opacity-45">/</span>
         <span className="text-os-text">{here}</span>
       </div>

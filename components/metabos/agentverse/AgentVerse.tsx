@@ -29,6 +29,8 @@ export function AgentVerse() {
   const [d, setD] = useState<Data | null>(null); const [err, setErr] = useState(''); const [note, setNote] = useState('');
   const [mode, setMode] = useState<'personal' | 'business'>('business'); const [ws, setWs] = useState<string>('home');
   const [chan, setChan] = useState('sanctum'); const [sel, setSel] = useState<string | null>(null); const [tab, setTab] = useState<'logs' | 'diffs' | 'preview'>('diffs');
+  // Deep link from the MuZe home Meta products tile: ?chan=meta-status.
+  useEffect(() => { if (new URLSearchParams(window.location.search).get('chan') === 'meta-status') setChan('meta-status'); }, []);
   const [k, setK] = useState(false); const [q, setQ] = useState(''); const [hits, setHits] = useState<{ type: string; id: string; label: string }[]>([]);
   const [newWs, setNewWs] = useState(''); const [creating, setCreating] = useState(false); const [busy, setBusy] = useState(false);
   const [drafts, setDrafts] = useState<Record<string, string>>({}); const [editing, setEditing] = useState<string | null>(null);
@@ -88,8 +90,7 @@ export function AgentVerse() {
       {chan === 'fleet-console' && <>{header('fleet-console', 'Runners and agent activity from real records')}
         <ul className="mb-av-cards">{d.home.queues.filter((q) => ['claw', 'yao', 'llm', 'ollama'].includes(q.id)).map((q) => <li key={q.id}><span><span className="mb-av-tag" data-tone={q.state === 'ready' ? 'ok' : q.state === 'not_connected' ? 'warn' : 'idle'}>{q.state.replace('_', ' ')}</span> <strong>{q.label}</strong></span><span className="mb-muted">{q.detail}</span></li>)}</ul>
         {(() => { const ag = d.home.activity.filter((a) => /agent|claw|yao|swarm|jev|workflow/i.test(a.action)); return ag.length === 0 ? <p className="mb-muted mb-hub-empty">No records yet</p> : <pre className="mb-av-log" aria-label="Agent log">{ag.map((a) => `#${a.seq} ${a.at} ${a.action} ${a.target} ${a.hash.slice(0, 8)}`).join('\n')}</pre>; })()}</>}
-      {chan === 'sparring-pit' && <>{header('sparring-pit', 'Arena')}<div className="mb-av-cards"><p>The Arena office (observed agents and the Skill Forge) is in its own draft PRs, #59 and #60, which aren&apos;t in this stack. Once they&apos;re merged it opens at <code>/workspace/brain/arena</code>.</p>
-        <div className="mb-av-actions"><a className="mb-av-link" href="https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/59" rel="noopener noreferrer" target="_blank">Arena PR #59</a><a className="mb-av-link" href="https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS/pull/60" rel="noopener noreferrer" target="_blank">Arena PR #60</a></div>
+      {chan === 'sparring-pit' && <>{header('sparring-pit', 'Arena')}<div className="mb-av-cards"><p>See observed agents and the Skill Forge in the Arena.</p><a className="mb-av-link" href="/workspace/brain/arena">Open Arena</a>
         <p className="mb-muted">A sparring winner becomes a commit only through Jev. No matches yet: No records yet</p></div></>}
       {chan === 'home-overview' && <div data-testid="av-home">{header('home-overview', 'Command center · real records only')}
         <div className="mb-av-hud">

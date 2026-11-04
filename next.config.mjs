@@ -33,6 +33,7 @@ const nextConfig = {
       // tests/metabos-registry.test.ts keeps this list in sync). 307 so the
       // short paths stay free for later use.
       ...MUZEBOS_SHORT_PATHS.map((id) => ({ source: `/${id}`, destination: `/workspace/${id}`, permanent: false })),
+      { source: '/workspace/workflows', destination: '/workflows', permanent: false },
       { source: '/help', destination: '/workspace/support', permanent: false },
       { source: '/api-docs', destination: '/workspace/developer', permanent: false },
       { source: '/billing', destination: '/workspace/upgrade', permanent: false },

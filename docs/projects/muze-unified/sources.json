@@ -1,0 +1,77 @@
+{
+  "date": "2026-11-03",
+  "sourceFiles": [
+    {
+      "name": "argon-source.zip",
+      "sha256": "671e5fc6d9afcb00e83d7afb2b8dc9e618a2d64e1ef2fc1adbb79a6882b7070a"
+    },
+    {
+      "name": "argon.html",
+      "sha256": "d85be5f4474f294d6bc9704a7b49f011a0dd080da5df80fa3e23987a6ed21cf4"
+    },
+    {
+      "name": "qw.tar",
+      "sha256": "8fc7e579f5d37f4653d615221f6e706bc110923eaa74c7cfd91614e8d955f02b"
+    }
+  ],
+  "missingSource": "workspace-dc62d6d9-9cd5-4352-8ba3-f91b495a87e9.tar",
+  "importedArgonModules": [
+    {
+      "path": "vendor/argon/README.md",
+      "sha256": "05e49ebb03e1defb087d7eddaa1baf03b4cdc7a81bbff82b77d401f1b2fb5c1e"
+    },
+    {
+      "path": "vendor/argon/build/01-app.css",
+      "sha256": "45ea04e64ed7c5b0c4916fa301d44e3541ab27363419b97d301dbdeb53d6ea32"
+    },
+    {
+      "path": "vendor/argon/build/20-body.html",
+      "sha256": "06c8c27486f4654d8b21828df03cd9675e57e882bb618416c4653dbfaf78ce69"
+    },
+    {
+      "path": "vendor/argon/build/30-i18n.js",
+      "sha256": "88aec3b8ac59afdbc3e5c53244136dffc65c5cc7a722acbb311e575e481e57c3"
+    },
+    {
+      "path": "vendor/argon/build/40-core.js",
+      "sha256": "a20bb728d7949afd9162a5f037214a4b9d54589d01421f9e93ce87286438f371"
+    },
+    {
+      "path": "vendor/argon/build/50-tools.js",
+      "sha256": "50189fc3d7401bfac1200eddf1840972ac3b9e609d71e38527cc5af9648fb232"
+    },
+    {
+      "path": "vendor/argon/build/60-brain.js",
+      "sha256": "aa189fd94ae34f9f99c97cd7c0e4bf6c0452a44986903fac1ee8ef2361ad6151"
+    },
+    {
+      "path": "vendor/argon/build/70-voice.js",
+      "sha256": "a2719784c008ad4395e4e43155b955d8598fc0c01f2fbadfb07513ea07d41abd"
+    },
+    {
+      "path": "vendor/argon/build/80-music.js",
+      "sha256": "f088aa3ebbaa1249bdd22f4d34b1086d5829ccdea03efec51bcb6d62a7bee9f3"
+    },
+    {
+      "path": "vendor/argon/build/90-scene.js",
+      "sha256": "c322916b5c6cc4bf316b63ffb7a2c0bc9175c6852870961edb41f292bcf314b6"
+    },
+    {
+      "path": "vendor/argon/build/95-shell.js",
+      "sha256": "d65cbcd925ae47845745a14886885f390098ecf7645b1cdfa743146c55854758"
+    },
+    {
+      "path": "vendor/argon/build/99-muze-bridge.js",
+      "sha256": "6c96eb97fc881cc876ae4c5f20d03e18bd8bcf358540664d660c3354dc71ecb5"
+    },
+    {
+      "path": "vendor/argon/build/fonts-inline.css",
+      "sha256": "f938725e1f26caac165eb32a70a8941bac8326c72365a26075c607849a571cb9"
+    },
+    {
+      "path": "vendor/argon/vendor/three.min.js",
+      "sha256": "9274bbcec8d96168626c732b5d31c775aa8cfb7eaa0599bec0c175908a2c1ce2"
+    }
+  ],
+  "attachedHtmlMatchesSourceBuild": true
+}

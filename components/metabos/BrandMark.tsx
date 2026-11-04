@@ -1,4 +1,6 @@
-/** MeTaBos geometric M mark, recreated as SVG from docs/design/logo-reference.png. */
+import { BRAND } from "@/lib/brand";
+
+/** MuZe geometric M mark, recreated as SVG from docs/design/logo-reference.png. */
 export const MARK_PATH = 'M4 26V6h5l7 9 7-9h5v20h-5V14l-7 9-7-9v12z';
 export function BrandMark({ size = 24, className, title }: { size?: number; className?: string; title?: string }) {
   return (
@@ -9,6 +11,6 @@ export function BrandMark({ size = 24, className, title }: { size?: number; clas
 }
 export function BrandLockup() {
   return (
-    <span className="mb-lockup"><BrandMark size={22} /><span className="mb-lockup-text"><span className="mb-lockup-name">METABOS</span><span className="mb-lockup-mode">OPERATOR MODE</span></span></span>
+    <span className="mb-lockup"><BrandMark size={22} /><span className="mb-lockup-text"><span className="mb-lockup-name">{BRAND.wordmark}</span><span className="mb-lockup-mode">OPERATOR MODE</span></span></span>
   );
 }

@@ -1,5 +1,7 @@
 /** Claw swarms import + agent run intake (Yao stream format checked against a live reply). */
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { BusinessStore } from '@/lib/metabos/store';
 import { checkCard, importSwarms, swarmNames, swarmTree, type AgentCard } from '@/lib/metabos/b3/swarms';
@@ -54,7 +56,11 @@ describe('agent runs', () => {
   it('claw-local is called with execFile argv (no shell) and its JSON is read', async () => {
     const s = new BusinessStore(':memory:'); const c = first(s, 'S01-C1-W04'); let argv: string[] = [];
     const fake = ((_f: string, a: string[], _o: unknown, cb: (e: Error | null, out: string) => void) => { argv = a; cb(null, 'loading…\n{"output":{"text":"hi; rm -rf /","confidence":0.7,"proposed_actions":[]},"model":"Llama-3.2-3B","cost_usd":0}'); }) as never;
-    const d = await runOnClaw(c, 'x"; rm -rf / #', { MUZEBOS_CLAW_DIR: '/workspace/claw-local' }, fake);
-    expect(argv).toEqual(['run', '--swarm', 'ContentForge', '--role', c.role, '--type', 'draft', '--task', 'x"; rm -rf / #']); expect(d).toMatchObject({ draft: 'hi; rm -rf /', model: 'Llama-3.2-3B' });
+    const dir = mkdtempSync(join(tmpdir(), 'claw-argv-fixture-'));
+    writeFileSync(join(dir, 'claw'), 'fixture only; injected execFile handles the call', { mode: 0o700 });
+    try {
+      const d = await runOnClaw(c, 'x"; rm -rf / #', { MUZEBOS_CLAW_DIR: dir }, fake);
+      expect(argv).toEqual(['run', '--swarm', 'ContentForge', '--role', c.role, '--type', 'draft', '--task', 'x"; rm -rf / #']); expect(d).toMatchObject({ draft: 'hi; rm -rf /', model: 'Llama-3.2-3B' });
+    } finally { rmSync(dir, { recursive: true, force: true }); s.close(); }
   });
 });

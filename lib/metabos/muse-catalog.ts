@@ -34,6 +34,8 @@ export function connectionLabel(e: CatalogEntry, env: Record<string, string | un
   if (e.kind === 'skill') return e.vendorPath ? 'Vendored (instructions only)' : 'Reference only';
   const m = missingFor(e, env);
   if (m.length) return `Not connected — add ${m.join(', ')}`;
+  if (e.id === 'mcp:muze/canvas') return 'Built in (canvas writes only)';
+  if (e.id === 'mcp:external/doop') return 'External — you must sign in and authorize it at doop.design';
   return e.origin === 'muze' && e.id === 'mcp:muze/gst' ? 'Built in (read-only)' : 'Not connected — needs an operator to start and register it';
 }
 /** Writes or external-send entries must go through Jev; read-only ones still never auto-run. */

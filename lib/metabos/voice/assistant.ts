@@ -89,7 +89,7 @@ export function runTool(ctx: Ctx, name: string, args: Record<string, unknown> = 
 
 /** Deterministic intent rules (token saver: no model call for common commands). */
 export function ruleIntent(text: string): { tool: ToolName; args: Record<string, unknown> } | null {
-  const t = text.trim().replace(/^(hey|ok)[\s,]+meta[\s,]*bo?ss?[,.!]?\s*/i, '');
+  const t = text.trim().replace(/^(hey|ok)[\s,]+(?:muze|muse|meta[\s,]*bo?ss?)\b[,.!]?\s*/i, '');
   let m;
   if ((m = t.match(/^(?:create|add|make)\s+(?:a\s+)?(?:task|reminder|to-?do)\s*(?:to|:|for)?\s+(.+)$/i))) return { tool: 'create_task', args: { title: m[1].replace(/[.?!]$/, '') } };
   if ((m = t.match(/^(?:draft|write)\s+(?:a\s+)?(?:message|note|reply|email)(?:\s+to\s+([^:,]+?))?\s*(?::|,|saying|that)\s*(.+)$/i))) return { tool: 'draft_message', args: { to: m[1] ?? '', body: m[2] } };

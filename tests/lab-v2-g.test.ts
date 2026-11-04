@@ -4,8 +4,8 @@
  * data-lab-shared (AC-03-15), the run poller's timing (AC-09-20), and static guards for the GP4 control
  * rule (AC-02-37's source half) and tokens-only styles (AC-02-10 for the tree's CSS).
  */
-import { readFileSync } from 'node:fs';
-import { globSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 import { createElement as h, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterAll, describe, expect, it, vi } from 'vitest';
@@ -23,6 +23,15 @@ import { LAB_INTRO_SCRIPT } from '@/components/lab/v2/shared/motion/LabIntroScri
 import { POLL_MS, RunPoller, pollDelay } from '@/components/lab/v2/shared/runPoller';
 import { waveBuckets } from '@/components/lab/v2/g/adapt';
 import type { BatchProgress } from '@/lib/lab/setup/progress';
+
+/** Recursive *.ts / *.tsx walk that works on Node 20 (no fs.globSync, which landed in Node 22). */
+function walkTs(root: string): string[] {
+  return readdirSync(root).flatMap((name) => {
+    const full = join(root, name);
+    if (statSync(full).isDirectory()) return walkTs(full);
+    return /\.(ts|tsx)$/.test(name) ? [full] : [];
+  });
+}
 
 const NOW = new Date('2026-10-11T15:00:00.000Z');
 const FLAGS = { configured: true, sample: true, filming: false, dry: false, dryReason: null, dryLabel: null, setupHref: '/lab?setup=keys', fixtureName: 'Sample', agentName: 'Content Lab' } as const;
@@ -101,7 +110,7 @@ describe('AC-03-14 the intro pre-script', () => {
   });
 });
 
-const G_FILES = globSync('components/lab/v2/g/**/*.tsx');
+const G_FILES = walkTs('components/lab/v2/g').filter((f) => f.endsWith('.tsx'));
 
 describe('AC-03-15 every sheet opener in the GladOS tree is a shared-element origin', () => {
   it('each element whose href opens a sheet carries data-lab-shared (or says it opens no sheet)', () => {
@@ -118,7 +127,7 @@ describe('AC-03-15 every sheet opener in the GladOS tree is a shared-element ori
     expect(bad).toEqual([]);
   });
   it('no second origin registry and no second SheetKind', () => {
-    for (const f of [...G_FILES, ...globSync('components/lab/v2/shared/**/*.{ts,tsx}')]) {
+    for (const f of [...G_FILES, ...walkTs('components/lab/v2/shared')]) {
       const src = readFileSync(f, 'utf8');
       expect(src, f).not.toMatch(/data-lab-origin|findOrigin|LabSheetKind|type SheetKind\s*=/);
     }

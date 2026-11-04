@@ -36,3 +36,8 @@ requirements. Use private TLS and current dependency/security updates before a p
 See [threat model](../METABOS-ARCHITECTURE.md), [operations](../METABOS-OPERATIONS.md)
 and [inference boundaries](../METABOS-INFERENCE.md).
 Return to the [documentation hub](README.md).
+
+
+## Private evidence exports
+
+The Evidence explorer can encrypt a full audit-chain download in the browser. Its export password is not sent to the application server. The live SQLite database remains server-readable. Portable bundles and per-event inclusion paths can be checked offline with `npm run evidence:verify`; retain an export root separately to compare later copies. These checks are not signatures or zero-knowledge proofs. See [the format, source review and trust limits](../projects/private-evidence/TASKS.md).

@@ -2,6 +2,13 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
+// Network/retention integration, not a 2,000-resample statistics benchmark. All evaluator
+// branches still run; bootstrap correctness and defaults are covered by the metrics suites.
+vi.mock('@/lib/lab/ledger/evals', async importOriginal => {
+  const actual = await importOriginal<typeof import('@/lib/lab/ledger/evals')>();
+  return { ...actual, computeEvals: (store: Parameters<typeof actual.computeEvals>[0], opts: Parameters<typeof actual.computeEvals>[1]) => actual.computeEvals(store, { ...opts, B: 10 }) };
+});
+
 vi.mock('@/lib/lab/ledger/deps', async (importOriginal) => (await import('./helpers/lab-measure-ref')).withMeasureFallback(await importOriginal()));
 const google = vi.hoisted(() => ({ calls: 0 }));
 vi.mock('@/lib/lab/setup/oauth-google', () => ({
@@ -103,7 +110,7 @@ describe('retentionDue and the cycle (06 9.2, 7.4, 14)', () => {
     });
     const s = memStore();
     seedLabFixtures(s, new Date(NOW));
-    const { runs } = await runLedgerCycle(s, { now: new Date(NOW), dry: true });
+    const { runs } = await runLedgerCycle(s, { now: new Date(NOW), dry: true, bootstrapB: 200 });
     expect(calls).toEqual([]);
     expect(google.calls).toBe(0);
     expect(runs.map((r) => r.kind).sort()).toEqual(['backtest', 'grade', 'oauth_refresh', 'retention', 'retention']);

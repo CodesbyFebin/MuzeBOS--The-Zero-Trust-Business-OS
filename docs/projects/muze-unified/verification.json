@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-03",
+  "baseCommit": "6b6cb3fea42aaf0fc0466d58a025103e5c9c7b6e",
+  "implementationCommit": "ef5e30497473792159c5b1fd293c0feb800a0a10",
+  "tests": {
+    "filesPassed": 446,
+    "passed": 5619,
+    "skipped": 9,
+    "failed": 0
+  },
+  "typecheck": "passed",
+  "productionBuild": "passed; inherited @miosa/sdk dynamic-import warning",
+  "productionHttpAndWorker": "passed: member gate, grounded awaiting-approval draft, idempotent retry, strict approval rejection, single shared roam control, real server worker heartbeat, unapproved task unexecuted, hosted Argon CSP",
+  "hostedBridge": "passed VM routing/disabled-tool checks and embedded-script syntax checks; not browser interaction",
+  "browserInteraction": false,
+  "liveProviderCalls": false,
+  "continuousProductionDeployment": false,
+  "githubPublished": false,
+  "missingArchive": "workspace-dc62d6d9-9cd5-4352-8ba3-f91b495a87e9.tar",
+  "hostWorkaround": "Scratch-only RSS fallback used for restricted-host qualification, outside application startup",
+  "logsSha256": {
+    "argon-full-final.log": "f8a8fcab415199cc70b71e2aaaafac60e1f1ab6e07463f5558c7c9c735849f9d",
+    "argon-typecheck-final.log": "ba1d5276d83685a07a7d156f1a0217d288e0d53cee572339d0cc44a4e2095162",
+    "argon-build-final.log": "d42f5d7b56f12522727d321a17e4016231d37212cadb17dd353cc3b0ad2fddbd",
+    "argon-http-smoke-final.log": "9a0551f7d50e640a9014f56d62ccac70dd49b90a5e7d5f6050eac4d2c5cb955e",
+    "argon-bridge-check.log": "a354ce903e58cb9eecdbbef3d68f54433489d455d4aecee7dac1587bbd3df523"
+  }
+}

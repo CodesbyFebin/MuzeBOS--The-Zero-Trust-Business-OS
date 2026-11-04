@@ -1,61 +1,46 @@
+# MuZe/&gt; — Agentic Business Orchestration Server
 
-   # 🜂 MuZe--B.O.S- Business Ochestrian Server
-<img width="3439" height="1824" alt="image" src="https://github.com/user-attachments/assets/06dfec09-1567-4bd5-bba2-96234a0ce186" />
+<img width="3439" height="1824" alt="MuZe dashboard" src="https://github.com/user-attachments/assets/06dfec09-1567-4bd5-bba2-96234a0ce186" />
 
-> **MuZe: Agentic Business Orchestration Server (ABOS)
-
-Not just a server. Server = infrastructure. Orchestration = intelligence.
-
-MuZe doesn't host your business. It orchestrates 100+ agents (pm/dev/qa/deploy/design/sales) across 28 extensions over one event bus with 1.5s ticks, atomic sagas, trust-gated deploy, CRDT sync, capability tokens.
-
-One Server To Orchestrate Your Business.**
-
-MuzeBOS is a self-hostable operating system for solo founders and small teams who want the leverage of AI agents without handing their data, money, or decisions to a third party. SQLite invoicing, inventory, CRM, approval-gated AI tasks, in-browser inference (WebLLM), Meta channel dispatch behind approval, and a hash-chained audit ledger — all in one Node process you can run on a laptop.
+MuZe is a self-hostable operating system for solo founders and small teams who want the leverage of AI agents without handing their data, money, or decisions to a third party. SQLite invoicing, inventory, CRM, approval-gated AI tasks, in-browser inference (WebLLM), Meta channel dispatch behind approval, and a hash-chained audit ledger — all in one Node process you can run on a laptop.
 
 **Status:** Single-operator local preview. No model is configured by default, Meta sends are **DRY_RUN by default**, and live Meta use needs your own test-app tokens. Production qualification is not complete. Read [Honest Status](#-honest-status) before you build anything critical on top of it.
 
-![License](https://img.shields.io/badge/license-MIT-FF2A2A) ![TypeScript](https://img.shields.io/badge/TypeScript-strict-FF2A2A) ![Tests](https://img.shields.io/badge/vitest-5%2C456%20passed%20%C2%B7%202%20known%20failures-FF2A2A) ![Runtime](https://img.shields.io/badge/runtime-Node%20%2B%20SQLite-0A0A0A)
-
-> The test badge is the count from the last local `npx vitest run` on the `feat/business-open-server` branch (5,456 passed, 9 skipped). Two failures were already there on the base branch: `tests/lab-ledger-retention.test.ts` and `tests/lab-v2-g-copy.test.ts`. They are known and not yet fixed. CI badge numbers are not claimed.
+![License](https://img.shields.io/badge/license-MIT-FF2A2A) ![TypeScript](https://img.shields.io/badge/TypeScript-strict-FF2A2A) ![Runtime](https://img.shields.io/badge/runtime-Node%2022%20%2B%20SQLite-0A0A0A) ![Test mode](https://img.shields.io/badge/Meta%20sends-DRY__RUN%20by%20default-0A0A0A)
 
 ---
 
-## Table of Contents
+## 🧑‍⚖️ For Meta hackathon judges (start here)
 
-1. [For Meta hackathon judges](#-for-meta-hackathon-judges)
-2. [Why This Exists](#-why-this-exists)
-3. [The Zero-Trust Model](#️-the-zero-trust-model)
-4. [Feature Map](#️-feature-map)
-5. [Architecture](#️-architecture)
-6. [Quick Start](#-quick-start)
-7. [Chatting With Muse](#-chatting-with-muse)
-8. [The Inference Swarm](#-the-inference-swarm)
-9. [Audit Ledger & Evidence](#-audit-ledger--evidence)
-10. [Addon Catalog](#-addon-catalog)
-11. [Muze Landing Widget (HTML)](#️-muze-landing-widget-html)
-12. [Testing & Validation](#-testing--validation)
-13. [Honest Status](#-honest-status)
-14. [Known Gaps](#-known-gaps)
-15. [Roadmap](#️-roadmap)
-16. [Contributing](#-contributing)
-17. [License & Attribution](#-license--attribution)
+| | |
+|---|---|
+| **What it is** | A self-hosted business OS: SQLite books, CRM and inventory, AI agents whose every outward action waits for human approval bound to the exact payload, and a hash-chained audit ledger. MuZe is the voice/command assistant on top. |
+| **Pre-existing code** | Part of this repo predates the event (FounderOS fork plus work committed before **Oct 26 2026, 9:30 PM IST / 16:00 UTC**). The exact commit ranges are labelled in [HACKATHON.md](HACKATHON.md#what-was-built-during-the-hackathon-vs-inherited-read-this-first). |
+| **How to judge it** | [docs/JUDGING.md](docs/JUDGING.md) · [5-minute walkthrough](docs/DEMO-SCRIPT.md) · [all docs](docs/README.md) · [repo audit](docs/REPO-AUDIT.md) (7/12 criteria pass) |
+| **Licence** | MIT ([LICENSE](LICENSE)); third-party credits in [THIRD_PARTY.md](THIRD_PARTY.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 
----
+### Quick start (about 5 minutes)
 
-## 🧑‍⚖️ For Meta hackathon judges
+```bash
+git clone https://github.com/CodesbyFebin/MuzeBOS--The-Zero-Trust-Business-OS.git
+cd MuzeBOS--The-Zero-Trust-Business-OS
+cp .env.example .env.local      # every value is optional; blank = "not configured"
+npm ci                          # Node 22 (pinned in .node-version; lab tests use fs.globSync)
+npm run dev                     # binds to 127.0.0.1 until you set an owner password
+```
 
-- **How to judge it:** [docs/JUDGING.md](docs/JUDGING.md)
-- **5-minute walkthrough:** [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md)
+Open the printed localhost URL; the first run walks you through owner setup. For a production-style run: `npm run build && npm start`.
 
-What to expect when you run it:
+### What is real and what needs keys
 
-- Out of the box, **no model is configured**. The UI says "Model not configured" instead of inventing a reply.
-- **Meta sends are DRY_RUN.** An approved Messenger, Page or Instagram dispatch is recorded as evidence, and nothing goes to Meta.
-- **Going live** needs your own Meta test-app tokens plus `MUZEBOS_META_DRY_RUN=0`. Lead retrieval also needs Meta App Review.
+| Works with no keys | Needs your own keys or approval |
+|---|---|
+| Books, invoices, inventory, CRM on local SQLite | A model: WebLLM in the browser, Ollama, or a Meta / Baseten / OpenRouter key. Without one the UI says "Model not configured" |
+| Approval queue with two-reviewer, payload-bound approvals | Live Meta sends: your own Meta test-app tokens **and** `MUZEBOS_META_DRY_RUN=0`. Until then sends are **DRY_RUN** and recorded as evidence only |
+| Hash-chained audit ledger and its verifier | Lead retrieval: Meta App Review |
+| Service board with real health checks ("Not configured" / "Down", never invented numbers) | Rakazo agent runtime: your own Rakazo server |
 
-This project has **no partnership, endorsement or other relationship with Meta**. "Meta" names the Graph API and model APIs it calls.
-
----
+This project has **no partnership, endorsement or other relationship with Meta**. No users, revenue or traction are claimed.
 
 ## 🔥 Why This Exists
 
@@ -199,7 +184,7 @@ Actions, approvals, rejections, dispatch results (including dry runs), reviewer 
 
 ### Prerequisites
 
-- Node.js 20+ and npm
+- Node.js 22 (see .node-version) and npm
 - Optional: a GPU and Chrome/Edge for WebLLM
 - Optional: local Ollama (`MUZEBOS_OLLAMA_URL`)
 - Optional: Meta test-app tokens (see [docs/PROVIDER-ENV.md](docs/PROVIDER-ENV.md))
@@ -395,3 +380,22 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Please keep claims evidence-backed: no m
 ## 📄 License & Attribution
 
 MIT. Upstream and third-party credits, including the owner-made AI Studio design references, are in [THIRD_PARTY.md](THIRD_PARTY.md).
+
+## Unified MuZe companion
+
+The shared **MuZe brain** button opens the supplied Argon companion inside the
+dashboard. Argon handles local coat, mood, language, music and text controls;
+MuzeBOS owns business records, model routing, approvals and durable execution.
+Try `open board`, `workspace status`, or `task: analyse outstanding work`. A task
+first fills a review form, then creates an awaiting-approval inference draft.
+Nothing is sent or executed merely because the companion says something.
+
+The pulse cards show real workspace counts and recent worker heartbeats. For
+continuous operation, run the existing supervised server worker on a persistent
+host; browser presence is not a 24/7 execution guarantee. Read
+[comparison and integration choices](docs/projects/muze-unified/COMPARISON.md) and
+[worker operating instructions](docs/projects/muze-unified/OPERATIONS.md).
+
+Regenerate the self-contained hosted Argon asset after editing its sources:
+`python3 scripts/build-argon.py`. It runs in an isolated frame with network access
+blocked. Use the existing dashboard voice controls for microphone input.

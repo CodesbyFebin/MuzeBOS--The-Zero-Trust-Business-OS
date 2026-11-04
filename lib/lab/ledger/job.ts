@@ -27,7 +27,11 @@ export const HARNESS_PRIOR = 'ledger:harness';
  * gradeDueForecasts; (3) fit and cache sh / mv; (4) runBacktest; (5) computeEvals; (6) planWeek
  * when the gate is open. One lab_runs row per step kind (oauth_refresh, retention, grade, backtest).
  */
-export async function runLedgerCycle(store: LabStore, opts: { now: Date; dry: boolean }): Promise<{ runs: LabRun[] }> {
+/**
+ * `bootstrapB` sets the eval bootstrap resample count (computeEvals' `B`, default 2000). Tests pass a
+ * smaller count so a full cycle over the fixture world finishes in seconds; production leaves it unset.
+ */
+export async function runLedgerCycle(store: LabStore, opts: { now: Date; dry: boolean; bootstrapB?: number }): Promise<{ runs: LabRun[] }> {
   const { now, dry } = opts;
   const runs: LabRun[] = [];
 
@@ -70,7 +74,7 @@ export async function runLedgerCycle(store: LabStore, opts: { now: Date; dry: bo
     try {
       const fits = fitAndCache(store, now);
       const bt = runBacktest(store, { now, dry });
-      const ev = computeEvals(store, { now, dry, abstained: bt.abstained, origins: bt.origins });
+      const ev = computeEvals(store, { now, dry, abstained: bt.abstained, origins: bt.origins, B: opts.bootstrapB });
       const gate = plannerGate(store);
       const plan = gate.open ? planWeek(store, now, { dry }) : null;
       store.priors.set({ key: HARNESS_PRIOR, value: { ranAt: now.toISOString(), version: HARNESS_VERSION, origins: bt.origins, rows: bt.rows, abstained: bt.abstained }, n: bt.origins, supersedesDefault: false, updatedAt: now.toISOString() });

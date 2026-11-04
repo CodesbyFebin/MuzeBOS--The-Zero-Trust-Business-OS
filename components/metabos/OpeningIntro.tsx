@@ -1,11 +1,12 @@
 'use client';
 import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { BRAND } from '@/lib/brand';
 import { BrandMark } from '@/components/metabos/BrandMark';
 
 /** Captions double as the optional narration script (browser speechSynthesis only, off by default). */
 export const INTRO_CAPTIONS = [
-  'MeTaBos. Your business operating system.',
+  'MuZe. Your business operating system.',
   'AI copilots draft and propose. You approve every action through Jev.',
   'Start in Mission Control, or open Brain from the top of the side panel.',
 ];
@@ -58,10 +59,10 @@ export function OpeningIntro() {
   }
   if (!open) return null;
   return createPortal(
-    <div className="mb-intro" role="dialog" aria-modal="true" aria-label="MeTaBos introduction" data-testid="opening-intro">
+    <div className="mb-intro" role="dialog" aria-modal="true" aria-label="MuZe introduction" data-testid="opening-intro">
       <div className="mb-intro-lockup">
         <BrandMark size={72} className="mb-intro-mark" />
-        <div className="mb-intro-word"><span>METABOS</span><span className="mb-intro-mode">OPERATOR MODE</span></div>
+        <div className="mb-intro-word"><span>{BRAND.wordmark}</span><span className="mb-intro-mode">OPERATOR MODE</span></div>
         <span className="mb-intro-accent" aria-hidden />
       </div>
       <p className="mb-intro-caption" aria-live="polite" data-testid="intro-caption">{INTRO_CAPTIONS[step]}</p>

@@ -18,7 +18,7 @@ export function LegacySideHead() {
     <Link href="/" className="l-side-lockup" data-l="SideLockup" title={BRAND.name}>
       <OsMark size={34} className="l-side-mark" />
       <span className="l-side-word">
-        <span className="l-side-name">{BRAND.name}</span>
+        <span className="l-side-name">{BRAND.wordmark}</span>
         <span className="l-side-sub">Operator mode</span>
       </span>
     </Link>
