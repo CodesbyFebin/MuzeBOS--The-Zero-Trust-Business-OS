@@ -3,6 +3,7 @@
 Updated: 2026-11-04
 
 MuZe release wiring: run `node --import tsx scripts/audit-workspace.ts` for the live registry-to-channel map. See [unified source comparison](projects/muze-unified/COMPARISON.md) for integration boundaries.
+Judge proof sequence: [MuZe V6 walkthrough](hackathon/MUZE-V6.md).
 
 ## MeTaBos commerce and reference UI
 
