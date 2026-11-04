@@ -53,7 +53,7 @@ export function BusinessConsole({initialView='overview'}:{initialView?:string}={
   function printInvoice(inv:Invoice) {
     const win=window.open('','_blank');if(!win){setError('Allow a new window to print the invoice');return;}
     // Use textContent for all business data, never interpolate it into HTML.
-    const heading=win.document.createElement('h1');heading.textContent=`MeTaBos · ${inv.number}`;win.document.body.append(heading);
+    const heading=win.document.createElement('h1');heading.textContent=`MuZe · ${inv.number}`;win.document.body.append(heading);
     const pre=win.document.createElement('pre');pre.textContent=`Merchant: ${inv.payload.merchant.name}\nAddress: ${inv.payload.merchant.address||'Not supplied'}\nTax ID: ${inv.payload.merchant.taxId||'Not supplied'}\n\nIssued: ${inv.createdAt}\nCustomer: ${inv.payload.customer.name}\nCurrency: INR\n\n${inv.payload.lines.map(l=>`${l.name} (${l.sku})\n${l.quantity} × ${money(l.unitPrice)} | Tax ${l.taxBps/100}% | ${money(l.total)}`).join('\n\n')}\n\nSubtotal: ${money(inv.payload.subtotal)}\nTax: ${money(inv.payload.tax)}\nTotal: ${money(inv.payload.total)}\nPayment: ${inv.payment}\n\nBasic commercial invoice. Tax profile is merchant-configured.\nNot a registered GST e-invoice. Check merchant details and applicable legal requirements before external use.`;win.document.body.append(pre);win.document.title=inv.number;win.document.close();win.print();
   }
   return <div className="mb-console">

@@ -60,7 +60,7 @@ import { useUiStyle } from '@/lib/use-ui-style';
 import { LegacySideFoot, LegacySideHead } from '@/components/legacy/Shell';
 
 /** The product name and mark for this deployment (lib/brand.ts, read on the server). */
-export type BrandMark = { name: string; mark: string };
+export type BrandMark = { id: string; name: string; mark: string };
 
 /** Window events: in, run the toggle (palette); out, a committed width change. */
 export const SIDEBAR_TOGGLE_EVENT = 'sidebar:toggle';
@@ -399,7 +399,7 @@ export function Sidebar({ brand, ui = 'classic', off = [] }: { brand: BrandMark;
             </Link>
           </div>
         )}
-        {brand.name === 'MeTaBos' ? <WorkspaceNavigation /> : <nav ref={navRef} className="os-nav" aria-label="Views">
+        {brand.id === 'metabos' ? <WorkspaceNavigation /> : <nav ref={navRef} className="os-nav" aria-label="Views">
           <div ref={listRef} className="os-nav-list">
             {visibleGroups(off).map((group) => (
               <div key={group.id} role="group" aria-label={group.label} className="os-nav-group">

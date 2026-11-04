@@ -6,7 +6,7 @@ import { NotificationsMenu, ProfileMenu, PageDetailDrawer, MobileTabBar } from '
 import { breadcrumbs, resolveMenu, featureByRoute } from '@/lib/metabos/registry';
 import { StatusBadge } from '@/components/metabos/StatusBadge';
 
-/** MeTaBos top bar: page title, registry breadcrumb, search (⌘K), notifications and founder profile. */
+/** MuZe top bar: page title, registry breadcrumb, search (⌘K), notifications and founder profile. */
 export function MetaTopbar({ onSearch }: { onSearch: () => void }) {
   const pathname = usePathname() || '/';
   const crumbs = breadcrumbs(pathname);

@@ -1,7 +1,7 @@
 'use client';
 /**
  * Features ported from the AI Studio prototype (docs/design/aistudio/).
- * The prototype ran on src/data/mockData.ts; these versions read only real MeTaBos APIs
+ * The prototype ran on src/data/mockData.ts; these versions read only real MuZe APIs
  * and show "No records yet" (or the server's refusal reason) when there is nothing to show.
  */
 import { useCallback, useEffect, useState } from 'react';

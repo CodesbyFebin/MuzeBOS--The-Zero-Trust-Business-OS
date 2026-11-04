@@ -8,7 +8,7 @@ import { MusePanels } from './muse/MusePanels';
 type Reply = { heard: string; text: string; links: { label: string; href: string }[]; tool: string; via: string; stt?: { model: string; audioDurationMs: number } | null; error?: string };
 type SR = { start(): void; stop(): void; abort(): void; continuous: boolean; interimResults: boolean; lang: string; onresult: ((e: any) => void) | null; onend: (() => void) | null; onerror: ((e: any) => void) | null };
 const getSR = (): (new () => SR) | null => typeof window === 'undefined' ? null : ((window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition ?? null);
-const WAKE = /\bhey[\s,]+meta[\s,]*bo?ss?\b/i; // STT heard "Hey meta, boss" in the live test
+const WAKE = /\bhey[\s,]+(?:muze|muse|meta[\s,]*bo?ss?)\b/i; // STT heard "Hey meta, boss" in the live test
 
 /** 16-bit mono PCM WAV from Float32 chunks (Muse Voice Transcribe accepts WAV only). */
 export function encodeWav(chunks: Float32Array[], rate: number): Blob {
@@ -20,7 +20,7 @@ export function encodeWav(chunks: Float32Array[], rate: number): Blob {
   return new Blob([buf], { type: 'audio/wav' });
 }
 
-/** MeTaBos voice assistant. Push-to-talk (button or Alt+M), optional "Hey MeTaBos" wake phrase (off by default,
+/** MuZe voice assistant. Push-to-talk (button or Alt+M), optional "Hey MuZe" wake phrase (off by default,
  *  only while this tab is open), typed fallback. It reads and drafts; it never approves or sends. */
 export function VoiceAssistant() {
   const [state, setState] = useState<'idle' | 'listening' | 'thinking' | 'speaking'>('idle');
@@ -100,13 +100,13 @@ export function VoiceAssistant() {
   return <div className="mb-muse"><section className="mb-panel mb-voice" aria-labelledby="voice-h" data-testid="voice-assistant">
     <div className="mb-muse-stage"><MuseFurSimulator ref={fur} state={state} coat={coat} onCoatChange={pickCoat} /></div>
     <div className="mb-voice-head">
-      <h2 id="voice-h">MUSE <span className="mb-muted">· MeTaBos voice</span></h2>
+      <h2 id="voice-h">MuZe <span className="mb-muted">· MuZe voice</span></h2>
       <span className="mb-voice-state" aria-live="polite" data-testid="voice-state">{state === 'idle' ? 'Ready' : state === 'listening' ? 'Listening…' : state === 'thinking' ? 'Working…' : 'Speaking…'}</span>
     </div>
     <p className="mb-voice-help">Hold the mic (or Alt+M) and speak. I can read status, explain an item, list tasks, and draft a task or message for your approval. I never approve or send.</p>
     <div className="mb-voice-row">
-      <button type="button" className="mb-voice-mic" aria-pressed={state === 'listening'} aria-label="Hold to talk to MeTaBos" onPointerDown={() => void start()} onPointerUp={stop} onPointerLeave={stop} onKeyDown={(e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); void start(); } }} onKeyUp={(e) => { if (e.key === ' ' || e.key === 'Enter') stop(); }}>🎙 Hold to talk</button>
-      <label className="mb-voice-opt"><input type="checkbox" checked={wake} onChange={(e) => setWake(e.target.checked)} /> “Hey MeTaBos” while this tab is open</label>
+      <button type="button" className="mb-voice-mic" aria-pressed={state === 'listening'} aria-label="Hold to talk to MuZe" onPointerDown={() => void start()} onPointerUp={stop} onPointerLeave={stop} onKeyDown={(e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); void start(); } }} onKeyUp={(e) => { if (e.key === ' ' || e.key === 'Enter') stop(); }}>🎙 Hold to talk</button>
+      <label className="mb-voice-opt"><input type="checkbox" checked={wake} onChange={(e) => setWake(e.target.checked)} /> “Hey MuZe” while this tab is open</label>
       <label className="mb-voice-opt"><input type="checkbox" checked={speak} onChange={(e) => { setSpeak(e.target.checked); if (!e.target.checked) window.speechSynthesis?.cancel(); }} /> Speak replies</label>
     </div>
     <form onSubmit={submit} className="mb-voice-row">
@@ -119,7 +119,7 @@ export function VoiceAssistant() {
       {replies.length === 0 && <li className="mb-voice-empty">No records yet</li>}
       {replies.map((r, i) => <li key={i} className="mb-voice-card" data-testid="voice-card">
         {r.heard && <p className="mb-voice-heard"><strong>You:</strong> {r.heard}</p>}
-        <p className={r.tool === 'error' ? 'mb-bad' : r.tool === 'refused' ? 'mb-warn' : undefined}><strong>MeTaBos:</strong> {r.text}</p>
+        <p className={r.tool === 'error' ? 'mb-bad' : r.tool === 'refused' ? 'mb-warn' : undefined}><strong>MuZe:</strong> {r.text}</p>
         {r.links.length > 0 && <p className="mb-voice-links">{r.links.map((l) => <a key={l.href + l.label} href={l.href}>{l.label}</a>)}</p>}
         <p className="mb-voice-meta">{r.stt ? `Heard by ${r.stt.model}` : 'Typed or browser speech'} · intent by {r.via}{r.tool !== 'error' ? ` · ${r.tool}` : ''}</p>
       </li>)}

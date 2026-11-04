@@ -1,5 +1,5 @@
 'use client';
-/** MeTa Server — one Discord-style shell over MeTaBos. Business servers list every registry page as a
+/** MeTa Server — one Discord-style shell over MuZe. Business servers list every registry page as a
  *  channel (links/embeds the real page), swarm servers embed the Agent Hub, and #commits is the
  *  "git for agents" log over Jev, drafts, dispatches and the evidence chain. Ideas from the owner's
  *  prototypes; rebuilt with no copied code, CDN assets or mock data. */

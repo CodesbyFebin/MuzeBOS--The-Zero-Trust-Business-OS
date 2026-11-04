@@ -17,7 +17,7 @@ export function MuzeSanctum({ pending, commits, workspaces, onOpen }: Props) {
     <div className="mb-av-sanctum-hero">
       <div className="mb-muse-stage"><MuseFurSimulator state="idle" coat={coat} onCoatChange={setCoat} size={260} /></div>
       <div>
-        <p className="mb-av-eyebrow">MeTaBos platform</p>
+        <p className="mb-av-eyebrow">MuZe platform</p>
         <h2 className="mb-av-title">{PRODUCT_TITLE}</h2>
         <p className="mb-muted">MUSE watches the commit log. Every send waits for you in Jev, then goes out through /api/dispatch.</p>
         <div className="mb-av-actions">
